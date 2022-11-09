@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    tools:context=".ui.view.usecases.home.fragment.MyStoriesFragment">
+
+
+    <LinearLayout
+        android:id="@+id/ly_sign_in"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:textColor="@color/gray_letter"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:id="@+id/textViewMyStories"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/you_re_not_currently_signed_in_create_an_naccount_or_sign_in_to_manage_your_settings" />
+
+        <LinearLayout
+            android:weightSum="2"
+            android:gravity="center"
+            android:layout_marginHorizontal="64dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewMyStories">
+
+            <Button
+                android:id="@+id/btn_signup"
+                android:layout_weight="1"
+                style="@style/Button.Blue"
+                android:textAllCaps="false"
+                android:text="@string/sign_up"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp" />
+
+            <Button
+                android:id="@+id/btn_signin"
+                android:layout_weight="1"
+                style="@style/Button.Gray"
+                android:textAllCaps="false"
+                android:text="@string/sign_in"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ly_stories_list"
+        android:visibility="visible"
+        android:layout_margin="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                style="@style/Button.Shape.transparent"
+                app:tint="@color/button_background"
+                android:src="@drawable/ic_bookmarks"
+                android:layout_width="45dp"
+                android:layout_height="45dp" />
+            <TextView
+                android:layout_marginHorizontal="8dp"
+                android:text="Bookmarks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                style="@style/Button.Shape.transparent"
+                app:tint="@color/button_background"
+                android:src="@drawable/ic_favorite"
+                android:layout_width="45dp"
+                android:layout_height="45dp"/>
+            <TextView
+                android:layout_marginHorizontal="8dp"
+                android:text="Favorites"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                style="@style/Button.Shape.transparent"
+                app:tint="@color/button_background"
+                android:src="@drawable/ic_history"
+                android:layout_width="45dp"
+                android:layout_height="45dp" />
+            <TextView
+                android:layout_marginHorizontal="8dp"
+                android:text="History"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginVertical="8dp"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                style="@style/Button.Shape.transparent"
+                app:tint="@color/button_background"
+                android:src="@drawable/ic_download"
+                android:layout_width="45dp"
+                android:layout_height="45dp" />
+            <TextView
+                android:layout_marginHorizontal="8dp"
+                android:text="Downloads"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

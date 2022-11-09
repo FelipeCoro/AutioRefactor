@@ -1,3 +1,70 @@
 <resources>
-    <string name="app_name">Android-app</string>
+    <string name="app_name">Autio</string>
+    <string name="menu_player">Player</string>
+    <string name="menu_map">Map</string>
+    <string name="menu_my_stories">My Stories</string>
+    <string name="menu_account">Account</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="or"> or </string>
+    <string name="restore_purchase"> <u>Restore Purchase</u></string>
+    <string name="watch_how_it_works">Watch How it Works</string>
+    <string name="_1_is_donated_for_every_purchase_to_nsupport_storytellers_in_underserved_ncommunities_learn_more">$1 is donated for every purchase to\nsupport storytellers in underserved\ncommunities.Learn more</string>
+    <string name="_4_9_5_stars">4.9 / 5 Stars</string>
+    <string name="choose_a_plan"><u>Choose a Plan</u></string>
+    <string name="love_this">Love this!</string>
+    <string name="great_app_my_husband_and_i_are_fulltime_rv_rs_rv_n_free_and_this_is_the_perfect_app_to_use_while_traveling_the_us">“Great app! My husband and I are fulltime RV’rs (RV-N-Free) and this is the PERFECT app to use while traveling the US.”</string>
+    <string name="rv_n_free">— RV-N-Free</string>
+    <string name="try_5_stories_free">Try 5 Stories Free</string>
+    <string name="an_start">An start</string>
+    <string name="focus_on_your_road_trip">Focus on your road trip</string>
+    <string name="this_app_really_brings_the_trip_home_on_a_personal_level">“This app really brings the trip home on a personal level.”</string>
+    <string name="ron_tg">— Ron TG</string>
+    <string name="a_traveling_companion_not_to_be_missed">A traveling companion not to be missed</string>
+    <string name="my_family_and_i_travel_often_amp_the_stories_we_hear_are_informative_amp_interesting_even_listening_near_my_home_has_introduced_me_to_things_i_didn_t_know"><![CDATA[“My family and I travel often & the stories we hear are informative & interesting. Even listening near my home has introduced me to things I didn’t know. ”]]></string>
+    <string name="camswphd">— CAMSWPhD</string>
+    <string name="enjoy_5_stories_free_tap_for_plans">Enjoy 5 Stories Free - Tap for Plans</string>
+    <string name="email">EMAIL</string>
+    <string name="create_your_account">Create Your Account</string>
+
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="cancel">Cancel</string>
+    <string name="name">NAME</string>
+    <string name="you_re_not_currently_signed_in_ncreate_an_account_or_sign_in_to_nmanage_your_settings">You’re not currently signed in.\nCreate an account or sign in to\nmanage your settings.</string>
+    <string name="autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"><![CDATA[Autio offers 30 Day & 3 Year\nplans that don’t automatically renew,\nas well as an annual subscription.]]></string>
+    <string name="see_plans">See Plans</string>
+    <string name="questions_about_your_account_or_subscription">Questions about your account or subscription?.</string>
+    <string name="up_next">Up Next</string>
+    <string name="you_re_not_currently_signed_in_create_an_naccount_or_sign_in_to_manage_your_settings">You\'re not currently signed in. Create an\naccount or sign in to manage your settings.</string>
+    <string name="search">Search</string>
+    <string name="most_popular">MOST POPULAR</string>
+    <string name="a_story_for_everyone">A Story for Everyone</string>
+    <string name="share_20_off_autio_s_annual_nsubscription_with_a_friend">Share 20% off Autio’s annual\nsubscription with a friend.</string>
+    <string name="send_20_off_to_a_friend">Send 20% Off to a Friend</string>
+    <string name="account_status">ACCOUNT STATUS</string>
+    <string name="no_plan_selected">No Plan Selected</string>
+    <string name="profile">Profile</string>
+    <string name="change_password">Change Password</string>
+    <string name="interests">Interests</string>
+    <string name="organize_your_interests_from_the_top_down">ORGANIZE YOUR INTERESTS FROM THE TOP DOWN</string>
+    <string name="saves_changes">Saves Changes</string>
+    <string name="contact">Contact</string>
+    <string name="log_out">Log Out</string>
+    <string name="delete_my_account">Delete My Account</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="continue_as_guest">Continue As Guest</string>
+    <string name="update">Update</string>
+    <!-- Summaries and short messages -->
+    <string name="welcome">Welcome, explorer!</string>
+    <string name="app_description">Autio is a location-based\naudio app that alerts you to exciting\nstories along your journey.\n\nWe’ll need a few permissions\nto get started…</string>
+    <string name="tagline">Every place has a story.\nNow every story has a place.</string>
+    <!-- Buttons' body text -->
+    <string name="welcome_nav_to_permissions">Let’s go!</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="guest">Continue as a guest</string>
+    <!-- Images' content description -->
+    <string name="logo_description">Autio logo</string>
+    <!-- Miscellaneous -->
+    <string name="divider">Divider component for separating visuals</string>
 </resources>

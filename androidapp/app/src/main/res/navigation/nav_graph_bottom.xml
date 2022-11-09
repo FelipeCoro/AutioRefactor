@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_bottom"
+    app:startDestination="@id/map">
+    <fragment
+        android:id="@+id/map"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" />
+    <fragment
+        android:id="@+id/account"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.AccountFragment"
+        android:label="fragment_account"
+        tools:layout="@layout/fragment_account" />
+    <fragment
+        android:id="@+id/my_stories"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MyStoriesFragment"
+        android:label="fragment_my_stories"
+        tools:layout="@layout/fragment_my_stories" />
+    <fragment
+        android:id="@+id/player"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment"
+        android:label="fragment_player"
+        tools:layout="@layout/fragment_player" />
+</navigation>

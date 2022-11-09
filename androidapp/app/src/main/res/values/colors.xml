@@ -1,10 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!-- Light Mode   -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="blue">#080F45</color>
+    <color name="red">#AEFF0000</color>
+    <color name="blue_background"> #393F6A</color>
+    <color name="gray_letter">#9C9FB5</color>
+    <color name="gray_donated">#F2F2F2</color>
+    <color name="transparent">#00FFFFFF</color>
+    <!-- Subscribe Background  -->
+    <color name="subscribe_background">#FFFFFFFF</color>
+    <!-- Lora Bold Titles  -->
+    <color name="lora_text_bold">#080F45</color>
+    <color name="lora_text_title_bold">#FFFFFF</color>
+    <color name="lora_text_regular">#FFFFFF</color>
+    <!-- Layouts  -->
+    <color name="fragment_background">#FFFFFF</color>
+    <color name="divider">#EEEEF2</color>
+    <color name="divider_account">#9C9FB5</color>
+    <!-- Text  -->
+    <color name="normal_text">#080F45</color>
+    <color name="text_map_fragment">#FFFFFF</color>
+    <!-- Button -->
+    <color name="button_background">#080F45</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="button_border">#9C9FB5</color>
+    <color name="button_border_text">#080F45</color>
+    <!-- Bottom Navigation -->
+    <color name="bn_background">#FAFAFA</color>
+    <color name="unselected_item">#9C9FB5</color>
+    <color name="selected_item">#080F45</color>
+    <!--  Player Fragment Page  -->
+    <color name="player_fragment"> #393F6A</color>
+    <color name="player_fragment_text"> #FFFFFF</color>
+    <color name="player_fragment_icon"> #FFFFFF</color>
+    <!-- Map Fragment Page -->
+    <color name="persistent_player_next">#393F6A</color>
 </resources>
