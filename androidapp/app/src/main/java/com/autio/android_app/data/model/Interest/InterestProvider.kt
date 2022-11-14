@@ -6,14 +6,31 @@ object InterestProvider {
         return interest
     }
 
-    private val interest = listOf(
-        InterestModel("History"),
-        InterestModel("Local Insights"),
-        InterestModel("Colorful Characters"),
-        InterestModel("Culture"),
-        InterestModel("Natural Wonders"),
-        InterestModel("Special Places of Interest"),
-        InterestModel("Sports"),
-        InterestModel("Music")
-    )
+    private val interest =
+        listOf(
+            InterestModel(
+                "History"
+            ),
+            InterestModel(
+                "Local Insights"
+            ),
+            InterestModel(
+                "Colorful Characters"
+            ),
+            InterestModel(
+                "Culture"
+            ),
+            InterestModel(
+                "Natural Wonders"
+            ),
+            InterestModel(
+                "Special Places of Interest"
+            ),
+            InterestModel(
+                "Sports"
+            ),
+            InterestModel(
+                "Music"
+            )
+        )
 }

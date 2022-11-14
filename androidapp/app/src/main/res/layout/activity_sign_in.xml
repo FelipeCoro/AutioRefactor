@@ -32,6 +32,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/linearLayoutSignInFields"
         android:orientation="vertical"
@@ -40,13 +41,15 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/mail_label"
             android:fontFamily="@font/inter_regular"
             android:textColor="@color/gray_letter"
             android:text="@string/email"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <EditText
             android:id="@+id/edit_text_email"
             android:fontFamily="@font/inter_regular"
@@ -56,7 +59,8 @@
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:inputType="textEmailAddress"
-            android:labelFor="@id/mail_label"/>
+            android:labelFor="@id/mail_label" />
+
         <TextView
             android:id="@+id/password_label"
             android:layout_marginTop="16dp"
@@ -64,7 +68,8 @@
             android:textColor="@color/gray_letter"
             android:text="@string/password"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <EditText
             android:id="@+id/edit_text_password"
             android:inputType="textPassword"
@@ -74,7 +79,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="password"
-            android:labelFor="@id/password_label"/>
+            android:labelFor="@id/password_label" />
     </LinearLayout>
 
     <LinearLayout
@@ -93,7 +98,7 @@
             android:text="@string/sign_in"
             android:textSize="12sp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btn_cancel"
@@ -101,7 +106,7 @@
             style="@style/Button.Shape.transparent"
             android:text="@string/cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btn_forgot_password"
@@ -124,6 +129,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/continue_as_guest"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

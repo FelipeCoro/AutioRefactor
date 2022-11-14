@@ -12,6 +12,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintTop_toTopOf="parent">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -38,16 +39,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent">
+
                     <RelativeLayout
                         android:gravity="center"
                         android:layout_weight="1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content">
+
                         <ImageView
                             android:id="@+id/bt_heart"
                             android:src="@drawable/ic_heart"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"/>
+                            android:layout_height="wrap_content" />
 
                         <TextView
                             android:layout_marginStart="4dp"
@@ -57,26 +60,30 @@
                             android:layout_toEndOf="@+id/bt_heart"
                             tools:text="213" />
                     </RelativeLayout>
+
                     <ImageView
                         android:layout_weight="1"
                         android:src="@drawable/ic_share"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <ImageView
                         android:layout_weight="1"
                         android:src="@drawable/ic_baseline_cast"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <ImageView
                         android:layout_weight="1"
                         android:src="@drawable/ic_feedback"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <ImageView
                         android:layout_weight="1"
                         android:src="@drawable/ic_more"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -100,36 +107,41 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/tvStoryTitle">
+
                 <ImageView
                     android:layout_weight="1"
                     android:src="@drawable/ic_speed_audio"
                     app:tint="@color/button_background"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <ImageView
                     android:layout_weight="1"
                     app:tint="@color/button_background"
                     android:src="@drawable/ic_rollback"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <ImageView
                     android:layout_weight="1"
                     app:tint="@color/button_background"
                     android:src="@drawable/ic_player_selected_light"
                     android:layout_width="0dp"
-                    android:layout_height="70dp"/>
+                    android:layout_height="70dp" />
+
                 <ImageView
                     android:layout_weight="1"
                     app:tint="@color/button_background"
                     android:src="@drawable/ic_forward"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <ImageView
                     android:layout_weight="1"
                     app:tint="@color/button_background"
                     android:src="@drawable/ic_save_audio"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <androidx.cardview.widget.CardView
@@ -140,17 +152,17 @@
                 app:cardCornerRadius="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
                 <androidx.fragment.app.FragmentContainerView
                     android:layout_gravity="center"
                     android:id="@+id/maps"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="330dp"
-                    android:layout_height="330dp"/>
+                    android:layout_height="330dp" />
             </androidx.cardview.widget.CardView>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 
     </androidx.core.widget.NestedScrollView>
@@ -162,6 +174,7 @@
         android:background="@color/player_fragment"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

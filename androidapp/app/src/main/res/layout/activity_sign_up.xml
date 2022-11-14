@@ -31,6 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/linearLayoutSignInFields"
         android:orientation="vertical"
@@ -39,13 +40,15 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/label_name"
             android:fontFamily="@font/inter_regular"
             android:textColor="@color/gray_letter"
             android:text="@string/name"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <EditText
             android:id="@+id/tv_name"
             android:fontFamily="@font/inter_regular"
@@ -55,7 +58,8 @@
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:inputType="text"
-            android:labelFor="@id/label_name"/>
+            android:labelFor="@id/label_name" />
+
         <TextView
             android:id="@+id/label_email"
             android:layout_marginTop="16dp"
@@ -63,7 +67,8 @@
             android:textColor="@color/gray_letter"
             android:text="@string/email"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <EditText
             android:id="@+id/tv_email"
             android:backgroundTint="@color/gray_letter"
@@ -73,7 +78,8 @@
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
             android:inputType="textEmailAddress"
-            android:labelFor="@id/label_email"/>
+            android:labelFor="@id/label_email" />
+
         <TextView
             android:id="@+id/label_password"
             android:layout_marginTop="16dp"
@@ -81,7 +87,8 @@
             android:textColor="@color/gray_letter"
             android:text="@string/password"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <EditText
             android:id="@+id/tv_password"
             android:backgroundTint="@color/gray_letter"
@@ -91,7 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="password"
-            android:labelFor="@id/label_password"/>
+            android:labelFor="@id/label_password" />
     </LinearLayout>
 
     <LinearLayout
@@ -110,7 +117,7 @@
             android:textAllCaps="false"
             android:text="@string/sign_up"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/btn_cancel"
@@ -118,7 +125,7 @@
             style="@style/Button.Shape.transparent"
             android:text="@string/cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

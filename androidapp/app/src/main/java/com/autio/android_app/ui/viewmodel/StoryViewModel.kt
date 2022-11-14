@@ -10,20 +10,38 @@ import com.autio.android_app.data.database.repository.StoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class StoryViewModel(application: Application):AndroidViewModel(application) {
+class StoryViewModel(
+    application: Application
+) : AndroidViewModel(
+    application
+) {
 
     private val readAllData: LiveData<List<StoryEntitie>>
     private val repository: StoryRepository
 
     init {
-        val storyDao = StoryDataBase.getDatabase(application).storyDao()
-        repository = StoryRepository(storyDao)
-        readAllData = repository.readAllData
+        val storyDao =
+            StoryDataBase.getDatabase(
+                application
+            )
+                .storyDao()
+        repository =
+            StoryRepository(
+                storyDao
+            )
+        readAllData =
+            repository.readAllData
     }
 
-    fun addPointer(storyEntity: StoryEntitie){
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.addPointer(storyEntity)
+    fun addPointer(
+        storyEntity: StoryEntitie
+    ) {
+        viewModelScope.launch(
+            Dispatchers.IO
+        ) {
+            repository.addPointer(
+                storyEntity
+            )
         }
     }
 }

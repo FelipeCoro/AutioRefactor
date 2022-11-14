@@ -14,23 +14,44 @@ import androidx.recyclerview.widget.RecyclerView
 
 // Card flip vertically
 fun ImageView.animateFlip() {
-    val randomDelay = (0..16000).random()
+    val randomDelay =
+        (0..16000).random()
     Handler(
-        Looper.getMainLooper()).postDelayed({
-        this.rotationY = 0f
-        this.animate().rotationY(90f).setListener(object: AnimatorListenerAdapter() {
-            override fun onAnimationEnd(
-                animation: Animator
-            ) {
-                this@animateFlip.rotationY = 270f
-                this@animateFlip.animate().rotationY(360f).setListener(null)
-            }
-        })
-    }, randomDelay.toLong())
+        Looper.getMainLooper()
+    ).postDelayed(
+        {
+            this.rotationY =
+                0f
+            this.animate()
+                .rotationY(
+                    90f
+                )
+                .setListener(
+                    object :
+                        AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(
+                            animation: Animator
+                        ) {
+                            this@animateFlip.rotationY =
+                                270f
+                            this@animateFlip.animate()
+                                .rotationY(
+                                    360f
+                                )
+                                .setListener(
+                                    null
+                                )
+                        }
+                    })
+        },
+        randomDelay.toLong()
+    )
 }
 
 // Recycler view automatic scroll
-fun RecyclerView.setAutomaticScroll(scrollFocus: Int = ScrollView.FOCUS_DOWN) {
+fun RecyclerView.setAutomaticScroll(
+    scrollFocus: Int = ScrollView.FOCUS_DOWN
+) {
     this.addOnItemTouchListener(
         object :
             RecyclerView.SimpleOnItemTouchListener() {

@@ -78,7 +78,9 @@ class LoginActivity :
         )
 
         firstRecyclerView.setAutomaticScroll()
-        secondRecyclerView.setAutomaticScroll(ScrollView.FOCUS_UP)
+        secondRecyclerView.setAutomaticScroll(
+            ScrollView.FOCUS_UP
+        )
         thirdRecyclerView.setAutomaticScroll()
     }
 

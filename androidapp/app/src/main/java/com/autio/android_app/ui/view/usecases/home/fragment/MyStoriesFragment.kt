@@ -3,48 +3,67 @@ package com.autio.android_app.ui.view.usecases.home.fragment
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
 import com.autio.android_app.ui.view.usecases.login.SignInActivity
 import com.autio.android_app.ui.view.usecases.login.SignUpActivity
 
 
-class MyStoriesFragment : Fragment() {
+class MyStoriesFragment :
+    Fragment() {
 
-    private var _binding: FragmentMyStoriesBinding? = null
+    private var _binding: FragmentMyStoriesBinding? =
+        null
     private val binding get() = _binding!!
-    private val prefRepository by lazy { PrefRepository(requireContext()) }
+    private val prefRepository by lazy {
+        PrefRepository(
+            requireContext()
+        )
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        _binding = FragmentMyStoriesBinding.inflate(inflater, container, false)
+        _binding =
+            FragmentMyStoriesBinding.inflate(
+                inflater,
+                container,
+                false
+            )
 
 
-        Log.i("SESSION:", isUserGuest().toString())
+        Log.i(
+            "SESSION:",
+            isUserGuest().toString()
+        )
 
         createView()
         intentFunctions()
         return binding.root
     }
 
-    private fun createView(){
-        if(isUserGuest()){
-            binding.lySignIn.visibility = View.VISIBLE
-            binding.lyStoriesList.visibility = View.GONE
-        }else{
-            binding.lySignIn.visibility = View.GONE
-            binding.lyStoriesList.visibility = View.VISIBLE
+    private fun createView() {
+        if (isUserGuest()) {
+            binding.lySignIn.visibility =
+                View.VISIBLE
+            binding.lyStoriesList.visibility =
+                View.GONE
+        } else {
+            binding.lySignIn.visibility =
+                View.GONE
+            binding.lyStoriesList.visibility =
+                View.VISIBLE
         }
     }
 
-    private fun intentFunctions(){
+    private fun intentFunctions() {
         binding.btnSignIn.setOnClickListener {
             goToSignIn()
         }
@@ -53,17 +72,30 @@ class MyStoriesFragment : Fragment() {
         }
     }
 
-    private fun goToSignIn(){
-        val signInIntent = Intent(activity, SignInActivity::class.java)
-        startActivity(signInIntent)
+    private fun goToSignIn() {
+        val signInIntent =
+            Intent(
+                activity,
+                SignInActivity::class.java
+            )
+        startActivity(
+            signInIntent
+        )
     }
 
-    private fun goToSignUp(){
-        val signUpIntent = Intent(activity, SignUpActivity::class.java)
-        startActivity(signUpIntent)
+    private fun goToSignUp() {
+        val signUpIntent =
+            Intent(
+                activity,
+                SignUpActivity::class.java
+            )
+        startActivity(
+            signUpIntent
+        )
     }
 
-    private fun isUserGuest():Boolean = prefRepository.getIsUserGuest()
+    private fun isUserGuest(): Boolean =
+        prefRepository.getIsUserGuest()
 
 
 }

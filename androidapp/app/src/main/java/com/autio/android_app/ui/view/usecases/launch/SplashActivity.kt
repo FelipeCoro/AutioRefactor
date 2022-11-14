@@ -12,21 +12,37 @@ import com.autio.android_app.ui.view.usecases.login.LoginActivity
 import com.autio.android_app.ui.view.usecases.onboarding.OnBoardingActivity
 
 
-class SplashActivity : AppCompatActivity() {
+class SplashActivity :
+    AppCompatActivity() {
 
-    private val prefRepository by lazy { PrefRepository(this) }
+    private val prefRepository by lazy {
+        PrefRepository(
+            this
+        )
+    }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+        super.onCreate(
+            savedInstanceState
+        )
         isNightModeOn()
         whereToGo()
     }
 
     //val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
     //return sharedPreferences.getBoolean("Finished", false)
-    private fun onBoardingFinished():Boolean{
-        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        return sharedPreferences.getBoolean("Finished",false)
+    private fun onBoardingFinished(): Boolean {
+        val sharedPreferences =
+            this.getSharedPreferences(
+                "onBoarding",
+                Context.MODE_PRIVATE
+            )
+        return sharedPreferences.getBoolean(
+            "Finished",
+            false
+        )
     }
 
     private fun isNightModeOn() {
@@ -43,20 +59,37 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    private fun getUserSession():String = prefRepository.getUserApiToken()
+    private fun getUserSession(): String =
+        prefRepository.getUserApiToken()
 
     private fun whereToGo() {
-        val apiToken = getUserSession()
+        val apiToken =
+            getUserSession()
         if (onBoardingFinished()) {
             if (apiToken.isEmpty()) {
-                startActivity(Intent(this, LoginActivity::class.java))
+                startActivity(
+                    Intent(
+                        this,
+                        LoginActivity::class.java
+                    )
+                )
                 finish()
             } else {
-                startActivity(Intent(this, BottomNavigation::class.java))
+                startActivity(
+                    Intent(
+                        this,
+                        BottomNavigation::class.java
+                    )
+                )
                 finish()
             }
         } else {
-            startActivity(Intent(this, OnBoardingActivity::class.java))
+            startActivity(
+                Intent(
+                    this,
+                    OnBoardingActivity::class.java
+                )
+            )
             finish()
         }
     }

@@ -9,7 +9,7 @@
         android:id="@+id/welcomeExplorerFragment"
         android:name="com.autio.android_app.ui.view.usecases.onboarding.screens.WelcomeExplorerFragment"
         android:label="fragment_welcome_explorer"
-        tools:layout="@layout/fragment_welcome_explorer" >
+        tools:layout="@layout/fragment_welcome_explorer">
         <action
             android:id="@+id/action_welcomeExplorerFragment_to_viewPagerFragment"
             app:destination="@id/viewPagerFragment"

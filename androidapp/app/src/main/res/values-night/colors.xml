@@ -1,40 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Dark Mode   -->
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="blue">#171E50</color>
-    <color name="red">#AEFF0000</color>
-    <color name="blue_background"> #393F6A</color>
-    <color name="gray_letter">#9C9FB5</color>
-    <color name="gray_donated">#F2F2F2</color>
-    <color name="transparent">#00FFFFFF</color>
+    <color name="black">
+        #FF000000
+    </color>
+    <color name="white">
+        #FFFFFFFF
+    </color>
+    <color name="blue">
+        #171E50
+    </color>
+    <color name="red">
+        #AEFF0000
+    </color>
+    <color name="blue_background">
+        #393F6A
+    </color>
+    <color name="gray_letter">
+        #9C9FB5
+    </color>
+    <color name="gray_donated">
+        #F2F2F2
+    </color>
+    <color name="transparent">
+        #00FFFFFF
+    </color>
     <!-- Subscribe Background  -->
-    <color name="subscribe_background">#080F45</color>
+    <color name="subscribe_background">
+        #080F45
+    </color>
     <!-- Lora Bold Titles  -->
-    <color name="lora_text_bold">#FFFFFF</color>
-    <color name="lora_text_title_bold">#080F45</color>
-    <color name="lora_text_regular">#080F45</color>
+    <color name="lora_text_bold">
+        #FFFFFF
+    </color>
+    <color name="lora_text_title_bold">
+        #080F45
+    </color>
+    <color name="lora_text_regular">
+        #080F45
+    </color>
     <!-- Layouts  -->
-    <color name="fragment_background">#393F6A</color>
-    <color name="divider">#EEEEF2</color>
-    <color name="divider_account">#080F45</color>
+    <color name="fragment_background">
+        #393F6A
+    </color>
+    <color name="divider">
+        #EEEEF2
+    </color>
+    <color name="divider_account">
+        #080F45
+    </color>
     <!-- Text  -->
-    <color name="normal_text">#FFFFFF</color>
-    <color name="text_map_fragment">#080F45</color>
+    <color name="normal_text">
+        #FFFFFF
+    </color>
+    <color name="text_map_fragment">
+        #080F45
+    </color>
     <!-- Button -->
-    <color name="button_background">#FFFFFF</color>
-    <color name="button_text">#080F45</color>
-    <color name="button_border">#9C9FB5</color>
-    <color name="button_border_text">#FFFFFF</color>
+    <color name="button_background">
+        #FFFFFF
+    </color>
+    <color name="button_text">
+        #080F45
+    </color>
+    <color name="button_border">
+        #9C9FB5
+    </color>
+    <color name="button_border_text">
+        #FFFFFF
+    </color>
     <!-- Bottom Navigation -->
-    <color name="bn_background">#080F45</color>
-    <color name="unselected_item">#9C9FB5</color>
-    <color name="selected_item">#FAFAFA</color>
+    <color name="bn_background">
+        #080F45
+    </color>
+    <color name="unselected_item">
+        #9C9FB5
+    </color>
+    <color name="selected_item">
+        #FAFAFA
+    </color>
     <!--  Player Fragment Page  -->
-    <color name="player_fragment"> #FFFFFF</color>
-    <color name="player_fragment_text"> #FF000000</color>
-    <color name="player_fragment_icon"> #FF000000</color>
+    <color name="player_fragment">
+        #FFFFFF
+    </color>
+    <color name="player_fragment_text">
+        #FF000000
+    </color>
+    <color name="player_fragment_icon">
+        #FF000000
+    </color>
     <!-- Map Fragment Page -->
-    <color name="persistent_player_next">#393F6A</color>
+    <color name="persistent_player_next">
+        #393F6A
+    </color>
 </resources>

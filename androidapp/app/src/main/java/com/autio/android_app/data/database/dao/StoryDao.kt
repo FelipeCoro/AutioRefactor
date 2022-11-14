@@ -7,10 +7,16 @@ import com.autio.android_app.data.database.entities.StoryEntitie
 @Dao
 interface StoryDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addPointer(storyEntitie: StoryEntitie)
+    @Insert(
+        onConflict = OnConflictStrategy.IGNORE
+    )
+    suspend fun addPointer(
+        storyEntitie: StoryEntitie
+    )
 
-    @Query("SELECT * FROM map_points ORDER BY id ASC")
+    @Query(
+        "SELECT * FROM map_points ORDER BY id ASC"
+    )
     fun readAllData(): LiveData<List<StoryEntitie>>
 
 //    @Query("SELECT * FROM user")

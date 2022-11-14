@@ -5,12 +5,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.data.model.Interest.InterestModel
 import com.autio.android_app.databinding.ItemInterestBinding
 
-class InterestViewHolder(view: View):RecyclerView.ViewHolder(view) {
+class InterestViewHolder(
+    view: View
+) : RecyclerView.ViewHolder(
+    view
+) {
 
-    val binding = ItemInterestBinding.bind(view)
+    val binding =
+        ItemInterestBinding.bind(
+            view
+        )
 
-    fun render(interestModel: InterestModel){
-        binding.tvInterest.text = interestModel.interest
+    fun render(
+        interestModel: InterestModel
+    ) {
+        binding.tvInterest.text =
+            interestModel.interest
     }
 
 }

@@ -8,20 +8,33 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
 
-    private val okHttpClient: OkHttpClient = OkHttpClient()
-        .newBuilder()
-        .addInterceptor(RequestInterceptor)
-        .build()
+    private val okHttpClient: OkHttpClient =
+        OkHttpClient()
+            .newBuilder()
+            .addInterceptor(
+                RequestInterceptor
+            )
+            .build()
 
-    private fun getRetrofit(): Retrofit{
+    private fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
+            .baseUrl(
+                baseUrl
+            )
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .client(
+                okHttpClient
+            )
             .build()
     }
 
-    fun<T> buildService(service: Class<T>): T{
-        return getRetrofit().create(service)
+    fun <T> buildService(
+        service: Class<T>
+    ): T {
+        return getRetrofit().create(
+            service
+        )
     }
 }

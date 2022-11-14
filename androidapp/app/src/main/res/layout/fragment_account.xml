@@ -124,6 +124,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
+
     <ScrollView
         android:id="@+id/scroll_view_account"
         android:visibility="visible"
@@ -131,9 +132,11 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_width="match_parent"
         android:layout_height="0dp">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/iv_account"
                 android:layout_width="match_parent"
@@ -150,13 +153,15 @@
                 app:layout_constraintTop_toTopOf="@+id/iv_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <TextView
                     android:fontFamily="@font/lora_regular"
                     android:textSize="24sp"
                     android:textColor="@color/white"
                     android:text="@string/a_story_for_everyone"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:layout_marginTop="8dp"
                     android:textSize="14sp"
@@ -164,13 +169,14 @@
                     android:textColor="@color/white"
                     android:text="@string/share_20_off_autio_s_annual_nsubscription_with_a_friend"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <Button
                     android:layout_marginTop="42dp"
                     style="@style/Button.White"
                     android:text="@string/send_20_off_to_a_friend"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
@@ -182,27 +188,31 @@
                 app:layout_constraintTop_toBottomOf="@+id/iv_account"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <TextView
                     android:textColor="@color/gray_letter"
                     android:text="@string/account_status"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:layout_marginTop="8dp"
                     style="@style/TextViewLoraBoldTitle"
                     android:text="@string/no_plan_selected"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <View
                     android:layout_marginTop="18dp"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:background="@color/divider" />
+
                 <TextView
                     android:layout_marginTop="16dp"
                     android:text="@string/choose_a_plan"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
 
             </LinearLayout>
@@ -221,7 +231,8 @@
                     android:textSize="20sp"
                     android:text="@string/profile"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:textSize="12sp"
                     android:fontFamily="@font/inter_regular"
@@ -229,7 +240,8 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/name"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <EditText
                     android:id="@+id/et_name"
                     android:textSize="12sp"
@@ -237,7 +249,8 @@
                     android:textColor="@color/gray_letter"
                     android:backgroundTint="@color/gray_letter"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:textSize="12sp"
                     android:fontFamily="@font/inter_regular"
@@ -245,7 +258,8 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/email"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <EditText
                     android:id="@+id/et_email"
                     android:textSize="12sp"
@@ -253,7 +267,8 @@
                     android:textColor="@color/gray_letter"
                     android:backgroundTint="@color/gray_letter"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <LinearLayout
                     android:id="@+id/ly_update_profile"
                     android:visibility="gone"
@@ -263,6 +278,7 @@
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <Button
                         android:id="@+id/btn_update_profile"
                         style="@style/Button.Blue"
@@ -271,7 +287,8 @@
                         android:layout_weight="1"
                         android:text="Update"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <Button
                         android:id="@+id/btn_cancel_update"
                         style="@style/Button.Shape.transparent"
@@ -279,7 +296,7 @@
                         android:layout_weight="1"
                         android:text="Cancel"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -296,7 +313,8 @@
                         android:layout_marginTop="8dp"
                         android:text="CURRENT PASSWORD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <EditText
                         android:id="@+id/et_current_password"
                         android:textSize="12sp"
@@ -304,7 +322,7 @@
                         android:textColor="@color/gray_letter"
                         android:backgroundTint="@color/gray_letter"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
 
                     <TextView
                         android:textSize="12sp"
@@ -313,7 +331,8 @@
                         android:layout_marginTop="8dp"
                         android:text="NEW PASSWORD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <EditText
                         android:id="@+id/et_new_password"
                         android:textSize="12sp"
@@ -321,7 +340,7 @@
                         android:textColor="@color/gray_letter"
                         android:backgroundTint="@color/gray_letter"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
 
                     <TextView
                         android:textSize="12sp"
@@ -330,7 +349,8 @@
                         android:layout_marginTop="8dp"
                         android:text="CONFIRM PASSWORD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <EditText
                         android:id="@+id/et_confirm_password"
                         android:textSize="12sp"
@@ -338,7 +358,7 @@
                         android:textColor="@color/gray_letter"
                         android:backgroundTint="@color/gray_letter"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -357,7 +377,8 @@
                         android:layout_weight="1"
                         android:text="@string/update"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
+
                     <Button
                         android:id="@+id/btn_cancel_password"
                         style="@style/Button.Shape.transparent"
@@ -365,9 +386,10 @@
                         android:layout_weight="1"
                         android:text="@string/cancel"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content" />
 
                 </LinearLayout>
+
                 <Button
                     android:id="@+id/btn_change_password"
                     android:layout_marginTop="16dp"
@@ -375,7 +397,7 @@
                     style="@style/Button.Shape.transparent"
                     android:text="@string/change_password"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -387,19 +409,21 @@
                 app:layout_constraintTop_toBottomOf="@+id/lyProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <TextView
                     style="@style/TextViewLoraBoldTitle"
                     android:textSize="20sp"
                     android:text="@string/interests"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <TextView
                     android:textSize="12sp"
                     android:fontFamily="@font/inter_regular"
                     android:textColor="@color/normal_text"
                     android:text="@string/organize_your_interests_from_the_top_down"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:background="@color/fragment_background"
@@ -408,7 +432,7 @@
                     android:id="@+id/recycler_view_interests"
                     tools:listitem="@layout/item_interest"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
 
                 <Button
                     android:layout_marginTop="8dp"
@@ -416,7 +440,7 @@
                     style="@style/Button.Gray"
                     android:text="@string/saves_changes"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <View
@@ -438,7 +462,7 @@
                 android:textAllCaps="true"
                 android:text="@string/questions_about_your_account_or_subscription"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <RelativeLayout
                 android:layout_marginTop="24dp"
@@ -478,6 +502,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/rlWatchHowWorks"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
                 <Button
                     android:paddingHorizontal="16dp"
                     android:layout_marginEnd="4dp"
@@ -485,7 +510,8 @@
                     android:text="@string/contact"
                     android:layout_weight="1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
+
                 <Button
                     android:id="@+id/btn_log_out"
                     android:paddingHorizontal="16dp"
@@ -494,7 +520,7 @@
                     android:text="@string/log_out"
                     android:layout_weight="1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <TextView
@@ -507,7 +533,7 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/restore_purchase"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:layout_width="wrap_content"

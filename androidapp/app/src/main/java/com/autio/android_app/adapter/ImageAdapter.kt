@@ -8,9 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.animateFlip
 import com.autio.android_app.data.model.design.LocationView
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ImageAdapter(
     private val dataset: List<LocationView>
@@ -49,13 +46,17 @@ class ImageAdapter(
         holder: ImageViewHolder,
         position: Int
     ) {
-        val fakePosition = position % dataset.size
+        val fakePosition =
+            position % dataset.size
         val item =
             dataset[fakePosition]
-        holder.imageView.setImageResource(item.resourceId)
+        holder.imageView.setImageResource(
+            item.resourceId
+        )
 
         holder.imageView.animateFlip()
     }
 
-    override fun getItemCount(): Int = Integer.MAX_VALUE
+    override fun getItemCount(): Int =
+        Integer.MAX_VALUE
 }

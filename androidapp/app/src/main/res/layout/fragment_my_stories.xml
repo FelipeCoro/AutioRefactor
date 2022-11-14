@@ -87,12 +87,14 @@
                 android:src="@drawable/ic_bookmarks"
                 android:layout_width="45dp"
                 android:layout_height="45dp" />
+
             <TextView
                 android:layout_marginHorizontal="8dp"
                 android:text="Bookmarks"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_marginVertical="8dp"
             android:gravity="center"
@@ -105,13 +107,15 @@
                 app:tint="@color/button_background"
                 android:src="@drawable/ic_favorite"
                 android:layout_width="45dp"
-                android:layout_height="45dp"/>
+                android:layout_height="45dp" />
+
             <TextView
                 android:layout_marginHorizontal="8dp"
                 android:text="Favorites"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_marginVertical="8dp"
             android:gravity="center"
@@ -125,12 +129,14 @@
                 android:src="@drawable/ic_history"
                 android:layout_width="45dp"
                 android:layout_height="45dp" />
+
             <TextView
                 android:layout_marginHorizontal="8dp"
                 android:text="History"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_marginVertical="8dp"
             android:gravity="center"
@@ -144,11 +150,12 @@
                 android:src="@drawable/ic_download"
                 android:layout_width="45dp"
                 android:layout_height="45dp" />
+
             <TextView
                 android:layout_marginHorizontal="8dp"
                 android:text="Downloads"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
     </LinearLayout>
