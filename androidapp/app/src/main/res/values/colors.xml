@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Colors used along the app following the glossary used in Figma project -->
+    <!-- Link to Figma: https://www.figma.com/file/7oQJetlvXHiH2p7L4CaYox/Android?node-id=1%3A2 -->
+
+    <!-- Colors in the app -->
+    <color name="autio_white">#FFFFFF</color>
+    <color name="autio_blue_7">#EEEEF2</color>
+    <color name="autio_blue_20">#CECFDA</color>
+    <color name="autio_blue_40">#9C9FB5</color>
+    <color name="autio_blue_60">#6B6F8F</color>
+    <color name="autio_blue_80">#393F6A</color>
+    <color name="autio_blue_93">#171E50</color>
+    <color name="autio_blue">#080F45</color>
+
     <!-- Light Mode   -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>

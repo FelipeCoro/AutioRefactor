@@ -26,16 +26,14 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun setListeners() {
-        binding.btnSignin.setOnClickListener {
+        binding.btnSignIn.setOnClickListener {
             loginUser()
         }
-
-        binding.tvGuestMode.setOnClickListener {
+        binding.btnGuestMode.setOnClickListener {
             loginGuest()
         }
-
-        binding.txtCancelSignIn.setOnClickListener {
-            onBackPressed()
+        binding.btnCancel.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -46,7 +44,6 @@ class SignInActivity : AppCompatActivity() {
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
             val loginRequest = LoginDto(email, password)
-            //loginViewmodel.login(loginRequest)
             apiService.login(loginRequest) {
                 if (it != null) {
                     saveUserInfo(it)

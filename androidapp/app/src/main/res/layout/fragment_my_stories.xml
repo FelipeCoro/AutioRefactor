@@ -52,7 +52,7 @@
                 android:layout_marginHorizontal="8dp" />
 
             <Button
-                android:id="@+id/btn_signin"
+                android:id="@+id/btn_sign_in"
                 android:layout_weight="1"
                 style="@style/Button.Gray"
                 android:textAllCaps="false"

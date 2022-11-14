@@ -24,10 +24,7 @@
     <string name="my_family_and_i_travel_often_amp_the_stories_we_hear_are_informative_amp_interesting_even_listening_near_my_home_has_introduced_me_to_things_i_didn_t_know"><![CDATA[“My family and I travel often & the stories we hear are informative & interesting. Even listening near my home has introduced me to things I didn’t know. ”]]></string>
     <string name="camswphd">— CAMSWPhD</string>
     <string name="enjoy_5_stories_free_tap_for_plans">Enjoy 5 Stories Free - Tap for Plans</string>
-    <string name="email">EMAIL</string>
     <string name="create_your_account">Create Your Account</string>
-
-    <string name="forgot_password">Forgot Password?</string>
     <string name="cancel">Cancel</string>
     <string name="name">NAME</string>
     <string name="you_re_not_currently_signed_in_ncreate_an_account_or_sign_in_to_nmanage_your_settings">You’re not currently signed in.\nCreate an account or sign in to\nmanage your settings.</string>
@@ -58,11 +55,15 @@
     <string name="welcome">Welcome, explorer!</string>
     <string name="app_description">Autio is a location-based\naudio app that alerts you to exciting\nstories along your journey.\n\nWe’ll need a few permissions\nto get started…</string>
     <string name="tagline">Every place has a story.\nNow every story has a place.</string>
+    <!-- Text fields' labels -->
+    <string name="email">EMAIL</string>
+    <string name="password">PASSWORD</string>
     <!-- Buttons' body text -->
     <string name="welcome_nav_to_permissions">Let’s go!</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="guest">Continue as a guest</string>
+    <string name="forgot_password">Forgot Password</string>
     <!-- Images' content description -->
     <string name="logo_description">Autio logo</string>
     <!-- Miscellaneous -->

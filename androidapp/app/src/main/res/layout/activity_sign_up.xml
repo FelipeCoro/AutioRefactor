@@ -8,15 +8,16 @@
     tools:context=".ui.view.usecases.login.SignUpActivity">
 
     <com.airbnb.lottie.LottieAnimationView
-        app:layout_constraintStart_toEndOf="@+id/linearLayoutSignInFields"
-        app:layout_constraintBottom_toBottomOf="@+id/linearLayoutSignInFields"
         android:id="@+id/animationView"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        app:lottie_rawRes="@raw/story_wheel"
+        android:layout_width="240dp"
+        android:layout_height="240dp"
         android:layout_marginStart="-90dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintStart_toEndOf="@+id/linearLayoutSignInFields"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
         app:lottie_autoPlay="true"
-        app:lottie_loop="true"/>
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/story_wheel" />
 
     <TextView
         android:id="@+id/textViewSignIn"
@@ -39,6 +40,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
+            android:id="@+id/label_name"
             android:fontFamily="@font/inter_regular"
             android:textColor="@color/gray_letter"
             android:text="@string/name"
@@ -52,8 +54,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
-            android:inputType="text" />
+            android:inputType="text"
+            android:labelFor="@id/label_name"/>
         <TextView
+            android:id="@+id/label_email"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/inter_regular"
             android:textColor="@color/gray_letter"
@@ -68,12 +72,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:autofillHints="emailAddress"
-            android:inputType="textEmailAddress" />
+            android:inputType="textEmailAddress"
+            android:labelFor="@id/label_email"/>
         <TextView
+            android:id="@+id/label_password"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/inter_regular"
             android:textColor="@color/gray_letter"
-            android:text="PASSWORD"
+            android:text="@string/password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <EditText
@@ -84,7 +90,8 @@
             android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints="password" />
+            android:autofillHints="password"
+            android:labelFor="@id/label_password"/>
     </LinearLayout>
 
     <LinearLayout
@@ -105,15 +112,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/tv_forgot_password"
-            android:textSize="18sp"
-            android:layout_marginTop="34dp"
-            android:textColor="@color/gray_letter"
-            android:text="@string/forgot_password"
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_marginTop="23dp"
+            style="@style/Button.Shape.transparent"
+            android:text="@string/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

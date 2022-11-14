@@ -45,7 +45,7 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun intentFunctions(){
-        binding.btnSignin.setOnClickListener {
+        binding.btnSignIn.setOnClickListener {
             goToSignIn()
         }
         binding.btnSignup.setOnClickListener {
