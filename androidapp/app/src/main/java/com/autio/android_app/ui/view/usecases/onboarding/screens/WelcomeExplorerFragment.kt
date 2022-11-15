@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentWelcomeExplorerBinding
 
-
 class WelcomeExplorerFragment :
     Fragment() {
 
@@ -35,7 +34,63 @@ class WelcomeExplorerFragment :
             )
         }
 
+        startAnimation()
+
         return binding.root
     }
 
+    private fun startAnimation() {
+        binding.tvWelcome.apply {
+            alpha =
+                0f
+            visibility =
+                View.VISIBLE
+            animate().alpha(
+                1f
+            )
+                .duration =
+                2000
+        }
+        binding.ivDivider.apply {
+            alpha =
+                0f
+            x =
+                binding.root.x
+            visibility =
+                View.VISIBLE
+            animate().alpha(
+                1f
+            )
+                .setDuration(
+                    2000
+                )
+                .withEndAction {
+                    binding.tvAppDescription.apply {
+                        alpha =
+                            0f
+                        visibility =
+                            View.VISIBLE
+                        animate().alpha(
+                            1f
+                        )
+                            .setDuration(
+                                2000
+                            )
+                            .withEndAction {
+                                binding.buttonLetsGo.apply {
+                                    alpha =
+                                        0f
+                                    visibility =
+                                        View.VISIBLE
+                                    animate().alpha(
+                                        1f
+                                    )
+                                        .duration =
+                                        2000
+                                }
+                            }
+                    }
+                }
+        }
+    }
 }

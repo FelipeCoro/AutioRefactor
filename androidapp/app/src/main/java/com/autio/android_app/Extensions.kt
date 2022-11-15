@@ -90,3 +90,15 @@ fun RecyclerView.setAutomaticScroll(
         }
     timer.start()
 }
+
+/**
+ * Is the number even (aka divisible by 0)
+ */
+fun Int.isEven(): Boolean =
+    this % 2 == 0
+
+/**
+ * Is the number od (aka not divisible by 0)
+ */
+fun Int.isOdd(): Boolean =
+    this % 2 != 0
