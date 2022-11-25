@@ -6,7 +6,7 @@
     app:startDestination="@id/map">
     <fragment
         android:id="@+id/map"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MapFragment"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.map.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map" />
     <fragment

@@ -88,7 +88,8 @@ class SignInActivity :
                     finish()
                 } else {
                     Utils.showError(
-                        this
+                        this,
+                        "The user and/or password are incorrect"
                     )
                 }
             }
@@ -120,32 +121,25 @@ class SignInActivity :
     private fun saveGuestInfo(
         guestResponse: GuestResponse
     ) {
-        prefRepository.setIsUserGuest(
+        prefRepository.isUserGuest =
             true
-        )
-        prefRepository.setUserApiToken(
+        prefRepository.userApiToken =
             guestResponse.apiToken
-        )
     }
 
     private fun saveUserInfo(
         loginResponse: LoginResponse
     ) {
-        prefRepository.setIsUserGuest(
+        prefRepository.isUserGuest =
             false
-        )
-        prefRepository.setUserId(
+        prefRepository.userId =
             loginResponse.id!!
-        )
-        prefRepository.setUserApiToken(
+        prefRepository.userApiToken =
             loginResponse.apiToken!!
-        )
-        prefRepository.setUserName(
+        prefRepository.userName =
             loginResponse.name!!
-        )
-        prefRepository.setUserEmail(
+        prefRepository.userEmail =
             loginResponse.email!!
-        )
     }
 
 }

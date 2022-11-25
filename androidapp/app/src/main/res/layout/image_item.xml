@@ -8,4 +8,4 @@
     android:scaleType="centerCrop"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
-    android:contentDescription="Image used for background purposes"></ImageView>
+    android:contentDescription="Image used for background purposes" />

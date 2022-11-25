@@ -1,21 +1,43 @@
 package com.autio.android_app.data.database.repository
 
+import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import com.autio.android_app.data.database.dao.StoryDao
-import com.autio.android_app.data.database.entities.StoryEntitie
+import com.autio.android_app.data.model.story.StoryResponse
+import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
-class StoryRepository(
+class StoryRepository @Inject constructor(
     private val storyDao: StoryDao
 ) {
-
-    val readAllData: LiveData<List<StoryEntitie>> =
+    fun getAllStories(): LiveData<List<StoryResponse>> =
         storyDao.readAllData()
 
-    suspend fun addPointer(
-        storyEntitie: StoryEntitie
+    fun addPointer(
+        storyResponse: StoryResponse
     ) {
-        storyDao.addPointer(
-            storyEntitie
+        InsertAsyncTask(
+            storyDao
+        ).execute(
+            storyResponse
         )
+    }
+
+    private class InsertAsyncTask(
+        val storyDao: StoryDao
+    ) : AsyncTask<StoryResponse, Unit, Unit>() {
+        @Deprecated(
+            "Deprecated in Java"
+        )
+        override fun doInBackground(
+            vararg stories: StoryResponse
+        ) {
+            runBlocking {
+                storyDao.addPointer(
+                    stories[0]
+                )
+            }
+        }
+
     }
 }

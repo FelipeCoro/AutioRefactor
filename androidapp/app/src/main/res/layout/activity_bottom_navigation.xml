@@ -12,95 +12,187 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/cl_persistent_player"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutSeePlans"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph_bottom" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:background="@color/button_text"
-        android:id="@+id/cl_persistent_player"
-        app:layout_constraintBottom_toTopOf="@+id/cl_next_story_label"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/floatingPersistentPlayer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/btnMapPlayer_Persistent"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:layout_margin="16dp"
-            android:src="@drawable/ic_player_selected_light"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/normal_text" />
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutSeePlans"
+        tools:layout_editor_absoluteX="24dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/btnMapPlayer_Persistent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:orientation="vertical">
 
-            <TextView
-                style="@style/TextViewLoraBoldTitle"
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_next_story_label"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="start"
-                android:text="No story loaded"
-                android:textSize="17sp"
-                tools:text="San Francisco from the Beginning" />
+                android:background="@color/persistent_player_next">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/imageView4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Up Next /  NEARBY — WAVE ORGAN, NATURAL MUSIC" />
+
+                <ImageView
+                    android:id="@+id/imageView4"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:layout_margin="15dp"
+                    android:src="@drawable/ic_forward"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/white" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/gray_letter"
-                tools:text="Kevin Costner" />
+                android:background="@color/subscribe_background">
+
+                <ImageView
+                    android:id="@+id/btnMapPlayer"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:layout_margin="16dp"
+                    android:src="@drawable/ic_player_selected_light"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/normal_text" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_info"
+                    app:layout_constraintStart_toEndOf="@+id/btnMapPlayer"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        style="@style/TextViewLoraBoldTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:text="No story loaded"
+                        android:textSize="17sp"
+                        tools:text="San Francisco from the Beginning" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/gray_letter"
+                        tools:text="Kevin Costner" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/btn_info"
+                    android:layout_width="3dp"
+                    android:layout_height="16dp"
+                    android:layout_margin="18dp"
+                    android:src="@drawable/ic_drag"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/button_background" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_next_story_label"
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:background="@color/button_text"-->
+    <!--        android:id="@+id/cl_persistent_player"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/cl_next_story_label"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content">-->
+
+    <!--        <ImageView-->
+    <!--            android:id="@+id/btnMapPlayer_Persistent"-->
+    <!--            android:layout_width="52dp"-->
+    <!--            android:layout_height="52dp"-->
+    <!--            android:layout_margin="16dp"-->
+    <!--            android:src="@drawable/ic_player_selected_light"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--            app:tint="@color/normal_text" />-->
+
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="16dp"-->
+    <!--            android:orientation="vertical"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toEndOf="@+id/btnMapPlayer_Persistent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent">-->
+
+    <!--            <TextView-->
+    <!--                style="@style/TextViewLoraBoldTitle"-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:gravity="start"-->
+    <!--                android:text="@string/no_story_loaded"-->
+    <!--                android:textSize="17sp"-->
+    <!--                tools:text="San Francisco from the Beginning" />-->
+
+    <!--            <TextView-->
+    <!--                android:layout_width="wrap_content"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:textColor="@color/gray_letter"-->
+    <!--                tools:text="Kevin Costner" />-->
+
+    <!--        </LinearLayout>-->
+
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <RelativeLayout
+        android:id="@+id/relativeLayoutSeePlans"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/persistent_player_next"
+        android:background="@color/normal_text"
+        android:gravity="center"
+        android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView">
 
         <TextView
-            android:textColor="@color/white"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@+id/imageView4"
-            tools:text="Up Next /  NEARBY — WAVE ORGAN, NATURAL MUSIC" />
-
-        <ImageView
-            android:id="@+id/imageView4"
-            android:layout_width="13dp"
-            android:layout_height="13dp"
-            android:layout_margin="15dp"
-            android:src="@drawable/ic_forward"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:text="@string/enjoy_5_stories_free_tap_for_plans"
+            android:textColor="@color/text_map_fragment" />
+    </RelativeLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:background="@color/subscribe_background"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu"
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/subscribe_background"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

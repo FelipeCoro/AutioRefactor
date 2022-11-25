@@ -60,7 +60,7 @@ class SplashActivity :
     }
 
     private fun getUserSession(): String =
-        prefRepository.getUserApiToken()
+        prefRepository.userApiToken
 
     private fun whereToGo() {
         val apiToken =

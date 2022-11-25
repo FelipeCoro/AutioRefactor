@@ -19,17 +19,18 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="232dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingHorizontal="50dp">
 
             <TextView
                 android:id="@+id/textView2"
                 style="@style/TextViewInterRegular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="60dp"
                 android:gravity="center"
-                android:text="@string/you_re_not_currently_signed_in_ncreate_an_account_or_sign_in_to_nmanage_your_settings"
+                android:text="@string/guest_authenticate_message"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -37,7 +38,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="45dp"
                 android:orientation="horizontal"
                 android:weightSum="2"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -63,8 +65,6 @@
                     android:layout_weight="1"
                     android:text="@string/sign_up" />
             </LinearLayout>
-
-
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -74,15 +74,16 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="232dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingHorizontal="50dp">
 
             <TextView
                 android:id="@+id/textView3"
                 style="@style/TextViewInterRegular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="40dp"
                 android:gravity="center"
                 android:text="@string/autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -93,6 +94,8 @@
                 style="@style/Button.Strong"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="45dp"
                 android:text="@string/see_plans"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -108,14 +111,18 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="232dp"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="50dp">
 
             <TextView
+                android:id="@+id/tv_guest_contact_autio"
                 style="@style/TextViewInterRegularLight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/questions_about_your_account_or_subscription"
+                android:text="@string/guest_contact_autio"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="45dp"
+                android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -127,11 +134,11 @@
 
     <ScrollView
         android:id="@+id/scroll_view_account"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_width="match_parent"
-        android:layout_height="0dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -141,338 +148,341 @@
                 android:id="@+id/iv_account"
                 android:layout_width="match_parent"
                 android:layout_height="375dp"
+                android:scaleType="fitXY"
                 android:src="@drawable/account_image_2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_account"
-                app:layout_constraintTop_toTopOf="@+id/iv_account"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/iv_account">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:fontFamily="@font/lora_regular"
-                    android:textSize="24sp"
-                    android:textColor="@color/white"
                     android:text="@string/a_story_for_everyone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/white"
+                    android:textSize="24sp" />
 
                 <TextView
-                    android:layout_marginTop="8dp"
-                    android:textSize="14sp"
-                    android:fontFamily="@font/inter_regular"
-                    android:textColor="@color/white"
-                    android:text="@string/share_20_off_autio_s_annual_nsubscription_with_a_friend"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="@string/share_20_off_autio_s_annual_nsubscription_with_a_friend"
+                    android:textColor="@color/white"
+                    android:textSize="14sp" />
 
                 <Button
-                    android:layout_marginTop="42dp"
                     style="@style/Button.White"
-                    android:text="@string/send_20_off_to_a_friend"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="42dp"
+                    android:text="@string/send_20_off_to_a_friend" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/ly_account_status"
-                android:orientation="vertical"
-                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginHorizontal="70dp"
                 android:layout_marginTop="21dp"
-                app:layout_constraintTop_toBottomOf="@+id/iv_account"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/iv_account">
 
                 <TextView
-                    android:textColor="@color/gray_letter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="@string/account_status"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textSize="12sp"
+                    android:textColor="@color/gray_letter" />
 
                 <TextView
-                    android:layout_marginTop="8dp"
                     style="@style/TextViewLoraBoldTitle"
-                    android:text="@string/no_plan_selected"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/no_plan_selected"
+                    android:textSize="24sp" />
 
                 <View
-                    android:layout_marginTop="18dp"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginTop="18dp"
                     android:background="@color/divider" />
 
                 <TextView
-                    android:layout_marginTop="16dp"
-                    android:text="@string/choose_a_plan"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-
-
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textSize="16sp"
+                    android:text="@string/manage_subscription" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/lyProfile"
-                android:layout_marginHorizontal="16dp"
-                android:orientation="vertical"
-                android:layout_marginTop="42dp"
-                app:layout_constraintTop_toBottomOf="@+id/ly_account_status"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="42dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/ly_account_status">
 
                 <TextView
                     style="@style/TextViewLoraBoldTitle"
-                    android:textSize="20sp"
-                    android:text="@string/profile"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile"
+                    android:textSize="20sp" />
 
                 <TextView
-                    android:textSize="12sp"
-                    android:fontFamily="@font/inter_regular"
-                    android:textColor="@color/normal_text"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/name"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="@string/name"
+                    android:textColor="@color/normal_text"
+                    android:textSize="12sp" />
 
                 <EditText
                     android:id="@+id/et_name"
-                    android:textSize="12sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray_letter"
                     android:fontFamily="@font/inter_regular"
                     android:textColor="@color/gray_letter"
-                    android:backgroundTint="@color/gray_letter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:textSize="12sp" />
 
                 <TextView
-                    android:textSize="12sp"
-                    android:fontFamily="@font/inter_regular"
-                    android:textColor="@color/normal_text"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/email"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="@string/email"
+                    android:textColor="@color/normal_text"
+                    android:textSize="12sp" />
 
                 <EditText
                     android:id="@+id/et_email"
-                    android:textSize="12sp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/gray_letter"
                     android:fontFamily="@font/inter_regular"
                     android:textColor="@color/gray_letter"
-                    android:backgroundTint="@color/gray_letter"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:id="@+id/ly_update_profile"
-                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginVertical="8dp"
-                    android:weightSum="2"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:visibility="gone"
+                    android:weightSum="2">
 
                     <Button
                         android:id="@+id/btn_update_profile"
                         style="@style/Button.Blue"
-                        android:textColor="@color/white"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginHorizontal="16dp"
                         android:layout_weight="1"
                         android:text="Update"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:textColor="@color/white" />
 
                     <Button
                         android:id="@+id/btn_cancel_update"
                         style="@style/Button.Shape.transparent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginHorizontal="16dp"
                         android:layout_weight="1"
-                        android:text="Cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:text="Cancel" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/ly_change_password"
-                    android:visibility="gone"
-                    android:orientation="vertical"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <TextView
-                        android:textSize="12sp"
-                        android:fontFamily="@font/inter_regular"
-                        android:textColor="@color/normal_text"
-                        android:layout_marginTop="8dp"
-                        android:text="CURRENT PASSWORD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="CURRENT PASSWORD"
+                        android:textColor="@color/normal_text"
+                        android:textSize="12sp" />
 
                     <EditText
                         android:id="@+id/et_current_password"
-                        android:textSize="12sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/gray_letter"
                         android:fontFamily="@font/inter_regular"
                         android:textColor="@color/gray_letter"
-                        android:backgroundTint="@color/gray_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:textSize="12sp" />
 
                     <TextView
-                        android:textSize="12sp"
-                        android:fontFamily="@font/inter_regular"
-                        android:textColor="@color/normal_text"
-                        android:layout_marginTop="8dp"
-                        android:text="NEW PASSWORD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="NEW PASSWORD"
+                        android:textColor="@color/normal_text"
+                        android:textSize="12sp" />
 
                     <EditText
                         android:id="@+id/et_new_password"
-                        android:textSize="12sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/gray_letter"
                         android:fontFamily="@font/inter_regular"
                         android:textColor="@color/gray_letter"
-                        android:backgroundTint="@color/gray_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:textSize="12sp" />
 
                     <TextView
-                        android:textSize="12sp"
-                        android:fontFamily="@font/inter_regular"
-                        android:textColor="@color/normal_text"
-                        android:layout_marginTop="8dp"
-                        android:text="CONFIRM PASSWORD"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/inter_regular"
+                        android:text="CONFIRM PASSWORD"
+                        android:textColor="@color/normal_text"
+                        android:textSize="12sp" />
 
                     <EditText
                         android:id="@+id/et_confirm_password"
-                        android:textSize="12sp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@color/gray_letter"
                         android:fontFamily="@font/inter_regular"
                         android:textColor="@color/gray_letter"
-                        android:backgroundTint="@color/gray_letter"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:textSize="12sp" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:visibility="gone"
                     android:id="@+id/ly_btns_change_password"
-                    android:gravity="center"
-                    android:weightSum="2"
-                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="gone"
+                    android:weightSum="2">
 
                     <Button
                         android:id="@+id/btn_update_password"
                         style="@style/Button.Gray"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginHorizontal="8dp"
                         android:layout_weight="1"
-                        android:text="@string/update"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:text="@string/update" />
 
                     <Button
                         android:id="@+id/btn_cancel_password"
                         style="@style/Button.Shape.transparent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginHorizontal="8dp"
                         android:layout_weight="1"
-                        android:text="@string/cancel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:text="@string/cancel" />
 
                 </LinearLayout>
 
                 <Button
                     android:id="@+id/btn_change_password"
-                    android:layout_marginTop="16dp"
-                    android:layout_gravity="center"
                     style="@style/Button.Shape.transparent"
-                    android:text="@string/change_password"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/change_password" />
 
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/lyInterests"
-                android:layout_marginTop="16dp"
-                android:layout_marginHorizontal="16dp"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/lyProfile"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/lyProfile">
 
                 <TextView
                     style="@style/TextViewLoraBoldTitle"
-                    android:textSize="20sp"
-                    android:text="@string/interests"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:text="@string/interests"
+                    android:textSize="20sp" />
 
                 <TextView
-                    android:textSize="12sp"
-                    android:fontFamily="@font/inter_regular"
-                    android:textColor="@color/normal_text"
-                    android:text="@string/organize_your_interests_from_the_top_down"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/inter_regular"
+                    android:text="@string/organize_your_interests_from_the_top_down"
+                    android:textColor="@color/normal_text"
+                    android:textSize="12sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view_interests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginVertical="8dp"
                     android:background="@color/fragment_background"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    android:layout_marginVertical="8dp"
-                    android:id="@+id/recycler_view_interests"
-                    tools:listitem="@layout/item_interest"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    tools:listitem="@layout/item_interest" />
 
                 <Button
-                    android:layout_marginTop="8dp"
-                    android:layout_gravity="center"
                     style="@style/Button.Gray"
-                    android:text="@string/saves_changes"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/saves_changes" />
             </LinearLayout>
 
             <View
                 android:id="@+id/viewDivider"
-                app:layout_constraintTop_toBottomOf="@+id/lyInterests"
-                android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/divider" />
+                android:layout_marginTop="16dp"
+                android:background="@color/divider"
+                app:layout_constraintTop_toBottomOf="@+id/lyInterests" />
 
             <TextView
                 android:id="@+id/tvQuestionsAbout"
-                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:text="@string/user_questions"
                 android:textColor="@color/gray_letter"
+                android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/viewDivider"
-                android:textAllCaps="true"
-                android:text="@string/questions_about_your_account_or_subscription"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                app:layout_constraintTop_toBottomOf="@+id/viewDivider" />
 
             <RelativeLayout
-                android:layout_marginTop="24dp"
                 android:id="@+id/rlWatchHowWorks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
                 android:gravity="center"
                 app:layout_constraintEnd_toEndOf="@+id/tvQuestionsAbout"
                 app:layout_constraintStart_toStartOf="@+id/tvQuestionsAbout"
-                app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout">
 
                 <TextView
                     android:id="@+id/tvWatchWorks"
@@ -483,9 +493,9 @@
                     android:textSize="16sp" />
 
                 <ImageView
-                    android:layout_marginStart="4dp"
                     android:layout_width="19dp"
                     android:layout_height="19dp"
+                    android:layout_marginStart="4dp"
                     android:layout_toEndOf="@+id/tvWatchWorks"
                     android:src="@drawable/ic_player_selected_light"
                     app:tint="@color/button_background" />
@@ -494,52 +504,53 @@
 
             <LinearLayout
                 android:id="@+id/lyConactButtons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:weightSum="2"
                 android:orientation="horizontal"
+                android:weightSum="2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rlWatchHowWorks"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                app:layout_constraintTop_toBottomOf="@+id/rlWatchHowWorks">
 
                 <Button
-                    android:paddingHorizontal="16dp"
-                    android:layout_marginEnd="4dp"
+                    android:id="@+id/btn_contact"
                     style="@style/Button.Shape.transparent"
-                    android:text="@string/contact"
-                    android:layout_weight="1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/contact" />
 
                 <Button
                     android:id="@+id/btn_log_out"
-                    android:paddingHorizontal="16dp"
-                    android:layout_marginStart="4dp"
                     style="@style/Button.Blue"
-                    android:text="@string/log_out"
-                    android:layout_weight="1"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:paddingHorizontal="16dp"
+                    android:text="@string/log_out" />
             </LinearLayout>
 
             <TextView
-                android:textSize="12sp"
-                android:textColor="@color/gray_letter"
                 android:id="@+id/tvRestorePurchase"
-                app:layout_constraintStart_toStartOf="@+id/lyConactButtons"
-                app:layout_constraintEnd_toEndOf="@+id/lyConactButtons"
-                app:layout_constraintTop_toBottomOf="@+id/lyConactButtons"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:text="@string/restore_purchase"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:textColor="@color/gray_letter"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="@+id/lyConactButtons"
+                app:layout_constraintStart_toStartOf="@+id/lyConactButtons"
+                app:layout_constraintTop_toBottomOf="@+id/lyConactButtons" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="64dp"
                 android:text="@string/delete_my_account"
                 android:textColor="@color/red"
                 android:textSize="12sp"

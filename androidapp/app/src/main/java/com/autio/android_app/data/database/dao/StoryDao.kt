@@ -2,22 +2,22 @@ package com.autio.android_app.data.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.autio.android_app.data.database.entities.StoryEntitie
+import com.autio.android_app.data.model.story.StoryResponse
 
 @Dao
 interface StoryDao {
-
     @Insert(
         onConflict = OnConflictStrategy.IGNORE
     )
     suspend fun addPointer(
-        storyEntitie: StoryEntitie
+        storyResponse: StoryResponse
     )
 
     @Query(
         "SELECT * FROM map_points ORDER BY id ASC"
     )
-    fun readAllData(): LiveData<List<StoryEntitie>>
+    fun readAllData(): LiveData<List<StoryResponse>>
+
 
 //    @Query("SELECT * FROM user")
 //    fun getAll(): List<User>
@@ -34,5 +34,4 @@ interface StoryDao {
 //
 //    @Delete
 //    fun delete(user: User)
-
 }

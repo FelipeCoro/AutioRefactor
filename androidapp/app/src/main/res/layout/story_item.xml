@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:layout_marginHorizontal="15dp"
+    android:paddingVertical="9dp"
+    android:weightSum="5">
+
+    <ImageView
+        android:id="@+id/story_image"
+        android:layout_width="64dp"
+        android:layout_height="match_parent"
+        app:srcCompat="@android:drawable/list_selector_background" />
+
+    <View
+        android:layout_width="15dp"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="4">
+
+        <TextView
+            android:id="@+id/story_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/story_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/story_options"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_three_dots" />
+
+    <View
+        android:layout_width="15dp"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/story_pin"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:srcCompat="@drawable/ic_non_listened_pin" />
+</LinearLayout>

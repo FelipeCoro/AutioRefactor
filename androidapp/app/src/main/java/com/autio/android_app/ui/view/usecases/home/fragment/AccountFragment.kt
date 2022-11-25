@@ -2,24 +2,24 @@ package com.autio.android_app.ui.view.usecases.home.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.Interest.InterestProvider
 import com.autio.android_app.data.model.account.ChangePasswordDto
 import com.autio.android_app.data.model.account.UpdateProfileDto
+import com.autio.android_app.data.model.interest.InterestProvider
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
+import com.autio.android_app.makeLinks
 import com.autio.android_app.ui.view.usecases.home.adapter.InterestAdapter
 import com.autio.android_app.ui.view.usecases.login.LoginActivity
 import com.autio.android_app.ui.view.usecases.login.SignInActivity
@@ -42,9 +42,9 @@ class AccountFragment :
             requireContext()
         )
     }
+
     private val apiService =
         ApiService()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -76,36 +76,27 @@ class AccountFragment :
     }
 
     private fun setListeners() {
+        binding.etName.doOnTextChanged { text, _, _, _ ->
+            run {
+                if (text?.toString()
+                        ?.equals(
+                            prefRepository.userName
+                        ) == false
+                ) binding.lyUpdateProfile.visibility =
+                    VISIBLE
+            }
+        }
 
-        binding.etName.addTextChangedListener(
-            object :
-                TextWatcher {
-                override fun beforeTextChanged(
-                    p0: CharSequence?,
-                    p1: Int,
-                    p2: Int,
-                    p3: Int
-                ) {
-                    return
-                }
-
-                override fun onTextChanged(
-                    p0: CharSequence?,
-                    p1: Int,
-                    p2: Int,
-                    p3: Int
-                ) {
-                    binding.lyUpdateProfile.visibility =
-                        VISIBLE
-                }
-
-                override fun afterTextChanged(
-                    p0: Editable?
-                ) {
-                    return
-                }
-
-            })
+        binding.etEmail.doOnTextChanged { text, _, _, _ ->
+            run {
+                if (text?.toString()
+                        ?.equals(
+                            prefRepository.userEmail
+                        ) == false
+                ) binding.lyUpdateProfile.visibility =
+                    VISIBLE
+            }
+        }
 
         binding.btnChangePassword.setOnClickListener {
             binding.lyChangePassword.visibility =
@@ -134,9 +125,51 @@ class AccountFragment :
                 GONE
             getUserInfo()
         }
+
         binding.btnUpdateProfile.setOnClickListener {
             updateUserData()
         }
+
+        binding.rlWatchHowWorks.setOnClickListener {
+            Utils.openUrl(
+                requireContext(),
+                "https://www.youtube.com/watch?v=SvbahDL4aYc&ab_channel=Autio"
+            )
+        }
+
+        binding.btnContact.setOnClickListener {
+            Utils.writeEmail(
+                requireContext(),
+                arrayOf(
+                    "support@autio.com"
+                ),
+                "Autio Android Customer Support",
+                """
+                    Device: ${Utils.getDeviceData()}
+                    Android Version: ${android.os.Build.VERSION.SDK_INT}
+                    App Version: ${android.os.Build.VERSION.RELEASE}
+                """.trimIndent()
+            )
+        }
+
+        binding.tvGuestContactAutio.makeLinks(
+            Pair(
+                "Contact Autio",
+                View.OnClickListener {
+                    Utils.writeEmail(
+                        requireContext(),
+                        arrayOf(
+                            "support@autio.com"
+                        ),
+                        "Autio Android Customer Support",
+                        """
+                    Device: ${Utils.getDeviceData()}
+                    Android Version: ${android.os.Build.VERSION.SDK_INT}
+                    App Version: ${android.os.Build.VERSION.RELEASE}
+                """.trimIndent()
+                    )
+                })
+        )
     }
 
     private fun updateUserData() {
@@ -191,15 +224,15 @@ class AccountFragment :
                 binding.etCurrentPassword.text.toString()
             val newPassword =
                 binding.etNewPassword.text.toString()
-            val confirmPassowrd =
+            val confirmPassword =
                 binding.etConfirmPassword.text.toString()
             val passwordInfo =
                 ChangePasswordDto(
                     currentPassword,
                     newPassword,
-                    confirmPassowrd
+                    confirmPassword
                 )
-            if (newPassword == confirmPassowrd) {
+            if (newPassword == confirmPassword) {
                 apiService.changePassword(
                     getUserId(),
                     getApiToken(),
@@ -224,9 +257,9 @@ class AccountFragment :
 
     private fun getUserInfo() {
         val name =
-            prefRepository.getUserName()
+            prefRepository.userName
         val email =
-            prefRepository.getUserEmail()
+            prefRepository.userEmail
         binding.etName.setText(
             name
         )
@@ -275,10 +308,6 @@ class AccountFragment :
     }
 
     private fun initRecyclerViewInterest() {
-        val manager =
-            LinearLayoutManager(
-                context
-            )
         val adapter =
             InterestAdapter(
                 interestList
@@ -360,22 +389,20 @@ class AccountFragment :
     }
 
     private fun isUserGuest(): Boolean =
-        prefRepository.getIsUserGuest()
+        prefRepository.isUserGuest
 
     private fun getUserId(): Int =
-        prefRepository.getUserId()
+        prefRepository.userId
 
     private fun getApiToken(): String =
-        "Bearer " + prefRepository.getUserApiToken()
+        "Bearer " + prefRepository.userApiToken
 
     private fun saveUserInfo(
         updateProfileDto: UpdateProfileDto
     ) {
-        prefRepository.setUserName(
+        prefRepository.userName =
             updateProfileDto.name
-        )
-        prefRepository.setUserEmail(
+        prefRepository.userEmail =
             updateProfileDto.email
-        )
     }
 }

@@ -1,4 +1,4 @@
-package com.autio.android_app.data.model.Interest
+package com.autio.android_app.data.model.interest
 
 object InterestProvider {
 

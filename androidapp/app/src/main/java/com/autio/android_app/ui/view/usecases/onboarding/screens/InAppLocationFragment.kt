@@ -9,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.databinding.FragmentInAppLocationBinding
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
 import com.autio.android_app.util.Constants.REQUEST_CODE_LOCATION_PERMISSION
@@ -24,8 +23,6 @@ class InAppLocationFragment :
     private var _binding: FragmentInAppLocationBinding? =
         null
     private val binding get() = _binding!!
-
-    private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,17 +41,6 @@ class InAppLocationFragment :
         }
 
         return binding.root
-    }
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(
-            view,
-            savedInstanceState
-        )
-
     }
 
     private fun requestPermission() {

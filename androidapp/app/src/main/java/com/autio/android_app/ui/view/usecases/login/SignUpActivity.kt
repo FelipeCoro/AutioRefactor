@@ -2,7 +2,6 @@ package com.autio.android_app.ui.view.usecases.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.model.account.CreateAccountDto
 import com.autio.android_app.data.model.account.LoginResponse
@@ -81,10 +80,6 @@ class SignUpActivity :
             apiService.createAccount(
                 createAccountDto
             ) {
-                Log.i(
-                    "CREATE ACCOUNT:",
-                    "---------Im here----------"
-                )
                 if (it != null) {
                     saveUserInfo(
                         it
@@ -108,20 +103,15 @@ class SignUpActivity :
     private fun saveUserInfo(
         loginResponse: LoginResponse
     ) {
-        prefRepository.setIsUserGuest(
+        prefRepository.isUserGuest =
             false
-        )
-        prefRepository.setUserId(
+        prefRepository.userId =
             loginResponse.id!!
-        )
-        prefRepository.setUserApiToken(
+        prefRepository.userApiToken =
             loginResponse.apiToken!!
-        )
-        prefRepository.setUserName(
+        prefRepository.userName =
             loginResponse.name!!
-        )
-        prefRepository.setUserEmail(
+        prefRepository.userEmail =
             loginResponse.email!!
-        )
     }
 }

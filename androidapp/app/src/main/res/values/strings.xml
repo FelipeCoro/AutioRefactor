@@ -4,18 +4,14 @@
     <string name="menu_map">Map</string>
     <string name="menu_my_stories">My Stories</string>
     <string name="menu_account">Account</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="or"> or </string>
     <string name="restore_purchase"> <u>Restore Purchase</u></string>
     <string name="watch_how_it_works">Watch How it Works</string>
-    <string name="_1_is_donated_for_every_purchase_to_nsupport_storytellers_in_underserved_ncommunities_learn_more">$1 is donated for every purchase to\nsupport storytellers in underserved\ncommunities.Learn more</string>
+    <string name="_1_is_donated_for_every_purchase_to_support_storytellers_in_underserved_communities_learn_more">$1 is donated for every purchase to\nsupport storytellers in underserved\ncommunities. <u>Learn more</u>.</string>
     <string name="_4_9_5_stars">4.9 / 5 Stars</string>
-    <string name="choose_a_plan"><u>Choose a Plan</u></string>
     <string name="love_this">Love this!</string>
-    <string name="great_app_my_husband_and_i_are_fulltime_rv_rs_rv_n_free_and_this_is_the_perfect_app_to_use_while_traveling_the_us">“Great app! My husband and I are fulltime RV’rs (RV-N-Free) and this is the PERFECT app to use while traveling the US.”</string>
+    <string name="great_app_my_husband_and_i_are_fulltime_rv_rs_rv_n_free_and_this_is_the_perfect_app_to_use_while_traveling_the_us">“Great app! My husband and I are full-time RV’rs (RV-N-Free) and this is the PERFECT app to use while traveling the US.”</string>
     <string name="rv_n_free">— RV-N-Free</string>
-    <string name="try_5_stories_free">Try 5 Stories Free</string>
     <string name="an_start">An start</string>
     <string name="focus_on_your_road_trip">Focus on your road trip</string>
     <string name="this_app_really_brings_the_trip_home_on_a_personal_level">“This app really brings the trip home on a personal level.”</string>
@@ -27,10 +23,8 @@
     <string name="create_your_account">Create Your Account</string>
     <string name="cancel">Cancel</string>
     <string name="name">NAME</string>
-    <string name="you_re_not_currently_signed_in_ncreate_an_account_or_sign_in_to_nmanage_your_settings">You’re not currently signed in.\nCreate an account or sign in to\nmanage your settings.</string>
     <string name="autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"><![CDATA[Autio offers 30 Day & 3 Year\nplans that don’t automatically renew,\nas well as an annual subscription.]]></string>
     <string name="see_plans">See Plans</string>
-    <string name="questions_about_your_account_or_subscription">Questions about your account or subscription?.</string>
     <string name="up_next">Up Next</string>
     <string name="you_re_not_currently_signed_in_create_an_naccount_or_sign_in_to_manage_your_settings">You\'re not currently signed in. Create an\naccount or sign in to manage your settings.</string>
     <string name="search">Search</string>
@@ -48,13 +42,26 @@
     <string name="contact">Contact</string>
     <string name="log_out">Log Out</string>
     <string name="delete_my_account">Delete My Account</string>
-    <string name="title_activity_maps">MapsActivity</string>
     <string name="continue_as_guest">Continue As Guest</string>
     <string name="update">Update</string>
     <!-- Summaries and short messages -->
     <string name="welcome">Welcome, explorer!</string>
     <string name="app_description">Autio is a location-based\naudio app that alerts you to exciting\nstories along your journey.\n\nWe’ll need a few permissions\nto get started…</string>
     <string name="tagline">Every place has a story.\nNow every story has a place.</string>
+    <string name="traveler_plan_title">Traveler - only $3/month</string>
+    <string name="traveler_plan_description">1 YEAR SUBSCRIPTION • $35.99 paid annually</string>
+    <string name="traveler_plan_note">You\'ll be reminded before renewal. You can cancel any time.</string>
+    <string name="adventurer_discount">35% OFF, BEST VALUE</string>
+    <string name="single_trip_plan_title">Single Trip</string>
+    <string name="single_trip_plan_description">30 DAYS PASS • $29.99</string>
+    <string name="single_trip_note">One-time payment.</string>
+    <string name="adventurer_plan_title">Adventurer</string>
+    <string name="adventurer_plan_description">3 YEAR MEMBER • <strike>$107.97</strike> $69.99</string>
+    <string name="adventurer_plan_note">One-time payment.</string>
+    <string name="user_questions">QUESTIONS ABOUT YOUR ACCOUNT OR SUBSCRIPTION?</string>
+    <string name="guest_authenticate_message">You\'re not currently signed in.\nCreate an account or sign in to\nmanage your account.</string>
+    <string name="guest_contact_autio">Questions about your account or subscription? <u>Contact Autio</u>.</string>
+    <string name="no_story_loaded">No story loaded</string>
     <!-- Text fields' labels -->
     <string name="email">EMAIL</string>
     <string name="password">PASSWORD</string>
@@ -62,10 +69,24 @@
     <string name="welcome_nav_to_permissions">Let’s go!</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
-    <string name="guest">Continue as a guest</string>
     <string name="forgot_password">Forgot Password</string>
+    <string name="choose_a_plan">Choose a Plan</string>
+    <string name="manage_subscription"><u>Manage Subscription</u></string>
+    <string name="continue_free_trial">Continue Free Trial</string>
+    <string name="try_5_stories_free">Try 5 Stories Free</string>
+    <string name="back">Back</string>
+    <string name="learn_more">Learn More</string>
     <!-- Images' content description -->
     <string name="logo_description">Autio logo</string>
+    <string name="app_store_rate">Average rating of the app in stores</string>
+    <string name="moth_logo">The Moth group\'s logo</string>
+    <!-- Modal content -->
+    <string name="moth_advertisement_title">Help the Next Generation\nTell Their Stories</string>
+    <string name="moth_advertisement_body">Autio is a proud sponsor of The Moth\nCommunity Engagement Program,
+        which\nprovides the space, tools and expertise\nfor people to practice the art and craft of\npersonal
+        storytelling. We partner with\ncommunity organizations, cultural institutions\nand non-profits to host
+        workshops that\ninspire confidence and self-reflection\nand deepen connections within and\n
+        between communities.</string>
     <!-- Miscellaneous -->
     <string name="divider">Divider component for separating visuals</string>
 </resources>

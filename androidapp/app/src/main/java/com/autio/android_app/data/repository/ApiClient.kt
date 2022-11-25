@@ -1,6 +1,8 @@
 package com.autio.android_app.data.repository
 
 import com.autio.android_app.data.model.account.*
+import com.autio.android_app.data.model.story.StoryDto
+import com.autio.android_app.data.model.story.StoryResponse
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -71,4 +73,23 @@ interface ApiClient {
         ) apiToken: String,
         @Body changePasswordDto: ChangePasswordDto
     ): Call<ChangePasswordResponse>
+
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    @GET(
+        "/api/v1/stories/ids"
+    )
+    fun getStoriesByIds(
+        @Header(
+            "X-User-Id"
+        ) xUserId: Int,
+        @Header(
+            "Authorization"
+        ) apiToken: String,
+        @Query(
+            "ids"
+        ) ids: StoryDto
+    ): Call<List<StoryResponse>>
 }

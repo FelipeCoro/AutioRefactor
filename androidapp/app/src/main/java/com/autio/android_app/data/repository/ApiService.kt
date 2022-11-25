@@ -3,12 +3,13 @@ package com.autio.android_app.data.repository
 import android.util.Log
 import com.autio.android_app.core.RetrofitHelper
 import com.autio.android_app.data.model.account.*
+import com.autio.android_app.data.model.story.StoryDto
+import com.autio.android_app.data.model.story.StoryResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class ApiService {
-
     private val retrofit =
         RetrofitHelper.buildService(
             ApiClient::class.java
@@ -31,49 +32,23 @@ class ApiService {
                         onResult(
                             null
                         )
-                        Log.i(
-                            "SIGN IN:",
-                            "-------------------Fail Response-----------------"
-                        )
                     }
 
                     override fun onResponse(
                         call: Call<LoginResponse>,
                         response: Response<LoginResponse>
                     ) {
-                        Log.i(
-                            "SIGN IN:",
-                            "-------------------Success on call-----------------"
-                        )
                         if (!response.isSuccessful) {
-                            Log.e(
-                                "SIGN IN:",
-                                response.errorBody()
-                                    ?.string()
-                                    ?: "Unknown error"
+                            onResult(
+                                null
                             )
-                            if (response.errorBody()
-                                    ?.contentType()
-                                    ?.subtype()
-                                    .equals(
-                                        "application/json"
-                                    )
-                            ) {
-                                Log.i(
-                                    "SIGN IN:",
-                                    "-------------Error message----------------"
-                                )
-                            }
+                        } else {
+                            val userInfo =
+                                response.body()
+                            onResult(
+                                userInfo
+                            )
                         }
-                        val userInfo =
-                            response.body()
-                        Log.i(
-                            "SIGN IN:",
-                            userInfo.toString()
-                        )
-                        onResult(
-                            userInfo
-                        )
                     }
                 })
     }
@@ -89,10 +64,6 @@ class ApiService {
                         call: Call<GuestResponse>,
                         response: Response<GuestResponse>
                     ) {
-                        Log.i(
-                            "SIGN IN:",
-                            "-------------------Success on call-----------------"
-                        )
                         if (!response.isSuccessful) {
                             if (response.errorBody()
                                     ?.contentType()
@@ -109,10 +80,6 @@ class ApiService {
                         }
                         val guestInfo =
                             response.body()
-                        Log.i(
-                            "SIGN IN:",
-                            guestInfo.toString()
-                        )
                         onResult(
                             guestInfo
                         )
@@ -124,10 +91,6 @@ class ApiService {
                     ) {
                         onResult(
                             null
-                        )
-                        Log.i(
-                            "SIGN IN:",
-                            "-------------------Fail Response-----------------"
                         )
                     }
                 })
@@ -147,10 +110,6 @@ class ApiService {
                         call: Call<LoginResponse>,
                         response: Response<LoginResponse>
                     ) {
-                        Log.i(
-                            "CREATE ACCOUNT:",
-                            "-------------------SUCCESS Response-----------------"
-                        )
                         if (!response.isSuccessful) {
                             if (response.errorBody()
                                     ?.contentType()
@@ -166,10 +125,6 @@ class ApiService {
                             }
                             val userInfo =
                                 response.body()
-                            Log.i(
-                                "CREATE ACCOUNT:",
-                                userInfo.toString()
-                            )
                             onResult(
                                 userInfo
                             )
@@ -182,10 +137,6 @@ class ApiService {
                     ) {
                         onResult(
                             null
-                        )
-                        Log.i(
-                            "CREATE ACCOUNT:",
-                            "-------------------Fail Response-----------------"
                         )
                     }
 
@@ -212,10 +163,6 @@ class ApiService {
                         call: Call<UpdateProfileDto>,
                         response: Response<UpdateProfileDto>
                     ) {
-                        Log.i(
-                            "UPDATE PROFILE:",
-                            "---------------Update Response--------------"
-                        )
                         if (!response.isSuccessful) {
                             if (response.errorBody()
                                     ?.contentType()
@@ -247,10 +194,6 @@ class ApiService {
                     ) {
                         onResult(
                             null
-                        )
-                        Log.i(
-                            "UPDATE PROFILE:",
-                            "-------------------Fail Response-----------------"
                         )
                     }
 
@@ -308,6 +251,45 @@ class ApiService {
                         )
                     }
 
+                })
+    }
+
+    fun getStoriesByIds(
+        xUserId: Int,
+        apiToken: String,
+        storyDto: StoryDto,
+        onResult: (List<StoryResponse>?) -> Unit
+    ) {
+        retrofit.getStoriesByIds(
+            xUserId,
+            apiToken,
+            storyDto
+        )
+            .enqueue(
+                object :
+                    Callback<List<StoryResponse>> {
+                    override fun onResponse(
+                        call: Call<List<StoryResponse>>,
+                        response: Response<List<StoryResponse>>
+                    ) {
+                        if (response.isSuccessful) {
+                            val stories =
+                                response.body()
+                            onResult(
+                                stories
+                            )
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<List<StoryResponse>>,
+                        t: Throwable
+                    ) {
+                        Log.d(
+                            "STORIES",
+                            "-------------------Fail Response-----------------\n${t.message}"
+                        )
+                    }
                 })
     }
 }

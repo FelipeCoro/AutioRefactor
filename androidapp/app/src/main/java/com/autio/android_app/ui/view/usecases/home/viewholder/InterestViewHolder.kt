@@ -2,7 +2,7 @@ package com.autio.android_app.ui.view.usecases.home.viewholder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.autio.android_app.data.model.Interest.InterestModel
+import com.autio.android_app.data.model.interest.InterestModel
 import com.autio.android_app.databinding.ItemInterestBinding
 
 class InterestViewHolder(

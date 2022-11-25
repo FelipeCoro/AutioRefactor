@@ -2,14 +2,12 @@ package com.autio.android_app.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.autio.android_app.util.Constants.ON_BOARDING_FINISHED
 import com.autio.android_app.util.Constants.USER_API_TOKEN
 import com.autio.android_app.util.Constants.USER_EMAIL
 import com.autio.android_app.util.Constants.USER_ID
 import com.autio.android_app.util.Constants.USER_IS_GUEST
 import com.autio.android_app.util.Constants.USER_NAME
 import com.autio.android_app.util.Constants.USER_PREFERENCES
-import com.google.gson.Gson
 
 class PrefRepository(
     val context: Context
@@ -22,18 +20,6 @@ class PrefRepository(
         )
     private val editor =
         pref.edit()
-    private val gson =
-        Gson()
-
-    private fun String.put(
-        long: Long
-    ) {
-        editor.putLong(
-            this,
-            long
-        )
-        editor.commit()
-    }
 
     private fun String.put(
         int: Int
@@ -65,12 +51,6 @@ class PrefRepository(
         editor.commit()
     }
 
-    private fun String.getLong() =
-        pref.getLong(
-            this,
-            0
-        )
-
     private fun String.getInt() =
         pref.getInt(
             this,
@@ -89,65 +69,40 @@ class PrefRepository(
             false
         )
 
-    fun setOnBoardingFinished(
-        onBoardingFinished: Boolean
-    ) =
-        ON_BOARDING_FINISHED.put(
-            onBoardingFinished
-        )
-
-    fun getOnBoardingFinished() =
-        ON_BOARDING_FINISHED.getBoolean()
-
-    fun setUserId(
-        id: Int
-    ) =
-        USER_ID.put(
+    var userId: Int =
+        USER_ID.getInt()
+        set(id) = USER_ID.put(
             id
         )
 
-    fun getUserId() =
-        USER_ID.getInt()
-
-    fun setUserName(
-        name: String
-    ) =
-        USER_NAME.put(
-            name
-        )
-
-    fun getUserName() =
+    var userName: String =
         USER_NAME.getString()
+        set(
+            name
+        ) =
+            USER_NAME.put(
+                name
+            )
 
-    fun setUserEmail(
-        email: String
-    ) =
-        USER_EMAIL.put(
+    var userEmail: String =
+        USER_EMAIL.getString()
+        set(
+            email
+        ) = USER_EMAIL.put(
             email
         )
 
-    fun getUserEmail() =
-        USER_EMAIL.getString()
-
-    fun setUserApiToken(
-        apiToken: String
-    ) =
-        USER_API_TOKEN.put(
+    var userApiToken: String =
+        USER_API_TOKEN.getString()
+        set(apiToken) = USER_API_TOKEN.put(
             apiToken
         )
 
-    fun getUserApiToken() =
-        USER_API_TOKEN.getString()
-
-    fun setIsUserGuest(
-        isGuest: Boolean
-    ) =
-        USER_IS_GUEST.put(
+    var isUserGuest: Boolean =
+        USER_IS_GUEST.getBoolean()
+        set(isGuest) = USER_IS_GUEST.put(
             isGuest
         )
-
-    fun getIsUserGuest() =
-        USER_IS_GUEST.getBoolean()
 
     fun clearData() {
         editor.clear()

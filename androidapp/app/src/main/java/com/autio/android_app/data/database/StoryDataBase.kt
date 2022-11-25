@@ -5,10 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.autio.android_app.data.database.dao.StoryDao
-import com.autio.android_app.data.database.entities.StoryEntitie
+import com.autio.android_app.data.model.story.StoryResponse
 
 @Database(
-    entities = [StoryEntitie::class],
+    entities = [StoryResponse::class],
     version = 1
 )
 abstract class StoryDataBase :
@@ -21,28 +21,30 @@ abstract class StoryDataBase :
         private var INSTANCE: StoryDataBase? =
             null
 
-        fun getDatabase(
+        fun getInstance(
             context: Context
-        ): StoryDataBase {
-            val tempInstance =
-                INSTANCE
-            if (tempInstance != null) {
-                return tempInstance
-            }
-            synchronized(
-                this
-            ) {
-                val instance =
-                    Room.databaseBuilder(
-                        context.applicationContext,
-                        StoryDataBase::class.java,
-                        "map_points"
-                    )
-                        .build()
-                INSTANCE =
-                    instance
-                return instance
-            }
-        }
+        ): StoryDataBase =
+            INSTANCE
+                ?: synchronized(
+                    this
+                ) {
+                    INSTANCE
+                        ?: buildDatabase(
+                            context
+                        ).also {
+                            INSTANCE =
+                                it
+                        }
+                }
+
+        private fun buildDatabase(
+            context: Context
+        ) =
+            Room.databaseBuilder(
+                context.applicationContext,
+                StoryDataBase::class.java,
+                "map_points"
+            )
+                .build()
     }
 }

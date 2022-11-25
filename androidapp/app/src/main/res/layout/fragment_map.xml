@@ -4,111 +4,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.view.usecases.home.fragment.MapFragment">
+    tools:context=".ui.view.usecases.home.fragment.map.MapFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/maps"
-        app:layout_constraintTop_toTopOf="parent"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></androidx.fragment.app.FragmentContainerView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutSeePlans"
-        tools:layout_editor_absoluteX="24dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toTopOf="@+id/relativeLayoutSeePlans">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:background="@color/subscribe_background"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/btnMapPlayer"
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:layout_margin="16dp"
-                    android:src="@drawable/ic_player_selected_light"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/normal_text" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_info"
-                    app:layout_constraintStart_toEndOf="@+id/btnMapPlayer"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        style="@style/TextViewLoraBoldTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="start"
-                        android:text="No story loaded"
-                        android:textSize="17sp"
-                        tools:text="San Francisco from the Beginning" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textColor="@color/gray_letter"
-                        tools:text="Kevin Costner" />
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_margin="18dp"
-                    app:tint="@color/button_background"
-                    android:id="@+id/btn_info"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:src="@drawable/ic_drag"
-                    android:layout_width="3dp"
-                    android:layout_height="16dp" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout="@layout/fragment_map_placeholder" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="150dp"
+        android:backgroundTint="@color/fragment_background"
         app:cardCornerRadius="6dp"
-        app:layout_constraintStart_toStartOf="@+id/cardView"
-        app:layout_constraintBottom_toTopOf="@+id/cardView">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
-            android:gravity="center"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
-                android:layout_margin="8dp"
-                android:src="@drawable/ic_map"
+                android:id="@+id/img_map_view"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:src="@drawable/ic_map" />
 
             <View
                 android:layout_width="1dp"
@@ -116,44 +43,38 @@
                 android:background="@color/gray_letter" />
 
             <ImageView
-                android:layout_margin="8dp"
-                android:src="@drawable/ic_map_list"
+                android:id="@+id/img_playlist_view"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_map_list" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
-        app:cardCornerRadius="12dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="12dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/cardView"
-        app:layout_constraintEnd_toEndOf="@+id/cardView">
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="150dp"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageView
-            android:layout_margin="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="8dp"
             android:src="@drawable/ic_location" />
     </androidx.cardview.widget.CardView>
 
-    <RelativeLayout
-        android:padding="8dp"
-        android:background="@color/normal_text"
-        android:gravity="center"
-        android:id="@+id/relativeLayoutSeePlans"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/playlist"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.map.MapPlaylistFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <TextView
-            android:textColor="@color/text_map_fragment"
-            android:text="@string/enjoy_5_stories_free_tap_for_plans"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </RelativeLayout>
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout="@layout/fragment_map_playlist" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,7 +19,7 @@ class SearchFragment :
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding =
             FragmentSearchBinding.inflate(
                 inflater,

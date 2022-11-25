@@ -43,24 +43,31 @@ class WelcomeExplorerFragment :
         binding.tvWelcome.apply {
             alpha =
                 0f
+            x -= 500
             visibility =
                 View.VISIBLE
             animate().alpha(
                 1f
             )
+                .translationX(
+                    0f
+                )
                 .duration =
                 2000
         }
         binding.ivDivider.apply {
             alpha =
                 0f
-            x =
-                binding.root.x
+            x -=
+                500
             visibility =
                 View.VISIBLE
             animate().alpha(
                 1f
             )
+                .translationX(
+                    0f
+                )
                 .setDuration(
                     2000
                 )
@@ -68,11 +75,15 @@ class WelcomeExplorerFragment :
                     binding.tvAppDescription.apply {
                         alpha =
                             0f
+                        x += 500
                         visibility =
                             View.VISIBLE
                         animate().alpha(
                             1f
                         )
+                            .translationX(
+                                0f
+                            )
                             .setDuration(
                                 2000
                             )
@@ -80,11 +91,15 @@ class WelcomeExplorerFragment :
                                 binding.buttonLetsGo.apply {
                                     alpha =
                                         0f
+                                    x -= 500
                                     visibility =
                                         View.VISIBLE
                                     animate().alpha(
                                         1f
                                     )
+                                        .translationX(
+                                            0f
+                                        )
                                         .duration =
                                         2000
                                 }

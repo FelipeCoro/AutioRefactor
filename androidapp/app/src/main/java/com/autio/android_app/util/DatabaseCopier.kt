@@ -22,14 +22,10 @@ class DatabaseCopier {
 
     fun getInstance(
         context: Context
-    ): DatabaseCopier? {
+    ): DatabaseCopier {
         appContext =
             context
         return Holder.INSTANCE
-    }
-
-    private fun DatabaseCopier() {
-
     }
 
     fun getRoomDatabase(): StoryDataBase? {

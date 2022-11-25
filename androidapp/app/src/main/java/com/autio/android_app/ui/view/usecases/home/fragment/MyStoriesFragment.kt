@@ -2,7 +2,6 @@ package com.autio.android_app.ui.view.usecases.home.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,12 +36,6 @@ class MyStoriesFragment :
                 container,
                 false
             )
-
-
-        Log.i(
-            "SESSION:",
-            isUserGuest().toString()
-        )
 
         createView()
         intentFunctions()
@@ -95,7 +88,7 @@ class MyStoriesFragment :
     }
 
     private fun isUserGuest(): Boolean =
-        prefRepository.getIsUserGuest()
+        prefRepository.isUserGuest
 
 
 }

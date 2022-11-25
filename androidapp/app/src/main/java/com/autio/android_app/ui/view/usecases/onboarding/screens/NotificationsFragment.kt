@@ -9,7 +9,6 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentNotificationsBinding
 import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
@@ -20,11 +19,6 @@ class NotificationsFragment :
     Fragment(),
     EasyPermissions.PermissionCallbacks {
 
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
     private var _binding: FragmentNotificationsBinding? =
         null
     private val binding get() = _binding!!
@@ -50,12 +44,10 @@ class NotificationsFragment :
         binding.buttonNotificationPermission.setOnClickListener {
             if (Build.VERSION.SDK_INT >= 33) {
                 requestPermission()
-            } else {
-                if (viewPager != null) {
-                    goToLocationPermission(
-                        viewPager
-                    )
-                }
+            } else if (viewPager != null) {
+                goToLocationPermission(
+                    viewPager
+                )
             }
         }
         return binding.root

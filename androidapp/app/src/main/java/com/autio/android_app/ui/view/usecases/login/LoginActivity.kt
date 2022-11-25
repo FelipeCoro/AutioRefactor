@@ -8,12 +8,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.adapter.ImageAdapter
 import com.autio.android_app.data.Datasource
+import com.autio.android_app.data.model.account.GuestResponse
+import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivityLoginBinding
 import com.autio.android_app.setAutomaticScroll
+import com.autio.android_app.ui.view.usecases.home.BottomNavigation
+import com.autio.android_app.util.Utils
 
 class LoginActivity :
     AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
+    private val apiService =
+        ApiService()
+    private val prefRepository by lazy {
+        PrefRepository(
+            this
+        )
+    }
 
     private lateinit var firstRecyclerView: RecyclerView
     private lateinit var secondRecyclerView: RecyclerView
@@ -101,5 +113,38 @@ class LoginActivity :
                 )
             )
         }
+        binding.btnLoginAsGuest.setOnClickListener {
+            loginGuest()
+        }
+    }
+
+    private fun loginGuest() {
+        apiService.guest {
+            if (it != null) {
+                saveGuestInfo(
+                    it
+                )
+                startActivity(
+                    Intent(
+                        this,
+                        BottomNavigation::class.java
+                    )
+                )
+                finish()
+            } else {
+                Utils.showError(
+                    this
+                )
+            }
+        }
+    }
+
+    private fun saveGuestInfo(
+        guestResponse: GuestResponse
+    ) {
+        prefRepository.isUserGuest =
+            true
+        prefRepository.userApiToken =
+            guestResponse.apiToken
     }
 }
