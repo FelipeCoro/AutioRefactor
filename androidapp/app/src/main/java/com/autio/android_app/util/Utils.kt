@@ -2,12 +2,17 @@ package com.autio.android_app.util
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 object Utils {
 
@@ -17,6 +22,14 @@ object Utils {
         return etText.text.toString()
             .trim()
             .isEmpty()
+    }
+
+    fun checkEmptyFormFields(
+        formFields: Array<EditText>
+    ):Boolean{
+        return formFields.all {
+            it.text.toString().trim().isEmpty()
+        }
     }
 
     fun pleaseFillText(
@@ -66,11 +79,11 @@ object Utils {
         ) {
             capitalize(
                 model
-            );
+            )
         } else {
             capitalize(
                 manufacturer
-            ) + " " + model;
+            ) + " " + model
         }
     }
 
@@ -151,5 +164,34 @@ object Utils {
                 1
             )
         }
+    }
+
+    fun getIconFromDrawable(
+        drawable: Drawable?
+    ): BitmapDescriptor? {
+        if (drawable == null) return null
+        val canvas =
+            Canvas()
+        val bitmap =
+            Bitmap.createBitmap(
+                drawable.intrinsicWidth,
+                drawable.intrinsicHeight,
+                Bitmap.Config.ARGB_8888
+            )
+        canvas.setBitmap(
+            bitmap
+        )
+        drawable.setBounds(
+            0,
+            0,
+            drawable.intrinsicWidth,
+            drawable.intrinsicHeight
+        )
+        drawable.draw(
+            canvas
+        )
+        return BitmapDescriptorFactory.fromBitmap(
+            bitmap
+        )
     }
 }

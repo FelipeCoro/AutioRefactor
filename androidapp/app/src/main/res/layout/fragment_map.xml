@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/maps_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.view.usecases.home.fragment.map.MapFragment">
@@ -15,11 +16,12 @@
         tools:layout="@layout/fragment_map_placeholder" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cv_actions_tabs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="150dp"
-        android:backgroundTint="@color/fragment_background"
+        android:layout_marginBottom="160dp"
+        android:backgroundTint="@color/fragment_background_opaque"
         app:cardCornerRadius="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -35,7 +37,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:src="@drawable/ic_map" />
+                android:src="@drawable/ic_map"
+                app:tint="@color/tab_view_icon_active"/>
 
             <View
                 android:layout_width="1dp"
@@ -47,25 +50,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:src="@drawable/ic_map_list" />
+                android:src="@drawable/ic_map_list"
+                app:tint="@color/tab_view_icon_inactive"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/card_location_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="150dp"
+        android:layout_marginBottom="160dp"
         app:cardCornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cardBackgroundColor="@color/location_icon_background">
 
         <ImageView
+            android:id="@+id/location_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:src="@drawable/ic_location" />
+            android:src="@drawable/ic_location"
+            app:tint="@color/location_icon"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.fragment.app.FragmentContainerView

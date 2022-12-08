@@ -9,28 +9,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.adapter.StoryAdapter
-import com.autio.android_app.data.database.StoryDataBase
 import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.story.StoryDto
-import com.autio.android_app.data.model.story.StoryResponse
-import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.databinding.FragmentMapPlaylistBinding
 import com.autio.android_app.ui.viewmodel.StoryViewModel
-import kotlinx.coroutines.runBlocking
 
 class MapPlaylistFragment :
     Fragment() {
     private var _binding: FragmentMapPlaylistBinding? =
         null
     private val binding get() = _binding!!
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
 
-    private lateinit var stories: List<StoryResponse>
+    private lateinit var stories: List<Story>
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var storyRepository: StoryRepository
@@ -41,28 +31,16 @@ class MapPlaylistFragment :
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(
-            "STORIES",
-            "Stories being fetched..."
-        )
         _binding =
             FragmentMapPlaylistBinding.inflate(
                 inflater,
                 container,
                 false
             )
-        val database =
-            container?.context?.let {
-                StoryDataBase.getInstance(
-                    it
-                )
-            }
-        if (database != null) {
-            storyRepository =
-                StoryRepository(
-                    database.storyDao()
-                )
-        }
+        storyRepository =
+            StoryRepository(
+                application = requireActivity().application
+            )
         stories =
             ArrayList()
         recyclerView =
@@ -75,7 +53,6 @@ class MapPlaylistFragment :
             StoryAdapter(
                 stories
             )
-        requestStories()
         storyViewModel.getAllStories()
             .observe(
                 viewLifecycleOwner
@@ -90,41 +67,4 @@ class MapPlaylistFragment :
             }
         return binding.root
     }
-
-    private fun requestStories() {
-        // TODO (Marshysaurus): Remove dummy ids
-        val dummyIds =
-            StoryDto(
-                listOf(
-                    "1",
-                    "2",
-                    "3"
-                )
-            )
-        ApiService().getStoriesByIds(
-            getUserId(),
-            getApiToken(),
-            dummyIds
-        ) {
-            if (it != null) {
-                Log.d(
-                    "STORIES",
-                    "Stories fetched: $it"
-                )
-                runBlocking {
-                    for (s in it) {
-                        storyRepository.addPointer(
-                            s
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getUserId(): Int =
-        prefRepository.userId
-
-    private fun getApiToken(): String =
-        "Bearer " + prefRepository.userApiToken
 }

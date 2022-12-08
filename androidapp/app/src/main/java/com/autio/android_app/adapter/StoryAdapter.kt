@@ -1,32 +1,43 @@
 package com.autio.android_app.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.story.StoryResponse
+import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.databinding.StoryItemBinding
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 
 class StoryAdapter(
-    private var stories: List<StoryResponse>
+    private var stories: List<Story>
 ) :
     RecyclerView.Adapter<StoryAdapter.StoryViewHolder>() {
 
     class StoryViewHolder(
-        itemView: View
+        val binding: StoryItemBinding
     ) : RecyclerView.ViewHolder(
-        itemView
+        binding.root
     ) {
-        val binding =
-            StoryItemBinding.bind(
-                itemView
-            )
-
         fun render(
-            model: StoryResponse
+            model: Story
         ) {
+            Glide.with(
+                binding.root
+            )
+                .load(
+                    model.imageUrl
+                )
+                .apply(
+                    RequestOptions().placeholder(
+                        R.drawable.maps_placeholder
+                    ).error(
+                        R.drawable.maps_placeholder
+                    )
+                )
+                .into(
+                    binding.storyImage
+                )
             binding.storyTitle.text =
                 model.title
             binding.storyAuthor.text =
@@ -42,11 +53,11 @@ class StoryAdapter(
         viewType: Int
     ): StoryViewHolder {
         return StoryViewHolder(
-            LayoutInflater.from(
-                parent.context
-            )
+            StoryItemBinding
                 .inflate(
-                    R.layout.fragment_map_playlist,
+                    LayoutInflater.from(
+                        parent.context
+                    ),
                     parent,
                     false
                 )
@@ -57,10 +68,6 @@ class StoryAdapter(
         holder: StoryViewHolder,
         position: Int
     ) {
-        Log.d(
-            "STORIES",
-            "$stories"
-        )
         val story =
             stories[position]
         holder.render(
@@ -72,7 +79,7 @@ class StoryAdapter(
         stories.size
 
     fun getAllData(
-        stories: List<StoryResponse>
+        stories: List<Story>
     ) {
         this.stories =
             stories

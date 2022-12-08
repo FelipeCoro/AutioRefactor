@@ -66,7 +66,7 @@
     <string name="email">EMAIL</string>
     <string name="password">PASSWORD</string>
     <!-- Buttons' body text -->
-    <string name="welcome_nav_to_permissions">Let’s go!</string>
+    <string name="welcome_nav_to_permissions">Let\'s go!</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="forgot_password">Forgot Password</string>

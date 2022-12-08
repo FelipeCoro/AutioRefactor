@@ -49,14 +49,12 @@ class SignUpActivity :
     }
 
     private fun createUser() {
-        if (Utils.checkEmptyField(
-                binding.tvName
-            ) ||
-            Utils.checkEmptyField(
-                binding.tvEmail
-            ) ||
-            Utils.checkEmptyField(
-                binding.tvPassword
+        if (Utils.checkEmptyFormFields(
+                arrayOf(
+                    binding.tvName,
+                    binding.tvEmail,
+                    binding.tvPassword
+                )
             )
         ) {
             Utils.pleaseFillText(
@@ -93,7 +91,8 @@ class SignUpActivity :
                     finish()
                 } else {
                     Utils.showError(
-                        this
+                        this,
+                        "The mail is already associated to another account"
                     )
                 }
             }

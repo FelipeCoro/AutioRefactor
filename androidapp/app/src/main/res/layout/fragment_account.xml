@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
     tools:context=".ui.view.usecases.home.fragment.AccountFragment">
-
     <LinearLayout
         android:id="@+id/linear_layout_sign_in"
         android:layout_width="match_parent"
@@ -16,7 +15,6 @@
         android:weightSum="3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -497,7 +495,7 @@
                     android:layout_height="19dp"
                     android:layout_marginStart="4dp"
                     android:layout_toEndOf="@+id/tvWatchWorks"
-                    android:src="@drawable/ic_player_selected_light"
+                    android:src="@drawable/ic_player_play"
                     app:tint="@color/button_background" />
 
             </RelativeLayout>
@@ -550,7 +548,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:layout_marginBottom="64dp"
+                android:layout_marginBottom="180dp"
                 android:text="@string/delete_my_account"
                 android:textColor="@color/red"
                 android:textSize="12sp"

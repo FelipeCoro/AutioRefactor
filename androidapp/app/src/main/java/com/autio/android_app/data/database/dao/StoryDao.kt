@@ -2,22 +2,34 @@ package com.autio.android_app.data.database.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.autio.android_app.data.model.story.StoryResponse
+import com.autio.android_app.data.model.story.Story
 
 @Dao
 interface StoryDao {
     @Insert(
         onConflict = OnConflictStrategy.IGNORE
     )
-    suspend fun addPointer(
-        storyResponse: StoryResponse
-    )
+    fun addStories(
+        story: List<Story>
+    ): List<Long>
 
     @Query(
-        "SELECT * FROM map_points ORDER BY id ASC"
+        "SELECT * FROM stories ORDER BY id ASC"
     )
-    fun readAllData(): LiveData<List<StoryResponse>>
+    fun readAllStories(): LiveData<List<Story>>
 
+    @Query("SELECT * FROM stories WHERE id IN (:ids)")
+    fun readStoriesWithIds(ids: Array<String>): LiveData<Array<Story>>
+
+    @Query(
+        "SELECT * FROM stories WHERE publishedDate = (SELECT MAX(publishedDate) FROM stories)"
+    )
+    fun readLastFetchedStory(): Story
+
+    @Query(
+        "DELETE FROM stories"
+    )
+    fun deleteAllStories()
 
 //    @Query("SELECT * FROM user")
 //    fun getAll(): List<User>

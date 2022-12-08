@@ -34,34 +34,51 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:id="@+id/cl_next_story_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/persistent_player_next">
+                android:background="@color/persistent_player_next"
+                android:paddingTop="10dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                android:gravity="center_vertical">
 
-                <TextView
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <LinearLayout
+                    android:id="@+id/columnNextStory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView4"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Up Next /  NEARBY — WAVE ORGAN, NATURAL MUSIC" />
+                    android:orientation="vertical"
+                    android:gravity="end">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="11sp"
+                        android:textColor="@color/white"
+                        tools:text="Up Next / NEARBY" />
+                    <TextView
+                        android:id="@+id/tvNextStory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        tools:text="Wave Organ - Natural Music" />
+                </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/imageView4"
-                    android:layout_width="13dp"
-                    android:layout_height="13dp"
-                    android:layout_margin="15dp"
+                    android:id="@+id/ivNextIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginStart="14dp"
                     android:src="@drawable/ic_forward"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/white" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    app:tint="@color/player_next_icon" />
+            </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -69,11 +86,11 @@
                 android:background="@color/subscribe_background">
 
                 <ImageView
-                    android:id="@+id/btnMapPlayer"
+                    android:id="@+id/btnFloatingPlayerPlay"
                     android:layout_width="52dp"
                     android:layout_height="52dp"
                     android:layout_margin="16dp"
-                    android:src="@drawable/ic_player_selected_light"
+                    android:src="@drawable/ic_player_play"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -86,10 +103,11 @@
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/btn_info"
-                    app:layout_constraintStart_toEndOf="@+id/btnMapPlayer"
+                    app:layout_constraintStart_toEndOf="@+id/btnFloatingPlayerPlay"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
+                        android:id="@+id/tvFloatingPlayerTitle"
                         style="@style/TextViewLoraBoldTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -99,6 +117,7 @@
                         tools:text="San Francisco from the Beginning" />
 
                     <TextView
+                        android:id="@+id/tvFloatingPlayerNarrator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/gray_letter"
@@ -122,53 +141,6 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-
-    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
-    <!--        android:background="@color/button_text"-->
-    <!--        android:id="@+id/cl_persistent_player"-->
-    <!--        app:layout_constraintBottom_toTopOf="@+id/cl_next_story_label"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content">-->
-
-    <!--        <ImageView-->
-    <!--            android:id="@+id/btnMapPlayer_Persistent"-->
-    <!--            android:layout_width="52dp"-->
-    <!--            android:layout_height="52dp"-->
-    <!--            android:layout_margin="16dp"-->
-    <!--            android:src="@drawable/ic_player_selected_light"-->
-    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent"-->
-    <!--            app:tint="@color/normal_text" />-->
-
-    <!--        <LinearLayout-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="16dp"-->
-    <!--            android:orientation="vertical"-->
-    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintStart_toEndOf="@+id/btnMapPlayer_Persistent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent">-->
-
-    <!--            <TextView-->
-    <!--                style="@style/TextViewLoraBoldTitle"-->
-    <!--                android:layout_width="wrap_content"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:gravity="start"-->
-    <!--                android:text="@string/no_story_loaded"-->
-    <!--                android:textSize="17sp"-->
-    <!--                tools:text="San Francisco from the Beginning" />-->
-
-    <!--            <TextView-->
-    <!--                android:layout_width="wrap_content"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:textColor="@color/gray_letter"-->
-    <!--                tools:text="Kevin Costner" />-->
-
-    <!--        </LinearLayout>-->
-
-    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
 
     <RelativeLayout
         android:id="@+id/relativeLayoutSeePlans"

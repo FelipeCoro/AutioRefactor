@@ -3,9 +3,8 @@ package com.autio.android_app.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.autio.android_app.data.database.StoryDataBase
 import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.story.StoryResponse
+import com.autio.android_app.data.model.story.Story
 
 class StoryViewModel(
     application: Application
@@ -13,26 +12,20 @@ class StoryViewModel(
     AndroidViewModel(
         application
     ) {
-    private val database =
-        StoryDataBase.getInstance(
-            application
-        )
     private val storyRepository =
         StoryRepository(
-            database
-                .storyDao()
+            application
         )
-    private val getAllStories =
-        storyRepository.getAllStories()
 
-    fun insert(
-        story: StoryResponse
+    fun addStories(
+        stories: List<Story>
     ) {
-        storyRepository.addPointer(
-            story
+        storyRepository.addPointers(
+            stories
         )
     }
 
-    fun getAllStories(): LiveData<List<StoryResponse>> =
-        getAllStories
+    fun getAllStories(): LiveData<List<Story>> = storyRepository.getAllStories()
+
+    fun getStoriesByIds(ids: Array<String>): LiveData<Array<Story>> = storyRepository.getStoriesByIds(ids)
 }

@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Colors in the app -->
+    <color name="autio_white">
+        #FFFFFF
+    </color>
+    <color name="autio_blue_7">
+        #EEEEF2
+    </color>
+    <color name="autio_blue_20">
+        #CECFDA
+    </color>
+    <color name="autio_blue_40">
+        #9C9FB5
+    </color>
+    <color name="autio_blue_60">
+        #6B6F8F
+    </color>
+    <color name="autio_blue_80">
+        #393F6A
+    </color>
+    <color name="autio_blue_93">
+        #171E50
+    </color>
+    <color name="autio_blue">
+        #080F45
+    </color>
+
     <!-- Dark Mode   -->
     <color name="black">
         #FF000000
@@ -42,6 +68,9 @@
     <!-- Layouts  -->
     <color name="fragment_background">
         #393F6A
+    </color>
+    <color name="fragment_background_opaque">
+        #080F45
     </color>
     <color name="divider">
         #EEEEF2
@@ -86,11 +115,26 @@
     <color name="player_fragment_text">
         #FF000000
     </color>
-    <color name="player_fragment_icon">
-        #FF000000
+    <color name="player_next_icon">
+        #090E42
+    </color>
+    <color name="player_highlighted_text">
+        #FFFFFF
     </color>
     <!-- Map Fragment Page -->
     <color name="persistent_player_next">
-        #393F6A
+        #FFFFFF
+    </color>
+    <color name="location_icon">
+        #FFFFFF
+    </color>
+    <color name="tab_view_icon_active">
+        #FFFFFF
+    </color>
+    <color name="tab_view_icon_inactive">
+        #6B6F8F
+    </color>
+    <color name="location_icon_background">
+        #080F45
     </color>
 </resources>

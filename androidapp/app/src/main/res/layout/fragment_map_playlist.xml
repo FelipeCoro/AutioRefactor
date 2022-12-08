@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/autio_blue"
+    android:background="@color/autio_blue_80"
     tools:context=".ui.view.usecases.home.fragment.map.MapPlaylistFragment">
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/map_playlist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="18dp"
+        tools:listitem="@layout/story_item"
         app:layoutManager="LinearLayoutManager" />
 </LinearLayout>

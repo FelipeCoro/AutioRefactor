@@ -4,6 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class ChangePasswordResponse(
     @SerializedName(
-        "succes"
+        "success"
     ) val success: String
 )

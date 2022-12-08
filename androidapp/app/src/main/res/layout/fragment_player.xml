@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_player"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
@@ -25,10 +26,15 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <ImageView
-                    android:id="@+id/imageView3"
+                    android:id="@+id/ivStoryImage"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/gray_letter" />
+                    android:background="@color/gray_letter"
+                    android:scaleType="centerCrop"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -91,11 +97,60 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="10dp"
                 android:fontFamily="@font/lora_regular"
                 android:gravity="center"
-                android:text="No story loaded"
-                android:textSize="24sp"
-                app:layout_constraintTop_toBottomOf="@+id/ly_image_story" />
+                android:text="@string/no_story_loaded"
+                android:textColor="@color/player_highlighted_text"
+                android:textSize="30sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ly_image_story" />
+
+            <TextView
+                android:id="@+id/tvStoryNarrator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/player_highlighted_text"
+                android:textAllCaps="true"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvStoryTitle" />
+
+            <TextView
+                android:id="@+id/tvStoryLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/autio_blue_40"
+                android:textAllCaps="true"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvStoryNarrator"/>
+
+            <TextView
+                android:id="@+id/tvStoryAuthor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/player_highlighted_text"
+                android:textAllCaps="true"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvStoryLocation"/>
+
+            <TextView
+                android:id="@+id/tvStoryCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="12sp"
+                android:textColor="@color/autio_blue_40"
+                android:textAllCaps="true"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/tvStoryAuthor"/>
 
             <LinearLayout
                 android:id="@+id/layout_player"
@@ -105,7 +160,9 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:weightSum="5"
-                app:layout_constraintTop_toBottomOf="@+id/tvStoryTitle">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvStoryCategory">
 
                 <ImageView
                     android:layout_width="0dp"
@@ -122,10 +179,11 @@
                     app:tint="@color/button_background" />
 
                 <ImageView
+                    android:id="@+id/btnPlay"
                     android:layout_width="0dp"
                     android:layout_height="70dp"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_player_selected_light"
+                    android:src="@drawable/ic_player_play"
                     app:tint="@color/button_background" />
 
                 <ImageView
@@ -144,13 +202,15 @@
             </LinearLayout>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/map_card"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layout_player">
+                app:layout_constraintTop_toBottomOf="@+id/layout_player"
+                android:visibility="gone">
 
                 <androidx.fragment.app.FragmentContainerView
                     android:id="@+id/maps"

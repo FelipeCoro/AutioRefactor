@@ -5,13 +5,13 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 @Entity(
-    tableName = "map_points",
+    tableName = "stories",
     indices = [Index(
         value = ["id"],
         unique = true
     )]
 )
-data class StoryResponse constructor(
+data class Story constructor(
     @PrimaryKey
     val id: String,
     val title: String,
@@ -25,8 +25,10 @@ data class StoryResponse constructor(
     )
     val lon: Double,
     val range: Int,
-    val imageUrl: String,
-    val recordUrl: String,
+    @SerializedName("imageURL")
+    val imageUrl: String?,
+    @SerializedName("recordURL")
+    val recordUrl: String?,
     val duration: Int,
     @SerializedName(
         "dateAdded"
@@ -42,10 +44,7 @@ data class StoryResponse constructor(
     @SerializedName(
         "authorName"
     ) val author: String,
-    @ColumnInfo(
-        name = "state"
-    )
-    val state: String,
+    val state: String?,
     @Embedded(
         prefix = "category_"
     )
@@ -54,16 +53,7 @@ data class StoryResponse constructor(
 
 data class CategoryResponse(
     @PrimaryKey
-    @ColumnInfo(
-        name = "id"
-    )
     val id: Int,
-    @ColumnInfo(
-        name = "title"
-    )
     val title: String,
-    @ColumnInfo(
-        name = "url"
-    )
     val link: String,
 )
