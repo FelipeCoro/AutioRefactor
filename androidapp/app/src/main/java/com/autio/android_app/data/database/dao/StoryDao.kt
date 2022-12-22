@@ -16,10 +16,16 @@ interface StoryDao {
     @Query(
         "SELECT * FROM stories ORDER BY id ASC"
     )
-    fun readAllStories(): LiveData<List<Story>>
+    fun readLiveStories(): LiveData<List<Story>>
+
+    @Query("SELECT * FROM stories")
+    suspend fun readStories(): List<Story>
 
     @Query("SELECT * FROM stories WHERE id IN (:ids)")
     fun readStoriesWithIds(ids: Array<String>): LiveData<Array<Story>>
+
+    @Query("SELECT * FROM stories WHERE id = (:id)")
+    suspend fun getStoryById(id: String): Story?
 
     @Query(
         "SELECT * FROM stories WHERE publishedDate = (SELECT MAX(publishedDate) FROM stories)"

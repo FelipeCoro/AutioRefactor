@@ -1,6 +1,7 @@
 package com.autio.android_app.ui.view.usecases.onboarding.screens
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -8,21 +9,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.viewpager2.widget.ViewPager2
+import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentInAppLocationBinding
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
-import com.autio.android_app.util.Constants.REQUEST_CODE_LOCATION_PERMISSION
 import com.autio.android_app.util.TrackingUtility
-import pub.devrel.easypermissions.AppSettingsDialog
-import pub.devrel.easypermissions.EasyPermissions
 
 class InAppLocationFragment :
-    Fragment(),
-    EasyPermissions.PermissionCallbacks {
+    Fragment() {
 
     private var _binding: FragmentInAppLocationBinding? =
         null
     private val binding get() = _binding!!
+
+    private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +38,11 @@ class InAppLocationFragment :
                 false
             )
 
+        viewPager =
+            requireActivity().findViewById(
+                R.id.viewPager
+            )
+
         binding.buttonLocationPermission.setOnClickListener {
             requestPermission()
         }
@@ -44,30 +51,32 @@ class InAppLocationFragment :
     }
 
     private fun requestPermission() {
-        if (TrackingUtility.hasLocationPermissions(
+        if (TrackingUtility.hasCoreLocationPermissions(
                 requireContext()
             )
         ) {
-            return
-        }
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            EasyPermissions.requestPermissions(
-                this,
-                "You need to accept location permissions  to use this app.",
-                REQUEST_CODE_LOCATION_PERMISSION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+            moveToNextStep()
         } else {
-            EasyPermissions.requestPermissions(
-                this,
-                "You need to accept location permissions  to use this app.",
-                REQUEST_CODE_LOCATION_PERMISSION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            requestPermissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
             )
         }
+    }
+
+    private fun moveToNextStep() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            goToBackgroundLocationPermission()
+        } else {
+            goToSubscribeActivity()
+        }
+    }
+
+    private fun goToBackgroundLocationPermission() {
+        viewPager.currentItem =
+            2
     }
 
     private fun goToSubscribeActivity() {
@@ -96,50 +105,41 @@ class InAppLocationFragment :
             true
         )
         editor.apply()
-        // prefRepository.setOnBoardingFinished(true)
     }
 
-    override fun onPermissionsGranted(
-        requestCode: Int,
-        perms: MutableList<String>
-    ) {
-        goToSubscribeActivity()
-    }
-
-    override fun onPermissionsDenied(
-        requestCode: Int,
-        perms: MutableList<String>
-    ) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(
-                this,
-                perms
-            )
-        ) {
-            AppSettingsDialog.Builder(
-                this
-            )
-                .build()
-                .show()
-        } else {
-            requestPermission()
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissionsResults ->
+            val allGranted =
+                permissionsResults.all { it.value }
+            if (allGranted) {
+                moveToNextStep()
+            } else {
+                showWarningDialog()
+            }
         }
-    }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults
+    private fun showWarningDialog() {
+        AlertDialog.Builder(
+            requireActivity()
         )
-        EasyPermissions.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults,
-            this
-        )
+            .apply {
+                setMessage(
+                    "For a full experience of the app, accepting the " +
+                            "requested permissions are necessary. Are you sure want to continue?" +
+                            " You can change this later in your Settings."
+                )
+                setPositiveButton(
+                    "Continue"
+                ) { _, _ ->
+                    moveToNextStep()
+                }
+                setNegativeButton(
+                    "Request again"
+                ) { _, _ -> requestPermission() }
+                create()
+            }
+            .show()
     }
 }

@@ -2,6 +2,7 @@ package com.autio.android_app.ui.view.usecases.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +13,7 @@ import com.autio.android_app.data.model.account.GuestResponse
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivityLoginBinding
-import com.autio.android_app.setAutomaticScroll
+import com.autio.android_app.extensions.setAutomaticScroll
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.util.Utils
 
@@ -46,7 +47,7 @@ class LoginActivity :
         )
 
         setUpBackgroundAnimation()
-        intentsButtons()
+        setListeners()
     }
 
     private fun setUpBackgroundAnimation() {
@@ -96,7 +97,7 @@ class LoginActivity :
         thirdRecyclerView.setAutomaticScroll()
     }
 
-    private fun intentsButtons() {
+    private fun setListeners() {
         binding.btnSignIn.setOnClickListener {
             startActivity(
                 Intent(
@@ -118,7 +119,16 @@ class LoginActivity :
         }
     }
 
+    private fun showLoadingView() {
+        binding.flLoading.root.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingView() {
+        binding.flLoading.root.visibility = View.GONE
+    }
+
     private fun loginGuest() {
+        showLoadingView()
         apiService.guest {
             if (it != null) {
                 saveGuestInfo(
@@ -132,6 +142,7 @@ class LoginActivity :
                 )
                 finish()
             } else {
+                hideLoadingView()
                 Utils.showError(
                     this
                 )
@@ -144,6 +155,7 @@ class LoginActivity :
     ) {
         prefRepository.isUserGuest =
             true
+        prefRepository.userId = guestResponse.id
         prefRepository.userApiToken =
             guestResponse.apiToken
     }

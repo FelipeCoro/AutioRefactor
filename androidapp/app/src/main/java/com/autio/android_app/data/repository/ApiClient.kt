@@ -79,9 +79,15 @@ interface ApiClient {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    @GET(
-        "/api/v1/stories/ids"
+    suspend fun getAllStories(
+
     )
+
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    @GET("/api/v1/stories/by-ids-v2")
     fun getStoriesByIds(
         @Header(
             "X-User-Id"
@@ -90,8 +96,8 @@ interface ApiClient {
             "Authorization"
         ) apiToken: String,
         @Query(
-            "ids"
-        ) ids: String
+            "ids[]"
+        ) ids : List<String>
     ): Call<List<Story>>
 
     @Headers(

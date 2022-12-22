@@ -2,6 +2,7 @@ package com.autio.android_app.ui.view.usecases.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.model.account.GuestResponse
 import com.autio.android_app.data.model.account.LoginDto
@@ -52,6 +53,14 @@ class SignInActivity :
         }
     }
 
+    private fun showLoadingView() {
+        binding.flLoading.root.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingView() {
+        binding.flLoading.root.visibility = View.GONE
+    }
+
     private fun loginUser() {
         if (Utils.checkEmptyField(
                 binding.editTextEmail
@@ -63,6 +72,7 @@ class SignInActivity :
                 this
             )
         } else {
+            showLoadingView()
             val email =
                 binding.editTextEmail.text.toString()
             val password =
@@ -87,6 +97,7 @@ class SignInActivity :
                     )
                     finish()
                 } else {
+                    hideLoadingView()
                     Utils.showError(
                         this,
                         "The user and/or password are incorrect"
@@ -94,10 +105,10 @@ class SignInActivity :
                 }
             }
         }
-
     }
 
     private fun loginGuest() {
+        showLoadingView()
         apiService.guest {
             if (it != null) {
                 saveGuestInfo(
@@ -111,6 +122,7 @@ class SignInActivity :
                 )
                 finish()
             } else {
+                hideLoadingView()
                 Utils.showError(
                     this
                 )
@@ -123,6 +135,7 @@ class SignInActivity :
     ) {
         prefRepository.isUserGuest =
             true
+        prefRepository.userId = guestResponse.id
         prefRepository.userApiToken =
             guestResponse.apiToken
     }

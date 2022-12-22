@@ -18,7 +18,7 @@
             android:id="@+id/tv_Interest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/inter_regular"
+            android:fontFamily="@font/sf_pro_text_regular"
             android:textColor="@color/normal_text"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"

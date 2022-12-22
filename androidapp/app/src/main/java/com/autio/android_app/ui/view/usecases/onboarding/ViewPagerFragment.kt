@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.autio.android_app.databinding.FragmentViewPagerBinding
+import com.autio.android_app.ui.view.usecases.onboarding.screens.BackgroundLocationFragment
 import com.autio.android_app.ui.view.usecases.onboarding.screens.InAppLocationFragment
 import com.autio.android_app.ui.view.usecases.onboarding.screens.NotificationsFragment
 
@@ -28,21 +29,20 @@ class ViewPagerFragment :
                 false
             )
 
-        val fragmentList =
-            arrayListOf<Fragment>(
-                NotificationsFragment(),
-                InAppLocationFragment()
-            )
-
         val adapter =
             ViewPagerAdapter(
-                fragmentList,
+                arrayOf(
+                    NotificationsFragment(),
+                    InAppLocationFragment(),
+                    BackgroundLocationFragment()
+                ),
                 requireActivity().supportFragmentManager,
                 lifecycle
             )
 
         binding.viewPager.adapter =
             adapter
+        binding.viewPager.isUserInputEnabled = false
 
         return binding.root
     }

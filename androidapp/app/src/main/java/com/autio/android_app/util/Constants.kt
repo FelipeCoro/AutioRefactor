@@ -3,7 +3,7 @@ package com.autio.android_app.util
 
 object Constants {
     const val baseUrl =
-        "https://test.autio.com/"
+        "https://app.autio.com/"
     const val REQUEST_CODE_LOCATION_PERMISSION =
         0
     const val REQUEST_CODE_NOTIFICATION_PERMISSION =
@@ -24,5 +24,4 @@ object Constants {
         "USER_IS_GUEST"
     const val USER_FIREBASE_KEY =
         "USER_FIREBASE_KEY"
-
 }

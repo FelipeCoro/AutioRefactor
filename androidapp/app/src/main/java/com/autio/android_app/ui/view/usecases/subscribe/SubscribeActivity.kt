@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivitySubscribeBinding
 import com.autio.android_app.databinding.MothPopupBinding
-import com.autio.android_app.makeLinks
+import com.autio.android_app.extensions.makeLinks
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.view.usecases.login.LoginActivity
 import com.smarteist.autoimageslider.SliderView
@@ -25,25 +25,20 @@ class SubscribeActivity :
         )
     }
 
-    private lateinit var dialogBinding: MothPopupBinding
-    private lateinit var dialog: Dialog
-
     private lateinit var binding: ActivitySubscribeBinding
-    private lateinit var sliderView: SliderView
-    private lateinit var sliderAdapter: SliderAdapter
     private val textListTitle =
         arrayListOf(
-            "Take your journey to the next level\nwith location-based audio stories",
-            "Go anywhere with nationwide\ncoverage",
-            "Always more to discover with new\noriginal content",
-            "A collection of narrators as unique as\nthe stories"
+            "Take your journey to the next level with location-based audio stories",
+            "Go anywhere with nationwide coverage",
+            "Always more to discover with new original content",
+            "A collection of narrators as unique as the stories"
         )
     private val textList =
         arrayListOf(
-            "Explore our collection of over 8,500+ stories\nexclusive to HearHere.",
-            "Road trip across the country with new stories to\ndiscover wherever you travel.",
+            "Explore our collection of over 10,000+ stories exclusive to Autio.",
+            "Road trip across the country with new stories to discover wherever you travel.",
             "New, unique stories added weekly.",
-            "Listen to some of your favorite voices, like Kevin\nCostner, Phil Jackson, & John Lithgow."
+            "Listen to some of your favorite voices, like Kevin Costner, Phil Jackson, & John Lithgow."
         )
 
     override fun onCreate(
@@ -63,24 +58,22 @@ class SubscribeActivity :
         binding.tvMothInvitation.movementMethod =
             LinkMovementMethod.getInstance()
 
-        sliderView =
-            binding.imageSliderSubscribe
-
-        sliderAdapter =
-            SliderAdapter(
-                textListTitle,
-                textList
-            )
-        sliderView.autoCycleDirection =
-            SliderView.LAYOUT_DIRECTION_LTR
-        sliderView.setSliderAdapter(
-            sliderAdapter
-        )
-        sliderView.scrollTimeInSec =
-            3
-        sliderView.isAutoCycle =
-            true
-        sliderView.startAutoCycle()
+            binding.imageSliderSubscribe.apply {
+                autoCycleDirection =
+                    SliderView.LAYOUT_DIRECTION_LTR
+                setSliderAdapter(
+                    SliderAdapter(
+                        textListTitle,
+                        textList
+                    )
+                )
+                scrollTimeInSec =
+                    6
+                isAutoCycle =
+                    true
+                setInfiniteAdapterEnabled(true)
+                startAutoCycle()
+            }
 
         setListeners()
     }
@@ -90,11 +83,11 @@ class SubscribeActivity :
             Pair(
                 "Learn more",
                 View.OnClickListener {
-                    dialogBinding =
+                    val dialogBinding =
                         MothPopupBinding.inflate(
                             layoutInflater
                         )
-                    dialog =
+                    val dialog =
                         Dialog(
                             this
                         )

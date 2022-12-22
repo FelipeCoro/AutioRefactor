@@ -2,38 +2,41 @@ package com.autio.android_app.util
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
-import pub.devrel.easypermissions.EasyPermissions
+import androidx.core.content.ContextCompat
 
 object TrackingUtility {
 
-    fun hasLocationPermissions(
+    fun hasCoreLocationPermissions(
         context: Context
     ) =
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            EasyPermissions.hasPermissions(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        } else {
-            EasyPermissions.hasPermissions(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )
-        }
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+
+    fun hasBackgroundLocationPermission(
+        context: Context
+    ) =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.Q || ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
 
     @RequiresApi(
-        33
+        Build.VERSION_CODES.TIRAMISU
     )
     fun hasNotificationPermissions(
         context: Context
     ) =
-        EasyPermissions.hasPermissions(
+        ContextCompat.checkSelfPermission(
             context,
-//            Manifest.permission.POST_NOTIFICATIONS
-        )
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
 }

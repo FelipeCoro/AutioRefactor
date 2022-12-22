@@ -1,193 +1,69 @@
 package com.autio.android_app.ui.view.usecases.home.fragment
 
+import android.content.res.Resources
+import android.graphics.Paint
+import android.net.Uri
 import android.os.Bundle
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.res.ResourcesCompat
+import android.widget.SeekBar
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.autio.android_app.R
+import com.autio.android_app.data.model.story.NowPlayingMetadata
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.databinding.FragmentPlayerBinding
-import com.autio.android_app.player.MediaBrowserAdapter
-import com.autio.android_app.player.StoryLibrary
-import com.autio.android_app.ui.viewmodel.StoryViewModel
-import com.autio.android_app.util.Utils.getIconFromDrawable
+import com.autio.android_app.extensions.timestampToMSS
+import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
+import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
+import com.autio.android_app.util.InjectorUtils
+import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 
 class PlayerFragment :
     Fragment(),
     OnMapReadyCallback {
 
-    private var _binding: FragmentPlayerBinding? =
-        null
-    private val binding get() = _binding!!
+    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel> {
+        InjectorUtils.provideBottomNavigationViewModel(
+            requireContext()
+        )
+    }
+    private val playerFragmentViewModel by viewModels<PlayerFragmentViewModel> {
+        InjectorUtils.providePlayerFragmentViewModel(
+            requireContext()
+        )
+    }
 
-    private var currentState =
-        STATE_PAUSED
-
-    private lateinit var mediaBrowserAdapter: MediaBrowserAdapter
-
-    private lateinit var stories: LiveData<Array<Story>>
-    private var currentStory: Story? =
-        null
+    lateinit var binding: FragmentPlayerBinding
 
     private var map: GoogleMap? =
         null
-
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-        super.onCreate(
-            savedInstanceState
-        )
-        val dummyIds =
-            arrayOf(
-                "3"
-            )
-
-        mediaBrowserAdapter =
-            MediaBrowserAdapter(
-                requireContext()
-            ).apply {
-                addListener(
-                    object :
-                        MediaBrowserAdapter.MediaBrowserChangeListener() {
-                        override fun onConnected(
-                            mediaController: MediaControllerCompat
-                        ) {
-                            Log.d(
-                                TAG,
-                                "onConnected: "
-                            )
-                        }
-
-                        override fun onPlaybackStateChanged(
-                            playbackState: PlaybackStateCompat?
-                        ) {
-                            Log.d(
-                                TAG,
-                                "onPlaybackStateChanged: $playbackState"
-                            )
-                            currentState =
-                                if (playbackState?.state == STATE_PLAYING) {
-                                    binding.btnPlay.setImageDrawable(
-                                        ResourcesCompat.getDrawable(
-                                            resources,
-                                            R.drawable.ic_player_pause,
-                                            null
-                                        )
-                                    )
-                                    STATE_PLAYING
-                                } else {
-                                    binding.btnPlay.setImageDrawable(
-                                        ResourcesCompat.getDrawable(
-                                            resources,
-                                            R.drawable.ic_player_play,
-                                            null
-                                        )
-                                    )
-                                    STATE_PAUSED
-                                }
-                        }
-
-                        override fun onMetadataChanged(
-                            mediaMetadata: MediaMetadataCompat?
-                        ) {
-                            if (mediaMetadata == null) {
-                                Log.d(
-                                    TAG,
-                                    "onMetadataChanged: Metadata is null!"
-                                )
-                                binding.tvStoryTitle.text = getText(R.string.no_story_loaded)
-                                binding.tvStoryNarrator.visibility = View.GONE
-                                binding.tvStoryAuthor.visibility = View.GONE
-                                binding.tvStoryCategory.visibility = View.GONE
-                                return
-                            }
-                            binding.tvStoryTitle.text =
-                                mediaMetadata.getString(
-                                    MediaMetadataCompat.METADATA_KEY_TITLE
-                                )
-                            binding.tvStoryNarrator.apply {
-                                text = mediaMetadata.getString(
-                                    MediaMetadataCompat.METADATA_KEY_ARTIST
-                                )
-                                visibility = View.VISIBLE
-                            }
-                            binding.tvStoryAuthor.apply {
-                                text = mediaMetadata.getString(
-                                    MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST
-                                )
-                                visibility = View.VISIBLE
-                            }
-                            binding.tvStoryCategory.apply {
-                                text = mediaMetadata.getString(
-                                    MediaMetadataCompat.METADATA_KEY_GENRE
-                                )
-                                visibility = View.VISIBLE
-                            }
-                            StoryLibrary.getStoryBitmap(
-                                requireContext(),
-                                mediaMetadata.getString(
-                                    MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-                                )
-                            ) {
-                                activity?.runOnUiThread {
-                                    binding.ivStoryImage.setImageBitmap(
-                                        it
-                                    )
-                                }
-                            }
-                        }
-                    })
-            }
-
-        stories =
-            ViewModelProvider(
-                this
-            )[StoryViewModel::class.java].getStoriesByIds(
-                dummyIds
-            )
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding =
+        binding =
             FragmentPlayerBinding.inflate(
                 inflater,
                 container,
                 false
             )
 
-        binding.btnPlay.setOnClickListener {
-            if (currentState == STATE_PLAYING) {
-                mediaBrowserAdapter.getTransportControls()
-                    .pause()
-            } else {
-                Log.d(TAG, "Playing now...")
-                mediaBrowserAdapter.getTransportControls().play()
-            }
-        }
-
         val mapFragment =
             childFragmentManager.findFragmentById(
-                R.id.maps
+                R.id.player_map
             ) as SupportMapFragment?
         mapFragment?.getMapAsync(
             this
@@ -195,15 +71,193 @@ class PlayerFragment :
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
-        mediaBrowserAdapter.onStart()
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
+
+        val context =
+            activity
+                ?: return
+
+        playerFragmentViewModel.storyLikes.observe(
+            viewLifecycleOwner
+        ) {
+            binding.tvNumberOfLikes.text =
+                it.size.toString()
+        }
+        playerFragmentViewModel.currentStory.observe(
+            viewLifecycleOwner
+        ) { mediaItem ->
+            updateUI(
+                view,
+                mediaItem
+            )
+        }
+        playerFragmentViewModel.speedButtonRes.observe(
+            viewLifecycleOwner
+        ) { res ->
+            binding.btnChangeSpeed.setImageResource(
+                res
+            )
+        }
+        playerFragmentViewModel.mediaButtonRes.observe(
+            viewLifecycleOwner
+        ) { res ->
+            binding.btnPlay.setImageResource(
+                res
+            )
+        }
+        playerFragmentViewModel.mediaPosition.observe(
+            viewLifecycleOwner
+        ) { pos ->
+            binding.tvNowPlayingSeek.text =
+                NowPlayingMetadata.timestampToMSS(
+                    context,
+                    pos
+                )
+            binding.sBTrack.progress =
+                (pos / 1000)
+                    .toInt()
+        }
+
+        binding.sBTrack.setOnSeekBarChangeListener(
+            object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onStartTrackingTouch(
+                    p0: SeekBar?
+                ) {
+                }
+
+                override fun onStopTrackingTouch(
+                    p0: SeekBar?
+                ) {
+                }
+
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    if (fromUser) {
+                        bottomNavigationViewModel.setPlaybackPosition(
+                            progress
+                        )
+                    }
+                }
+            })
+
+        binding.btnChangeSpeed.setOnClickListener {
+            bottomNavigationViewModel.changePlaybackSpeed()
+        }
+
+        binding.btnRewind.setOnClickListener {
+            bottomNavigationViewModel.rewindFifteenSeconds()
+        }
+
+        binding.btnPlay.setOnClickListener {
+            playerFragmentViewModel.currentStory.value?.let {
+                bottomNavigationViewModel.playMediaId(
+                    it.id
+                )
+            }
+        }
+
+        binding.tvNowPlayingDuration.text =
+            NowPlayingMetadata.timestampToMSS(
+                context,
+                0L
+            )
+        binding.tvNowPlayingSeek.text =
+            NowPlayingMetadata.timestampToMSS(
+                context,
+                0L
+            )
     }
 
-    override fun onStop() {
-        super.onStop()
-        mediaBrowserAdapter.onStop()
-    }
+    private fun updateUI(
+        view: View,
+        story: Story?
+    ) =
+        with(
+            binding
+        ) {
+            if (story != null) {
+                if (story.imageUrl?.isNotEmpty() == true) {
+                    val uri =
+                        Uri.parse(
+                            story.imageUrl
+                        )
+                    Glide.with(
+                        view
+                    )
+                        .load(
+                            uri
+                        )
+                        .into(
+                            ivStoryImage
+                        )
+                }
+                sBTrack.max =
+                    story.duration
+                tvStoryTitle.text =
+                    story.title
+                tvStoryAuthor.apply {
+                    text =
+                        getString(
+                            R.string.story_author,
+                            story.author
+                        )
+                    paintFlags =
+                        Paint.UNDERLINE_TEXT_FLAG
+                    visibility =
+                        View.VISIBLE
+                }
+                tvStoryNarrator.apply {
+                    text =
+                        story.narrator
+                    visibility =
+                        View.VISIBLE
+                }
+                tvStoryCategory.apply {
+                    text =
+                        story.category.title
+                    visibility =
+                        View.VISIBLE
+                }
+                tvNowPlayingDuration.text =
+                    (story.duration * 1000L)
+                        .timestampToMSS(
+                            requireContext()
+                        )
+                mapCard.visibility =
+                    View.VISIBLE
+            } else {
+                ivStoryImage.setImageResource(
+                    0
+                )
+                tvStoryTitle.text =
+                    requireContext().resources.getResourceName(
+                        R.string.no_story_loaded
+                    )
+                tvStoryAuthor.visibility =
+                    View.GONE
+                tvStoryNarrator.visibility =
+                    View.GONE
+                tvStoryCategory.visibility =
+                    View.GONE
+                tvNowPlayingDuration.text =
+                    requireContext().getString(
+                        R.string.duration_unknown
+                    )
+                mapCard.visibility =
+                    View.GONE
+            }
+        }
 
     override fun onMapReady(
         map: GoogleMap
@@ -213,27 +267,26 @@ class PlayerFragment :
         this.map =
             map
 
-        stories
-            .observe(
-                viewLifecycleOwner
-            ) { t ->
-                currentStory =
-                    t.firstOrNull()
-                val pinDrawable =
-                    ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_non_listened_pin,
-                        null
-                    )
-                val pinIcon =
-                    getIconFromDrawable(
-                        pinDrawable
-                    )
-                addStoryMarker(
-                    t.first(),
-                    pinIcon
+        setMapLayout()
+
+        playerFragmentViewModel.currentStory.value?.let {
+            addStoryMarker(
+                it
+            )
+        }
+    }
+
+    private fun setMapLayout() {
+        try {
+            map?.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.map_style
                 )
-            }
+            )
+        } catch (e: Resources.NotFoundException) {
+            return
+        }
     }
 
     private fun addStoryMarker(
@@ -279,29 +332,7 @@ class PlayerFragment :
         val TAG =
             PlayerFragment::class.simpleName
 
-        private const val STATE_PAUSED =
-            PlaybackStateCompat.STATE_PAUSED
-        private const val STATE_PLAYING =
-            PlaybackStateCompat.STATE_PLAYING
-        private const val STATE_BUFFERING =
-            PlaybackStateCompat.STATE_BUFFERING
-        private const val STATE_CONNECTING =
-            PlaybackStateCompat.STATE_CONNECTING
-        private const val STATE_ERROR =
-            PlaybackStateCompat.STATE_ERROR
-        private const val STATE_FAST_FORWARDING =
-            PlaybackStateCompat.STATE_FAST_FORWARDING
-        private const val STATE_NONE =
-            PlaybackStateCompat.STATE_NONE
-        private const val STATE_REWINDING =
-            PlaybackStateCompat.STATE_REWINDING
-        private const val STATE_SKIPPING_TO_NEXT =
-            PlaybackStateCompat.STATE_SKIPPING_TO_NEXT
-        private const val STATE_SKIPPING_TO_PREVIOUS =
-            PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS
-        private const val STATE_SKIPPING_TO_QUEUE_ITEM =
-            PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM
-        private const val STATE_STOPPED =
-            PlaybackStateCompat.STATE_STOPPED
+        fun newInstance() =
+            PlayerFragment()
     }
 }

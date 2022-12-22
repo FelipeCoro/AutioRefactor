@@ -1,134 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/view_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_sign_in"
     tools:context=".ui.view.usecases.login.SignInActivity">
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/animationView"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
-        android:layout_marginStart="-90dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintStart_toEndOf="@+id/linearLayoutSignInFields"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/story_wheel" />
-
-    <TextView
-        android:id="@+id/textViewSignIn"
-        android:layout_marginTop="61dp"
-        android:textSize="28sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/lora_bold"
-        android:text="@string/sign_in"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <LinearLayout
-        android:id="@+id/linearLayoutSignInFields"
-        android:orientation="vertical"
-        android:layout_marginTop="31dp"
-        android:layout_marginHorizontal="42dp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/view_root"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:background="@drawable/background_sign_in">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/animationView"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_marginStart="-90dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toEndOf="@+id/linearLayoutSignInFields"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/story_wheel" />
 
         <TextView
-            android:id="@+id/mail_label"
-            android:fontFamily="@font/inter_regular"
-            android:textColor="@color/gray_letter"
-            android:text="@string/email"
+            android:id="@+id/textViewSignIn"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:id="@+id/edit_text_email"
-            android:fontFamily="@font/inter_regular"
-            android:textColor="@color/white"
-            android:backgroundTint="@color/gray_letter"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autofillHints="emailAddress"
-            android:inputType="textEmailAddress"
-            android:labelFor="@id/mail_label" />
-
-        <TextView
-            android:id="@+id/password_label"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/inter_regular"
-            android:textColor="@color/gray_letter"
-            android:text="@string/password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:id="@+id/edit_text_password"
-            android:inputType="textPassword"
-            android:backgroundTint="@color/gray_letter"
-            android:fontFamily="@font/inter_regular"
-            android:textColor="@color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:autofillHints="password"
-            android:labelFor="@id/password_label" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_marginTop="68dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayoutSignInFields">
-
-        <Button
-            android:id="@+id/btn_sign_in"
-            style="@style/Button.White"
+            android:layout_marginTop="61dp"
+            android:fontFamily="@font/lora_bold"
             android:text="@string/sign_in"
-            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/linearLayoutSignInFields"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="42dp"
+            android:layout_marginTop="31dp"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSignIn">
+
+            <TextView
+                android:id="@+id/mail_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:text="@string/email"
+                android:textColor="@color/gray_letter" />
+
+            <EditText
+                android:id="@+id/edit_text_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="emailAddress"
+                android:backgroundTint="@color/gray_letter"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:inputType="textEmailAddress"
+                android:labelFor="@id/mail_label"
+                android:textColor="@color/white" />
+
+            <TextView
+                android:id="@+id/password_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:text="@string/password"
+                android:textColor="@color/gray_letter" />
+
+            <EditText
+                android:id="@+id/edit_text_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:autofillHints="password"
+                android:backgroundTint="@color/gray_letter"
+                android:fontFamily="@font/sf_pro_text_regular"
+                android:inputType="textPassword"
+                android:labelFor="@id/password_label"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="68dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayoutSignInFields">
+
+            <Button
+                android:id="@+id/btn_sign_in"
+                style="@style/Button.White"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sign_in"
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/Button.Shape.transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="23dp"
+                android:text="@string/cancel" />
+
+            <Button
+                android:id="@+id/btn_forgot_password"
+                style="@style/Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="34dp"
+                android:text="@string/forgot_password" />
+
+        </LinearLayout>
 
         <Button
-            android:id="@+id/btn_cancel"
-            android:layout_marginTop="23dp"
-            style="@style/Button.Shape.transparent"
-            android:text="@string/cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/btn_forgot_password"
+            android:id="@+id/btn_guest_mode"
             style="@style/Button.Text"
-            android:textSize="18sp"
-            android:layout_marginTop="34dp"
-            android:text="@string/forgot_password"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="@string/continue_as_guest"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/btn_guest_mode"
-        style="@style/Button.Text"
-        android:textSize="18sp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/continue_as_guest"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <include
+        android:id="@+id/fl_loading"
+        layout="@layout/loading_barrier" />
+</FrameLayout>

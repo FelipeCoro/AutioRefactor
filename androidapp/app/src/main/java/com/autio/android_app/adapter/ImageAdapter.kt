@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.animateFlip
 import com.autio.android_app.data.model.design.LocationView
+import com.autio.android_app.extensions.animateFlip
 
 class ImageAdapter(
     private val dataset: List<LocationView>

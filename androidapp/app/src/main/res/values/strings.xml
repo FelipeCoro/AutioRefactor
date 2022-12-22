@@ -48,6 +48,12 @@
     <string name="welcome">Welcome, explorer!</string>
     <string name="app_description">Autio is a location-based\naudio app that alerts you to exciting\nstories along your journey.\n\nWe’ll need a few permissions\nto get started…</string>
     <string name="tagline">Every place has a story.\nNow every story has a place.</string>
+    <string name="notifications">Notifications</string>
+    <string name="in_app_location">In-App Location</string>
+    <string name="background_location">Background Location</string>
+    <string name="explanation_on_notifications">So you\'ll know when you’re near a story\nyou\'ve never heard before.</string>
+    <string name="explanation_on_in_app_location">Select “precise” and “while using the app” to discover nearby stories, especially on road.</string>
+    <string name="explanation_on_background_location">Background location gives you the best experience. The magic of Autio is discovering stories as you drive even if you’re not using the app. Let Autio use your location, even if you’re in your favorite navigation or music apps. We never share or sell your location information to third parties.</string>
     <string name="traveler_plan_title">Traveler - only $3/month</string>
     <string name="traveler_plan_description">1 YEAR SUBSCRIPTION • $35.99 paid annually</string>
     <string name="traveler_plan_note">You\'ll be reminded before renewal. You can cancel any time.</string>
@@ -62,11 +68,15 @@
     <string name="guest_authenticate_message">You\'re not currently signed in.\nCreate an account or sign in to\nmanage your account.</string>
     <string name="guest_contact_autio">Questions about your account or subscription? <u>Contact Autio</u>.</string>
     <string name="no_story_loaded">No story loaded</string>
+    <string name="story_author">%1$s</string>
     <!-- Text fields' labels -->
     <string name="email">EMAIL</string>
     <string name="password">PASSWORD</string>
     <!-- Buttons' body text -->
     <string name="welcome_nav_to_permissions">Let\'s go!</string>
+    <string name="set_notification_permissions">Set Notifications Permissions</string>
+    <string name="set_in_app_location_permissions">Set Location Permissions</string>
+    <string name="set_background_permissions">Set Background Permissions</string>
     <string name="sign_in">Sign In</string>
     <string name="sign_up">Sign Up</string>
     <string name="forgot_password">Forgot Password</string>
@@ -78,6 +88,9 @@
     <string name="learn_more">Learn More</string>
     <!-- Images' content description -->
     <string name="logo_description">Autio logo</string>
+    <string name="notification_icon_description">Notification icon</string>
+    <string name="location_icon_description">Location icon</string>
+    <string name="background_location_icon_description">Background location icon</string>
     <string name="app_store_rate">Average rating of the app in stores</string>
     <string name="moth_logo">The Moth group\'s logo</string>
     <!-- Modal content -->
@@ -89,4 +102,19 @@
         between communities.</string>
     <!-- Miscellaneous -->
     <string name="divider">Divider component for separating visuals</string>
+    <string name="notification_channel">Now Playing</string>
+    <string name="notification_channel_description">Shows what story is currently playing</string>
+    <!-- Player -->
+    <string name="allowed_caller_log">
+        Caller has a valid certificate, but its package doesn\'t match any expected package for the
+        given certificate. To allow this caller, add the following to the allowed callers list:\n
+        <![CDATA[
+        <signature name=\"%1$s\" package=\"%2$s\">\n\t<key>%3$s</key>\n</signature>\n
+        ]]>
+    </string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="story_art_alt">Story art</string>
+    <string name="duration_unknown">--:--</string>
+    <string name="duration_format">%d:%02d</string>
 </resources>

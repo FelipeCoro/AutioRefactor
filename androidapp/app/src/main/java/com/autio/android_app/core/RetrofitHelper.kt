@@ -5,6 +5,7 @@ import com.autio.android_app.util.Constants.baseUrl
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitHelper {
 
@@ -14,6 +15,8 @@ object RetrofitHelper {
             .addInterceptor(
                 RequestInterceptor
             )
+            .readTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
             .build()
 
     private fun getRetrofit(): Retrofit {

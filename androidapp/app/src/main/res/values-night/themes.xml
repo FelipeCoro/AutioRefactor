@@ -75,7 +75,7 @@
     <!-- TexView Inter Bold  -->
     <style name="TextViewInterBold" parent="ThemeOverlay.AppCompat">
         <item name="android:fontFamily">
-            @font/inter_bold
+            @font/sf_pro_text_bold
         </item>
         <item name="android:textColor">
             @color/normal_text
@@ -87,7 +87,7 @@
     <!-- TexView Inter Regular  -->
     <style name="TextViewInterRegular" parent="ThemeOverlay.AppCompat">
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="android:textColor">
             @color/normal_text
@@ -99,7 +99,7 @@
     <!-- TexView Inter Regular  -->
     <style name="TextViewInterRegularLight" parent="ThemeOverlay.AppCompat">
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="android:textColor">
             @color/gray_letter
@@ -113,7 +113,7 @@
 
     <!-- Active -->
     <!-- Contained button with filling color -->
-    <style name="Button.Contained.Filled.Active" parent="ThemeOverlay.AppCompat">
+    <style name="Button.Active.Filled" parent="ThemeOverlay.AppCompat">
         <item name="android:backgroundTint">
             @color/button_text
         </item>
@@ -121,17 +121,23 @@
             @color/white
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
         </item>
         <item name="textAllCaps">
             false
+        </item>
+        <item name="android:textSize">
+            15sp
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Outlined button with hard stroke -->
-    <style name="Button.Outlined.StrongStroke.Active" parent="ThemeOverlay.AppCompat">
+    <style name="Button.Active.Outlined.StrongStroke" parent="ThemeOverlay.AppCompat">
         <item name="backgroundTint">
             @color/transparent
         </item>
@@ -142,7 +148,7 @@
             @color/button_text
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
@@ -155,10 +161,13 @@
         </item>
         <item name="strokeColor">
             @color/autio_blue_40
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Outlined button with soft stroke -->
-    <style name="Button.Outlined.SoftStroke.Active" parent="ThemeOverlay.AppCompat">
+    <style name="Button.Active.Outlined.SoftStroke" parent="ThemeOverlay.AppCompat">
         <item name="backgroundTint">
             @color/transparent
         </item>
@@ -169,7 +178,7 @@
             @color/button_text
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
@@ -182,6 +191,9 @@
         </item>
         <item name="strokeColor">
             @color/autio_blue_40
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Text button -->
@@ -195,11 +207,17 @@
         <item name="android:stateListAnimator">
             @null
         </item>
+        <item name="android:letterSpacing">
+            0
+        </item>
+        <item name="android:textSize">
+            15sp
+        </item>
     </style>
 
     <!-- Inactive -->
     <!-- Contained button with filling color inactive -->
-    <style name="Button.Contained.Filled.Inactive" parent="ThemeOverlay.AppCompat">
+    <style name="Button.Inactive.Contained.Filled" parent="ThemeOverlay.AppCompat">
         <item name="android:backgroundTint">
             @color/button_text
         </item>
@@ -207,7 +225,7 @@
             @color/white
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
@@ -220,10 +238,13 @@
         </item>
         <item name="android:clickable">
             false
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Outlined button with hard stroke inactive -->
-    <style name="Button.Outlined.StrongStroke.Inactive" parent="ThemeOverlay.AppCompat">
+    <style name="Button.Inactive.Outlined.StrongStroke" parent="ThemeOverlay.AppCompat">
         <item name="android:background">
             @android:color/transparent
         </item>
@@ -231,7 +252,7 @@
             @color/button_text
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
@@ -245,9 +266,12 @@
         <item name="android:clickable">
             false
         </item>
+        <item name="android:letterSpacing">
+            0
+        </item>
     </style>
     <!-- Outlined button with soft stroke inactive -->
-    <style name="Button.Outlined.SoftStroke.Inactive" parent="ThemeOverlay.AppCompat">
+    <style name="Button.Inactive.Outlined.SoftStroke" parent="ThemeOverlay.AppCompat">
         <item name="android:background">
             @android:color/transparent
         </item>
@@ -255,7 +279,7 @@
             @color/button_text
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
@@ -275,26 +299,11 @@
         <item name="android:clickable">
             false
         </item>
+        <item name="android:letterSpacing">
+            0
+        </item>
     </style>
 
-    <!-- Button Style -->
-    <style name="Button.Blue" parent="ThemeOverlay.AppCompat">
-        <item name="android:backgroundTint">
-            @color/button_background
-        </item>
-        <item name="android:textColor">
-            @color/button_text
-        </item>
-        <item name="android:fontFamily">
-            @font/inter_regular
-        </item>
-        <item name="cornerRadius">
-            5dp
-        </item>
-        <item name="textAllCaps">
-            false
-        </item>
-    </style>
     <!-- Button Gray -->
     <style name="Button.Gray" parent="ThemeOverlay.AppCompat">
         <item name="android:backgroundTint">
@@ -304,13 +313,16 @@
             @color/white
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
         </item>
         <item name="textAllCaps">
             false
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Button Style White-->
@@ -322,13 +334,16 @@
             @color/blue
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
             5dp
         </item>
         <item name="textAllCaps">
             false
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Button Shape light Style   -->
@@ -340,7 +355,7 @@
             @color/white
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="strokeWidth">
             1dp
@@ -357,6 +372,9 @@
         <item name="android:stateListAnimator">
             @null
         </item>
+        <item name="android:letterSpacing">
+            0
+        </item>
     </style>
     <!-- Button Shape light Style   -->
     <style name="Button.Shape" parent="ThemeOverlay.AppCompat">
@@ -367,7 +385,7 @@
             @color/button_border_text
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="strokeWidth">
             1dp
@@ -381,6 +399,9 @@
         <item name="textAllCaps">
             false
         </item>
+        <item name="android:letterSpacing">
+            0
+        </item>
     </style>
     <!-- Button Shape Strong Style   -->
     <style name="Button.Strong" parent="ThemeOverlay.AppCompat">
@@ -391,7 +412,7 @@
             @color/button_border_text
         </item>
         <item name="android:fontFamily">
-            @font/inter_regular
+            @font/sf_pro_text_regular
         </item>
         <item name="strokeWidth">
             1dp
@@ -404,6 +425,9 @@
         </item>
         <item name="textAllCaps">
             false
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- BottomNavigationView  -->

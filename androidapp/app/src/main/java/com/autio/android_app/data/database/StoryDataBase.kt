@@ -1,17 +1,17 @@
 package com.autio.android_app.data.database
 
 import android.content.Context
-import android.os.AsyncTask
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.model.story.Story
+import java.util.concurrent.Executors
 
 @Database(
     entities = [Story::class],
-    version = 3
+    version = 5
 )
 abstract class StoryDataBase :
     RoomDatabase() {
@@ -19,6 +19,8 @@ abstract class StoryDataBase :
     abstract fun storyDao(): StoryDao
 
     companion object {
+        private val executor = Executors.newSingleThreadExecutor()
+
         @Volatile
         private var INSTANCE: StoryDataBase? =
             null
@@ -51,6 +53,7 @@ abstract class StoryDataBase :
                 .addCallback(
                     callback
                 )
+                .enableMultiInstanceInvalidation()
                 .build()
 
         private var callback: Callback =
@@ -62,28 +65,10 @@ abstract class StoryDataBase :
                     super.onOpen(
                         db
                     )
-                    PopulateDbAsync(
-                        INSTANCE!!
-                    )
+                    executor.execute {
+                        INSTANCE?.storyDao()?.deleteAllStories()
+                    }
                 }
             }
-
-        internal class PopulateDbAsync(
-            storyDatabase: StoryDataBase
-        ) :
-            AsyncTask<Unit, Unit, Unit>() {
-            private val storyDao: StoryDao
-
-            init {
-                storyDao =
-                    storyDatabase.storyDao()
-            }
-
-            override fun doInBackground(
-                vararg p0: Unit
-            ) {
-                storyDao.deleteAllStories()
-            }
-        }
     }
 }

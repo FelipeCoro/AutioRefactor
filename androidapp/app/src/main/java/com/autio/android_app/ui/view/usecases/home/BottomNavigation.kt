@@ -1,17 +1,14 @@
 package com.autio.android_app.ui.view.usecases.home
 
 import android.content.Intent
+import android.media.AudioManager
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.get
@@ -21,13 +18,25 @@ import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
-import com.autio.android_app.player.MediaBrowserAdapter
-import com.autio.android_app.player.StoryLibrary
+import com.autio.android_app.player.PlayerService
+import com.autio.android_app.ui.view.usecases.home.fragment.map.MapFragment
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
+import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.StoryViewModel
+import com.autio.android_app.util.InjectorUtils
+import com.google.android.gms.cast.framework.CastContext
+import kotlinx.coroutines.launch
 
 class BottomNavigation :
     AppCompatActivity() {
+
+    private val viewModel by viewModels<BottomNavigationViewModel> {
+        InjectorUtils.provideBottomNavigationViewModel(
+            this
+        )
+    }
+    private var castContext: CastContext? =
+        null
 
     private val prefRepository by lazy {
         PrefRepository(
@@ -40,19 +49,18 @@ class BottomNavigation :
 
     private lateinit var storyViewModel: StoryViewModel
 
-    private var currentState =
-        STATE_PAUSED
-
-    private lateinit var stories: LiveData<Array<Story>>
-
-    lateinit var mediaBrowserAdapter: MediaBrowserAdapter
-
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
         super.onCreate(
             savedInstanceState
         )
+
+        castContext =
+            CastContext.getSharedInstance(
+                this
+            )
+
         binding =
             ActivityBottomNavigationBinding.inflate(
                 layoutInflater
@@ -60,92 +68,83 @@ class BottomNavigation :
         setContentView(
             binding.root
         )
-        mediaBrowserAdapter =
-            MediaBrowserAdapter(
-                this
-            )
+
         setListeners()
+
+        volumeControlStream =
+            AudioManager.STREAM_MUSIC
+
+        /**
+         * Observe [BottomNavigationViewModel.navigateToFragment] for [Event]s that request a
+         * fragment swap
+         */
+        viewModel.navigateToFragment.observe(
+            this
+        ) {
+            Log.d(
+                TAG,
+                "navigateToFragment: ${it.peekContent()}"
+            )
+            it.getContentIfNotHandled()
+                ?.let { fragmentRequest ->
+                    val transaction =
+                        supportFragmentManager.beginTransaction()
+                    transaction.replace(
+                        R.id.mainContainer,
+                        fragmentRequest.fragment,
+                        fragmentRequest.tag
+                    )
+                    if (fragmentRequest.backStack) transaction.addToBackStack(
+                        null
+                    )
+                    transaction.commit()
+                }
+        }
+
+        viewModel.currentStory.observe(
+            this
+        ) { mediaItem ->
+            updatePlayer(
+                mediaItem
+            )
+        }
+        viewModel.mediaButtonRes.observe(
+            this
+        ) { res ->
+            binding.btnFloatingPlayerPlay.setImageResource(
+                res
+            )
+        }
+
+        /**
+         * Observe changes to the [BottomNavigationViewModel.rootMediaId]
+         * When app starts, and UI connect to [PlayerService], this will be updated
+         * and app will show the initial map with media items
+         */
+//        viewModel.rootMediaId.observe(this) {
+//            rootMediaId ->
+//                rootMediaId?.let {
+//                    navigateToMediaItem(it)
+//                }
+//        }
+
+//        viewModel.navigateToMediaItem.observe(this) {
+//            it?.getContentIfNotHandled()?.let { mediaId ->
+//                navigateToMediaItem(mediaId)
+//            }
+//        }
 
         storyViewModel =
             ViewModelProvider(
                 this
             )[StoryViewModel::class.java]
 
-        requestStories()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mediaBrowserAdapter.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mediaBrowserAdapter.onStop()
+        lifecycleScope.launch {
+            requestStories()
+        }
     }
 
     private fun setListeners() {
-        mediaBrowserAdapter.addListener(
-            object :
-                MediaBrowserAdapter.MediaBrowserChangeListener() {
-                override fun onConnected(
-                    mediaController: MediaControllerCompat
-                ) {
-                    Log.d(
-                        TAG,
-                        "onConnected: "
-                    )
-                }
-
-                override fun onPlaybackStateChanged(
-                    playbackState: PlaybackStateCompat?
-                ) {
-                    Log.d(
-                        TAG,
-                        "onPlaybackStateChanged: $playbackState"
-                    )
-                    currentState =
-                        if (playbackState?.state == STATE_PLAYING) {
-                            binding.btnFloatingPlayerPlay.setImageDrawable(
-                                ResourcesCompat.getDrawable(
-                                    resources,
-                                    R.drawable.ic_player_pause,
-                                    null
-                                )
-                            )
-                            STATE_PLAYING
-                        } else {
-                            binding.btnFloatingPlayerPlay.setImageDrawable(
-                                ResourcesCompat.getDrawable(
-                                    resources,
-                                    R.drawable.ic_player_play,
-                                    null
-                                )
-                            )
-                            STATE_PAUSED
-                        }
-                }
-
-                override fun onMetadataChanged(
-                    mediaMetadata: MediaMetadataCompat?
-                ) {
-                    if (mediaMetadata == null) {
-                        Log.d(
-                            TAG,
-                            "onMetadataChanged: Metadata is null!"
-                        )
-                        return
-                    }
-                    binding.tvFloatingPlayerTitle.text =
-                        mediaMetadata.getString(
-                            MediaMetadataCompat.METADATA_KEY_TITLE
-                        )
-                    binding.tvFloatingPlayerNarrator.text =
-                        mediaMetadata.getString(
-                            MediaMetadataCompat.METADATA_KEY_ARTIST
-                        )
-                }
-            })
         val navHostFragment =
             supportFragmentManager.findFragmentById(
                 R.id.mainContainer
@@ -157,6 +156,10 @@ class BottomNavigation :
             navController
         )
         navController.addOnDestinationChangedListener { controller, destination, _ ->
+            Log.d(
+                TAG,
+                "destinationAdd: $destination"
+            )
             if (controller.graph[R.id.player] == destination) {
                 hidePlayerComponent()
             } else if (binding.floatingPersistentPlayer.visibility != View.VISIBLE) {
@@ -174,45 +177,82 @@ class BottomNavigation :
             )
         }
         binding.btnFloatingPlayerPlay.setOnClickListener {
-            if (currentState == STATE_PLAYING) {
-                mediaBrowserAdapter.getTransportControls()
-                    .pause()
-            } else {
-                Log.d(
-                    TAG,
-                    "Playing now..."
+            viewModel.currentStory.value?.let {
+                viewModel.playMediaId(
+                    it.id
                 )
-                mediaBrowserAdapter.getTransportControls()
-                    .play()
             }
         }
+    }
 
-        stories =
-            ViewModelProvider(
-                this
-            )[StoryViewModel::class.java].getStoriesByIds(
-                arrayOf(
-                    "3"
-                )
+    private fun navigateToMediaItem(
+        mediaId: String
+    ) {
+        Log.d(
+            TAG,
+            "navigate to $mediaId"
+        )
+        var fragment: MapFragment? =
+            getBrowseFragment(
+                mediaId
             )
+        if (fragment == null) {
+            fragment =
+                MapFragment.newInstance(
+                    mediaId
+                )
+            // If this is not the top level root, we add it to the fragment
+            // back stack, so actionbar toggle and back will work appropriately
+            viewModel.showFragment(
+                fragment,
+                !isRootId(
+                    mediaId
+                ),
+                mediaId
+            )
+        }
+    }
+
+    private fun isRootId(
+        mediaId: String
+    ) =
+        mediaId == viewModel.rootMediaId.value
+
+    private fun getBrowseFragment(
+        mediaId: String
+    ): MapFragment? {
+        return supportFragmentManager.findFragmentByTag(
+            mediaId
+        ) as? MapFragment
+    }
+
+    private fun updatePlayer(
+        story: Story?
+    ) {
+        binding.tvFloatingPlayerTitle.text =
+            story?.title
+        binding.tvFloatingPlayerNarrator.text =
+            story?.narrator
     }
 
     private fun requestStories() {
         // TODO (Marshysaurus): Remove dummy ids
-        val dummyIds =
+        var dummyIds =
             ArrayList(
-                (1..100).map { t -> t.toString() })
-        ApiService().getStoriesByIds(
-            getUserId(),
-            getApiToken(),
-            dummyIds as ArrayList<String>
-        ) {
-            if (it != null) {
-                storyViewModel.addStories(
-                    it
-                )
-                StoryLibrary.addStoriesToLibrary(it)
+                (1..100).map { it })
+        repeat (20) {
+            ApiService().getStoriesByIds(
+                getUserId(),
+                getApiToken(),
+                dummyIds.map { it.toString() }.toList()
+            ) {
+                if (it != null) {
+                    storyViewModel.addStories(
+                        it
+                    )
+                }
             }
+            dummyIds = ArrayList(dummyIds.map { it + 100 })
         }
     }
 
@@ -255,35 +295,5 @@ class BottomNavigation :
     companion object {
         val TAG =
             BottomNavigation::class.simpleName
-
-        const val SAVED_MEDIA_ID = "com.autio.android_app.MEDIA_ID"
-        const val SAVED_MEDIA_DESCRIPTION = "com.autio.android_app.CURRENT_MEDIA_DESCRIPTION"
-        const val FRAGMENT_PLAYER_TAG = "autio_player_container"
-        const val FRAGMENT_LIST_TAG = "autio_list_container"
-
-        private const val STATE_PAUSED =
-            PlaybackStateCompat.STATE_PAUSED
-        private const val STATE_PLAYING =
-            PlaybackStateCompat.STATE_PLAYING
-        private const val STATE_BUFFERING =
-            PlaybackStateCompat.STATE_BUFFERING
-        private const val STATE_CONNECTING =
-            PlaybackStateCompat.STATE_CONNECTING
-        private const val STATE_ERROR =
-            PlaybackStateCompat.STATE_ERROR
-        private const val STATE_FAST_FORWARDING =
-            PlaybackStateCompat.STATE_FAST_FORWARDING
-        private const val STATE_NONE =
-            PlaybackStateCompat.STATE_NONE
-        private const val STATE_REWINDING =
-            PlaybackStateCompat.STATE_REWINDING
-        private const val STATE_SKIPPING_TO_NEXT =
-            PlaybackStateCompat.STATE_SKIPPING_TO_NEXT
-        private const val STATE_SKIPPING_TO_PREVIOUS =
-            PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS
-        private const val STATE_SKIPPING_TO_QUEUE_ITEM =
-            PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM
-        private const val STATE_STOPPED =
-            PlaybackStateCompat.STATE_STOPPED
     }
 }

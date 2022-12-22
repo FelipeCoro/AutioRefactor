@@ -27,9 +27,8 @@ class SliderAdapter(
             R.drawable.photo_slider4
         )
 
-    override fun getCount(): Int {
-        return titleList.size
-    }
+    override fun getCount() =
+        titleList.size
 
     override fun onCreateViewHolder(
         parent: ViewGroup?
@@ -51,10 +50,6 @@ class SliderAdapter(
         viewHolder: SliderViewHolder?,
         position: Int
     ) {
-//        if (viewHolder != null) {
-//            Glide.with(viewHolder.itemView).load(titleList[position]).fitCenter()
-//                .into(viewHolder.imageView)
-//        }
         Glide.with(
             viewHolder!!.imageView
         )
@@ -73,7 +68,7 @@ class SliderAdapter(
 
     class SliderViewHolder(
         itemView: View?
-    ) : SliderViewAdapter.ViewHolder(
+    ) : ViewHolder(
         itemView
     ) {
         var imageView: ImageView =

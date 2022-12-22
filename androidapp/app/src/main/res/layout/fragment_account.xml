@@ -56,7 +56,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSignUp"
-                    style="@style/Button.Blue"
+                    style="@style/Button.Active.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
@@ -174,7 +174,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/sf_pro_text_regular"
                     android:text="@string/share_20_off_autio_s_annual_nsubscription_with_a_friend"
                     android:textColor="@color/white"
                     android:textSize="14sp" />
@@ -246,7 +246,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/sf_pro_text_regular"
                     android:text="@string/name"
                     android:textColor="@color/normal_text"
                     android:textSize="12sp" />
@@ -256,7 +256,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/gray_letter"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/sf_pro_text_regular"
                     android:textColor="@color/gray_letter"
                     android:textSize="12sp" />
 
@@ -264,7 +264,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/sf_pro_text_regular"
                     android:text="@string/email"
                     android:textColor="@color/normal_text"
                     android:textSize="12sp" />
@@ -274,7 +274,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/gray_letter"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/sf_pro_text_regular"
                     android:textColor="@color/gray_letter"
                     android:textSize="12sp" />
 
@@ -290,7 +290,7 @@
 
                     <Button
                         android:id="@+id/btn_update_profile"
-                        style="@style/Button.Blue"
+                        style="@style/Button.Active.Filled"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="16dp"
@@ -319,7 +319,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:fontFamily="@font/inter_regular"
+                        android:fontFamily="@font/sf_pro_text_regular"
                         android:text="CURRENT PASSWORD"
                         android:textColor="@color/normal_text"
                         android:textSize="12sp" />
@@ -329,7 +329,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/gray_letter"
-                        android:fontFamily="@font/inter_regular"
+                        android:fontFamily="@font/sf_pro_text_regular"
                         android:textColor="@color/gray_letter"
                         android:textSize="12sp" />
 
@@ -337,7 +337,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:fontFamily="@font/inter_regular"
+                        android:fontFamily="@font/sf_pro_text_regular"
                         android:text="NEW PASSWORD"
                         android:textColor="@color/normal_text"
                         android:textSize="12sp" />
@@ -347,7 +347,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/gray_letter"
-                        android:fontFamily="@font/inter_regular"
+                        android:fontFamily="@font/sf_pro_text_regular"
                         android:textColor="@color/gray_letter"
                         android:textSize="12sp" />
 
@@ -355,7 +355,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:fontFamily="@font/inter_regular"
+                        android:fontFamily="@font/sf_pro_text_regular"
                         android:text="CONFIRM PASSWORD"
                         android:textColor="@color/normal_text"
                         android:textSize="12sp" />
@@ -365,7 +365,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:backgroundTint="@color/gray_letter"
-                        android:fontFamily="@font/inter_regular"
+                        android:fontFamily="@font/sf_pro_text_regular"
                         android:textColor="@color/gray_letter"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -429,7 +429,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/inter_regular"
+                    android:fontFamily="@font/sf_pro_text_regular"
                     android:text="@string/organize_your_interests_from_the_top_down"
                     android:textColor="@color/normal_text"
                     android:textSize="12sp" />
@@ -523,7 +523,7 @@
 
                 <Button
                     android:id="@+id/btn_log_out"
-                    style="@style/Button.Blue"
+                    style="@style/Button.Active.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"

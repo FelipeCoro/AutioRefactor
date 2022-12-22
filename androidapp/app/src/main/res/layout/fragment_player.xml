@@ -58,6 +58,7 @@
                             android:src="@drawable/ic_heart" />
 
                         <TextView
+                            android:id="@+id/tvNumberOfLikes"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerInParent="true"
@@ -92,6 +93,40 @@
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <SeekBar
+                android:id="@+id/sBTrack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:saveEnabled="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ly_image_story" />
+
+            <LinearLayout
+                android:id="@+id/ll_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sBTrack">
+
+                <TextView
+                    android:id="@+id/tvNowPlayingSeek"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="start" />
+
+                <TextView
+                    android:id="@+id/tvNowPlayingDuration"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:gravity="end" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/tvStoryTitle"
                 android:layout_width="match_parent"
@@ -105,7 +140,7 @@
                 android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ly_image_story" />
+                app:layout_constraintTop_toBottomOf="@id/ll_progress" />
 
             <TextView
                 android:id="@+id/tvStoryNarrator"
@@ -113,9 +148,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:textSize="12sp"
-                android:textColor="@color/player_highlighted_text"
                 android:textAllCaps="true"
+                android:textColor="@color/player_highlighted_text"
+                android:textSize="12sp"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/tvStoryTitle" />
 
@@ -124,33 +159,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="12sp"
-                android:textColor="@color/autio_blue_40"
                 android:textAllCaps="true"
+                android:textColor="@color/autio_blue_40"
+                android:textSize="12sp"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/tvStoryNarrator"/>
+                app:layout_constraintTop_toBottomOf="@id/tvStoryNarrator" />
 
             <TextView
                 android:id="@+id/tvStoryAuthor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="12sp"
-                android:textColor="@color/player_highlighted_text"
                 android:textAllCaps="true"
+                android:textColor="@color/player_highlighted_text"
+                android:textSize="12sp"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/tvStoryLocation"/>
+                app:layout_constraintTop_toBottomOf="@id/tvStoryLocation" />
 
             <TextView
                 android:id="@+id/tvStoryCategory"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textSize="12sp"
-                android:textColor="@color/autio_blue_40"
                 android:textAllCaps="true"
+                android:textColor="@color/autio_blue_40"
+                android:textSize="12sp"
                 android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@id/tvStoryAuthor"/>
+                app:layout_constraintTop_toBottomOf="@id/tvStoryAuthor" />
 
             <LinearLayout
                 android:id="@+id/layout_player"
@@ -165,13 +200,15 @@
                 app:layout_constraintTop_toBottomOf="@id/tvStoryCategory">
 
                 <ImageView
+                    android:id="@+id/btnChangeSpeed"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:src="@drawable/ic_speed_audio"
+                    android:src="@drawable/ic_speed_audio_1x"
                     app:tint="@color/button_background" />
 
                 <ImageView
+                    android:id="@+id/btnRewind"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -206,14 +243,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
+                android:visibility="gone"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/layout_player"
-                android:visibility="gone">
+                app:layout_constraintTop_toBottomOf="@+id/layout_player">
 
                 <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/maps"
+                    android:id="@+id/player_map"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="330dp"
                     android:layout_height="330dp"

@@ -1,5 +1,6 @@
 package com.autio.android_app.data.repository
 
+import android.util.Log
 import com.autio.android_app.core.RetrofitHelper
 import com.autio.android_app.data.model.account.*
 import com.autio.android_app.data.model.author.Author
@@ -7,6 +8,8 @@ import com.autio.android_app.data.model.category.StoryCategory
 import com.autio.android_app.data.model.narrator.Narrator
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.data.model.story.StoryDto
+import com.autio.android_app.util.Constants
+import com.github.kittinunf.fuel.core.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -16,6 +19,11 @@ class ApiService {
         RetrofitHelper.buildService(
             ApiClient::class.java
         )
+
+    init {
+        FuelManager.instance.basePath =
+            Constants.baseUrl
+    }
 
     // Authentication
 
@@ -39,6 +47,10 @@ class ApiService {
                         call: Call<LoginResponse>,
                         t: Throwable
                     ) {
+                        Log.d(
+                            TAG,
+                            "loginFailure: ${t.message}"
+                        )
                         onResult(
                             null
                         )
@@ -48,7 +60,11 @@ class ApiService {
                         call: Call<LoginResponse>,
                         response: Response<LoginResponse>
                     ) {
-                        if (response.isSuccessful) {
+                        if (!response.isSuccessful) {
+                            onResult(
+                                null
+                            )
+                        } else {
                             val userInfo =
                                 response.body()
                             onResult(
@@ -215,6 +231,41 @@ class ApiService {
     }
 
     // Stories requests
+//    fun getAllStories(
+//        xUserId: Int,
+//        apiToken: String,
+//        onResult: (List<Story>?) -> Unit
+//    ) =
+//        retrofit.getAllStories(
+//            xUserId,
+//            apiToken
+//        )
+//            .enqueue(
+//                object :
+//                    Callback<List<Story>> {
+//                    override fun onResponse(
+//                        call: Call<List<Story>>,
+//                        response: Response<List<Story>>
+//                    ) {
+//                        if (response.isSuccessful) {
+//                            val stories =
+//                                response.body()
+//                            onResult(
+//                                stories
+//                            )
+//                        }
+//                    }
+//
+//                    override fun onFailure(
+//                        call: Call<List<Story>>,
+//                        t: Throwable
+//                    ) {
+//                        onResult(
+//                            null
+//                        )
+//                    }
+//                }
+//            )
 
     /**
      * Capture stories by a list of [ids] passed to the [onResult]
@@ -222,15 +273,13 @@ class ApiService {
     fun getStoriesByIds(
         xUserId: Int,
         apiToken: String,
-        ids: ArrayList<String>,
+        ids: List<String>,
         onResult: (List<Story>?) -> Unit
-    ) {
+    ) =
         retrofit.getStoriesByIds(
             xUserId,
             apiToken,
-            ids.joinToString(
-                ","
-            )
+            ids
         )
             .enqueue(
                 object :
@@ -251,12 +300,13 @@ class ApiService {
                     override fun onFailure(
                         call: Call<List<Story>>,
                         t: Throwable
-                    ) =
+                    ) {
                         onResult(
                             null
                         )
-                })
-    }
+                    }
+                }
+            )
 
     /**
      * Capture stories after a certain epoch [date]
@@ -447,4 +497,20 @@ class ApiService {
                             null
                         )
                 })
+
+    private fun Request.addHeaders(
+        bearerToken: String? = null,
+        userId: Int? = null
+    ): Request =
+        header(
+            "Content-Type" to "application/json",
+            "Accept" to "application/json",
+            "Authorization" to "$bearerToken",
+            "X-User-Id" to "$userId"
+        )
+
+    companion object {
+        private val TAG =
+            ApiService::class.simpleName
+    }
 }

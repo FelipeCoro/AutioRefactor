@@ -1,12 +1,10 @@
 package com.autio.android_app.data.database.repository
 
 import android.app.Application
-import android.os.AsyncTask
-import android.util.Log
 import androidx.lifecycle.LiveData
 import com.autio.android_app.data.database.StoryDataBase
-import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.model.story.Story
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class StoryRepository @Inject constructor(
@@ -16,12 +14,19 @@ class StoryRepository @Inject constructor(
         StoryDataBase.getInstance(
             application
         )
-    private val storyDao =
-        database.storyDao()
+    private val storyDao = database.storyDao()
 
-    fun getAllStories(): LiveData<List<Story>> {
-        return storyDao.readAllStories()
+    private val executor = Executors.newSingleThreadExecutor()
+
+    fun getLiveStories(): LiveData<List<Story>> {
+        return storyDao.readLiveStories()
     }
+
+    suspend fun getStories(): List<Story> {
+        return storyDao.readStories()
+    }
+
+    suspend fun getStoryById(id: String) = storyDao.getStoryById(id)
 
     fun getStoriesByIds(ids: Array<String>): LiveData<Array<Story>> {
         return storyDao.readStoriesWithIds(ids)
@@ -32,33 +37,11 @@ class StoryRepository @Inject constructor(
     }
 
     fun addPointers(
-        story: List<Story>
+        stories: List<Story>
     ) {
-        InsertAsyncTask(
-            storyDao
-        ).execute(
-            story
-        )
-    }
-
-    private class InsertAsyncTask(
-        storyDao: StoryDao
-    ) : AsyncTask<List<Story>, Unit, Unit>() {
-        private var localStoryDao: StoryDao
-
-        init {
-            localStoryDao =
-                storyDao
-        }
-
-        @Deprecated(
-            "Deprecated in Java"
-        )
-        override fun doInBackground(
-            vararg stories: List<Story>
-        ) {
-            localStoryDao.addStories(
-                stories[0]
+        executor.execute {
+            storyDao.addStories(
+                stories
             )
         }
     }

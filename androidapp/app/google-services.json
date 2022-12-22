@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "517390244401",
+    "firebase_url": "https://hearhere-88db7.firebaseio.com",
+    "project_id": "hearhere-88db7",
+    "storage_bucket": "hearhere-88db7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:517390244401:android:23beadb29775ea4a999310",
+        "android_client_info": {
+          "package_name": "autio.audio.travel.guide"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "517390244401-tl2meu3hvunhd0hvgqrgpqpblbm3vkld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "autio.audio.travel.guide",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "517390244401-eng03bu059pv3d5j2ikc94lmgd1mfo8f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaRFHOUo2QH9_mR-JCu7ePh8fWGHtAv0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "517390244401-eng03bu059pv3d5j2ikc94lmgd1mfo8f.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "517390244401-jfeoufc6kjj87eo2m573tavees4tg1vn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hearhere.hearhere",
+                "app_store_id": "1300494609"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

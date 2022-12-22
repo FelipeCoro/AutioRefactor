@@ -52,7 +52,7 @@
 
                 <Button
                     android:id="@+id/btn_back"
-                    style="@style/Button.Outlined.SoftStroke.Active"
+                    style="@style/Button.Active.Outlined.SoftStroke"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -64,7 +64,7 @@
 
                 <Button
                     android:id="@+id/btn_learn_more"
-                    style="@style/Button.Contained.Filled.Active"
+                    style="@style/Button.Active.Filled"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

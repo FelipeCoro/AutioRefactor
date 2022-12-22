@@ -8,7 +8,13 @@
         android:id="@+id/map"
         android:name="com.autio.android_app.ui.view.usecases.home.fragment.map.MapFragment"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_map" >
+        <argument
+            android:name="com.autio.android_app.ui.view.usecases.home.fragment.MediaItemFragment.MEDIA_ID"
+            app:argType="string"
+            android:defaultValue="/__ALL__"
+            />
+    </fragment>
     <fragment
         android:id="@+id/account"
         android:name="com.autio.android_app.ui.view.usecases.home.fragment.AccountFragment"

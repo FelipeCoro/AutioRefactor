@@ -2,6 +2,7 @@ package com.autio.android_app.ui.view.usecases.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.model.account.CreateAccountDto
 import com.autio.android_app.data.model.account.LoginResponse
@@ -48,6 +49,14 @@ class SignUpActivity :
         }
     }
 
+    private fun showLoadingView() {
+        binding.flLoading.root.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingView() {
+        binding.flLoading.root.visibility = View.GONE
+    }
+
     private fun createUser() {
         if (Utils.checkEmptyFormFields(
                 arrayOf(
@@ -61,6 +70,7 @@ class SignUpActivity :
                 this
             )
         } else {
+            showLoadingView()
             val name =
                 "${binding.tvName.text}"
             val password =
@@ -90,6 +100,7 @@ class SignUpActivity :
                     )
                     finish()
                 } else {
+                    hideLoadingView()
                     Utils.showError(
                         this,
                         "The mail is already associated to another account"

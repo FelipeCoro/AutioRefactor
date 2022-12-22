@@ -1,266 +1,238 @@
 package com.autio.android_app.player
 
-import android.app.Notification
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.support.v4.media.MediaDescriptionCompat
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat.Token
-import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import androidx.media.session.MediaButtonReceiver
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
+import androidx.core.content.res.ResourcesCompat
 import com.autio.android_app.R
-import com.autio.android_app.ui.view.usecases.home.BottomNavigation
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.target.Target
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import kotlinx.coroutines.*
 
 /**
  * Keeps track of a notification and updates it for a given MediaSession. This is
  * required so the PlayerService don't get destroyed during playback.
  */
 class MediaNotificationManager(
-    val playerService: PlayerService
+    private val context: Context,
+    sessionToken: MediaSessionCompat.Token,
+    notificationListener: PlayerNotificationManager.NotificationListener,
 ) {
-    private var playAction =
-        NotificationCompat.Action(
-            com.google.android.exoplayer2.R.drawable.exo_icon_play,
-            "Play",
-            MediaButtonReceiver.buildMediaButtonPendingIntent(
-                playerService,
-                PlaybackStateCompat.ACTION_PLAY
-            )
+    private val serviceJob =
+        SupervisorJob()
+    private val serviceScope =
+        CoroutineScope(
+            Dispatchers.Main + serviceJob
         )
-    private var pauseAction =
-        NotificationCompat.Action(
-            com.google.android.exoplayer2.R.drawable.exo_icon_pause,
-            "Pause",
-            MediaButtonReceiver.buildMediaButtonPendingIntent(
-                playerService,
-                PlaybackStateCompat.ACTION_PAUSE
-            )
-        )
-    private var nextAction =
-        NotificationCompat.Action(
-            com.google.android.exoplayer2.R.drawable.exo_icon_next,
-            "Skip to next",
-            MediaButtonReceiver.buildMediaButtonPendingIntent(
-                playerService,
-                PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-            )
-        )
-    var notificationManager: NotificationManager =
-        playerService.getSystemService(
+    private val notificationManager: PlayerNotificationManager
+    private val platformNotificationManager: NotificationManager =
+        context.getSystemService(
             Context.NOTIFICATION_SERVICE
         ) as NotificationManager
-        private set
 
     init {
-        notificationManager.cancelAll()
-    }
-
-    fun onDestroy() {
-        Log.d(
-            TAG,
-            "onDestroy"
-        )
-    }
-
-    fun getNotification(
-        metadata: MediaMetadataCompat,
-        state: PlaybackStateCompat,
-        token: Token
-    ): Notification {
-        val isPlaying =
-            state.state == PlaybackStateCompat.STATE_PLAYING
-        val description =
-            metadata.description
-        val builder =
-            buildNotification(
-                state,
-                token,
-                isPlaying,
-                description
+        val mediaController =
+            MediaControllerCompat(
+                context,
+                sessionToken
             )
-        return builder.build()
-    }
-
-    private fun buildNotification(
-        state: PlaybackStateCompat,
-        token: Token,
-        isPlaying: Boolean,
-        description: MediaDescriptionCompat
-    ): NotificationCompat.Builder {
-        // Required after Oreo version
-        createChannel()
 
         val builder =
-            object :
-                NotificationCompat.Builder(
-                    playerService,
-                    CHANNEL_ID
-                ) {
-
-            }
-        builder.setStyle(
-            androidx.media.app.NotificationCompat.MediaStyle()
-                .setMediaSession(
-                    token
-                )
-                .setShowActionsInCompactView(
-                    0,
-                    1,
-                    2
-                )
-                .setShowCancelButton(
-                    true
-                )
-                .setCancelButtonIntent(
-                    MediaButtonReceiver.buildMediaButtonPendingIntent(
-                        playerService,
-                        PlaybackStateCompat.ACTION_STOP
-                    )
-                )
-        )
-            .setColor(
-                ContextCompat.getColor(
-                    playerService,
-                    R.color.white
-                )
+            PlayerNotificationManager.Builder(
+                context,
+                NOTIFICATION_ID,
+                CHANNEL_ID,
             )
-            .setSmallIcon(
-                R.mipmap.ic_launcher
-            )
-            // Pending intent that is fired when user clicks on notification.
-            .setContentIntent(
-                createContentIntent()
-            )
-            // Title - Usually Song name.
-            .setContentTitle(
-                description.title
-            )
-            // Subtitle - Usually Artist name.
-            .setContentText(
-                description.subtitle
-            )
-//            .setLargeIcon(MusicLibrary.getAlbumBitmap(mService, description.getMediaId()))
-            // When notification is deleted (when playback is paused and notification can be
-            // deleted) fire MediaButtonPendingIntent with ACTION_STOP.
-            .setDeleteIntent(
-                MediaButtonReceiver.buildMediaButtonPendingIntent(
-                    playerService,
-                    PlaybackStateCompat.ACTION_STOP
-                )
-            )
-            // Show controls on lock screen even when user hides sensitive content.
-            .setVisibility(
-                NotificationCompat.VISIBILITY_PUBLIC
-            )
-
-//        if ((state.actions and PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS) != 0L) {
-//            builder.addAction(prevAction)
-//        }
-        builder.addAction(
-            if (isPlaying) pauseAction else playAction
-        )
-
-        // If skip to prev action is enabled
-        if ((state.actions and PlaybackStateCompat.ACTION_SKIP_TO_NEXT) != 0L) {
-            builder.addAction(
-                nextAction
-            )
-        }
-
-        return builder
-    }
-
-    private fun createChannel() {
-        if (notificationManager.getNotificationChannel(
-                CHANNEL_ID
-            ) == null
+        with(
+            builder
         ) {
-            val name =
-                "MediaSession"
-            val description =
-                "MediaSession and MediaPlayer"
-            val importance =
-                NotificationManager.IMPORTANCE_LOW
-            val channel =
-                NotificationChannel(
-                    CHANNEL_ID,
-                    name,
-                    importance
-                ).apply {
-                    setDescription(
-                        description
-                    )
-                    enableLights(
-                        true
-                    )
-                    // Sets the notification light color for notifications posted to this
-                    // channel, if the device supports this feature
-                    lightColor =
-                        Color.BLUE
-                    enableVibration(
-                        true
-                    )
-                    vibrationPattern =
-                        longArrayOf(
-                            100,
-                            200,
-                            300,
-                            400,
-                            500,
-                            400,
-                            300,
-                            200,
-                            400
+            setMediaDescriptionAdapter(
+                DescriptionAdapter(
+                    mediaController
+                )
+            )
+            setNotificationListener(
+                notificationListener
+            )
+            setChannelNameResourceId(
+                R.string.notification_channel
+            )
+            setChannelDescriptionResourceId(
+                R.string.notification_channel_description
+            )
+        }
+        notificationManager =
+            builder.build()
+        notificationManager.setMediaSessionToken(
+            sessionToken
+        )
+        notificationManager.setSmallIcon(
+            R.drawable.ic_notification
+        )
+        notificationManager.setUseRewindAction(
+            true
+        )
+        notificationManager.setUseFastForwardAction(
+            false
+        )
+    }
+
+    fun hideNotification() {
+        notificationManager.setPlayer(
+            null
+        )
+    }
+
+    fun showNotificationForPlayer(
+        player: Player
+    ) {
+        notificationManager.setPlayer(
+            player
+        )
+    }
+
+    private inner class DescriptionAdapter(
+        private val controller: MediaControllerCompat
+    ) : PlayerNotificationManager.MediaDescriptionAdapter {
+        var currentIconUri: Uri? =
+            null
+        var currentBitmap: Bitmap? =
+            null
+
+        override fun createCurrentContentIntent(
+            player: Player
+        ): PendingIntent? =
+            controller.sessionActivity
+
+        override fun getCurrentContentText(
+            player: Player
+        ) =
+            controller.metadata.description.subtitle.toString()
+
+        override fun getCurrentContentTitle(
+            player: Player
+        ) =
+            controller.metadata.description.title.toString()
+
+        override fun getCurrentLargeIcon(
+            player: Player,
+            callback: PlayerNotificationManager.BitmapCallback
+        ): Bitmap? {
+            val iconUri =
+                controller.metadata.description.iconUri
+            return if (currentIconUri != iconUri || currentBitmap == null) {
+                currentIconUri =
+                    iconUri
+                serviceScope.launch {
+                    currentBitmap =
+                        iconUri?.let {
+                            resolveUriAsBitmap(
+                                it
+                            )
+                        }
+                    currentBitmap?.let {
+                        callback.onBitmap(
+                            it
                         )
+                    }
                 }
-            notificationManager.createNotificationChannel(
-                channel
-            )
-            Log.d(
-                TAG,
-                "createChannel: New channel created"
-            )
-        } else {
-            Log.d(
-                TAG,
-                "createChannel: Existing channel reused"
-            )
+                null
+            } else {
+                currentBitmap
+            }
+        }
+
+        private suspend fun resolveUriAsBitmap(
+            uri: Uri
+        ): Bitmap? {
+            return withContext(
+                Dispatchers.IO
+            ) {
+                try {
+                    Glide.with(
+                        context
+                    )
+                        .applyDefaultRequestOptions(
+                            glideOptions
+                        )
+                        .asBitmap()
+                        .load(
+                            uri
+                        )
+                        .listener(
+                            object :
+                                RequestListener<Bitmap> {
+                                override fun onLoadFailed(
+                                    e: GlideException?,
+                                    model: Any?,
+                                    target: Target<Bitmap>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    return false
+                                }
+
+                                override fun onResourceReady(
+                                    resource: Bitmap?,
+                                    model: Any?,
+                                    target: Target<Bitmap>?,
+                                    dataSource: DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    return false
+                                }
+                            })
+                        .error(
+                            R.drawable.ic_notification
+                        )
+                        .placeholder(
+                            R.drawable.ic_notification
+                        )
+                        .submit(
+                            NOTIFICATION_LARGE_ICON_SIZE,
+                            NOTIFICATION_LARGE_ICON_SIZE
+                        )
+                        .get()
+                } catch (e: Exception) {
+                    BitmapFactory.decodeResource(
+                        context.resources,
+                        R.drawable.ic_notification
+                    )
+                }
+            }
         }
     }
 
-    private fun createContentIntent(): PendingIntent {
-        val openUI =
-            Intent(
-                playerService,
-                BottomNavigation::class.java
-            ).apply {
-                flags =
-                    Intent.FLAG_ACTIVITY_SINGLE_TOP
-            }
-        return PendingIntent.getActivity(
-            playerService,
-            REQUEST_CODE,
-            openUI,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+    private val glideOptions =
+        RequestOptions().fallback(
+            R.drawable.ic_notification
         )
-    }
+            .diskCacheStrategy(
+                DiskCacheStrategy.DATA
+            )
+            .error(
+                R.drawable.ic_notification
+            )
 
     companion object {
         const val NOTIFICATION_ID =
-            412
+            0xb339
 
-        private val TAG =
-            MediaNotificationManager::class.simpleName
+        const val NOTIFICATION_LARGE_ICON_SIZE =
+            144
+
         private const val CHANNEL_ID =
-            "com.autio.android_app.storyplayer.channel"
-        private const val REQUEST_CODE =
-            501
+            "autio.audio.travel.guide.story-player.channel"
     }
 }

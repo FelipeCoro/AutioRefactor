@@ -43,7 +43,7 @@
             <Button
                 android:id="@+id/btn_signup"
                 android:layout_weight="1"
-                style="@style/Button.Blue"
+                style="@style/Button.Active.Filled"
                 android:textAllCaps="false"
                 android:text="@string/sign_up"
                 android:layout_width="match_parent"

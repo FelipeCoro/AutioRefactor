@@ -3,6 +3,7 @@ package com.autio.android_app.ui.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.autio.android_app.data.database.repository.StoryRepository
 import com.autio.android_app.data.model.story.Story
 
@@ -12,20 +13,23 @@ class StoryViewModel(
     AndroidViewModel(
         application
     ) {
-    private val storyRepository =
-        StoryRepository(
-            application
-        )
+
+    private val storyRepository = StoryRepository(application)
 
     fun addStories(
         stories: List<Story>
-    ) {
+    ) =
         storyRepository.addPointers(
             stories
         )
-    }
 
-    fun getAllStories(): LiveData<List<Story>> = storyRepository.getAllStories()
+    fun getLiveStories(): LiveData<List<Story>> =
+        storyRepository.getLiveStories()
 
-    fun getStoriesByIds(ids: Array<String>): LiveData<Array<Story>> = storyRepository.getStoriesByIds(ids)
+    suspend fun getStoryById(
+        ids: String
+    ): Story? =
+        storyRepository.getStoryById(
+            ids
+        )
 }
