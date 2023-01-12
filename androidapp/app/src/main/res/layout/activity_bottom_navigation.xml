@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activityRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.view.usecases.home.BottomNavigation">
@@ -12,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutSeePlans"
+        app:layout_constraintBottom_toTopOf="@+id/rlSeePlans"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/nav_graph_bottom" />
@@ -24,9 +25,9 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginBottom="12dp"
         app:cardCornerRadius="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/rlStatusFeedback"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/relativeLayoutSeePlans"
         tools:layout_editor_absoluteX="24dp">
 
         <LinearLayout
@@ -35,15 +36,15 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/cl_next_story_label"
+                android:id="@+id/llNextStoryLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/persistent_player_next"
-                android:paddingTop="10dp"
+                android:gravity="center_vertical"
                 android:paddingStart="14dp"
+                android:paddingTop="10dp"
                 android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
-                android:gravity="center_vertical">
+                android:paddingBottom="8dp">
 
                 <View
                     android:layout_width="0dp"
@@ -54,20 +55,22 @@
                     android:id="@+id/columnNextStory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="end">
+                    android:gravity="end"
+                    android:orientation="vertical">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="11sp"
                         android:textColor="@color/white"
+                        android:textSize="11sp"
                         tools:text="Up Next / NEARBY" />
+
                     <TextView
                         android:id="@+id/tvNextStory"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="14sp"
                         android:textColor="@color/white"
+                        android:textSize="14sp"
                         tools:text="Wave Organ - Natural Music" />
                 </LinearLayout>
 
@@ -102,40 +105,27 @@
                     android:layout_marginStart="16dp"
                     android:orientation="vertical"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_info"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/btnFloatingPlayerPlay"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
                         android:id="@+id/tvFloatingPlayerTitle"
-                        style="@style/TextViewLoraBoldTitle"
+                        style="@style/SmallerTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="start"
-                        android:text="No story loaded"
-                        android:textSize="17sp"
+                        android:text="@string/no_story_loaded"
                         tools:text="San Francisco from the Beginning" />
 
                     <TextView
                         android:id="@+id/tvFloatingPlayerNarrator"
+                        style="@style/SelectedStoryNarrator"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/gray_letter"
                         tools:text="Kevin Costner" />
 
                 </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/btn_info"
-                    android:layout_width="3dp"
-                    android:layout_height="16dp"
-                    android:layout_margin="18dp"
-                    android:src="@drawable/ic_drag"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:tint="@color/button_background" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
@@ -143,7 +133,37 @@
     </androidx.cardview.widget.CardView>
 
     <RelativeLayout
-        android:id="@+id/relativeLayoutSeePlans"
+        android:id="@+id/rlStatusFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="fill_horizontal"
+        android:paddingHorizontal="17dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="15dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/rlSeePlans"
+        tools:background="@color/fragment_background"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/tvFeedbackMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            tools:text="Allow Notifications" />
+
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_close"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rlSeePlans"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/normal_text"
@@ -151,9 +171,56 @@
         android:padding="8dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView">
 
+        <LinearLayout
+            android:id="@+id/llTickMarks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="8dp"
+            android:divider="@drawable/tick_marks_spacer"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:showDividers="middle"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <View
+                android:id="@+id/tickMark1"
+                android:layout_width="16dp"
+                android:layout_height="2dp"
+                android:background="@color/autio_blue_20" />
+
+            <View
+                android:id="@+id/tickMark2"
+                android:layout_width="16dp"
+                android:layout_height="2dp"
+                android:background="@color/autio_blue_20" />
+
+            <View
+                android:id="@+id/tickMark3"
+                android:layout_width="16dp"
+                android:layout_height="2dp"
+                android:background="@color/autio_blue_20" />
+
+            <View
+                android:id="@+id/tickMark4"
+                android:layout_width="16dp"
+                android:layout_height="2dp"
+                android:background="@color/autio_blue_20" />
+
+            <View
+                android:id="@+id/tickMark5"
+                android:layout_width="16dp"
+                android:layout_height="2dp"
+                android:background="@color/autio_blue_20" />
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/llTickMarks"
+            android:layout_centerHorizontal="true"
             android:text="@string/enjoy_5_stories_free_tap_for_plans"
             android:textColor="@color/text_map_fragment" />
     </RelativeLayout>

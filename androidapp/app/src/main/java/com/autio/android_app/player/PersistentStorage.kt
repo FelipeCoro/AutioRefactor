@@ -2,22 +2,17 @@ package com.autio.android_app.player
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
-import com.autio.android_app.R
 import com.autio.android_app.extensions.asAlbumArtContentUri
 import com.autio.android_app.player.MediaNotificationManager.Companion.NOTIFICATION_LARGE_ICON_SIZE
 import com.autio.android_app.player.PlayerService.Companion.MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 
 
 internal class PersistentStorage private constructor(
@@ -52,26 +47,8 @@ internal class PersistentStorage private constructor(
                         .get()
                         .asAlbumArtContentUri()
                 } catch (e: Exception) {
-                    val bytes =
-                        ByteArrayOutputStream()
-                    val image = BitmapFactory.decodeResource(
-                        context.resources,
-                        R.drawable.ic_notification
-                    )
-                        image.compress(
-                            Bitmap.CompressFormat.JPEG,
-                            100,
-                            bytes
-                        )
-                    val path: String =
-                        MediaStore.Images.Media.insertImage(
-                            context.contentResolver,
-                            image,
-                            "App Icon",
-                            null
-                        )
                     Uri.parse(
-                        path
+                        "android.resource://com.autio.android_app/drawable/ic_notification"
                     )
                 }
 
@@ -157,21 +134,21 @@ internal class PersistentStorage private constructor(
 
     companion object {
         @Volatile
-        private var instance: PersistentStorage? =
+        private var INSTANCE: PersistentStorage? =
             null
 
         fun getInstance(
             context: Context
         ) =
-            instance
+            INSTANCE
                 ?: synchronized(
                     this
                 ) {
-                    instance
+                    INSTANCE
                         ?: PersistentStorage(
                             context
                         ).also {
-                            instance =
+                            INSTANCE =
                                 it
                         }
                 }

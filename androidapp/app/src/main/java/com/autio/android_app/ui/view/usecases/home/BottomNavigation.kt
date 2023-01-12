@@ -7,47 +7,43 @@ import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.get
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.model.story.Story
-import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
-import com.autio.android_app.player.PlayerService
-import com.autio.android_app.ui.view.usecases.home.fragment.map.MapFragment
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
-import com.autio.android_app.ui.viewmodel.StoryViewModel
+import com.autio.android_app.ui.viewmodel.MyState
+import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
 import com.autio.android_app.util.InjectorUtils
 import com.google.android.gms.cast.framework.CastContext
-import kotlinx.coroutines.launch
 
 class BottomNavigation :
     AppCompatActivity() {
 
-    private val viewModel by viewModels<BottomNavigationViewModel> {
+    private val bottomNavigationViewModel by viewModels<BottomNavigationViewModel> {
         InjectorUtils.provideBottomNavigationViewModel(
+            this
+        )
+    }
+    private val networkViewModel by viewModels<NetworkStatusViewModel> {
+        InjectorUtils.provideNetworkStatusViewModel(
             this
         )
     }
     private var castContext: CastContext? =
         null
 
-    private val prefRepository by lazy {
-        PrefRepository(
-            this
-        )
-    }
-
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
 
-    private lateinit var storyViewModel: StoryViewModel
+    private var connected =
+        false
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -55,6 +51,19 @@ class BottomNavigation :
         super.onCreate(
             savedInstanceState
         )
+
+        networkViewModel.state.observe(
+            this
+        ) { state ->
+            connected =
+                when (state) {
+                    MyState.Fetched -> true
+                    MyState.Error -> false
+                }
+            updateConnectionUI(
+                connected
+            )
+        }
 
         castContext =
             CastContext.getSharedInstance(
@@ -69,79 +78,65 @@ class BottomNavigation :
             binding.root
         )
 
+        updateAvailableStoriesUI(
+            bottomNavigationViewModel.initialRemainingStories
+        )
+        bottomNavigationViewModel.remainingStoriesLiveData.observe(
+            this
+        ) {
+            updateAvailableStoriesUI(
+                it
+            )
+        }
+
         setListeners()
 
         volumeControlStream =
             AudioManager.STREAM_MUSIC
 
-        /**
-         * Observe [BottomNavigationViewModel.navigateToFragment] for [Event]s that request a
-         * fragment swap
-         */
-        viewModel.navigateToFragment.observe(
-            this
-        ) {
-            Log.d(
-                TAG,
-                "navigateToFragment: ${it.peekContent()}"
-            )
-            it.getContentIfNotHandled()
-                ?.let { fragmentRequest ->
-                    val transaction =
-                        supportFragmentManager.beginTransaction()
-                    transaction.replace(
-                        R.id.mainContainer,
-                        fragmentRequest.fragment,
-                        fragmentRequest.tag
-                    )
-                    if (fragmentRequest.backStack) transaction.addToBackStack(
-                        null
-                    )
-                    transaction.commit()
-                }
-        }
-
-        viewModel.currentStory.observe(
+        bottomNavigationViewModel.playingStory.observe(
             this
         ) { mediaItem ->
             updatePlayer(
                 mediaItem
             )
         }
-        viewModel.mediaButtonRes.observe(
+        bottomNavigationViewModel.mediaButtonRes.observe(
             this
         ) { res ->
             binding.btnFloatingPlayerPlay.setImageResource(
                 res
             )
         }
+    }
 
-        /**
-         * Observe changes to the [BottomNavigationViewModel.rootMediaId]
-         * When app starts, and UI connect to [PlayerService], this will be updated
-         * and app will show the initial map with media items
-         */
-//        viewModel.rootMediaId.observe(this) {
-//            rootMediaId ->
-//                rootMediaId?.let {
-//                    navigateToMediaItem(it)
-//                }
-//        }
+    override fun onStart() {
+        super.onStart()
+        updateConnectionUI(
+            connected
+        )
+    }
 
-//        viewModel.navigateToMediaItem.observe(this) {
-//            it?.getContentIfNotHandled()?.let { mediaId ->
-//                navigateToMediaItem(mediaId)
-//            }
-//        }
+    override fun onStop() {
+        super.onStop()
+        bottomNavigationViewModel.clearRoomCache()
+    }
 
-        storyViewModel =
-            ViewModelProvider(
-                this
-            )[StoryViewModel::class.java]
+    override fun onResume() {
+        super.onResume()
+        bottomNavigationViewModel.onCreate()
+    }
 
-        lifecycleScope.launch {
-            requestStories()
-        }
+    fun showUpButton() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(
+            true
+        )
+    }
+
+    fun hideUpButton() {
+        supportActionBar?.setDisplayHomeAsUpEnabled(
+            false
+        )
     }
 
     private fun setListeners() {
@@ -156,74 +151,100 @@ class BottomNavigation :
             navController
         )
         navController.addOnDestinationChangedListener { controller, destination, _ ->
-            Log.d(
-                TAG,
-                "destinationAdd: $destination"
-            )
             if (controller.graph[R.id.player] == destination) {
                 hidePlayerComponent()
             } else if (binding.floatingPersistentPlayer.visibility != View.VISIBLE) {
                 showPlayerComponent()
             }
         }
-        binding.relativeLayoutSeePlans.setOnClickListener {
-            val subscribeIntent =
-                Intent(
-                    this,
-                    SubscribeActivity::class.java
-                )
-            startActivity(
-                subscribeIntent
-            )
+        binding.rlSeePlans.setOnClickListener {
+            showPayWall()
         }
         binding.btnFloatingPlayerPlay.setOnClickListener {
-            viewModel.currentStory.value?.let {
-                viewModel.playMediaId(
+            bottomNavigationViewModel.playingStory.value?.let {
+                bottomNavigationViewModel.playMediaId(
                     it.id
                 )
             }
         }
     }
 
-    private fun navigateToMediaItem(
-        mediaId: String
-    ) {
-        Log.d(
-            TAG,
-            "navigate to $mediaId"
+    fun showPayWall() {
+        val subscribeIntent =
+            Intent(
+                this,
+                SubscribeActivity::class.java
+            )
+        startActivity(
+            subscribeIntent
         )
-        var fragment: MapFragment? =
-            getBrowseFragment(
-                mediaId
+    }
+
+    private fun updateAvailableStoriesUI(
+        remainingStories: Int
+    ) {
+        with(
+            binding
+        ) {
+            val tickMarks = arrayOf(
+                tickMark1,
+                tickMark2,
+                tickMark3,
+                tickMark4,
+                tickMark5
             )
-        if (fragment == null) {
-            fragment =
-                MapFragment.newInstance(
-                    mediaId
-                )
-            // If this is not the top level root, we add it to the fragment
-            // back stack, so actionbar toggle and back will work appropriately
-            viewModel.showFragment(
-                fragment,
-                !isRootId(
-                    mediaId
-                ),
-                mediaId
-            )
+
+            if (remainingStories < 0) {
+                llTickMarks.visibility =
+                    View.GONE
+            } else {
+                for ((i, tickMark) in tickMarks.withIndex()) {
+                    if (remainingStories >= i + 1) {
+                        tickMark.setBackgroundColor(
+                            ResourcesCompat.getColor(
+                                resources,
+                                R.color.contrasting_text,
+                                null
+                            )
+                        )
+                    } else {
+                        tickMark.setBackgroundColor(
+                            ResourcesCompat.getColor(
+                                resources,
+                                R.color.autio_blue_20,
+                                null
+                            )
+                        )
+                    }
+                }
+                llTickMarks.visibility =
+                    View.VISIBLE
+            }
         }
     }
 
-    private fun isRootId(
-        mediaId: String
-    ) =
-        mediaId == viewModel.rootMediaId.value
-
-    private fun getBrowseFragment(
-        mediaId: String
-    ): MapFragment? {
-        return supportFragmentManager.findFragmentByTag(
-            mediaId
-        ) as? MapFragment
+    private fun updateConnectionUI(
+        connectionAvailable: Boolean
+    ) {
+        if (!connectionAvailable) {
+            binding.tvFeedbackMessage.text =
+                resources.getString(
+                    R.string.snack_bar_no_connection
+                )
+            binding.rlStatusFeedback.apply {
+                setBackgroundColor(
+                    ContextCompat.getColor(
+                        this@BottomNavigation,
+                        R.color.autio_blue_20
+                    )
+                )
+                visibility =
+                    View.VISIBLE
+            }
+        } else {
+            binding.rlStatusFeedback.visibility =
+                View.GONE
+        }
     }
 
     private fun updatePlayer(
@@ -233,27 +254,6 @@ class BottomNavigation :
             story?.title
         binding.tvFloatingPlayerNarrator.text =
             story?.narrator
-    }
-
-    private fun requestStories() {
-        // TODO (Marshysaurus): Remove dummy ids
-        var dummyIds =
-            ArrayList(
-                (1..100).map { it })
-        repeat (20) {
-            ApiService().getStoriesByIds(
-                getUserId(),
-                getApiToken(),
-                dummyIds.map { it.toString() }.toList()
-            ) {
-                if (it != null) {
-                    storyViewModel.addStories(
-                        it
-                    )
-                }
-            }
-            dummyIds = ArrayList(dummyIds.map { it + 100 })
-        }
     }
 
     private fun hidePlayerComponent() {
@@ -284,16 +284,5 @@ class BottomNavigation :
             .withEndAction {
                 binding.mainContainer.requestLayout()
             }
-    }
-
-    private fun getUserId(): Int =
-        prefRepository.userId
-
-    private fun getApiToken(): String =
-        "Bearer " + prefRepository.userApiToken
-
-    companion object {
-        val TAG =
-            BottomNavigation::class.simpleName
     }
 }

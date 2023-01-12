@@ -2,17 +2,19 @@ package com.autio.android_app.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.autio.android_app.util.Constants.REMAINING_STORIES
 import com.autio.android_app.util.Constants.USER_API_TOKEN
 import com.autio.android_app.util.Constants.USER_EMAIL
+import com.autio.android_app.util.Constants.USER_FIREBASE_KEY
 import com.autio.android_app.util.Constants.USER_ID
 import com.autio.android_app.util.Constants.USER_IS_GUEST
 import com.autio.android_app.util.Constants.USER_NAME
 import com.autio.android_app.util.Constants.USER_PREFERENCES
+import com.autio.android_app.util.SharedPreferenceIntLiveData
 
 class PrefRepository(
     val context: Context
 ) {
-
     private val pref: SharedPreferences =
         context.getSharedPreferences(
             USER_PREFERENCES,
@@ -98,10 +100,22 @@ class PrefRepository(
             apiToken
         )
 
+    var firebaseKey: String =
+        USER_FIREBASE_KEY.getString()
+        set(firebaseKey) = USER_FIREBASE_KEY.put(
+            firebaseKey
+        )
+
     var isUserGuest: Boolean =
         USER_IS_GUEST.getBoolean()
         set(isGuest) = USER_IS_GUEST.put(
             isGuest
+        )
+
+    var remainingStories: Int =
+        REMAINING_STORIES.getInt()
+        set(remainingStories) = REMAINING_STORIES.put(
+            remainingStories
         )
 
     fun clearData() {
@@ -109,4 +123,10 @@ class PrefRepository(
         editor.commit()
     }
 
+    val remainingStoriesLiveData =
+        SharedPreferenceIntLiveData(
+            pref,
+            REMAINING_STORIES,
+            -1
+        )
 }

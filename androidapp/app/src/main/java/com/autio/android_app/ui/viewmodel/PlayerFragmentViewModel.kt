@@ -9,6 +9,7 @@ import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.data.repository.FirebaseStoryRepository
+import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.PlayerServiceConnection
@@ -20,6 +21,12 @@ class PlayerFragmentViewModel(
 ) : AndroidViewModel(
     app
 ) {
+    private val prefRepository by lazy {
+        PrefRepository(
+            app
+        )
+    }
+
     private var playbackState: PlaybackStateCompat =
         EMPTY_PLAYBACK_STATE
     val currentStory =
@@ -30,9 +37,18 @@ class PlayerFragmentViewModel(
                 0L
             )
         }
-    val speedButtonRes = MutableLiveData<Int>().apply {
-        postValue(R.drawable.ic_speed_audio_1x)
-    }
+
+    private val _speed =
+        MutableLiveData(
+            1F
+        )
+    private val _speedButtonRes =
+        MutableLiveData(
+            R.drawable.ic_speed_audio_1x
+        )
+    val speedButtonRes: LiveData<Int> =
+        _speedButtonRes
+
     val mediaButtonRes =
         MutableLiveData<Int>().apply {
             postValue(
@@ -40,8 +56,15 @@ class PlayerFragmentViewModel(
             )
         }
 
-    private val _storyLikes = MutableLiveData<Map<String, Boolean>>()
-    val storyLikes: LiveData<Map<String, Boolean>> = _storyLikes
+    private val _storyLikes =
+        MutableLiveData<Map<String, Boolean>>()
+    val storyLikes: LiveData<Map<String, Boolean>> =
+        _storyLikes
+
+    private val _isStoryBookmarked =
+        MutableLiveData<Boolean>()
+    val isStoryBookmarked: LiveData<Boolean> =
+        _isStoryBookmarked
 
     private var updatePosition =
         true
@@ -83,18 +106,15 @@ class PlayerFragmentViewModel(
         }
 
     /**
-     * Because there's a complex dance between this [ViewModel] and the [PlayerServiceConnection]
-     * (which is wrapping a [MediaBrowserCompat] object), the usual guidance of using
-     * [Transformations] doesn't quite work.
+     * Because there's a complex dance between this [ViewModel] and the [PlayerServiceConnection],
+     * the usual guidance of using [Transformations] doesn't quite work.
      *
      * Specifically there's three things that are watched that will cause the single piece of
      * [LiveData] exposed from this class to be updated.
      *
      * [PlayerServiceConnection.playbackState] changes state based on the playback state of
-     * the player, which can change the [MediaItemData.playbackRes]s in the list.
      *
-     * [PlayerServiceConnection.nowPlaying] changes based on the item that's being played,
-     * which can also change the [MediaItemData.playbackRes]s in the list.
+     * [PlayerServiceConnection.nowPlaying] changes based on the item that's being played
      */
     private val playerServiceConnection =
         playerServiceConnection.also {
@@ -148,13 +168,38 @@ class PlayerFragmentViewModel(
             false
     }
 
+    fun changePlaybackSpeed() {
+        val transportControls =
+            playerServiceConnection.transportControls
+
+        val newSpeed =
+            when (_speed.value) {
+                0.5F -> 1F
+                1F -> 1.1F
+                1.1F -> 1.25F
+                1.25F -> 1.5F
+                1.5F -> 1.75F
+                1.75F -> 2F
+                2F -> 0.5f
+                else -> 1F
+            }
+
+        transportControls.setPlaybackSpeed(
+            newSpeed
+        )
+        _speed.postValue(
+            newSpeed
+        )
+    }
+
     private fun updateState(
         playbackState: PlaybackStateCompat,
         story: Story?
     ) {
         // Update the playback speed button resource ID
-        speedButtonRes.postValue(
-            when (playbackState.playbackSpeed) {
+
+        _speedButtonRes.postValue(
+            when (_speed.value) {
                 0.5F -> R.drawable.ic_speed_audio_halfx
                 1F -> R.drawable.ic_speed_audio_1x
                 1.1F -> R.drawable.ic_speed_audio_1point1x
@@ -174,35 +219,32 @@ class PlayerFragmentViewModel(
             }
         )
 
-        story?.id?.let { storyId ->
-            // Call the service calling the Firebase likes' collection
+        if (story?.id != null) {
+            // Call Firebase service for likes' collection
             viewModelScope.launch {
-                val response = FirebaseStoryRepository.getLikesByStoryId(storyId)
-                response.likes?.let {
-                    _storyLikes.value = it
-                }
+                FirebaseStoryRepository.getLikesByStoryId(
+                    story.id
+                )
+                    .asLiveData()
+                    .observeForever { res ->
+                        _storyLikes.value =
+                            res.snapshot?.children?.associate { it.key!! to (it.value as Boolean) }
+                                ?: emptyMap()
+                    }
+                FirebaseStoryRepository.isStoryBookmarkedByUser(
+                    prefRepository.firebaseKey,
+                    story.id
+                )
+                    .asLiveData()
+                    .observeForever { res ->
+                        _isStoryBookmarked.value =
+                            res.snapshot?.exists()
+                                ?: false
+                    }
             }
 
             // Only update media item once we have duration available
             if (story.duration != 0) {
-//                val nowPlayingMetadata =
-//                    NowPlayingMetadata(
-//                        story.id,
-//                        story.description.iconUri
-//                            ?: Uri.EMPTY,
-//                        story.title?.trim(),
-//                        story.displaySubtitle?.trim(),
-//                        story.narrator,
-//                        story.author,
-//                        story.description.description?.toString(),
-//                        story.duration,
-//                        NowPlayingMetadata.timestampToMSS(
-//                            app,
-//                            story.duration
-//                        ),
-//                        story.category
-//                            ?: ""
-//                    )
                 this.currentStory.postValue(
                     story
                 )
@@ -230,4 +272,4 @@ class PlayerFragmentViewModel(
 }
 
 private const val POSITION_UPDATE_INTERVAL_MILLIS =
-    100L
+    17L

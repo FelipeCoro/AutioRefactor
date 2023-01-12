@@ -1,28 +1,62 @@
 package com.autio.android_app.ui.viewmodel
 
 import android.app.Application
-import android.net.Uri
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import com.autio.android_app.R
+import com.autio.android_app.data.database.repository.StoryRepository
+import com.autio.android_app.data.model.history.History
+import com.autio.android_app.data.model.plays.PlaysDto
 import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.repository.FirebaseStoryRepository
+import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
-import com.autio.android_app.util.Event
+import kotlinx.coroutines.*
 
 /**
  * [ViewModel] that watches a [PlayerServiceConnection] to become connected
- * and provides the root/initial media ID of the underlying [MediaBrowserCompat]
+ * and provides the root/initial media ID of the underlying MediaBrowserCompat
  */
 class BottomNavigationViewModel(
-    playerServiceConnection: PlayerServiceConnection
-) : ViewModel() {
+    private val app: Application,
+    playerServiceConnection: PlayerServiceConnection,
+    private val storyRepository: StoryRepository
+) : AndroidViewModel(
+    app
+) {
+    private val prefRepository by lazy {
+        PrefRepository(
+            app
+        )
+    }
+
+    val initialRemainingStories =
+        prefRepository.remainingStories
+    val remainingStoriesLiveData =
+        prefRepository.remainingStoriesLiveData
+
+    private val apiService =
+        ApiService()
+
+    private val storiesJob =
+        SupervisorJob()
+
+    fun onCreate() {
+        viewModelScope.launch {
+            getInitialData()
+        }
+    }
+
     private val _storiesInScreen =
         MutableLiveData<Map<String, Story>>(
             emptyMap()
@@ -33,55 +67,56 @@ class BottomNavigationViewModel(
     fun setStoryInView(
         story: Story
     ) {
-        val previousStories =
-            _storiesInScreen.value?.toMutableMap()
-                ?: mutableMapOf()
-        if (!previousStories.contains(
-                story.id
+        _storiesInScreen.value =
+            _storiesInScreen.value?.plus(
+                story.id to story
             )
-        ) {
-            previousStories[story.id] =
-                story
-            _storiesInScreen.postValue(
-                previousStories
-            )
-        }
+                ?: mapOf(
+                    story.id to story
+                )
     }
 
     fun removeStoryFromView(
         story: Story
     ) {
-        val previousStories =
-            _storiesInScreen.value?.toMutableMap()
-                ?: mutableMapOf()
-        if (previousStories.contains(
+        _storiesInScreen.value =
+            _storiesInScreen.value?.minus(
                 story.id
             )
-        ) {
-            previousStories.remove(
-                story.id
-            )
-            _storiesInScreen.postValue(
-                previousStories
-            )
+                ?: emptyMap()
+    }
+
+    fun fetchRecordsOfStories() {
+        _storiesInScreen.value?.let { stories ->
+            if (stories.isEmpty()) return
+            val storiesWithoutRecords =
+                stories.filter { it.value.recordUrl.isEmpty() }
+            if (storiesWithoutRecords.isNotEmpty()) {
+                apiService.getStoriesByIds(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    storiesWithoutRecords.map { it.value.originalId }
+                ) { storiesFromAPI ->
+                    if (storiesFromAPI != null) {
+                        for (story in storiesFromAPI) {
+                            storyRepository.cacheRecordOfStory(
+                                story.id,
+                                story.recordUrl
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
-    val rootMediaId: LiveData<String> =
-        Transformations.map(
-            playerServiceConnection.isConnected
-        ) { isConnected ->
-            if (isConnected) {
-                playerServiceConnection.rootMediaId
-            } else {
-                null
-            }
-        }
+    private var postedPlay =
+        false
     private var playbackState =
         EMPTY_PLAYBACK_STATE
-    val currentStory =
+    val playingStory =
         MutableLiveData<Story?>()
-    val mediaPosition =
+    private val mediaPosition =
         MutableLiveData<Int>().apply {
             postValue(
                 0
@@ -108,7 +143,7 @@ class BottomNavigationViewModel(
                     ?: EMPTY_PLAYBACK_STATE
             val currentStory =
                 playerServiceConnection.nowPlaying.value
-            updateState(
+            updateMediaState(
                 playbackState,
                 currentStory
             )
@@ -116,7 +151,7 @@ class BottomNavigationViewModel(
 
     private val mediaMetadataObserver =
         Observer<Story?> {
-            updateState(
+            updateMediaState(
                 playbackState,
                 it
             )
@@ -139,17 +174,92 @@ class BottomNavigationViewModel(
                 val currPosition =
                     playbackState.currentPlayBackPosition.toInt()
                 if (mediaPosition.value != currPosition)
-                    mediaPosition.postValue(
-                        currPosition
-                    )
+                    if (currPosition >= 30000 && !postedPlay) {
+                        postPlay()
+                    }
+                mediaPosition.postValue(
+                    currPosition
+                )
                 if (updatePosition)
                     checkPlaybackPosition()
             },
             POSITION_UPDATE_INTERVAL_MILLIS
         )
 
+    private fun postPlay() {
+        val storyToPost =
+            playingStory.value
+        postedPlay =
+            true
+        if (storyToPost != null) {
+            viewModelScope.launch {
+                withContext(
+                    Dispatchers.IO
+                ) {
+                    val downloadedStory =
+                        storyRepository.getDownloadedStoryById(
+                            playingStory.value!!.id
+                        )
+                    val connectivityManager =
+                        app.getSystemService(
+                            Context.CONNECTIVITY_SERVICE
+                        ) as ConnectivityManager
+                    val networkInfo =
+                        connectivityManager.activeNetwork
+                    val network =
+                        if (networkInfo == null) "disconnected" else {
+                            val actNw =
+                                connectivityManager.getNetworkCapabilities(
+                                    networkInfo
+                                )
+                            when {
+                                actNw?.hasTransport(
+                                    NetworkCapabilities.TRANSPORT_WIFI
+                                ) == true -> "wifi"
+                                actNw?.hasTransport(
+                                    NetworkCapabilities.TRANSPORT_CELLULAR
+                                ) == true -> "cellular"
+                                else -> "disconnected"
+                            }
+                        }
+                    apiService.postStoryPlayed(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        PlaysDto(
+                            storyToPost.id,
+                            wasPresent = true,
+                            autoPlay = true,
+                            downloadedStory != null,
+                            network,
+                            storyToPost.lat,
+                            storyToPost.lon
+                        )
+                    ) {
+                        if (it != null) {
+                            prefRepository.remainingStories =
+                                it.playsRemaining
+                        }
+                    }
+                }
+            }
+        } else {
+            apiService.postStoryPlayed(
+                prefRepository.userId,
+                prefRepository.userApiToken,
+                PlaysDto()
+            ) {
+                if (it != null) {
+                    prefRepository.remainingStories =
+                        it.playsRemaining
+                }
+            }
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
+
+        storiesJob.cancel()
 
         // Remove the permanent observers from the MusicServiceConnection.
         playerServiceConnection.playbackState.removeObserver(
@@ -164,13 +274,13 @@ class BottomNavigationViewModel(
             false
     }
 
-    private fun updateState(
+    private fun updateMediaState(
         playbackState: PlaybackStateCompat,
         story: Story?
     ) {
         // Only update media item once we have duration available
         if (story?.duration != 0 && story?.id != null) {
-            this.currentStory.postValue(
+            this.playingStory.postValue(
                 story
             )
         }
@@ -184,94 +294,7 @@ class BottomNavigationViewModel(
         )
     }
 
-    /**
-     * [navigateToMediaItem] acts as an event, rather than state. [Observer]
-     * are notified of the change as usual with [LiveData], but only one
-     * will actually read data
-     */
-    val navigateToMediaItem: LiveData<Event<String>> get() = _navigateToMediaItem
-    private val _navigateToMediaItem =
-        MutableLiveData<Event<String>>()
-
-    /**
-     * This [LiveData] object is used to notify the BottomNavigationActivity that
-     * the main content fragment needs to be swapped
-     */
-    val navigateToFragment: LiveData<Event<FragmentNavigationRequest>> get() = _navigateToFragment
-    private val _navigateToFragment =
-        MutableLiveData<Event<FragmentNavigationRequest>>()
-
-    /**
-     * This method takes a [MediaItemData] and routes it depending on
-     * whether it's browsable or not
-     *
-     * If item is browsable. handle it by sending an event to the Activity to
-     * browse to it, otherwise play it
-     */
-    fun mediaItemClicked(
-        clickedItem: MediaItemData
-    ) {
-        if (clickedItem.browsable) {
-            browseToItem(
-                clickedItem
-            )
-        } else {
-            playMedia(
-                clickedItem
-            )
-//            showFragment(NowPlayingFragment.newInstance())
-        }
-    }
-
-    fun storyClicked(
-        clickedStory: Story
-    ) {
-        val storyMetadata =
-            MediaItemData(
-                mediaId = clickedStory.id,
-                clickedStory.title,
-                clickedStory.narrator,
-                Uri.parse(
-                    clickedStory.imageUrl
-                ),
-                false,
-                0
-            )
-        playMedia(
-            storyMetadata
-        )
-    }
-
-    /**
-     * Convenience method used to swap the fragment shown in the BottomNavigation activity
-     */
-    fun showFragment(
-        fragment: Fragment,
-        backStack: Boolean = true,
-        tag: String? = null
-    ) {
-        _navigateToFragment.value =
-            Event(
-                FragmentNavigationRequest(
-                    fragment,
-                    backStack,
-                    tag
-                )
-            )
-    }
-
-    /**
-     * This posts a browse [Event] that will be handled by the
-     * observer in [BottomNavigation]
-     */
-    private fun browseToItem(
-        mediaItem: MediaItemData
-    ) {
-        _navigateToMediaItem.value =
-            Event(
-                mediaItem.mediaId
-            )
-    }
+    // Player code
 
     /**
      * This method takes a [MediaItemData] and does one of the following:
@@ -299,7 +322,7 @@ class BottomNavigationViewModel(
                     playbackState.isPlayEnabled -> transportControls.play()
                     else -> {
                         Log.w(
-                            TAG,
+                            "BottomNavigationViewModel",
                             "Playable item clicked but neither play nor pause" +
                                     "are enabled! (mediaId=${mediaItem.mediaId})"
                         )
@@ -307,9 +330,27 @@ class BottomNavigationViewModel(
                 }
             }
         } else {
+            postedPlay =
+                false
             transportControls.playFromMediaId(
                 mediaItem.mediaId,
                 null
+            )
+            FirebaseStoryRepository.addStoryToUserHistory(
+                prefRepository.firebaseKey,
+                mediaItem.mediaId,
+                onSuccessListener = { timestamp ->
+                    viewModelScope.launch(
+                        Dispatchers.IO
+                    ) {
+                        storyRepository.addStoryToHistory(
+                            History(
+                                mediaItem.mediaId,
+                                timestamp
+                            )
+                        )
+                    }
+                }
             )
         }
     }
@@ -332,44 +373,35 @@ class BottomNavigationViewModel(
                     playbackState.isPlayEnabled -> transportControls.play()
                     else -> {
                         Log.w(
-                            TAG,
+                            "BottomNavigationViewModel",
                             "Playable item clicked but neither play nor pause are enabled! (mediaId=$mediaId)"
                         )
                     }
                 }
             }
         } else {
-            Log.d(
-                TAG,
-                "Still not prepared!!"
-            )
+            postedPlay =
+                false
             transportControls.playFromMediaId(
                 mediaId,
                 null
             )
-        }
-    }
-
-    fun changePlaybackSpeed() {
-        val transportControls =
-            playerServiceConnection.transportControls
-        playerServiceConnection.playbackState.value?.let { playbackState ->
-            if (playbackState.playbackSpeed != 0F) {
-                val newSpeed =
-                    when (playbackState.playbackSpeed) {
-                        0.5F -> 1F
-                        1F -> 1.1F
-                        1.1F -> 1.25F
-                        1.25F -> 1.5F
-                        1.5F -> 1.75F
-                        1.75F -> 2F
-                        2F -> 0.5f
-                        else -> playbackState.playbackSpeed
+            FirebaseStoryRepository.addStoryToUserHistory(
+                prefRepository.firebaseKey,
+                mediaId,
+                onSuccessListener = { timestamp ->
+                    viewModelScope.launch(
+                        Dispatchers.IO
+                    ) {
+                        storyRepository.addStoryToHistory(
+                            History(
+                                mediaId,
+                                timestamp
+                            )
+                        )
                     }
-                transportControls.setPlaybackSpeed(
-                    newSpeed
-                )
-            }
+                }
+            )
         }
     }
 
@@ -385,6 +417,12 @@ class BottomNavigationViewModel(
         }
     }
 
+    fun skipToNextStory() {
+        val transportControls =
+            playerServiceConnection.transportControls
+        transportControls.skipToNext()
+    }
+
     fun setPlaybackPosition(
         progress: Int
     ) {
@@ -397,11 +435,119 @@ class BottomNavigationViewModel(
 
     // TODO: Add items to queue
     fun addMediaToQueue() {
-        val transportControls = playerServiceConnection.transportControls
+        val transportControls =
+            playerServiceConnection.transportControls
+    }
+
+    // Backend calls
+
+    private suspend fun getInitialData() {
+        viewModelScope.launch {
+            val storiesFetch =
+                async(
+                    start = CoroutineStart.LAZY
+                ) { getRemoteStories() }
+            val favoritesFetch =
+                async(
+                    start = CoroutineStart.LAZY
+                ) { setLikesToStories() }
+            val bookmarksFetch =
+                async(
+                    start = CoroutineStart.LAZY
+                ) { setBookmarksToStories() }
+            val historyFetch =
+                async(
+                    start = CoroutineStart.LAZY
+                ) { setListenedAtToStories() }
+            storiesFetch.await()
+            favoritesFetch.await()
+            bookmarksFetch.await()
+            historyFetch.await()
+            postPlay()
+        }
+    }
+
+    /**
+     * Get remote stories stored in Firebase to save them into
+     * room database
+     * It starts by fetching inside room the last modified story date
+     * so it uses this data to request to Firebase the stories updated
+     * after it
+     */
+    private suspend fun getRemoteStories() {
+        val lastFetchedStory =
+            storyRepository.getLastModifiedStory()
+        val date =
+            lastFetchedStory?.modifiedDate
+                ?: 63808881662
+        withContext(
+            Dispatchers.IO
+        ) {
+            val stories =
+                FirebaseStoryRepository.getStoriesAfterModifiedDate(
+                    date.toInt()
+                )
+            storyRepository.addStories(
+                stories
+            )
+        }
+    }
+
+    private suspend fun setBookmarksToStories() {
+        withContext(
+            Dispatchers.IO
+        ) {
+            val userBookmarkedStories =
+                FirebaseStoryRepository.getUserBookmarks(
+                    prefRepository.firebaseKey
+                )
+            storyRepository.setBookmarksDataToLocalStories(
+                userBookmarkedStories.map { it.storyId }
+            )
+        }
+    }
+
+    private suspend fun setLikesToStories() {
+        withContext(
+            Dispatchers.IO
+        ) {
+            val userFavoriteStories =
+                FirebaseStoryRepository.getUserFavoriteStories(
+                    prefRepository.firebaseKey
+                )
+            storyRepository.setLikesDataToLocalStories(
+                userFavoriteStories.filter { it.isGiven == true }
+                    .map { it.storyId }
+            )
+        }
+    }
+
+    private suspend fun setListenedAtToStories() {
+        withContext(
+            Dispatchers.IO
+        ) {
+            val userHistory =
+                FirebaseStoryRepository.getUserStoriesHistory(
+                    prefRepository.firebaseKey
+                )
+            storyRepository.setListenedAtToLocalStories(
+                userHistory
+            )
+        }
+    }
+
+    fun clearRoomCache() {
+        viewModelScope.launch(
+            Dispatchers.IO
+        ) {
+            storyRepository.deleteCachedData()
+        }
     }
 
     class Factory(
-        private val playerServiceConnection: PlayerServiceConnection
+        private val app: Application,
+        private val playerServiceConnection: PlayerServiceConnection,
+        private val storyRepository: StoryRepository
     ) : ViewModelProvider.NewInstanceFactory() {
 
         @Suppress(
@@ -411,25 +557,13 @@ class BottomNavigationViewModel(
             modelClass: Class<T>
         ): T {
             return BottomNavigationViewModel(
-                playerServiceConnection
+                app,
+                playerServiceConnection,
+                storyRepository
             ) as T
         }
     }
-
-    companion object {
-        private val TAG =
-            BottomNavigationViewModel::class.simpleName
-        private const val POSITION_UPDATE_INTERVAL_MILLIS =
-            100L
-    }
 }
 
-/**
- * Helper class used to pass fragment navigation requests between BottomNavigation
- * and its corresponding ViewModel
- */
-data class FragmentNavigationRequest(
-    val fragment: Fragment,
-    val backStack: Boolean = false,
-    val tag: String? = null
-)
+private const val POSITION_UPDATE_INTERVAL_MILLIS =
+    100L

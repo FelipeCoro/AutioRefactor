@@ -10,19 +10,21 @@ import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivitySignUpBinding
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
-import com.autio.android_app.util.Utils
+import com.autio.android_app.util.checkEmptyFormFields
+import com.autio.android_app.util.pleaseFillText
+import com.autio.android_app.util.showError
 
 class SignUpActivity :
     AppCompatActivity() {
-
-    private val apiService =
-        ApiService()
-    private lateinit var binding: ActivitySignUpBinding
     private val prefRepository by lazy {
         PrefRepository(
             this
         )
     }
+
+    private val apiService =
+        ApiService()
+    private lateinit var binding: ActivitySignUpBinding
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -50,15 +52,17 @@ class SignUpActivity :
     }
 
     private fun showLoadingView() {
-        binding.flLoading.root.visibility = View.VISIBLE
+        binding.flLoading.root.visibility =
+            View.VISIBLE
     }
 
     private fun hideLoadingView() {
-        binding.flLoading.root.visibility = View.GONE
+        binding.flLoading.root.visibility =
+            View.GONE
     }
 
     private fun createUser() {
-        if (Utils.checkEmptyFormFields(
+        if (checkEmptyFormFields(
                 arrayOf(
                     binding.tvName,
                     binding.tvEmail,
@@ -66,7 +70,7 @@ class SignUpActivity :
                 )
             )
         ) {
-            Utils.pleaseFillText(
+            pleaseFillText(
                 this
             )
         } else {
@@ -101,7 +105,7 @@ class SignUpActivity :
                     finish()
                 } else {
                     hideLoadingView()
-                    Utils.showError(
+                    showError(
                         this,
                         "The mail is already associated to another account"
                     )

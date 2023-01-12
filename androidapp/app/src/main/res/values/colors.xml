@@ -75,6 +75,9 @@
     <color name="fragment_background_opaque">
         #FFFFFF
     </color>
+    <color name="popup_background">
+        #FFFFFF
+    </color>
     <color name="divider">
         #EEEEF2
     </color>
@@ -85,6 +88,9 @@
     <color name="normal_text">
         #080F45
     </color>
+    <color name="contrasting_text">
+        #FFFFFF
+    </color>
     <color name="text_map_fragment">
         #FFFFFF
     </color>
@@ -94,6 +100,9 @@
     </color>
     <color name="button_text">
         #FFFFFF
+    </color>
+    <color name="secondary_button">
+        #080F45
     </color>
     <color name="button_border">
         #9C9FB5
@@ -125,6 +134,9 @@
         #090E42
     </color>
     <!-- Map Fragment Page -->
+    <color name="selected_story_card">
+        #FFFFFF
+    </color>
     <color name="persistent_player_next">
         #090E42
     </color>

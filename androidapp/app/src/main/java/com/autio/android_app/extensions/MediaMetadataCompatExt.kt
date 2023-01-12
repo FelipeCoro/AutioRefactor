@@ -211,7 +211,7 @@ fun MediaMetadataCompat.Builder.from(
     duration =
         durationMs
     category =
-        story.category.title
+        story.category?.title
     mediaUri =
         story.recordUrl
     albumArtUri =

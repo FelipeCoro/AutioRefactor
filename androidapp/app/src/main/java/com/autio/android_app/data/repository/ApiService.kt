@@ -3,13 +3,16 @@ package com.autio.android_app.data.repository
 import android.util.Log
 import com.autio.android_app.core.RetrofitHelper
 import com.autio.android_app.data.model.account.*
+import com.autio.android_app.data.model.api_response.ContributorApiResponse
+import com.autio.android_app.data.model.api_response.PlaysResponse
 import com.autio.android_app.data.model.author.Author
 import com.autio.android_app.data.model.category.StoryCategory
 import com.autio.android_app.data.model.narrator.Narrator
+import com.autio.android_app.data.model.plays.PlaysDto
 import com.autio.android_app.data.model.story.Story
-import com.autio.android_app.data.model.story.StoryDto
 import com.autio.android_app.util.Constants
-import com.github.kittinunf.fuel.core.*
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Request
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,10 +50,6 @@ class ApiService {
                         call: Call<LoginResponse>,
                         t: Throwable
                     ) {
-                        Log.d(
-                            TAG,
-                            "loginFailure: ${t.message}"
-                        )
                         onResult(
                             null
                         )
@@ -273,12 +272,12 @@ class ApiService {
     fun getStoriesByIds(
         xUserId: Int,
         apiToken: String,
-        ids: List<String>,
+        ids: List<Int>,
         onResult: (List<Story>?) -> Unit
     ) =
         retrofit.getStoriesByIds(
             xUserId,
-            apiToken,
+            "Bearer $apiToken",
             ids
         )
             .enqueue(
@@ -301,6 +300,10 @@ class ApiService {
                         call: Call<List<Story>>,
                         t: Throwable
                     ) {
+                        Log.e(
+                            TAG,
+                            "error fetching stories: $t"
+                        )
                         onResult(
                             null
                         )
@@ -358,50 +361,51 @@ class ApiService {
         apiToken: String,
         contributorId: Int,
         page: Int,
-        onResult: (List<Story>?) -> Unit
+        onResult: (ContributorApiResponse?) -> Unit
     ) =
         retrofit.getStoriesByContributor(
             xUserId,
-            apiToken,
+            "Bearer $apiToken",
             contributorId,
             page
         )
             .enqueue(
                 object :
-                    Callback<List<Story>> {
+                    Callback<ContributorApiResponse> {
                     override fun onResponse(
-                        call: Call<List<Story>>,
-                        response: Response<List<Story>>
+                        call: Call<ContributorApiResponse>,
+                        response: Response<ContributorApiResponse>
                     ) {
                         if (response.isSuccessful) {
-                            val stories =
+                            val authorApiResponse =
                                 response.body()
                             onResult(
-                                stories
+                                authorApiResponse
                             )
                         }
                     }
 
                     override fun onFailure(
-                        call: Call<List<Story>>,
+                        call: Call<ContributorApiResponse>,
                         t: Throwable
-                    ) =
+                    ) {
                         onResult(
                             null
                         )
+                    }
                 }
             )
 
     fun getAuthorOfStory(
         xUserId: Int,
         apiToken: String,
-        storyDto: StoryDto,
+        storyId: Int,
         onResult: (Author?) -> Unit
     ) =
         retrofit.getAuthorOfStory(
             xUserId,
             apiToken,
-            storyDto
+            storyId
         )
             .enqueue(
                 object :
@@ -431,13 +435,13 @@ class ApiService {
     fun getNarratorOfStory(
         xUserId: Int,
         apiToken: String,
-        storyDto: StoryDto,
+        storyId: Int,
         onResult: (Narrator?) -> Unit
     ) =
         retrofit.getNarratorOfStory(
             xUserId,
             apiToken,
-            storyDto
+            storyId
         )
             .enqueue(
                 object :
@@ -496,6 +500,43 @@ class ApiService {
                         onResult(
                             null
                         )
+                })
+
+    fun postStoryPlayed(
+        xUserId: Int,
+        apiToken: String,
+        playsDto: PlaysDto,
+        onResult: (PlaysResponse?) -> Unit
+    ) =
+        retrofit.postStoryPlayed(
+            xUserId,
+            "Bearer $apiToken",
+            playsDto
+        )
+            .enqueue(
+                object :
+                    Callback<PlaysResponse> {
+                    override fun onResponse(
+                        call: Call<PlaysResponse>,
+                        response: Response<PlaysResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            val body =
+                                response.body()
+                            onResult(
+                                body
+                            )
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<PlaysResponse>,
+                        t: Throwable
+                    ) {
+                        onResult(
+                            null
+                        )
+                    }
                 })
 
     private fun Request.addHeaders(

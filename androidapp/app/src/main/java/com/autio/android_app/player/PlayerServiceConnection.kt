@@ -3,9 +3,6 @@ package com.autio.android_app.player
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.ResultReceiver
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -14,7 +11,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
-import com.autio.android_app.data.database.StoryDataBase
+import com.autio.android_app.data.database.repository.StoryRepository
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.extensions.id
 import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
@@ -45,9 +42,9 @@ import kotlinx.coroutines.launch
  */
 class PlayerServiceConnection(
     context: Context,
-    serviceComponent: ComponentName
+    serviceComponent: ComponentName,
+    private val storyRepository: StoryRepository
 ) {
-    val storyDatabase = StoryDataBase.getInstance(context)
 
     val isConnected =
         MutableLiveData<Boolean>()
@@ -63,8 +60,6 @@ class PlayerServiceConnection(
                     false
                 )
             }
-
-    val rootMediaId: String get() = mediaBrowser.root
 
     val playbackState =
         MutableLiveData<PlaybackStateCompat>()
@@ -117,45 +112,6 @@ class PlayerServiceConnection(
         )
     }
 
-    fun sendCommand(
-        command: String,
-        parameters: Bundle?
-    ) =
-        sendCommand(
-            command,
-            parameters
-        ) { _, _ -> }
-
-    fun sendCommand(
-        command: String,
-        parameters: Bundle?,
-        resultCallback: ((Int, Bundle?) -> Unit)
-    ) =
-        if (mediaBrowser.isConnected) {
-            mediaController.sendCommand(
-                command,
-                parameters,
-                object :
-                    ResultReceiver(
-                        Handler(
-                            Looper.getMainLooper()
-                        )
-                    ) {
-                    override fun onReceiveResult(
-                        resultCode: Int,
-                        resultData: Bundle?
-                    ) {
-                        resultCallback(
-                            resultCode,
-                            resultData
-                        )
-                    }
-                })
-            true
-        } else {
-            false
-        }
-
     private inner class MediaBrowserConnectionCallback(
         private val context: Context
     ) :
@@ -166,7 +122,6 @@ class PlayerServiceConnection(
          */
         override fun onConnected() {
             // Get a MediaController for the MediaSession.
-            Log.d("PlayerConnection", "Connected!!")
             mediaController =
                 MediaControllerCompat(
                     context,
@@ -184,7 +139,6 @@ class PlayerServiceConnection(
          * Invoked when the client is disconnected from the media browser.
          */
         override fun onConnectionSuspended() {
-            Log.d("PlayerConnection", "Suspended!!")
             isConnected.postValue(
                 false
             )
@@ -194,7 +148,6 @@ class PlayerServiceConnection(
          * Invoked when the connection to the media browser failed.
          */
         override fun onConnectionFailed() {
-            Log.d("PlayerConnection", "Failed!!")
             isConnected.postValue(
                 false
             )
@@ -207,7 +160,6 @@ class PlayerServiceConnection(
         override fun onPlaybackStateChanged(
             state: PlaybackStateCompat?
         ) {
-            Log.d("PlayerConnection", "playbackStateChanged: ${state?.playbackSpeed}")
             playbackState.postValue(
                 state
                     ?: EMPTY_PLAYBACK_STATE
@@ -221,22 +173,35 @@ class PlayerServiceConnection(
             // metadata object which has been instantiated with default values. The default value
             // for media ID is null so we assume that if this value is null we are not playing
             // anything.
-                if (metadata?.id == null) {
-                    nowPlaying.postValue(null)
-                } else {
-                    CoroutineScope(Dispatchers.Main + SupervisorJob()).launch {
-                        val currentStory = storyDatabase.storyDao().getStoryById(metadata.id!!)
-                        currentStory?.let {
-                            nowPlaying.postValue(it)
-                        }
+            if (metadata?.id == null) {
+                nowPlaying.postValue(
+                    null
+                )
+            } else {
+                CoroutineScope(
+                    Dispatchers.Main + SupervisorJob()
+                ).launch {
+                    val currentStory =
+                        storyRepository
+                            .getStoryById(
+                                metadata.id!!
+                            )
+                    currentStory?.let {
+                        nowPlaying.postValue(
+                            it
+                        )
                     }
                 }
+            }
         }
 
         override fun onQueueChanged(
             queue: MutableList<MediaSessionCompat.QueueItem>?
         ) {
-            Log.d("PlayerConnection", "onQueueChanged: $queue")
+            Log.d(
+                "PlayerConnection",
+                "onQueueChanged: $queue"
+            )
         }
 
         override fun onSessionEvent(
@@ -247,7 +212,6 @@ class PlayerServiceConnection(
                 event,
                 extras
             )
-            Log.d("PlayerConnection", "onSessionEvent: $event")
             when (event) {
                 NETWORK_FAILURE -> networkFailure.postValue(
                     true
@@ -262,7 +226,6 @@ class PlayerServiceConnection(
          * send it on to the other callback.
          */
         override fun onSessionDestroyed() {
-            Log.d("PlayerConnection", "onSessionDestroyed!!")
             mediaBrowserConnectionCallback.onConnectionSuspended()
         }
     }
@@ -275,7 +238,8 @@ class PlayerServiceConnection(
 
         fun getInstance(
             context: Context,
-            serviceComponent: ComponentName
+            serviceComponent: ComponentName,
+            storyRepository: StoryRepository
         ) =
             instance
                 ?: synchronized(
@@ -284,7 +248,8 @@ class PlayerServiceConnection(
                     instance
                         ?: PlayerServiceConnection(
                             context,
-                            serviceComponent
+                            serviceComponent,
+                            storyRepository
                         )
                             .also {
                                 instance =
@@ -294,9 +259,6 @@ class PlayerServiceConnection(
     }
 }
 
-@Suppress(
-    "PropertyName"
-)
 val EMPTY_PLAYBACK_STATE: PlaybackStateCompat =
     PlaybackStateCompat.Builder()
         .setState(
@@ -306,9 +268,6 @@ val EMPTY_PLAYBACK_STATE: PlaybackStateCompat =
         )
         .build()
 
-@Suppress(
-    "PropertyName"
-)
 val NOTHING_PLAYING: MediaMetadataCompat =
     MediaMetadataCompat.Builder()
         .putString(

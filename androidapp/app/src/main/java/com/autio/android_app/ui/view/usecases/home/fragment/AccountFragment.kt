@@ -24,24 +24,23 @@ import com.autio.android_app.ui.view.usecases.home.adapter.InterestAdapter
 import com.autio.android_app.ui.view.usecases.login.LoginActivity
 import com.autio.android_app.ui.view.usecases.login.SignInActivity
 import com.autio.android_app.ui.view.usecases.login.SignUpActivity
-import com.autio.android_app.util.SwipeGesture
-import com.autio.android_app.util.Utils
+import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import java.util.*
 
 class AccountFragment :
     Fragment() {
+    private val prefRepository by lazy {
+        PrefRepository(
+            requireContext()
+        )
+    }
 
     private var _binding: FragmentAccountBinding? =
         null
     private val binding get() = _binding!!
     private val interestList =
         InterestProvider.getInterests()
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
 
     private val apiService =
         ApiService()
@@ -131,24 +130,15 @@ class AccountFragment :
         }
 
         binding.rlWatchHowWorks.setOnClickListener {
-            Utils.openUrl(
+            openUrl(
                 requireContext(),
                 "https://www.youtube.com/watch?v=SvbahDL4aYc&ab_channel=Autio"
             )
         }
 
         binding.btnContact.setOnClickListener {
-            Utils.writeEmail(
-                requireContext(),
-                arrayOf(
-                    "support@autio.com"
-                ),
-                "Autio Android Customer Support",
-                """
-                    Device: ${Utils.getDeviceData()}
-                    Android Version: ${android.os.Build.VERSION.SDK_INT}
-                    App Version: ${android.os.Build.VERSION.RELEASE}
-                """.trimIndent()
+            writeEmailToCustomerSupport(
+                requireContext()
             )
         }
 
@@ -156,30 +146,21 @@ class AccountFragment :
             Pair(
                 "Contact Autio",
                 View.OnClickListener {
-                    Utils.writeEmail(
-                        requireContext(),
-                        arrayOf(
-                            "support@autio.com"
-                        ),
-                        "Autio Android Customer Support",
-                        """
-                    Device: ${Utils.getDeviceData()}
-                    Android Version: ${android.os.Build.VERSION.SDK_INT}
-                    App Version: ${android.os.Build.VERSION.RELEASE}
-                """.trimIndent()
+                    writeEmailToCustomerSupport(
+                        requireContext()
                     )
                 })
         )
     }
 
     private fun updateUserData() {
-        if (Utils.checkEmptyField(
+        if (checkEmptyField(
                 binding.etName
-            ) || Utils.checkEmptyField(
+            ) || checkEmptyField(
                 binding.etEmail
             )
         ) {
-            Utils.pleaseFillText(
+            pleaseFillText(
                 requireContext()
             )
         } else {
@@ -208,15 +189,15 @@ class AccountFragment :
     }
 
     private fun changeUserPassword() {
-        if (Utils.checkEmptyField(
+        if (checkEmptyField(
                 binding.etCurrentPassword
-            ) || Utils.checkEmptyField(
+            ) || checkEmptyField(
                 binding.etNewPassword
-            ) || Utils.checkEmptyField(
+            ) || checkEmptyField(
                 binding.etConfirmPassword
             )
         ) {
-            Utils.pleaseFillText(
+            pleaseFillText(
                 requireContext()
             )
         } else {
@@ -245,7 +226,7 @@ class AccountFragment :
                             GONE
                         binding.btnChangePassword.visibility =
                             VISIBLE
-                        Utils.showToast(
+                        showToast(
                             requireContext(),
                             "Password has been updated"
                         )

@@ -20,8 +20,8 @@ data class Author constructor(
     ) val biography: String,
     @SerializedName(
         "website"
-    ) val url: String,
+    ) val url: String?,
     @SerializedName(
         "profile_image_url"
-    ) val imageUrl: String
+    ) val imageUrl: String?
 )

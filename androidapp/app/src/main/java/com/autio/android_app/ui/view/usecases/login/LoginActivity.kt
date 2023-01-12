@@ -7,7 +7,6 @@ import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.adapter.ImageAdapter
 import com.autio.android_app.data.Datasource
 import com.autio.android_app.data.model.account.GuestResponse
 import com.autio.android_app.data.repository.ApiService
@@ -15,18 +14,20 @@ import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivityLoginBinding
 import com.autio.android_app.extensions.setAutomaticScroll
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
-import com.autio.android_app.util.Utils
+import com.autio.android_app.ui.view.usecases.home.adapter.ImageAdapter
+import com.autio.android_app.util.showError
 
 class LoginActivity :
     AppCompatActivity() {
-    private lateinit var binding: ActivityLoginBinding
-    private val apiService =
-        ApiService()
     private val prefRepository by lazy {
         PrefRepository(
             this
         )
     }
+
+    private lateinit var binding: ActivityLoginBinding
+    private val apiService =
+        ApiService()
 
     private lateinit var firstRecyclerView: RecyclerView
     private lateinit var secondRecyclerView: RecyclerView
@@ -120,11 +121,13 @@ class LoginActivity :
     }
 
     private fun showLoadingView() {
-        binding.flLoading.root.visibility = View.VISIBLE
+        binding.flLoading.root.visibility =
+            View.VISIBLE
     }
 
     private fun hideLoadingView() {
-        binding.flLoading.root.visibility = View.GONE
+        binding.flLoading.root.visibility =
+            View.GONE
     }
 
     private fun loginGuest() {
@@ -143,7 +146,7 @@ class LoginActivity :
                 finish()
             } else {
                 hideLoadingView()
-                Utils.showError(
+                showError(
                     this
                 )
             }
@@ -155,8 +158,12 @@ class LoginActivity :
     ) {
         prefRepository.isUserGuest =
             true
-        prefRepository.userId = guestResponse.id
+        prefRepository.userId =
+            guestResponse.id
+        prefRepository.firebaseKey =
+            guestResponse.firebaseKey
         prefRepository.userApiToken =
             guestResponse.apiToken
+        prefRepository.remainingStories = 5
     }
 }

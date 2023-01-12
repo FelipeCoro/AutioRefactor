@@ -58,27 +58,37 @@ class SubscribeActivity :
         binding.tvMothInvitation.movementMethod =
             LinkMovementMethod.getInstance()
 
-            binding.imageSliderSubscribe.apply {
-                autoCycleDirection =
-                    SliderView.LAYOUT_DIRECTION_LTR
-                setSliderAdapter(
-                    SliderAdapter(
-                        textListTitle,
-                        textList
-                    )
+        binding.imageSliderSubscribe.apply {
+            autoCycleDirection =
+                SliderView.LAYOUT_DIRECTION_LTR
+            setSliderAdapter(
+                SliderAdapter(
+                    textListTitle,
+                    textList
                 )
-                scrollTimeInSec =
-                    6
-                isAutoCycle =
-                    true
-                setInfiniteAdapterEnabled(true)
-                startAutoCycle()
-            }
+            )
+            scrollTimeInSec =
+                6
+            isAutoCycle =
+                true
+            setInfiniteAdapterEnabled(
+                true
+            )
+            startAutoCycle()
+        }
 
         setListeners()
     }
 
     private fun setListeners() {
+        if (prefRepository.userApiToken.isEmpty() || prefRepository.firebaseKey.isEmpty()) {
+            binding.tvSignIn.setOnClickListener {
+                goToLoginActivity()
+            }
+        } else {
+            binding.tvSignIn.visibility =
+                View.GONE
+        }
         binding.tvMothInvitation.makeLinks(
             Pair(
                 "Learn more",

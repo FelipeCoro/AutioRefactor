@@ -68,7 +68,10 @@
     <string name="guest_authenticate_message">You\'re not currently signed in.\nCreate an account or sign in to\nmanage your account.</string>
     <string name="guest_contact_autio">Questions about your account or subscription? <u>Contact Autio</u>.</string>
     <string name="no_story_loaded">No story loaded</string>
-    <string name="story_author">%1$s</string>
+    <string name="empty_bookmarks_message">Bookmarked stories will appear on this list. Bookmarks are only visible to you and are a great way to earmark stories to revisit later.</string>
+    <string name="empty_favorites_message">Liked stories will appear on this list. Everyone can see likes — they’re a great way to show some love for your absolute favorite stories.</string>
+    <string name="empty_history_message">Listened-to stories will appear here in the order you discover them. Start listening now by choosing a story from the map.</string>
+    <string name="empty_downloads_message">Downloaded stories will appear here. Downloaded stories will be available just in this device.</string>
     <!-- Text fields' labels -->
     <string name="email">EMAIL</string>
     <string name="password">PASSWORD</string>
@@ -86,6 +89,7 @@
     <string name="try_5_stories_free">Try 5 Stories Free</string>
     <string name="back">Back</string>
     <string name="learn_more">Learn More</string>
+    <string name="clear_playlist">Clear</string>
     <!-- Images' content description -->
     <string name="logo_description">Autio logo</string>
     <string name="notification_icon_description">Notification icon</string>
@@ -93,13 +97,23 @@
     <string name="background_location_icon_description">Background location icon</string>
     <string name="app_store_rate">Average rating of the app in stores</string>
     <string name="moth_logo">The Moth group\'s logo</string>
+    <!-- Toolbars -->
+    <plurals name="toolbar_stories_subtitle">
+        <item quantity="one">1 STORY</item>
+        <item quantity="other">%1$d STORIES</item>
+    </plurals>
+    <plurals name="toolbar_stories_with_time_subtitle">
+        <item quantity="one">1 STORY — %2$d MINUTES</item>
+        <item quantity="other">%1$d STORIES — %2$d MINUTES</item>
+    </plurals>
+    <!-- SnackBar -->
+    <string name="snack_bar_no_connection">No Internet Connection</string>
     <!-- Modal content -->
     <string name="moth_advertisement_title">Help the Next Generation\nTell Their Stories</string>
-    <string name="moth_advertisement_body">Autio is a proud sponsor of The Moth\nCommunity Engagement Program,
-        which\nprovides the space, tools and expertise\nfor people to practice the art and craft of\npersonal
-        storytelling. We partner with\ncommunity organizations, cultural institutions\nand non-profits to host
-        workshops that\ninspire confidence and self-reflection\nand deepen connections within and\n
-        between communities.</string>
+    <string name="moth_advertisement_body">Autio is a proud sponsor of The Moth Community Engagement Program, which provides the space, tools and expertise for people to practice the art and craft of personalstorytelling. We partner with community organizations, cultural institutions and non-profits to host workshops that inspire confidence and self-reflection and deepen connections within and between communities.</string>
+    <!-- Menu Actions -->
+    <string name="action_download">Download</string>
+    <string name="action_directions">Directions</string>
     <!-- Miscellaneous -->
     <string name="divider">Divider component for separating visuals</string>
     <string name="notification_channel">Now Playing</string>
@@ -117,4 +131,10 @@
     <string name="story_art_alt">Story art</string>
     <string name="duration_unknown">--:--</string>
     <string name="duration_format">%d:%02d</string>
+    <string name="address">%1$s, %2$s</string>
+    <!-- My Stories Categories -->
+    <string name="my_stories_bookmarks">Bookmarks</string>
+    <string name="my_stories_favorites">Favorites</string>
+    <string name="my_stories_history">History</string>
+    <string name="my_stories_downloaded_stories">Downloaded Stories</string>
 </resources>

@@ -15,8 +15,11 @@ object RetrofitHelper {
             .addInterceptor(
                 RequestInterceptor
             )
-            .readTimeout(10, TimeUnit.SECONDS)
-            .connectTimeout(10, TimeUnit.SECONDS)
+            .callTimeout(1, TimeUnit.MINUTES)
+            .writeTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(1, TimeUnit.MINUTES)
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .retryOnConnectionFailure(true)
             .build()
 
     private fun getRetrofit(): Retrofit {

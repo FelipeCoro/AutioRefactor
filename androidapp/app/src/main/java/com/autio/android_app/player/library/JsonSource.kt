@@ -10,7 +10,9 @@ import com.autio.android_app.extensions.albumArtUri
 import com.autio.android_app.extensions.displayIconUri
 import com.autio.android_app.extensions.from
 import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -20,7 +22,9 @@ import java.io.IOException
  * Source of [MediaMetadataCompat] objects created from a basic
  * JSON stream
  */
-internal class JsonSource(val context : Context) :
+internal class JsonSource(
+    val context: Context
+) :
     AbstractStorySource() {
 
     private var catalog: List<MediaMetadataCompat> =
@@ -107,11 +111,14 @@ internal class JsonSource(val context : Context) :
      */
     private suspend fun downloadJson(): JsonCatalog {
         val stories =
-            StoryDataBase.getInstance(context).storyDao().readStories()
-        Log.d(
-            TAG,
-            stories.size.toString()
-        )
+            StoryDataBase.getInstance(
+                context,
+                CoroutineScope(
+                    SupervisorJob()
+                )
+            )
+                .storyDao()
+                .readStories()
         val jsonArray =
             JSONArray(
                 Gson().toJson(

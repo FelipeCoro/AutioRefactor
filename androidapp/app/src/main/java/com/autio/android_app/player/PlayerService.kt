@@ -2,7 +2,6 @@ package com.autio.android_app.player
 
 import android.app.Notification
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -15,7 +14,6 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.widget.Toast
-import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.autio.android_app.R
@@ -31,6 +29,7 @@ import com.autio.android_app.player.library.StorySource
 import com.autio.android_app.util.PackageValidator
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.Player.*
+import com.google.android.exoplayer2.analytics.PlaybackStatsListener
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.cast.CastPlayer
 import com.google.android.exoplayer2.ext.cast.SessionAvailabilityListener
@@ -40,7 +39,10 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.util.Util.constrainValue
 import com.google.android.gms.cast.framework.CastContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * [PlayerService] is the entry point for browsing and playback
@@ -51,8 +53,6 @@ import kotlinx.coroutines.*
  */
 open class PlayerService :
     MediaBrowserServiceCompat() {
-
-    private lateinit var storyDataBase: StoryDataBase
 
     private lateinit var notificationManager: MediaNotificationManager
     private lateinit var mediaSource: StorySource
@@ -69,8 +69,8 @@ open class PlayerService :
             Dispatchers.Main + serviceJob
         )
 
-    protected lateinit var mediaSession: MediaSessionCompat
-    protected lateinit var mediaSessionConnector: MediaSessionConnector
+    private lateinit var mediaSession: MediaSessionCompat
+    private lateinit var mediaSessionConnector: MediaSessionConnector
     private var currentPlaylistItems =
         mutableListOf<MediaMetadataCompat>()
     private var currentMediaItemIndex =
@@ -123,6 +123,12 @@ open class PlayerService :
                 addListener(
                     playerListener
                 )
+                addAnalyticsListener(
+                    PlaybackStatsListener(
+                        true,
+                        null
+                    )
+                )
             }
     }
 
@@ -162,11 +168,6 @@ open class PlayerService :
 
     override fun onCreate() {
         super.onCreate()
-
-        storyDataBase =
-            StoryDataBase.getInstance(
-                this
-            )
 
         val sessionActivityPendingIntent =
             packageManager.getLaunchIntentForPackage(
@@ -222,9 +223,6 @@ open class PlayerService :
             JsonSource(
                 this
             )
-        serviceScope.launch {
-            mediaSource.load()
-        }
 
         // ExoPlayer will manage the MediaSession
         mediaSessionConnector =
@@ -376,13 +374,6 @@ open class PlayerService :
                                     item.flag
                                 )
                             }
-                        Log.d(
-                            TAG,
-                            children?.joinToString(
-                                "\n"
-                            )
-                                ?: "empty"
-                        )
                         result.sendResult(
                             children
                         )
@@ -441,8 +432,27 @@ open class PlayerService :
     fun addStoryToPlaylist(
         metadata: MediaMetadataCompat
     ) {
-        currentPlaylistItems.add(metadata)
-        currentPlayer.addMediaItem(metadata.toMediaItem())
+        currentPlaylistItems.add(
+            metadata
+        )
+        currentPlayer.addMediaItem(
+            metadata.toMediaItem()
+        )
+    }
+
+    fun removeStoryFromPlaylist(
+        metadata: MediaMetadataCompat
+    ) {
+        if (currentPlaylistItems.contains(
+                metadata
+            )
+        ) {
+            currentPlaylistItems.remove(
+                metadata
+            )
+        }
+        currentPlayer.setMediaItems(
+            currentPlaylistItems.map { it.toMediaItem() })
     }
 
     /**
@@ -604,7 +614,13 @@ open class PlayerService :
         ) {
             serviceScope.launch {
                 val itemToPlay =
-                    storyDataBase.storyDao()
+                    StoryDataBase.getInstance(
+                        this@PlayerService,
+                        CoroutineScope(
+                            SupervisorJob()
+                        )
+                    )
+                        .storyDao()
                         .getStoryById(
                             mediaId
                         )
@@ -644,10 +660,6 @@ open class PlayerService :
             playWhenReady: Boolean,
             extras: Bundle?
         ) {
-            Log.d(
-                TAG,
-                "prepareFromSearch: "
-            )
             mediaSource.whenReady {
                 val metadataList =
                     mediaSource.search(
@@ -742,17 +754,26 @@ open class PlayerService :
     private inner class PlayerEventListener :
         Listener {
 
-        @Deprecated(
-            "Deprecated in Java"
-        )
-        override fun onPlayerStateChanged(
+        override fun onPlayWhenReadyChanged(
             playWhenReady: Boolean,
+            reason: Int
+        ) {
+            if (!playWhenReady) {
+                // If playback is paused we remove the foreground state which allows the
+                // notification to be dismissed. An alternative would be to provide a
+                // "close" button in the notification which stops playback and clears
+                // the notification.
+                stopForeground(
+                    STOP_FOREGROUND_DETACH
+                )
+                isForegroundService =
+                    false
+            }
+        }
+
+        override fun onPlaybackStateChanged(
             playbackState: Int
         ) {
-            Log.d(
-                TAG,
-                "playerStateChanged: $playbackState"
-            )
             when (playbackState) {
                 STATE_BUFFERING,
                 STATE_READY -> {
@@ -760,23 +781,10 @@ open class PlayerService :
                         currentPlayer
                     )
                     if (playbackState == STATE_READY) {
-
                         // When playing/paused save the current media item in persistent
                         // storage so that playback can be resumed between device reboots.
                         // Search for "media resumption" for more information.
                         saveRecentStoryToStorage()
-
-                        if (!playWhenReady) {
-                            // If playback is paused we remove the foreground state which allows the
-                            // notification to be dismissed. An alternative would be to provide a
-                            // "close" button in the notification which stops playback and clears
-                            // the notification.
-                            stopForeground(
-                                STOP_FOREGROUND_DETACH
-                            )
-                            isForegroundService =
-                                false
-                        }
                     }
                 }
                 else -> {
@@ -789,10 +797,6 @@ open class PlayerService :
             player: Player,
             events: Events
         ) {
-            Log.d(
-                TAG,
-                "onEvents: $events"
-            )
             if (events.containsAny(
                     EVENT_POSITION_DISCONTINUITY,
                     EVENT_MEDIA_ITEM_TRANSITION,
@@ -823,7 +827,7 @@ open class PlayerService :
                 || error.errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND
             ) {
                 message =
-                    "Media not found"
+                    "Media not available"
             }
             Toast.makeText(
                 applicationContext,
@@ -858,10 +862,7 @@ open class PlayerService :
         private const val CONTENT_STYLE_GRID =
             2
 
-        private const val USER_AGENT =
-            "autio.next"
-
-        val MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS =
+        const val MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS =
             "playback_start_position_ms"
     }
 }

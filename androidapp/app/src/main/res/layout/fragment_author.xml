@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fragment_background"
+    tools:context=".ui.view.usecases.home.fragment.AuthorFragment">
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:contentInsetStart="15dp"
+        android:contentInsetEnd="15dp"
+        android:paddingTop="12dp">
+
+        <LinearLayout
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_back_arrow"
+                app:backgroundColor="@color/autio_blue" />
+
+            <TextView
+                style="@style/ToolbarBackButtonText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/back"
+                android:textAllCaps="true" />
+        </LinearLayout>
+    </Toolbar>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cvAuthorPic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:layout_centerHorizontal="true"
+        app:cardCornerRadius="10dp">
+
+        <ImageView
+            android:id="@+id/ivAuthorPic"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@drawable/bio_placeholder"
+            android:scaleType="centerCrop" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvAuthorName"
+        style="@style/Title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/cvAuthorPic"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:visibility="gone" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/svAuthorContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvAuthorName">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvAuthorBio"
+                style="@style/TextViewInterRegular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="top"
+                android:visibility="gone"
+                tools:text="It all started with growing up in the mountains of Colorado which lit the love of the outdoors. 40 fantastic years in a variety of jobs in the outdoor industry in countries around the world did nothing but fuel the passions for travel and learning about new places. The spark of HearHere was driving my grandfather through Colorado and New Mexico and having him tell me stories about the places we were travellign through. It’s been a great journey with more to come!"
+                tools:visibility="visible" />
+
+            <LinearLayout
+                android:id="@+id/btnVisitAuthorLink"
+                style="@style/Button.Active.Outlined.StrongStroke"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/empty_button_background"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/ButtonText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Visit" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_link" />
+            </LinearLayout>
+
+            <View
+                android:id="@+id/viewDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/autio_blue_20" />
+
+            <TextView
+                android:id="@+id/tvPublishedStoriesSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="11dp"
+                android:text="Published Stories"
+                android:textAllCaps="true"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvAuthorStories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="200dp"
+                app:layoutManager="LinearLayoutManager"
+                tools:itemCount="0"
+                tools:listitem="@layout/story_item" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</RelativeLayout>

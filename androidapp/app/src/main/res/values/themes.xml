@@ -25,7 +25,13 @@
         <item name="android:statusBarColor">
             ?attr/colorPrimaryVariant
         </item>
-        <!-- Customize your theme here. -->
+        <!-- Background options menu -->
+        <item name="android:popupMenuStyle">
+            @style/PopupMenuStyle
+        </item>
+        <item name="android:listPopupWindowStyle">
+            @style/ListPopupWindowStyle
+        </item>
     </style>
     <!-- TexView Lora Regular  -->
     <style name="TextViewLoraRegular" parent="ThemeOverlay.AppCompat">
@@ -109,6 +115,150 @@
         </item>
     </style>
 
+    <!-- Snack bar -->
+
+    <!-- Snack bar text -->
+    <style name="SnackBarText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            18sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <!-- Text -->
+
+    <!-- Toolbar back button text -->
+    <style name="ToolbarBackButtonText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            12sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <style name="FeedbackSnackBar" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            18sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+    <!-- Title -->
+    <style name="Title" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/playfair_medium
+        </item>
+        <item name="android:textSize">
+            24sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <style name="Title2" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/playfair_regular
+        </item>
+        <item name="android:textSize">
+            20sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+        <item name="android:gravity">
+            center_horizontal
+        </item>
+    </style>
+
+    <style name="BoldTitle2" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/playfair_bold
+        </item>
+        <item name="android:textSize">
+            20sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+        <item name="android:gravity">
+            center_horizontal
+        </item>
+    </style>
+
+    <style name="SelectedStoryTitle" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/playfair_medium
+        </item>
+        <item name="android:textSize">
+            18sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <style name="SelectedStoryNarrator" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            12sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue_40
+        </item>
+    </style>
+
+    <style name="SmallerTitle" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/playfair_medium
+        </item>
+        <item name="android:textSize">
+            20sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <style name="BodyText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            16sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue_60
+        </item>
+    </style>
+
+    <style name="ButtonText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            15sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
     <!-- BUTTONS -->
 
     <!-- Active -->
@@ -145,10 +295,13 @@
             @null
         </item>
         <item name="android:textColor">
-            @color/autio_blue_40
+            @color/autio_blue
         </item>
         <item name="android:fontFamily">
             @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            15sp
         </item>
         <item name="cornerRadius">
             5dp
@@ -157,13 +310,19 @@
             false
         </item>
         <item name="strokeWidth">
-            3dp
+            1dp
         </item>
         <item name="strokeColor">
-            @color/autio_blue_40
+            @color/autio_blue
         </item>
         <item name="android:letterSpacing">
             0
+        </item>
+        <item name="android:paddingHorizontal">
+            16dp
+        </item>
+        <item name="android:paddingVertical">
+            12dp
         </item>
     </style>
     <!-- Outlined button with soft stroke -->
@@ -431,6 +590,18 @@
         </item>
         <item name="android:letterSpacing">
             0
+        </item>
+    </style>
+
+    <style name="PopupMenuStyle" parent="@style/Widget.AppCompat.PopupMenu">
+        <item name="popupMenuBackground">
+            @drawable/popup_background
+        </item>
+    </style>
+
+    <style name="ListPopupWindowStyle" parent="Widget.AppCompat.ListPopupWindow">
+        <item name="popupMenuBackground">
+            @drawable/popup_background
         </item>
     </style>
     <!-- BottomNavigationView  -->

@@ -17,9 +17,9 @@ class StoryClusterItem(
 
     override fun getPosition() = position
 
-    override fun getTitle() = title
+    override fun getTitle(): String? = null
 
-    override fun getSnippet() = snippet
+    override fun getSnippet(): String? = null
 
     override fun toString(): String {
         return """

@@ -4,6 +4,7 @@ import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.res.Resources
+import android.graphics.*
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -11,24 +12,29 @@ import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
+import androidx.core.view.contains
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.autio.android_app.R
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.data.model.story.StoryClusterItem
 import com.autio.android_app.data.model.story.StoryClusterRenderer
+import com.autio.android_app.data.repository.FirebaseStoryRepository
+import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentMapBinding
+import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
 import com.autio.android_app.ui.viewmodel.StoryViewModel
-import com.autio.android_app.util.InjectorUtils
-import com.autio.android_app.util.TrackingUtility
+import com.autio.android_app.util.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -39,37 +45,57 @@ import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.maps.android.clustering.ClusterManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MapFragment :
     Fragment(),
     OnMapReadyCallback {
-
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel> {
-        InjectorUtils.provideBottomNavigationViewModel(
+    private val prefRepository by lazy {
+        PrefRepository(
             requireContext()
         )
     }
+
+    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
     private val mapFragmentViewModel by viewModels<MapFragmentViewModel> {
         InjectorUtils.provideMapFragmentViewModel(
             requireContext(),
             mediaId
         )
     }
+    private val storyViewModel by viewModels<StoryViewModel> {
+        InjectorUtils.provideStoryViewModel(
+            requireContext()
+        )
+    }
 
     private lateinit var mediaId: String
     private lateinit var binding: FragmentMapBinding
+
+    private lateinit var activityLayout: ConstraintLayout
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var clusterManager: ClusterManager<StoryClusterItem>
 
     private val visibleMarkers =
         HashMap<String, StoryClusterItem>()
-    private lateinit var storyViewModel: StoryViewModel
-    private val stories =
-        arrayListOf<Story>()
 
     private var map: GoogleMap? =
         null
+    private var clusterRenderer: StoryClusterRenderer? =
+        null
+
+    private var _selectedStory: StoryClusterItem? =
+        null
+
+    private var storyDisplayTimer: Timer? =
+        null
+    private var cameraIdleTimer: Timer? =
+        null
+
     private var cameraPosition: CameraPosition? =
         null
 
@@ -85,7 +111,9 @@ class MapFragment :
     // location retrieved by the Fused Location Provider.
     private var lastKnownLocation: Location? =
         null
-    private var lastKnownCameraZoom : Double? =
+
+    private lateinit var snackBarView: View
+    private var feedbackJob: Job? =
         null
 
     override fun onCreate(
@@ -123,27 +151,27 @@ class MapFragment :
                 false
             )
 
-        storyViewModel =
-            ViewModelProvider(
-                this
-            )[StoryViewModel::class.java].also {
-                it.getLiveStories()
-                    .observe(
-                        viewLifecycleOwner
-                    ) { t ->
-                        stories.addAll(
-                            t
-                        )
-                    }
-            }
+        snackBarView =
+            layoutInflater.inflate(
+                R.layout.feedback_snackbar,
+                binding.root,
+                false
+            )
 
-        val mapFragment =
-            childFragmentManager.findFragmentById(
-                R.id.maps
-            ) as SupportMapFragment?
-        mapFragment?.getMapAsync(
-            this
-        )
+        activityLayout =
+            requireActivity().findViewById(
+                R.id.activityRoot
+            )
+
+        lifecycleScope.launch {
+            val mapFragment =
+                childFragmentManager.findFragmentById(
+                    R.id.maps
+                ) as SupportMapFragment?
+            mapFragment?.getMapAsync(
+                this@MapFragment
+            )
+        }
 
         setListeners()
 
@@ -158,6 +186,7 @@ class MapFragment :
             view,
             savedInstanceState
         )
+
         if (savedInstanceState != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 lastKnownLocation =
@@ -169,11 +198,6 @@ class MapFragment :
                     savedInstanceState.getParcelable(
                         KEY_CAMERA_POSITION,
                         CameraPosition::class.java
-                    )
-                lastKnownCameraZoom =
-                    savedInstanceState.getParcelable(
-                        KEY_CAMERA_ZOOM,
-                        Double::class.java
                     )
             } else {
                 lastKnownLocation =
@@ -193,22 +217,11 @@ class MapFragment :
                 MEDIA_ID_ARG
             )
                 ?: return
+    }
 
-        // Loading indicator for when data is available
-//        mapFragmentViewModel.mediaItems.observe(
-//            viewLifecycleOwner
-//        ) { list ->
-//        }
-
-        mapFragmentViewModel.networkError.observe(
-            viewLifecycleOwner
-        ) { error ->
-            if (error) {
-                // TODO: Show missing network snackbar
-            } else {
-                // TODO: Hide snackbar
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        clusterManager.clearItems()
     }
 
     override fun onSaveInstanceState(
@@ -218,7 +231,6 @@ class MapFragment :
             outState
         )
         map?.let { map ->
-            Log.d(TAG, "${map.cameraPosition}")
             outState.putParcelable(
                 KEY_CAMERA_POSITION,
                 map.cameraPosition
@@ -237,15 +249,17 @@ class MapFragment :
                 R.color.tab_view_icon_active
             )
             changeDrawableFillColor(
-                binding.imgPlaylistView
+                binding.ivPlaylistIcon
             )
+            binding.cardLocationIcon.visibility =
+                View.VISIBLE
             binding.maps.visibility =
                 View.VISIBLE
             binding.playlist.visibility =
                 View.GONE
         }
 
-        binding.imgPlaylistView.setOnClickListener {
+        binding.ivPlaylistIcon.setOnClickListener {
             changeDrawableFillColor(
                 it,
                 R.color.tab_view_icon_active
@@ -253,10 +267,14 @@ class MapFragment :
             changeDrawableFillColor(
                 binding.imgMapView
             )
+            binding.cardLocationIcon.visibility =
+                View.GONE
             binding.maps.visibility =
                 View.GONE
             binding.playlist.visibility =
                 View.VISIBLE
+            hideSelectedStoryComponent()
+            storyDisplayTimer?.cancelTimer()
             binding.playlist.bringToFront()
         }
     }
@@ -268,8 +286,28 @@ class MapFragment :
         map: GoogleMap
     ) {
         map.clear()
+        map.uiSettings.isMyLocationButtonEnabled =
+            false
+        map.uiSettings.isRotateGesturesEnabled =
+            false
+        map.uiSettings.isMapToolbarEnabled =
+            false
+        map.resetMinMaxZoomPreference()
+        map.setMaxZoomPreference(
+            20F
+        )
+        map.setMinZoomPreference(
+            8F
+        )
         this.map =
             map
+
+        lifecycleScope.launch {
+            mapFragmentViewModel.changeLatLngBounds(
+                this@MapFragment.map!!.projection.visibleRegion.latLngBounds
+            )
+        }
+
         // Sets the light or dark mode of the map from the "map_style.json" inside
         // raw resources
         setMapLayout()
@@ -285,43 +323,53 @@ class MapFragment :
 
         setGoogleLogoNewPosition()
 
+        mapFragmentViewModel.storiesInScreen.observe(
+            viewLifecycleOwner
+        ) {
+            removeNotVisibleMarkers(
+                it
+            )
+
+            for (story in it) {
+                if (visibleMarkers[story.id] == null) {
+                    addStoryMarker(
+                        story
+                    )
+                }
+            }
+            clusterManager.cluster()
+        }
+
         this.map!!.setOnCameraMoveListener {
-            cameraPosition = map.cameraPosition
+            clusterRenderer?.onCameraMove()
+            cameraPosition =
+                map.cameraPosition
             val bounds =
                 map.projection.visibleRegion.latLngBounds
-            for (story in stories) {
-                val markerPoint =
-                    LatLng(
-                        story.lat,
-                        story.lon
-                    )
-                if (bounds.contains(
-                        markerPoint
-                    )
-                ) {
-                    if (!visibleMarkers.containsKey(
-                            story.id
-                        )
-                    ) {
-                        addStoryMarker(
-                            story
-                        )
-                        bottomNavigationViewModel.setStoryInView(
-                            story
-                        )
-                    }
-                } else if (visibleMarkers.containsKey(
-                        story.id
-                    )
-                ) {
-                    removeStoryMarker(
-                        visibleMarkers[story.id]!!
-                    )
-                    visibleMarkers.remove(
-                        story.id
-                    )
-                    bottomNavigationViewModel.removeStoryFromView(
-                        story
+            lifecycleScope.launch {
+                mapFragmentViewModel.changeLatLngBounds(
+                    bounds
+                )
+            }
+        }
+        this.map!!.setOnCameraIdleListener {
+            lifecycleScope.launch(
+                Dispatchers.IO
+            ) {
+                bottomNavigationViewModel.fetchRecordsOfStories()
+            }
+            cameraIdleTimer =
+                Timer()
+            cameraIdleTimer?.startTimer()
+            cameraIdleTimer?.isActive?.observe(
+                this
+            ) {
+                if (it == false) {
+                    // TODO: Move camera to the currently playing story marker
+//                    moveCamera()
+                    Log.d(
+                        TAG,
+                        "camera faces current playing story"
                     )
                 }
             }
@@ -329,41 +377,64 @@ class MapFragment :
         clusterManager =
             ClusterManager<StoryClusterItem>(
                 requireContext(),
-                this.map!!
+                this.map!!,
             )
-        clusterManager.renderer =
+        clusterManager.setAnimation(
+            false
+        )
+        clusterRenderer =
             StoryClusterRenderer(
                 requireContext(),
                 this.map!!,
-                clusterManager
+                clusterManager,
+                this.map!!.cameraPosition.zoom,
+                18F
             )
-        this.map!!.setOnMarkerClickListener(
-            clusterManager
+        clusterManager.renderer =
+            clusterRenderer
+        clusterManager.addItems(
+            visibleMarkers.values
         )
         clusterManager.setOnClusterClickListener {
-            map.animateCamera(
-                CameraUpdateFactory.newLatLngZoom(
-                    it.position,
-                    map.cameraPosition.zoom + 1
-                ),
-                300,
-                null
+            moveCamera(
+                it.position,
+                map.cameraPosition.zoom + 1
             )
             true
         }
         clusterManager.setOnClusterItemClickListener { storyItem ->
-            bottomNavigationViewModel.storyClicked(
-                storyItem.getStory()
+            _selectedStory =
+                storyItem
+            tapClusterItem(
+                storyItem
             )
-            // Return false to indicate event was not consumed
-            // and to return default behaviour to occur
             false
         }
         clusterManager.setAnimation(
             true
         )
+        this.map!!.setOnMarkerClickListener(
+            clusterManager
+        )
     }
 
+    private fun highlightClusterItem(
+        storyClusterItem: StoryClusterItem
+    ) {
+
+    }
+
+    private fun unhighlightClusterItem(
+        storyClusterItem: StoryClusterItem
+    ) {
+
+    }
+
+    /**
+     * Sets Google's logo in a visible part since Google Maps Terms of Service
+     * requires the app to display it as referred in this link
+     * https://cloud.google.com/maps-platform/terms/
+     */
     private fun setGoogleLogoNewPosition() {
         val googleLogo: View =
             binding.maps.findViewWithTag(
@@ -420,38 +491,17 @@ class MapFragment :
                                     )
                                 )
                             } else {
-                                map?.moveCamera(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(
-                                            lastKnownLocation!!.latitude,
-                                            lastKnownLocation!!.longitude
-                                        ),
-                                        DEFAULT_ZOOM.toFloat()
-                                    )
-                                )
+                                moveCamera()
                             }
-
                             binding.cardLocationIcon.setOnClickListener {
-                                map?.animateCamera(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        LatLng(
-                                            lastKnownLocation!!.latitude,
-                                            lastKnownLocation!!.longitude
-                                        ),
-                                        DEFAULT_ZOOM.toFloat(),
-
-                                    ),
-                                    300,
-                                    null
-                                )
+                                moveCamera()
                             }
                         }
                     } else {
-//                        map?.moveCamera(CameraUpdateFactory
-//                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
-                        binding.cardLocationIcon.setOnClickListener {
-
-                        }
+                        moveCamera(
+                            DEFAULT_LOCATION_LAT,
+                            DEFAULT_LOCATION_LNG
+                        )
                     }
                 }
             }
@@ -468,6 +518,8 @@ class MapFragment :
         if (map == null) return
         try {
             if (locationPermissionGranted) {
+                map!!.isMyLocationEnabled =
+                    true
                 binding.cardLocationIcon.visibility =
                     View.VISIBLE
                 if (!TrackingUtility.hasBackgroundLocationPermission(
@@ -513,6 +565,179 @@ class MapFragment :
                 "Can't find style. Error: ",
                 e
             )
+        }
+    }
+
+    /**
+     * Moves camera to a certain position with an animation
+     *
+     * @param [position] moves camera so this point is located
+     * at the center
+     */
+    private fun moveCamera(
+        position: LatLng,
+        zoom: Float? = null
+    ) {
+        map?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                position,
+                zoom
+                    ?: DEFAULT_ZOOM.toFloat()
+            ),
+            200,
+            null
+        )
+    }
+
+    /**
+     * Positions camera over a point
+     * This call won't work if the user's location permission
+     * is not granted and both latitude/longitude are null
+     *
+     * @param [latitude] latitude of point
+     * @param [longitude] longitude of point
+     * @param [duration] time in milliseconds it will take to position
+     * the camera on the point to simulate an animation, by default is 0
+     * @param [zoom] zoom the camera will have over the point
+     */
+    private fun moveCamera(
+        latitude: Double? = null,
+        longitude: Double? = null,
+        duration: Int? = null,
+        zoom: Float? = null
+    ) {
+        val destinationLat =
+            latitude
+                ?: lastKnownLocation?.latitude
+        val destinationLng =
+            longitude
+                ?: lastKnownLocation?.longitude
+        if ((destinationLat) == null || (destinationLng) == null
+        ) return
+        map?.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    destinationLat,
+                    destinationLng
+                ),
+                zoom
+                    ?: DEFAULT_ZOOM.toFloat()
+            ),
+            duration
+                ?: 100,
+            null
+        )
+    }
+
+    /**
+     * Displays the story's data in a floating card
+     * for the user to tap on
+     * Tapping on the play/pause icon will make the story
+     * call [playMediaId]
+     */
+    private fun tapClusterItem(
+        clusterItem: StoryClusterItem
+    ) {
+        storyDisplayTimer?.cancelTimer()
+        storyDisplayTimer =
+            Timer()
+        val story =
+            clusterItem.getStory()
+        binding.tvSelectedStoryTitle.text =
+            story.title
+        binding.tvSelectedStoryNarrator.text =
+            story.narrator
+        bottomNavigationViewModel.mediaButtonRes.observe(
+            this
+        ) { res ->
+            if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
+                binding.btnSelectedStoryPlay.setImageResource(
+                    res
+                )
+            } else {
+                binding.btnSelectedStoryPlay.setImageResource(
+                    R.drawable.ic_player_play
+                )
+            }
+        }
+        binding.btnSelectedStoryPlay.setOnClickListener {
+            showPaywallOrProceedWithNormalProcess {
+                bottomNavigationViewModel.playMediaId(
+                    story.id
+                )
+            }
+        }
+        if (story.isBookmarked == true) {
+            binding.btnSelectedStoryBookmark.apply {
+                setImageResource(
+                    R.drawable.ic_player_bookmark_filled
+                )
+                setOnClickListener {
+                    showPaywallOrProceedWithNormalProcess {
+                        FirebaseStoryRepository.removeBookmark(
+                            prefRepository.firebaseKey,
+                            story.id,
+                            onSuccessListener = {
+                                storyViewModel.removeBookmarkFromStory(
+                                    story.id
+                                )
+                                showFeedbackSnackBar(
+                                    "Removed From Bookmarks"
+                                )
+                            },
+                            onFailureListener = {
+                                showFeedbackSnackBar(
+                                    "Connection Failure"
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        } else {
+            binding.btnSelectedStoryBookmark.apply {
+                setImageResource(
+                    R.drawable.ic_player_bookmark
+                )
+                setOnClickListener {
+                    showPaywallOrProceedWithNormalProcess {
+                        FirebaseStoryRepository.bookmarkStory(
+                            prefRepository.firebaseKey,
+                            story.id,
+                            story.title,
+                            onSuccessListener = {
+                                storyViewModel.bookmarkStory(
+                                    story.id
+                                )
+                                showFeedbackSnackBar(
+                                    "Added To Bookmarks"
+                                )
+                            },
+                            onFailureListener = {
+                                showFeedbackSnackBar(
+                                    "Connection Failure"
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+
+        }
+        showSelectedStoryComponent()
+        highlightClusterItem(
+            clusterItem
+        )
+        storyDisplayTimer?.startTimer()
+        storyDisplayTimer?.isActive?.observe(
+            this
+        ) {
+            if (it == false) {
+                hideSelectedStoryComponent()
+                unhighlightClusterItem(
+                    clusterItem
+                )
+            }
         }
     }
 
@@ -576,7 +801,7 @@ class MapFragment :
         Build.VERSION_CODES.Q
     )
     private fun showLocationPermissionAlwaysEnabledSnackBar() {
-        val inflater: View =
+        val inflater =
             layoutInflater.inflate(
                 R.layout.location_permission_snackbar,
                 binding.mapsRoot,
@@ -637,47 +862,119 @@ class MapFragment :
         clusterManager.addItem(
             clusterItem
         )
-        clusterManager.cluster()
-    }
 
-    private fun removeStoryMarker(
-        storyMarker: StoryClusterItem
-    ) {
-        clusterManager.removeItem(
-            storyMarker
+        bottomNavigationViewModel.setStoryInView(
+            story
         )
-        clusterManager.cluster()
     }
 
-    companion object {
-        private val TAG =
-            MapFragment::class.simpleName
-        private const val DEFAULT_ZOOM =
-            15
-
-        // Keys for storing activity state
-        private const val KEY_CAMERA_POSITION =
-            "camera_position"
-        private const val KEY_LOCATION =
-            "location"
-        private const val KEY_CAMERA_ZOOM =
-            "camera_zoom"
-
-        fun newInstance(
-            mediaId: String
-        ): MapFragment {
-            return MapFragment().apply {
-                arguments =
-                    Bundle().apply {
-                        putString(
-                            MEDIA_ID_ARG,
-                            mediaId
-                        )
-                    }
+    private fun removeNotVisibleMarkers(
+        visibleStories: List<Story>
+    ) {
+        val iterator =
+            visibleMarkers.iterator()
+        while (iterator.hasNext()) {
+            val marker =
+                iterator.next()
+            if (!visibleStories.map { it.id }
+                    .contains(
+                        marker.key
+                    )) {
+                bottomNavigationViewModel.removeStoryFromView(
+                    marker.value.getStory()
+                )
+                clusterManager.removeItem(
+                    marker.value
+                )
+                iterator.remove()
             }
         }
     }
+
+    private fun hideSelectedStoryComponent() {
+        binding.floatingSelectedStory.animate()
+            .alpha(
+                0.0f
+            )
+            .withEndAction {
+                binding.floatingSelectedStory.visibility =
+                    View.GONE
+            }
+    }
+
+    private fun showSelectedStoryComponent() {
+        if (binding.floatingSelectedStory.visibility != View.VISIBLE) {
+            binding.floatingSelectedStory.visibility =
+                View.VISIBLE
+            binding.floatingSelectedStory.animate()
+                .alpha(
+                    1.0f
+                )
+        }
+    }
+
+    private fun showFeedbackSnackBar(
+        feedback: String
+    ) {
+        cancelJob()
+        snackBarView.alpha =
+            1F
+        snackBarView.findViewById<TextView>(
+            R.id.tvFeedback
+        ).text =
+            feedback
+        activityLayout.addView(
+            snackBarView
+        )
+        feedbackJob =
+            lifecycleScope.launch {
+                delay(
+                    2000
+                )
+                snackBarView.animate()
+                    .alpha(
+                        0F
+                    )
+                    .withEndAction {
+                        activityLayout.removeView(
+                            snackBarView
+                        )
+                    }
+            }
+    }
+
+    private fun showPaywallOrProceedWithNormalProcess(
+        normalProcess: () -> Unit
+    ) {
+        if (prefRepository.remainingStories <= 0) {
+            (requireActivity() as BottomNavigation).showPayWall()
+        } else {
+            normalProcess.invoke()
+        }
+    }
+
+    private fun cancelJob() {
+        if (activityLayout.contains(
+                snackBarView
+            )
+        ) {
+            activityLayout.removeView(
+                snackBarView
+            )
+        }
+        feedbackJob?.cancel()
+    }
 }
 
+private val TAG =
+    MapFragment::class.simpleName
+private const val DEFAULT_ZOOM =
+    15
+
+// Keys for storing activity state
+private const val KEY_CAMERA_POSITION =
+    "camera_position"
+private const val KEY_LOCATION =
+    "location"
 private const val MEDIA_ID_ARG =
     "com.autio.android_app.ui.view.usecases.home.fragment.MediaItemFragment.MEDIA_ID"

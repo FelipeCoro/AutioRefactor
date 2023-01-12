@@ -7,7 +7,6 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
 import com.autio.android_app.R
-import com.autio.android_app.data.model.story.NowPlayingMetadata
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE

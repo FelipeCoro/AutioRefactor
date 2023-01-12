@@ -5,28 +5,55 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.StoryDao
+import com.autio.android_app.data.model.story.DownloadedStory
 import com.autio.android_app.data.model.story.Story
-import java.util.concurrent.Executors
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 @Database(
-    entities = [Story::class],
-    version = 5
+    entities = [
+        Story::class,
+        DownloadedStory::class
+    ],
+    version = 16
 )
 abstract class StoryDataBase :
     RoomDatabase() {
 
     abstract fun storyDao(): StoryDao
+    abstract fun downloadedStoryDao(): DownloadedStoryDao
+
+    private class StoryDatabaseCallback(
+        private val scope: CoroutineScope
+    ) : Callback() {
+        override fun onCreate(
+            db: SupportSQLiteDatabase
+        ) {
+            super.onCreate(
+                db
+            )
+            INSTANCE?.let { database ->
+                scope.launch {
+                    val storyDao =
+                        database.storyDao()
+                    storyDao
+                        .deleteAllStories()
+                    // Fill database with own data
+                }
+            }
+        }
+    }
 
     companion object {
-        private val executor = Executors.newSingleThreadExecutor()
-
         @Volatile
         private var INSTANCE: StoryDataBase? =
             null
 
         fun getInstance(
-            context: Context
+            context: Context,
+            scope: CoroutineScope
         ): StoryDataBase =
             INSTANCE
                 ?: synchronized(
@@ -34,7 +61,8 @@ abstract class StoryDataBase :
                 ) {
                     INSTANCE
                         ?: buildDatabase(
-                            context
+                            context,
+                            scope
                         ).also {
                             INSTANCE =
                                 it
@@ -42,7 +70,8 @@ abstract class StoryDataBase :
                 }
 
         private fun buildDatabase(
-            context: Context
+            context: Context,
+            scope: CoroutineScope
         ) =
             Room.databaseBuilder(
                 context.applicationContext,
@@ -51,24 +80,11 @@ abstract class StoryDataBase :
             )
                 .fallbackToDestructiveMigration()
                 .addCallback(
-                    callback
+                    StoryDatabaseCallback(
+                        scope
+                    )
                 )
                 .enableMultiInstanceInvalidation()
                 .build()
-
-        private var callback: Callback =
-            object :
-                Callback() {
-                override fun onOpen(
-                    db: SupportSQLiteDatabase
-                ) {
-                    super.onOpen(
-                        db
-                    )
-                    executor.execute {
-                        INSTANCE?.storyDao()?.deleteAllStories()
-                    }
-                }
-            }
     }
 }

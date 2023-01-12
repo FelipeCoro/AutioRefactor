@@ -8,12 +8,11 @@
         android:id="@+id/map"
         android:name="com.autio.android_app.ui.view.usecases.home.fragment.map.MapFragment"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" >
+        tools:layout="@layout/fragment_map">
         <argument
             android:name="com.autio.android_app.ui.view.usecases.home.fragment.MediaItemFragment.MEDIA_ID"
-            app:argType="string"
             android:defaultValue="/__ALL__"
-            />
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/account"
@@ -24,10 +23,102 @@
         android:id="@+id/my_stories"
         android:name="com.autio.android_app.ui.view.usecases.home.fragment.MyStoriesFragment"
         android:label="fragment_my_stories"
-        tools:layout="@layout/fragment_my_stories" />
+        tools:layout="@layout/fragment_my_stories">
+        <action
+            android:id="@+id/action_my_stories_to_bookmarks_playlist"
+            app:destination="@id/bookmarks_playlist" />
+        <action
+            android:id="@+id/action_my_stories_to_history_playlist"
+            app:destination="@id/history_playlist" />
+        <action
+            android:id="@+id/action_my_stories_to_favorites_playlist"
+            app:destination="@id/favorites_playlist" />
+        <action
+            android:id="@+id/action_my_stories_to_downloaded_playlist"
+            app:destination="@id/downloaded_playlist" />
+    </fragment>
     <fragment
         android:id="@+id/player"
         android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment"
         android:label="fragment_player"
-        tools:layout="@layout/fragment_player" />
+        tools:layout="@layout/fragment_player">
+        <argument
+            android:name="storyId"
+            android:defaultValue=""
+            app:argType="string" />
+        <deepLink
+            android:id="@+id/sharedStoryDeepLink"
+            android:autoVerify="true"
+            app:action="android.intent.action.PLAY_STORY_ACTION"
+            app:uri="app.autio.com/stories/{storyId}" />
+        <action
+            android:id="@+id/action_player_to_author_details"
+            app:destination="@id/author_details" />
+        <action
+            android:id="@+id/action_player_to_narrator_details"
+            app:destination="@id/narrator_details" />
+    </fragment>
+    <fragment
+        android:id="@+id/author_details"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.AuthorFragment"
+        android:label="fragment_author"
+        tools:layout="@layout/fragment_author">
+        <argument
+            android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_author_details_to_player"
+            app:destination="@id/player" />
+    </fragment>
+    <fragment
+        android:id="@+id/narrator_details"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.NarratorFragment"
+        android:label="fragment_narrator"
+        tools:layout="@layout/fragment_author">
+        <argument
+            android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"
+            android:defaultValue="0"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_narrator_details_to_player"
+            app:destination="@id/player" />
+    </fragment>
+    <fragment
+        android:id="@+id/bookmarks_playlist"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.BookmarksFragment"
+        android:label="fragment_bookmarks"
+        tools:layout="@layout/fragment_playlist">
+        <action
+            android:id="@+id/action_bookmarks_playlist_to_my_stories"
+            app:destination="@id/my_stories" />
+    </fragment>
+    <fragment
+        android:id="@+id/favorites_playlist"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.FavoritesFragment"
+        android:label="fragment_favorites"
+        tools:layout="@layout/fragment_playlist">
+        <action
+            android:id="@+id/action_favorites_playlist_to_my_stories"
+            app:destination="@id/my_stories" />
+    </fragment>
+    <fragment
+        android:id="@+id/history_playlist"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.HistoryFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_playlist">
+        <action
+            android:id="@+id/action_history_playlist_to_my_stories"
+            app:destination="@id/my_stories" />
+    </fragment>
+    <fragment
+        android:id="@+id/downloaded_playlist"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.DownloadedStoriesFragment"
+        android:label="fragment_downloaded_stories"
+        tools:layout="@layout/fragment_playlist">
+
+        <action
+            android:id="@+id/action_downloaded_playlist_to_my_stories"
+            app:destination="@id/my_stories" />
+    </fragment>
 </navigation>

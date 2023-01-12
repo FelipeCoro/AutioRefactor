@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
-import androidx.core.content.res.ResourcesCompat
 import com.autio.android_app.R
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource

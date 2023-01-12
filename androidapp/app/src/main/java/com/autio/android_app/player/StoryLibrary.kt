@@ -190,7 +190,8 @@ class StoryLibrary {
                     )
                     .putString(
                         MediaMetadataCompat.METADATA_KEY_GENRE,
-                        story.category.title
+                        story.category?.title
+                            ?: ""
                     )
                     .putString(
                         MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
@@ -199,10 +200,8 @@ class StoryLibrary {
                         )
                     )
                     .build()
-            if (story.recordUrl != null) {
-                playlistRecordUrl[story.id] =
-                    story.recordUrl
-            }
+            playlistRecordUrl[story.id] =
+                story.recordUrl
         }
     }
 }

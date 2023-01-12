@@ -1,13 +1,18 @@
 package com.autio.android_app.data.model.story
 
 import androidx.room.*
-import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.database.PropertyName
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
+/**
+ * Base class which the whole app works around
+ *
+ * Stories are fetched from an API endpoint and then stored in
+ * a room database for caching purposes
+ * Another database table was created for downloaded stories in
+ * device
+ */
 @Entity(
     tableName = "stories",
     indices = [Index(
@@ -17,124 +22,115 @@ import java.time.format.DateTimeFormatter
 )
 data class Story(
     @PrimaryKey
-    val id: String,
-    val title: String,
-    val description: String,
+    var id: String = "",
+    @get:PropertyName(
+        "hhId"
+    )
+    @set:PropertyName(
+        "hhId"
+    )
+    @SerializedName(
+        "hhId"
+    )
+    var originalId: Int = 0,
+    val title: String = "",
+    val description: String = "",
+    @get:PropertyName(
+        "latitude"
+    )
+    @set:PropertyName(
+        "latitude"
+    )
     @SerializedName(
         "latitude"
     )
-    val lat: Double,
+    var lat: Double = 0.0,
+    @get:PropertyName(
+        "longitude"
+    )
+    @set:PropertyName(
+        "longitude"
+    )
     @SerializedName(
         "longitude"
     )
-    val lon: Double,
-    val range: Int,
+    var lon: Double = 0.0,
+    @get:PropertyName(
+        "rangeInMeters"
+    )
+    @set:PropertyName(
+        "rangeInMeters"
+    )
+    var range: Int = 0,
+    @PropertyName(
+        "imageURL"
+    )
     @SerializedName(
         "imageURL"
     )
-    val imageUrl: String?,
+    val imageUrl: String = "",
+    @PropertyName(
+        "recordURL"
+    )
     @SerializedName(
         "recordURL"
     )
-    val recordUrl: String?,
-    val duration: Int,
+    val recordUrl: String = "",
+    @get:PropertyName(
+        "durationInSeconds"
+    )
+    @set:PropertyName(
+        "durationInSeconds"
+    )
+    var duration: Int = 0,
+//    @get:PropertyName(
+//        "dateAdded"
+//    ) @set:PropertyName(
+//        "dateAdded"
+//    )
     @SerializedName(
         "dateAdded"
     )
-    val publishedDate: Int,
+    var publishedDate: Int = 0,
+    @get:PropertyName(
+        "dateModifiedTimestamp"
+    ) @set:PropertyName(
+        "dateModifiedTimestamp"
+    )
     @SerializedName(
         "dateModified"
     )
-    val modifiedDate: Int,
+    var modifiedDate: Int = 0,
+    @get:PropertyName(
+        "narratorName"
+    ) @set:PropertyName(
+        "narratorName"
+    )
     @SerializedName(
         "narratorName"
-    ) val narrator: String,
+    ) var narrator: String = "",
+    @get:PropertyName(
+        "authorName"
+    ) @set:PropertyName(
+        "authorName"
+    )
     @SerializedName(
         "authorName"
-    ) val author: String,
-    val state: String?,
+    ) var author: String = "",
+    val state: String = "",
     @Embedded(
         prefix = "category_"
     )
-    val category: CategoryResponse,
-) : Serializable {
-    data class CategoryResponse(
-        @PrimaryKey
-        val id: String,
-        val title: String?,
-        val order: Int?,
-    )
+    var category: CategoryResponse? = null,
+    val isLiked: Boolean? = null,
+    val isBookmarked: Boolean? = null,
+    val isDownloaded: Boolean? = null,
+    val listenedAt: String? = null
+) : Serializable
 
-    companion object {
-        fun DocumentSnapshot.toStory(): Story? {
-            return try {
-                val title =
-                    getString(
-                        "title"
-                    )
-                        ?: ""
-                val description =
-                    getString(
-                        "description"
-                    )
-                        ?: ""
-                val lat =
-                    getDouble(
-                        "latitude"
-                    )
-                        ?: 0.0
-                val lon =
-                    getDouble(
-                        "longitude"
-                    )
-                        ?: 0.0
-                val range =
-                    getLong(
-                        "rangeInMeters"
-                    )
-                        ?: Long.MIN_VALUE
-                val imageUrl =
-                    getString(
-                        "imageUrl"
-                    )
-                val recordUrl =
-                    getString(
-                        "recordUrl"
-                    )
-                val duration = getLong("durationInSeconds") ?: 0
-                val publishedDate = getString("dateAdded")?.let {
-                    val l = LocalDate.parse(it, DateTimeFormatter.ISO_ZONED_DATE_TIME)
-                    l.atStartOfDay(ZoneId.systemDefault()).toInstant().epochSecond.toInt()
-                } ?: 0
-                val modifiedDate = getLong("dateModifiedTimestamp") ?: 0
-                val narratorName = getString("narratorName") ?: ""
-                val authorName = getString("authorName") ?: ""
-                val categoryId = getString("categoryId") ?: ""
-                Story(
-                    this.id,
-                    title,
-                    description,
-                    lat,
-                    lon,
-                    range.toInt(),
-                    imageUrl,
-                    recordUrl,
-                    duration.toInt(),
-                    publishedDate,
-                    modifiedDate.toInt(),
-                    narratorName,
-                    authorName,
-                    "",
-                    CategoryResponse(
-                        categoryId,
-                        null,
-                        null,
-                    )
-                )
-            } catch (e: Exception) {
-                // TODO: Implement crashlytics
-                null
-            }
-        }
-    }
-}
+data class CategoryResponse(
+    @PrimaryKey
+    val id: String = "",
+    val title: String = "",
+    val order: Int = 0
+) : Serializable

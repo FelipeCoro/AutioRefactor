@@ -59,14 +59,14 @@ class BrowseTree(
         val historyMetadata = MediaMetadataCompat.Builder().apply {
             id = HISTORY_ROOT
             title = "History"
-            albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(R.drawable.ic_history)
+            albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(R.drawable.ic_bordered_history)
             flag = MediaItem.FLAG_BROWSABLE
         }.build()
 
         val bookmarksMetadata = MediaMetadataCompat.Builder().apply {
             id = BOOKMARKS_ROOT
             title = "Bookmarks"
-            albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(R.drawable.ic_bookmarks)
+            albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(R.drawable.ic_bordered_bookmarks)
             flag = MediaItem.FLAG_BROWSABLE
         }.build()
 

@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import com.autio.android_app.data.repository.FirebaseStoryRepository
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.view.usecases.login.LoginActivity
@@ -28,11 +29,10 @@ class SplashActivity :
             savedInstanceState
         )
         isNightModeOn()
+        FirebaseStoryRepository
         whereToGo()
     }
 
-    //val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-    //return sharedPreferences.getBoolean("Finished", false)
     private fun onBoardingFinished(): Boolean {
         val sharedPreferences =
             this.getSharedPreferences(
@@ -59,14 +59,21 @@ class SplashActivity :
         }
     }
 
-    private fun getUserSession(): String =
-        prefRepository.userApiToken
-
+    /**
+     * Redirects the user to the proper view based on two conditions:
+     * - The user has opened the app for the first time, which then it'll
+     *   be redirected to [OnBoardingActivity]
+     * - The user is signed in, which will navigate the user to the [BottomNavigation]
+     *   if user is logged, [LoginActivity] if false
+     */
     private fun whereToGo() {
-        val apiToken =
-            getUserSession()
         if (onBoardingFinished()) {
-            if (apiToken.isEmpty()) {
+            // Checks if user is logged in based on the preferences saved
+            // It could be used any of the user's properties since all of them are saved
+            // once the user logs in (either with an account or as a guest),
+            // but it is found more properly to check for the API token and firebase key
+            // since the communication with backend requires any of these two
+            if (prefRepository.userApiToken.isEmpty() || prefRepository.firebaseKey.isEmpty()) {
                 startActivity(
                     Intent(
                         this,

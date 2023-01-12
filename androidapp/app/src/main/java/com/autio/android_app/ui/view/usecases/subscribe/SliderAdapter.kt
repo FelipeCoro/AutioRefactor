@@ -31,15 +31,16 @@ class SliderAdapter(
         titleList.size
 
     override fun onCreateViewHolder(
-        parent: ViewGroup?
+        parent: ViewGroup
     ): SliderViewHolder {
         val inflate: View =
             LayoutInflater.from(
-                parent!!.context
+                parent.context
             )
                 .inflate(
                     R.layout.slider_item,
-                    null
+                    parent,
+                    false
                 )
         return SliderViewHolder(
             inflate
@@ -67,20 +68,20 @@ class SliderAdapter(
     }
 
     class SliderViewHolder(
-        itemView: View?
+        itemView: View
     ) : ViewHolder(
         itemView
     ) {
         var imageView: ImageView =
-            itemView!!.findViewById(
+            itemView.findViewById(
                 R.id.myimage
             )
         var textViewTitle: TextView =
-            itemView!!.findViewById(
-                R.id.tvTitle
+            itemView.findViewById(
+                R.id.tvOptionTitle
             )
         var textViewSubText: TextView =
-            itemView!!.findViewById(
+            itemView.findViewById(
                 R.id.tvSubText
             )
     }

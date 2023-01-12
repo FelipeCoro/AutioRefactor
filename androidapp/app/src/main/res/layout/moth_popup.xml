@@ -5,11 +5,11 @@
     android:layout_height="match_parent">
 
     <androidx.cardview.widget.CardView
-        android:layout_width="350dp"
+        android:layout_width="345dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        app:cardCornerRadius="20dp"
-        app:cardBackgroundColor="@color/white">
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -20,23 +20,24 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="146dp"
-                android:src="@drawable/moth_banner"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY" />
+                android:scaleType="fitXY"
+                android:src="@drawable/moth_banner" />
 
             <TextView
+                style="@style/BoldTitle2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="16sp"
                 android:fontFamily="@font/lora_semi_bold"
                 android:gravity="center"
                 android:text="@string/moth_advertisement_title"
-                android:textColor="@color/autio_blue"
-                android:textSize="18sp" />
+                android:textColor="@color/autio_blue" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="start"
                 android:paddingHorizontal="21dp"
                 android:text="@string/moth_advertisement_body"
                 android:textColor="@color/autio_blue_40"
@@ -68,10 +69,10 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:maxLines="1"
-                    android:autoSizeTextType="uniform"
-                    android:autoSizeMinTextSize="10sp"
                     android:autoSizeMaxTextSize="14sp"
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeTextType="uniform"
+                    android:maxLines="1"
                     android:text="@string/learn_more" />
             </LinearLayout>
         </LinearLayout>

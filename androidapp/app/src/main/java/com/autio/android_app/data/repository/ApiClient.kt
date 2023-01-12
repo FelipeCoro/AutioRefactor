@@ -1,11 +1,13 @@
 package com.autio.android_app.data.repository
 
 import com.autio.android_app.data.model.account.*
+import com.autio.android_app.data.model.api_response.ContributorApiResponse
+import com.autio.android_app.data.model.api_response.PlaysResponse
 import com.autio.android_app.data.model.author.Author
 import com.autio.android_app.data.model.category.StoryCategory
 import com.autio.android_app.data.model.narrator.Narrator
+import com.autio.android_app.data.model.plays.PlaysDto
 import com.autio.android_app.data.model.story.Story
-import com.autio.android_app.data.model.story.StoryDto
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -79,14 +81,6 @@ interface ApiClient {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    suspend fun getAllStories(
-
-    )
-
-    @Headers(
-        "Content-Type: application/json",
-        "Accept: application/json"
-    )
     @GET("/api/v1/stories/by-ids-v2")
     fun getStoriesByIds(
         @Header(
@@ -97,7 +91,7 @@ interface ApiClient {
         ) apiToken: String,
         @Query(
             "ids[]"
-        ) ids : List<String>
+        ) ids : List<Int>
     ): Call<List<Story>>
 
     @Headers(
@@ -124,7 +118,7 @@ interface ApiClient {
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    @GET("api/v1/stories/contributor")
+    @GET("/api/v1/contributors/{contributor_id}/latest-stories")
     fun getStoriesByContributor(
         @Header(
             "X-User-Id"
@@ -132,17 +126,17 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String,
-        @Query(
+        @Path(
             "contributor_id"
         ) contributorId: Int,
         @Query("page") page: Int,
-    ): Call<List<Story>>
+    ): Call<ContributorApiResponse>
 
     @Headers(
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    @GET("api/v1/stories/author")
+    @GET("/api/v1/stories/{story_id}/author")
     fun getAuthorOfStory(
         @Header(
             "X-User-Id"
@@ -150,14 +144,16 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String,
-        @Body storyDto: StoryDto,
+        @Path(
+            "story_id"
+        ) storyId: Int,
     ): Call<Author>
 
     @Headers(
         "Content-Type: application/json",
         "Accept: application/json"
     )
-    @GET("api/v1/stories/narrator")
+    @GET("/api/v1/stories/{story_id}/narrator")
     fun getNarratorOfStory(
         @Header(
             "X-User-Id"
@@ -165,7 +161,9 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String,
-        @Body storyDto: StoryDto,
+        @Path(
+            "story_id"
+        ) storyId: Int,
     ): Call<Narrator>
 
     @Headers(
@@ -181,4 +179,15 @@ interface ApiClient {
             "Authorization"
         ) apiToken: String,
     ): Call<List<StoryCategory>>
+
+    @POST("api/v1/plays")
+    fun postStoryPlayed(
+        @Header(
+            "X-User-Id"
+        ) xUserId: Int,
+        @Header(
+            "Authorization"
+        ) apiToken: String,
+        @Body playsDto: PlaysDto
+    ): Call<PlaysResponse>
 }

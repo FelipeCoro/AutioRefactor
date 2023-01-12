@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.autio.android_app.R
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
 import com.autio.android_app.ui.view.usecases.login.SignInActivity
@@ -14,15 +16,15 @@ import com.autio.android_app.ui.view.usecases.login.SignUpActivity
 
 class MyStoriesFragment :
     Fragment() {
-
-    private var _binding: FragmentMyStoriesBinding? =
-        null
-    private val binding get() = _binding!!
     private val prefRepository by lazy {
         PrefRepository(
             requireContext()
         )
     }
+
+    private var _binding: FragmentMyStoriesBinding? =
+        null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +55,26 @@ class MyStoriesFragment :
                 View.GONE
             binding.lyStoriesList.visibility =
                 View.VISIBLE
+            binding.llBookmarksPlaylist.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_my_stories_to_bookmarks_playlist
+                )
+            }
+            binding.llFavoritesPlaylist.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_my_stories_to_favorites_playlist
+                )
+            }
+            binding.llHistoryPlaylist.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_my_stories_to_history_playlist
+                )
+            }
+            binding.llDownloadedPlaylist.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_my_stories_to_downloaded_playlist
+                )
+            }
         }
     }
 
@@ -89,6 +111,4 @@ class MyStoriesFragment :
 
     private fun isUserGuest(): Boolean =
         prefRepository.isUserGuest
-
-
 }

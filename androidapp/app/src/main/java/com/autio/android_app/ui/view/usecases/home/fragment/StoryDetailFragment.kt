@@ -8,12 +8,8 @@ import com.autio.android_app.ui.viewmodel.StoryDetailFragmentViewModel
 import com.autio.android_app.util.InjectorUtils
 
 class StoryDetailFragment : Fragment() {
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel> {
-        InjectorUtils.provideBottomNavigationViewModel(requireContext())
-    }
-    private val storyDetailViewModel by viewModels<StoryDetailFragmentViewModel> {
-        InjectorUtils.provideBottomNavigationViewModel(requireContext())
-    }
+    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
+//    private val storyDetailViewModel by viewModels<StoryDetailFragmentViewModel>()
 
 //    lateinit var binding:
     companion object {

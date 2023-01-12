@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="56dp"
     android:layout_marginHorizontal="15dp"
-    android:orientation="horizontal"
     android:layout_marginVertical="9dp"
     android:gravity="center_vertical">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/ivStoryCard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="5dp">
@@ -20,6 +20,11 @@
             android:scaleType="centerCrop"
             android:adjustViewBounds="true"
             tools:src="@drawable/maps_placeholder"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_media_play"/>
     </androidx.cardview.widget.CardView>
 
     <View
@@ -46,9 +51,10 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/story_options"
+        android:id="@+id/ivStoryItemOptions"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_three_dots" />
 
     <View

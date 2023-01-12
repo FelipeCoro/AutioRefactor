@@ -2,10 +2,10 @@ package com.autio.android_app.data.model.story
 
 import android.content.Context
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import com.autio.android_app.R
-import com.autio.android_app.util.Utils
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
@@ -14,15 +14,28 @@ import com.google.maps.android.clustering.view.DefaultClusterRenderer
 class StoryClusterRenderer(
     val context: Context,
     val map: GoogleMap,
-    clusterManager: ClusterManager<StoryClusterItem>
+    clusterManager: ClusterManager<StoryClusterItem>,
+    currentZoomLevel: Float,
+    private val maxZoomLevel: Float
 ) : DefaultClusterRenderer<StoryClusterItem>(
     context,
     map,
     clusterManager
-) {
+),
+    GoogleMap.OnCameraMoveListener {
+    private var currentZoomLevel: Float
+
+    init {
+        this.currentZoomLevel =
+            currentZoomLevel
+    }
+
     override fun shouldRenderAsCluster(
         cluster: Cluster<StoryClusterItem>
-    ) = cluster.size > 1
+    ) =
+        super.shouldRenderAsCluster(
+            cluster
+        ) && currentZoomLevel < maxZoomLevel
 
     override fun onBeforeClusterItemRendered(
         item: StoryClusterItem,
@@ -32,18 +45,27 @@ class StoryClusterRenderer(
             item,
             markerOptions
         )
-        val pinDrawable =
+
+        val markerBitmap =
             ResourcesCompat.getDrawable(
                 context.resources,
                 R.drawable.ic_non_listened_pin,
                 null
             )
-        val pinIcon =
-            Utils.getIconFromDrawable(
-                pinDrawable
+                ?.toBitmap()
+        if (markerBitmap != null) {
+            val pinIcon =
+                BitmapDescriptorFactory.fromBitmap(
+                    markerBitmap
+                )
+            markerOptions.icon(
+                pinIcon
             )
-        markerOptions.icon(
-            pinIcon
-        )
+        }
+    }
+
+    override fun onCameraMove() {
+        currentZoomLevel =
+            map.cameraPosition.zoom
     }
 }
