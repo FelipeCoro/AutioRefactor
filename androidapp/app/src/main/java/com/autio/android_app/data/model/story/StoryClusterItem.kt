@@ -1,25 +1,52 @@
 package com.autio.android_app.data.model.story
 
+import android.graphics.Bitmap
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterItem
 
 class StoryClusterItem(
-    private val story: Story
+    mStory: Story
 ) : ClusterItem {
 
     private val position: LatLng =
-        LatLng(story.lat, story.lon)
+        LatLng(
+            mStory.lat,
+            mStory.lon
+        )
     private val title: String =
-        story.title
-    private val snippet: String = ""
+        mStory.title
+    private val snippet: String =
+        ""
 
-    fun getStory() = story
+    var story =
+        mStory
+        private set
+    var marker: Marker? =
+        null
+    var bitmap: Bitmap? =
+        null
 
-    override fun getPosition() = position
+    fun updateStory(
+        story: Story
+    ) {
+        if (story.id != this.story.id) {
+            throw Exception(
+                "Story is not the same!"
+            )
+        }
+        this.story =
+            story
+    }
 
-    override fun getTitle(): String? = null
+    override fun getPosition() =
+        position
 
-    override fun getSnippet(): String? = null
+    override fun getTitle(): String? =
+        null
+
+    override fun getSnippet(): String? =
+        null
 
     override fun toString(): String {
         return """

@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.*
 
-class Timer {
+class Timer(
+    private val timeMillis: Long = 5000
+) {
     private val job =
         SupervisorJob()
     private val scope =
@@ -12,27 +14,57 @@ class Timer {
             Dispatchers.Default + job
         )
 
-    private val _isActive = MutableLiveData<Boolean?>(null)
-    val isActive : LiveData<Boolean?> = _isActive
+    private var isPaused =
+        false
+
+    private val _isActive =
+        MutableLiveData<Boolean?>(
+            null
+        )
+    val isActive: LiveData<Boolean?> =
+        _isActive
 
     private val timer =
         scope.launch(
             Dispatchers.IO,
             CoroutineStart.LAZY
         ) {
-            _isActive.postValue(true)
-            delay(
-                5000
+            _isActive.postValue(
+                true
             )
-            _isActive.postValue(false)
+            delay(
+                timeMillis
+            )
+            if (!isPaused) {
+                _isActive.postValue(
+                    false
+                )
+            }
         }
 
     fun startTimer() {
         timer.start()
     }
 
+    fun pauseTimer() {
+        isPaused =
+            true
+    }
+
+    fun finishTimer() {
+        isPaused =
+            false
+        _isActive.postValue(
+            false
+        )
+    }
+
     fun cancelTimer() {
-        _isActive.postValue(null)
+        _isActive.postValue(
+            null
+        )
+        isPaused =
+            false
         timer.cancel()
     }
 }

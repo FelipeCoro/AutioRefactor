@@ -6,9 +6,12 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.widget.TextView
 
-//Add underlined text for clickable span
+/**
+ * Adds underline to text with a click listener
+ */
 fun TextView.makeLinks(
-    vararg links: Pair<String, View.OnClickListener>
+    vararg links: Pair<String, View.OnClickListener>,
+    shouldUnderline: Boolean = true
 ) {
     val spannableString =
         SpannableString(
@@ -24,7 +27,7 @@ fun TextView.makeLinks(
                     textPaint: TextPaint
                 ) {
                     textPaint.isUnderlineText =
-                        true
+                        shouldUnderline
                 }
 
                 override fun onClick(

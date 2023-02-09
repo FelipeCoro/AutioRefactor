@@ -7,6 +7,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
 import com.autio.android_app.data.database.repository.StoryRepository
 import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
@@ -25,6 +26,13 @@ class MapFragmentViewModel(
         MutableLiveData<List<Story>>()
     val storiesInScreen: LiveData<List<Story>> =
         _storiesInScreen
+
+    private val _isListDisplaying =
+        MutableLiveData(
+            false
+        )
+    val isListDisplaying: LiveData<Boolean> =
+        _isListDisplaying
 
     private val subscriptionCallback =
         object :
@@ -107,6 +115,13 @@ class MapFragmentViewModel(
         )
     }
 
+    fun displayListForStoriesInScreen() {
+        _isListDisplaying.postValue(
+            !(_isListDisplaying.value
+                ?: false)
+        )
+    }
+
     suspend fun changeLatLngBounds(
         latLngBounds: LatLngBounds
     ) {
@@ -118,6 +133,33 @@ class MapFragmentViewModel(
         _storiesInScreen.postValue(
             storiesInBounds
         )
+    }
+
+    fun fetchRecordsOfStories(
+        userId: Int,
+        apiToken: String
+    ) {
+        _storiesInScreen.value?.let { stories ->
+            if (stories.isEmpty()) return
+            val storiesWithoutRecords =
+                stories.filter { it.recordUrl.isEmpty() }
+            if (storiesWithoutRecords.isNotEmpty()) {
+                ApiService.getStoriesByIds(
+                    userId,
+                    apiToken,
+                    storiesWithoutRecords.map { it.originalId }
+                ) { storiesFromAPI ->
+                    if (storiesFromAPI != null) {
+                        for (story in storiesFromAPI) {
+                            storyRepository.cacheRecordOfStory(
+                                story.id,
+                                story.recordUrl
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     class Factory(

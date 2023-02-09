@@ -1,7 +1,6 @@
 package com.autio.android_app.core
 
-import com.autio.android_app.data.model.account.RequestInterceptor
-import com.autio.android_app.util.Constants.baseUrl
+import com.autio.android_app.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -15,17 +14,31 @@ object RetrofitHelper {
             .addInterceptor(
                 RequestInterceptor
             )
-            .callTimeout(1, TimeUnit.MINUTES)
-            .writeTimeout(1, TimeUnit.MINUTES)
-            .readTimeout(1, TimeUnit.MINUTES)
-            .connectTimeout(1, TimeUnit.MINUTES)
-            .retryOnConnectionFailure(true)
+            .callTimeout(
+                120,
+                TimeUnit.SECONDS
+            )
+            .writeTimeout(
+                120,
+                TimeUnit.SECONDS
+            )
+            .readTimeout(
+                120,
+                TimeUnit.SECONDS
+            )
+            .connectTimeout(
+                120,
+                TimeUnit.SECONDS
+            )
+            .retryOnConnectionFailure(
+                true
+            )
             .build()
 
     private fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
             .baseUrl(
-                baseUrl
+                BuildConfig.base_url
             )
             .addConverterFactory(
                 GsonConverterFactory.create()

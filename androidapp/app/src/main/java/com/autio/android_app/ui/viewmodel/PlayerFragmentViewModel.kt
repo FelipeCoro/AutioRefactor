@@ -8,6 +8,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.FirebaseStoryRepository
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.extensions.*
@@ -222,6 +223,7 @@ class PlayerFragmentViewModel(
         if (story?.id != null) {
             // Call Firebase service for likes' collection
             viewModelScope.launch {
+                // TODO: change Firebase code with commented code once stable
                 FirebaseStoryRepository.getLikesByStoryId(
                     story.id
                 )
@@ -231,6 +233,14 @@ class PlayerFragmentViewModel(
                             res.snapshot?.children?.associate { it.key!! to (it.value as Boolean) }
                                 ?: emptyMap()
                     }
+//                ApiService.likesByStory(
+//                    prefRepository.userId,
+//                    prefRepository.userApiToken,
+//                    story.originalId
+//                ) {
+//
+//                }
+                // TODO: change Firebase code with commented code once stable
                 FirebaseStoryRepository.isStoryBookmarkedByUser(
                     prefRepository.firebaseKey,
                     story.id
@@ -241,6 +251,15 @@ class PlayerFragmentViewModel(
                             res.snapshot?.exists()
                                 ?: false
                     }
+//                ApiService.getStoriesFromUserBookmarks(
+//                    prefRepository.userId,
+//                    prefRepository.userApiToken
+//                ) { stories ->
+//                    if (stories != null) {
+//                        _isStoryBookmarked.value =
+//                            stories.firstOrNull { it.originalId == story.originalId } != null
+//                    }
+//                }
             }
 
             // Only update media item once we have duration available

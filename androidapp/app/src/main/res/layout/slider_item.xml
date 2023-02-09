@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="280dp"
         android:contentDescription="@string/app_name"
+        android:scaleType="centerCrop"
         tools:src="@drawable/photo_slider1" />
 
     <TextView

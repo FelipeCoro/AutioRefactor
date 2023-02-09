@@ -30,10 +30,7 @@ import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.view.usecases.home.adapter.StoryAdapter
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.StoryViewModel
-import com.autio.android_app.util.InjectorUtils
-import com.autio.android_app.util.openLocationInMapsApp
-import com.autio.android_app.util.openUrl
-import com.autio.android_app.util.shareStory
+import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.Job
@@ -47,9 +44,6 @@ class AuthorFragment :
             requireContext()
         )
     }
-
-    private val apiService =
-        ApiService()
 
     private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
     private val storyViewModel by viewModels<StoryViewModel> {
@@ -107,8 +101,12 @@ class AuthorFragment :
             binding.rvAuthorStories
         storyAdapter =
             StoryAdapter(
+                bottomNavigationViewModel.playingStory,
                 onStoryPlay = { id ->
-                    showPaywallOrProceedWithNormalProcess {
+                    showPaywallOrProceedWithNormalProcess(
+                        requireActivity(),
+                        isActionExclusiveForSignedInUser = true
+                    ) {
                         bottomNavigationViewModel.playMediaId(
                             id
                         )
@@ -135,7 +133,7 @@ class AuthorFragment :
 
         storyId?.let {
             lifecycleScope.launch {
-                apiService.getAuthorOfStory(
+                ApiService.getAuthorOfStory(
                     prefRepository.userId,
                     "Bearer " + prefRepository.userApiToken,
                     it
@@ -181,7 +179,7 @@ class AuthorFragment :
                                     View.VISIBLE
                             }
                         }
-                        apiService.getStoriesByContributor(
+                        ApiService.getStoriesByContributor(
                             prefRepository.userId,
                             prefRepository.userApiToken,
                             author.id,
@@ -225,9 +223,13 @@ class AuthorFragment :
         option: StoryOption,
         story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess {
+        showPaywallOrProceedWithNormalProcess(
+            requireActivity(),
+            isActionExclusiveForSignedInUser = true
+        ) {
             when (option) {
                 StoryOption.BOOKMARK -> {
+                    // TODO: change Firebase code with commented code once stable
                     FirebaseStoryRepository.bookmarkStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -246,9 +248,28 @@ class AuthorFragment :
                             )
                         }
                     )
+//                    ApiService.bookmarkStory(
+//                        prefRepository.userId,
+//                        prefRepository.userApiToken,
+//                        story.originalId
+//                    ) {
+//                        if (it != null) {
+//                            storyViewModel.bookmarkStory(
+//                                story.id
+//                            )
+//                            showFeedbackSnackBar(
+//                                "Added To Bookmarks"
+//                            )
+//                        } else {
+//                            showFeedbackSnackBar(
+//                                "Connection Failure"
+//                            )
+//                        }
+//                    }
                 }
                 StoryOption.REMOVE_BOOKMARK -> {
-                    FirebaseStoryRepository.removeBookmark(
+                    // TODO: change Firebase code with commented code once stable
+                    FirebaseStoryRepository.removeBookmarkFromStory(
                         prefRepository.firebaseKey,
                         story.id,
                         onSuccessListener = {
@@ -265,6 +286,24 @@ class AuthorFragment :
                             )
                         }
                     )
+//                    ApiService.removeBookmarkFromStory(
+//                        prefRepository.userId,
+//                        prefRepository.userApiToken,
+//                        story.originalId
+//                    ) {
+//                        if (it?.removed == true) {
+//                            storyViewModel.removeBookmarkFromStory(
+//                                story.id
+//                            )
+//                            showFeedbackSnackBar(
+//                                "Removed From Bookmarks"
+//                            )
+//                        } else {
+//                            showFeedbackSnackBar(
+//                                "Connection Failure"
+//                            )
+//                        }
+//                    }
                 }
                 StoryOption.LIKE -> {
                     FirebaseStoryRepository.giveLikeToStory(
@@ -284,6 +323,24 @@ class AuthorFragment :
                             )
                         }
                     )
+//                    ApiService.likeStory(
+//                        prefRepository.userId,
+//                        prefRepository.userApiToken,
+//                        story.originalId
+//                    ) {
+//                        if (it == true) {
+//                            storyViewModel.setLikeToStory(
+//                                story.id
+//                            )
+//                            showFeedbackSnackBar(
+//                                "Added To Favorites"
+//                            )
+//                        } else {
+//                            showFeedbackSnackBar(
+//                                "Connection Failure"
+//                            )
+//                        }
+//                    }
                 }
                 StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(
@@ -353,16 +410,6 @@ class AuthorFragment :
                     "no option available"
                 )
             }
-        }
-    }
-
-    private fun showPaywallOrProceedWithNormalProcess(
-        normalProcess: () -> Unit
-    ) {
-        if (prefRepository.remainingStories <= 0) {
-            (requireActivity() as BottomNavigation).showPayWall()
-        } else {
-            normalProcess.invoke()
         }
     }
 

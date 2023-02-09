@@ -3,6 +3,7 @@ package com.autio.android_app.ui.view.usecases.login
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.model.account.GuestResponse
 import com.autio.android_app.data.model.account.LoginDto
@@ -11,6 +12,8 @@ import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.ActivitySignInBinding
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
+import com.autio.android_app.ui.viewmodel.PurchaseViewModel
+import com.autio.android_app.util.InjectorUtils
 import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.pleaseFillText
 import com.autio.android_app.util.showError
@@ -23,9 +26,13 @@ class SignInActivity :
         )
     }
 
+    private val purchaseViewModel by viewModels<PurchaseViewModel> {
+        InjectorUtils.providePurchaseViewModel(
+            this
+        )
+    }
+
     private lateinit var binding: ActivitySignInBinding
-    private val apiService =
-        ApiService()
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -86,12 +93,15 @@ class SignInActivity :
                     email,
                     password
                 )
-            apiService.login(
+            ApiService.login(
                 loginRequest
             ) {
                 if (it != null) {
                     saveUserInfo(
                         it
+                    )
+                    purchaseViewModel.login(
+                        "${it.id}"
                     )
                     startActivity(
                         Intent(
@@ -113,10 +123,13 @@ class SignInActivity :
 
     private fun loginGuest() {
         showLoadingView()
-        apiService.guest {
+        ApiService.loginAsGuest {
             if (it != null) {
                 saveGuestInfo(
                     it
+                )
+                purchaseViewModel.login(
+                    "${it.id}"
                 )
                 startActivity(
                     Intent(
@@ -134,6 +147,9 @@ class SignInActivity :
         }
     }
 
+    /**
+     * Sets guest's data in the shared preferences
+     */
     private fun saveGuestInfo(
         guestResponse: GuestResponse
     ) {
@@ -145,9 +161,13 @@ class SignInActivity :
             guestResponse.firebaseKey
         prefRepository.userApiToken =
             guestResponse.apiToken
-        prefRepository.remainingStories = 5
+        prefRepository.remainingStories =
+            5
     }
 
+    /**
+     * Saves user's data in the shared preferences
+     */
     private fun saveUserInfo(
         loginResponse: LoginResponse
     ) {
@@ -163,7 +183,7 @@ class SignInActivity :
             loginResponse.email!!
         prefRepository.firebaseKey =
             loginResponse.firebaseKey!!
-        prefRepository.remainingStories = -1
+        prefRepository.remainingStories =
+            -1
     }
-
 }

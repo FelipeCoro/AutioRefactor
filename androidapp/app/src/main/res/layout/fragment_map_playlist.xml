@@ -2,15 +2,61 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:elevation="10dp"
+    tools:context=".ui.view.usecases.home.fragment.MapFragment">
+
+    <RelativeLayout
+        android:id="@+id/rlTab"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_alignStart="@id/llHeaders"
+            android:layout_alignTop="@id/llHeaders"
+            android:layout_alignEnd="@id/llHeaders"
+            android:layout_alignBottom="@id/llHeaders"
+            android:scaleType="fitXY"
+            android:src="@drawable/list_top_left_notch"
+            app:tint="@color/fragment_background" />
+
+        <LinearLayout
+            android:id="@+id/llHeaders"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16.5dp"
+            android:paddingTop="9dp">
+
+            <TextView
+                style="@style/SFPROTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/map_list_title" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing=".02"
+                android:text="@string/map_list_subtitle"
+                android:textColor="@color/autio_blue_40"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/map_playlist"
+        android:id="@+id/rvMapPlaylist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/autio_blue_80"
+        android:layout_below="@id/rlTab"
+        android:background="@color/fragment_background"
         android:clipToPadding="false"
-        android:paddingBottom="200dp"
+        android:paddingTop="25dp"
+        android:paddingBottom="125dp"
         app:layoutManager="LinearLayoutManager"
         tools:itemCount="15"
         tools:listitem="@layout/story_item" />

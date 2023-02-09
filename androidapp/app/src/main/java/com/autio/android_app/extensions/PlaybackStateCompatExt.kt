@@ -51,7 +51,8 @@ inline val PlaybackStateCompat.stateName
  */
 inline val PlaybackStateCompat.currentPlayBackPosition: Long
     get() = if (state == PlaybackStateCompat.STATE_PLAYING) {
-        val timeDelta = SystemClock.elapsedRealtime() - lastPositionUpdateTime
+        val timeDelta =
+            SystemClock.elapsedRealtime() - lastPositionUpdateTime
         (position + (timeDelta * playbackSpeed)).toLong()
     } else {
         position

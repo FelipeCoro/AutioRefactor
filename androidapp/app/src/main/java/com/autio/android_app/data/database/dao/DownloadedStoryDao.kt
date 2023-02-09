@@ -43,6 +43,11 @@ interface DownloadedStoryDao {
     )
 
     @Query(
+        "UPDATE downloaded_stories SET isBookmarked = 0"
+    )
+    fun removeAllBookmarks()
+
+    @Query(
         "UPDATE downloaded_stories SET isLiked = 1 WHERE id = :id"
     )
     fun setLikeToStory(
@@ -65,6 +70,13 @@ interface DownloadedStoryDao {
     )
 
     @Query(
+        "UPDATE downloaded_stories SET listenedAtLeast30Secs = true WHERE id = :storyId"
+    )
+    fun markStoryAsListenedAtLeast30Secs(
+        storyId: String
+    )
+
+    @Query(
         "UPDATE downloaded_stories SET listenedAt = '' WHERE id = :storyId"
     )
     fun removeListenedAtData(
@@ -82,4 +94,9 @@ interface DownloadedStoryDao {
     fun removeStory(
         id: String
     )
+
+    @Query(
+        "DELETE FROM downloaded_stories"
+    )
+    fun clearTable()
 }

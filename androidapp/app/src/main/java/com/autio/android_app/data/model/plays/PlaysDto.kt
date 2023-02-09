@@ -7,12 +7,18 @@ data class PlaysDto(
         "firebase_story_identifier"
     )
     val firebaseId: String? = null,
-    @SerializedName("was_present")
+    @SerializedName(
+        "was_present"
+    )
     val wasPresent: Boolean? = null,
-    @SerializedName("autoplay_enabled")
-    val autoPlay : Boolean? = null,
-    @SerializedName("on_disk")
-    val isDownloaded : Boolean? = null,
+    @SerializedName(
+        "autoplay_enabled"
+    )
+    val autoPlay: Boolean? = null,
+    @SerializedName(
+        "on_disk"
+    )
+    val isDownloaded: Boolean? = null,
     val connection: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null

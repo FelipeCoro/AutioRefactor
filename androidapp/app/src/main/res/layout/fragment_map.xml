@@ -5,7 +5,7 @@
     android:id="@+id/maps_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.view.usecases.home.fragment.map.MapFragment">
+    tools:context=".ui.view.usecases.home.fragment.MapFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/maps"
@@ -13,22 +13,66 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_map_placeholder" />
+        tools:layout="@layout/fragment_map_placeholder"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_location_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15.5dp"
+        android:layout_marginTop="30dp"
+        android:elevation="5dp"
+        android:padding="9dp"
+        app:cardBackgroundColor="@color/location_icon_background"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_location"
+            app:tint="@color/location_icon" />
+    </androidx.cardview.widget.CardView>
+
+    <FrameLayout
+        android:id="@+id/cvToggleMapPlaylist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15.5dp"
+        android:background="@drawable/cut_button_shape"
+        android:elevation="15dp"
+        android:padding="9dp"
+        android:outlineProvider="paddedBounds"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ivToggleIcon"
+            android:layout_width="22dp"
+            android:layout_height="20dp"
+            android:layout_gravity="end|center_vertical"
+            android:src="@drawable/ic_map_list"
+            app:tint="@color/location_icon" />
+
+    </FrameLayout>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/floatingSelectedStory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="13dp"
         android:visibility="gone"
+        app:cardBackgroundColor="@color/selected_story_card"
         app:cardCornerRadius="12dp"
         app:contentPaddingBottom="10dp"
         app:contentPaddingTop="10dp"
-        app:layout_constraintBottom_toTopOf="@id/cvActionTabs"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:cardBackgroundColor="@color/selected_story_card"
         tools:visibility="visible">
 
         <RelativeLayout
@@ -49,13 +93,13 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toStartOf="@id/btnSelectedStoryBookmark"
+                android:layout_toStartOf="@id/btnSelectedStoryInfo"
                 android:layout_toEndOf="@id/btnSelectedStoryPlay"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tvSelectedStoryTitle"
-                    style="@style/SelectedStoryTitle"
+                    style="@style/StoryTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="start"
@@ -63,31 +107,21 @@
 
                 <TextView
                     android:id="@+id/tvSelectedStoryNarrator"
-                    style="@style/SelectedStoryNarrator"
+                    style="@style/StoryNarrator"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAllCaps="true"
                     tools:text="Kevin Costner" />
             </LinearLayout>
 
             <ImageView
-                android:id="@+id/btnSelectedStoryBookmark"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_centerVertical="true"
-                android:layout_marginHorizontal="15dp"
-                android:layout_toStartOf="@id/btnSelectedStoryInfo"
-                android:src="@drawable/ic_player_bookmark"
-                app:tint="@color/secondary_button" />
-
-            <ImageView
                 android:id="@+id/btnSelectedStoryInfo"
-                android:layout_width="10dp"
-                android:layout_height="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="15dp"
+                android:minWidth="40dp"
+                android:minHeight="40dp"
+                android:scaleType="center"
                 android:src="@drawable/ic_drag"
                 app:tint="@color/secondary_button" />
 
@@ -95,73 +129,16 @@
 
     </androidx.cardview.widget.CardView>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvActionTabs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginBottom="160dp"
-        android:backgroundTint="@color/fragment_background_opaque"
-        app:cardCornerRadius="6dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/img_map_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:src="@drawable/ic_map"
-                app:tint="@color/tab_view_icon_active" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="fill_parent"
-                android:background="@color/gray_letter" />
-
-            <ImageView
-                android:id="@+id/ivPlaylistIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:src="@drawable/ic_map_list"
-                app:tint="@color/tab_view_icon_inactive" />
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_location_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="160dp"
-        app:cardBackgroundColor="@color/location_icon_background"
-        app:cardCornerRadius="12dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:src="@drawable/ic_location"
-            app:tint="@color/location_icon" />
-    </androidx.cardview.widget.CardView>
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.map.MapPlaylistFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <include
+        android:id="@+id/layoutPlaylist"
+        layout="@layout/fragment_map_playlist"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="-6dp"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_map_playlist" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/cvToggleMapPlaylist" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

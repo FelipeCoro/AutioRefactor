@@ -3,7 +3,6 @@ package com.autio.android_app.player.library
 import android.content.Context
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
-import android.util.Log
 import com.autio.android_app.data.database.StoryDataBase
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.extensions.albumArtUri

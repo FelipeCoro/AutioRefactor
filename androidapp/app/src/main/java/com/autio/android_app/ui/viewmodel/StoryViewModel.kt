@@ -5,12 +5,20 @@ import com.autio.android_app.data.database.repository.StoryRepository
 import com.autio.android_app.data.model.history.History
 import com.autio.android_app.data.model.story.DownloadedStory
 import com.autio.android_app.data.model.story.Story
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class StoryViewModel(
     private val storyRepository: StoryRepository
 ) : ViewModel() {
+
+    val userCategories =
+        storyRepository.userCategories.asLiveData()
+
+    val allStories = storyRepository.allStories.asLiveData()
+
+    suspend fun getAllStories() : List<Story> {
+        return storyRepository.getAllStories()
+    }
 
     fun getStoriesByIds(
         ids: Array<Int>
@@ -37,6 +45,9 @@ class StoryViewModel(
             id
         )
 
+    fun removeAllDownloads() =
+        storyRepository.removeAllDownloads()
+
     val bookmarkedStories =
         storyRepository.bookmarkedStories.asLiveData()
 
@@ -61,6 +72,14 @@ class StoryViewModel(
             storyRepository.removeBookmarkFromStory(
                 id
             )
+        }
+    }
+
+    fun removeAllBookmarks() {
+        viewModelScope.launch(
+            Dispatchers.IO
+        ) {
+            storyRepository.removeAllBookmarks()
         }
     }
 
@@ -150,6 +169,18 @@ class StoryViewModel(
                 storyId,
                 recordUrl
             )
+        }
+    }
+
+    /**
+     * Clears columns to be specific for a user
+     * i. e. listened at story column
+     */
+    fun clearUserData() {
+        viewModelScope.launch(
+            Dispatchers.IO
+        ) {
+            storyRepository.clearUserData()
         }
     }
 

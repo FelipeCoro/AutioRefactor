@@ -16,65 +16,66 @@
         android:contentInsetEnd="15dp"
         android:paddingTop="12dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="fill_horizontal">
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_gravity="fill_horizontal"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:id="@+id/btnBack"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerVertical="true">
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginEnd="10dp"
-                        android:src="@drawable/ic_back_arrow"
-                        app:backgroundColor="@color/autio_blue" />
-
-                    <TextView
-                        style="@style/ToolbarBackButtonText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/back"
-                        android:textAllCaps="true" />
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvToolbarTitle"
-                    style="@style/Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:gravity="center"
-                    tools:text="History" />
-
-                <TextView
-                    android:id="@+id/btnClearPlaylist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:text="@string/clear_playlist"
-                    android:visibility="gone" />
-            </RelativeLayout>
-
-            <TextView
-                android:id="@+id/tvToolbarSubtitle"
+            <LinearLayout
+                android:id="@+id/btnBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                tools:text="160 STORIES" />
-        </LinearLayout>
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_back_arrow"
+                    app:backgroundColor="@color/autio_blue" />
+
+                <TextView
+                    style="@style/ToolbarBackButtonText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/back"
+                    android:textAllCaps="true" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvToolbarTitle"
+                style="@style/Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                tools:text="History" />
+
+            <ProgressBar
+                android:id="@+id/pbLoadingProcess"
+                android:layout_marginStart="10dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/tvToolbarTitle"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/normal_text"
+                android:indeterminateTintMode="src_atop"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/btnPlaylistOptions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:minWidth="40dp"
+                android:minHeight="40dp"
+                android:scaleType="center"
+                android:src="@drawable/ic_three_dots"
+                app:tint="@color/secondary_button" />
+        </RelativeLayout>
     </Toolbar>
 
     <FrameLayout
@@ -92,11 +93,11 @@
                 android:id="@+id/rvStories"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
+                android:paddingBottom="120dp"
                 app:layoutManager="LinearLayoutManager"
-                tools:listitem="@layout/story_item"
-                android:paddingBottom="200dp"
-                android:clipToPadding="false"/>
+                tools:listitem="@layout/story_item" />
         </RelativeLayout>
 
         <LinearLayout
@@ -106,8 +107,7 @@
             android:layout_gravity="center"
             android:orientation="vertical"
             android:paddingHorizontal="60dp"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/ivNoContentIcon"
@@ -120,7 +120,7 @@
 
             <TextView
                 android:id="@+id/tvNoContentMessage"
-                style="@style/BodyText"
+                style="@style/NoContentText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"

@@ -1,22 +1,19 @@
 package com.autio.android_app.ui.view.usecases.home.adapter
 
-import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.OptionClickListener
 import com.autio.android_app.data.model.StoryOption
 import com.autio.android_app.data.model.story.DownloadedStory
+import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import java.io.File
@@ -101,78 +98,21 @@ class DownloadedStoryAdapter(
             )
             ivStoryItemOptions.setOnClickListener {
                 showStoryOptions(
+                    itemView.context,
+                    itemView.parent as ViewGroup,
+                    it,
                     model,
+                    arrayListOf(
+                        StoryOption.DELETE,
+                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                        StoryOption.REMOVE_DOWNLOAD,
+                        StoryOption.DIRECTIONS,
+                        StoryOption.SHARE
+                    ),
                     onOptionClick = onOptionClick
                 )
             }
-        }
-
-        private fun showStoryOptions(
-            story: DownloadedStory,
-            onOptionClick: ((StoryOption, DownloadedStory) -> Unit)? = null
-        ) {
-            val context =
-                itemView.context
-            val inflater =
-                context.getSystemService(
-                    Context.LAYOUT_INFLATER_SERVICE
-                ) as LayoutInflater
-            val view =
-                inflater.inflate(
-                    R.layout.list_popup_window,
-                    itemView.parent as ViewGroup,
-                    false
-                )
-            val popup =
-                PopupWindow(
-                    view,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    true
-                )
-            val recyclerView =
-                view.findViewById<RecyclerView>(
-                    R.id.rvWindowPopupList
-                )
-            val storyOptions =
-                arrayListOf(
-                    StoryOption.DELETE,
-                    if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                    if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                    StoryOption.REMOVE_DOWNLOAD,
-                    StoryOption.DIRECTIONS,
-                    StoryOption.SHARE
-                )
-            val storyOptionsAdapter =
-                StoryOptionsAdapter(
-                    story,
-                    storyOptions,
-                    object :
-                        OptionClickListener<DownloadedStory> {
-                        override fun onItemClick(
-                            option: StoryOption,
-                            story: DownloadedStory
-                        ) {
-                            popup.dismiss()
-                            onOptionClick?.invoke(
-                                option,
-                                story
-                            )
-                        }
-                    }
-                )
-            recyclerView.adapter =
-                storyOptionsAdapter
-            popup.setBackgroundDrawable(
-                ColorDrawable()
-            )
-            popup.isOutsideTouchable =
-                true
-            popup.showAsDropDown(
-                ivStoryItemOptions,
-                -200,
-                0
-            )
         }
 
         companion object {

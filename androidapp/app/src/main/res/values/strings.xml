@@ -4,9 +4,10 @@
     <string name="menu_map">Map</string>
     <string name="menu_my_stories">My Stories</string>
     <string name="menu_account">Account</string>
-    <string name="or"> or </string>
-    <string name="restore_purchase"> <u>Restore Purchase</u></string>
-    <string name="watch_how_it_works">Watch How it Works</string>
+    <string name="sign_in_or_restore_purchase">Sign In <font color='#9C9FB5'>or</font> Restore Purchase</string>
+    <string name="restore_purchase">Restore Purchase</string>
+    <string name="restore_purchase_underlined"><u>Restore Purchase</u></string>
+    <string name="watch_how_it_works"><u>Watch How it Works</u></string>
     <string name="_1_is_donated_for_every_purchase_to_support_storytellers_in_underserved_communities_learn_more">$1 is donated for every purchase to\nsupport storytellers in underserved\ncommunities. <u>Learn more</u>.</string>
     <string name="_4_9_5_stars">4.9 / 5 Stars</string>
     <string name="love_this">Love this!</string>
@@ -22,26 +23,31 @@
     <string name="enjoy_5_stories_free_tap_for_plans">Enjoy 5 Stories Free - Tap for Plans</string>
     <string name="create_your_account">Create Your Account</string>
     <string name="cancel">Cancel</string>
-    <string name="name">NAME</string>
     <string name="autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"><![CDATA[Autio offers 30 Day & 3 Year\nplans that don’t automatically renew,\nas well as an annual subscription.]]></string>
     <string name="see_plans">See Plans</string>
     <string name="up_next">Up Next</string>
-    <string name="you_re_not_currently_signed_in_create_an_naccount_or_sign_in_to_manage_your_settings">You\'re not currently signed in. Create an\naccount or sign in to manage your settings.</string>
+    <string name="my_stories_user_not_logged_message">You’ll need a subscription to create playlists, as well as bookmark, favorite, or download stories.</string>
     <string name="search">Search</string>
     <string name="most_popular">MOST POPULAR</string>
-    <string name="a_story_for_everyone">A Story for Everyone</string>
-    <string name="share_20_off_autio_s_annual_nsubscription_with_a_friend">Share 20% off Autio’s annual\nsubscription with a friend.</string>
+    <string name="account_header_title">The Perfect Gift for the Adventurer in Your Life</string>
+    <string name="account_header_subtitle">Schedule delivery ahead of time (or at the last minute). Give the timeless gift of storytelling, travel inspiration, and great conversation.</string>
+    <string name="gift_autio">Give the Gift of Autio</string>
     <string name="send_20_off_to_a_friend">Send 20% Off to a Friend</string>
     <string name="account_status">ACCOUNT STATUS</string>
     <string name="no_plan_selected">No Plan Selected</string>
     <string name="profile">Profile</string>
+    <string name="personal_information">Personal Information</string>
     <string name="change_password">Change Password</string>
-    <string name="interests">Interests</string>
-    <string name="organize_your_interests_from_the_top_down">ORGANIZE YOUR INTERESTS FROM THE TOP DOWN</string>
-    <string name="saves_changes">Saves Changes</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="categories">Categories</string>
+    <string name="organize_your_interests_from_the_top_down">Prioritize your interests for AUTIO to recommend more relevant types of stories</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="name">Name</string>
     <string name="contact">Contact</string>
     <string name="log_out">Log Out</string>
-    <string name="delete_my_account">Delete My Account</string>
+    <string name="delete_my_account"><u>Delete My Account</u></string>
     <string name="continue_as_guest">Continue As Guest</string>
     <string name="update">Update</string>
     <!-- Summaries and short messages -->
@@ -54,7 +60,8 @@
     <string name="explanation_on_notifications">So you\'ll know when you’re near a story\nyou\'ve never heard before.</string>
     <string name="explanation_on_in_app_location">Select “precise” and “while using the app” to discover nearby stories, especially on road.</string>
     <string name="explanation_on_background_location">Background location gives you the best experience. The magic of Autio is discovering stories as you drive even if you’re not using the app. Let Autio use your location, even if you’re in your favorite navigation or music apps. We never share or sell your location information to third parties.</string>
-    <string name="traveler_plan_title">Traveler - only $3/month</string>
+    <string name="background_location_not_active">Location inaccurate. Tap to enable ‘Always On’ to ensure relevant story notifications.</string>
+    <string name="traveler_plan_title">Traveler - only $3/month*</string>
     <string name="traveler_plan_description">1 YEAR SUBSCRIPTION • $35.99 paid annually</string>
     <string name="traveler_plan_note">You\'ll be reminded before renewal. You can cancel any time.</string>
     <string name="adventurer_discount">35% OFF, BEST VALUE</string>
@@ -64,14 +71,14 @@
     <string name="adventurer_plan_title">Adventurer</string>
     <string name="adventurer_plan_description">3 YEAR MEMBER • <strike>$107.97</strike> $69.99</string>
     <string name="adventurer_plan_note">One-time payment.</string>
-    <string name="user_questions">QUESTIONS ABOUT YOUR ACCOUNT OR SUBSCRIPTION?</string>
     <string name="guest_authenticate_message">You\'re not currently signed in.\nCreate an account or sign in to\nmanage your account.</string>
-    <string name="guest_contact_autio">Questions about your account or subscription? <u>Contact Autio</u>.</string>
+    <string name="contact_support">Questions about your account or subscription? <u>Contact Autio</u>.</string>
     <string name="no_story_loaded">No story loaded</string>
     <string name="empty_bookmarks_message">Bookmarked stories will appear on this list. Bookmarks are only visible to you and are a great way to earmark stories to revisit later.</string>
     <string name="empty_favorites_message">Liked stories will appear on this list. Everyone can see likes — they’re a great way to show some love for your absolute favorite stories.</string>
     <string name="empty_history_message">Listened-to stories will appear here in the order you discover them. Start listening now by choosing a story from the map.</string>
-    <string name="empty_downloads_message">Downloaded stories will appear here. Downloaded stories will be available just in this device.</string>
+    <string name="empty_downloads_message">Tap the “…” by any story to download the audio content for offline use.</string>
+    <string name="status_subscribed">Subscribed</string>
     <!-- Text fields' labels -->
     <string name="email">EMAIL</string>
     <string name="password">PASSWORD</string>
@@ -108,6 +115,8 @@
     </plurals>
     <!-- SnackBar -->
     <string name="snack_bar_no_connection">No Internet Connection</string>
+    <string name="snack_bar_allow_notifications">Allow Notifications</string>
+    <string name="snack_bar_allow_location_access">Allow Location Access</string>
     <!-- Modal content -->
     <string name="moth_advertisement_title">Help the Next Generation\nTell Their Stories</string>
     <string name="moth_advertisement_body">Autio is a proud sponsor of The Moth Community Engagement Program, which provides the space, tools and expertise for people to practice the art and craft of personalstorytelling. We partner with community organizations, cultural institutions and non-profits to host workshops that inspire confidence and self-reflection and deepen connections within and between communities.</string>
@@ -118,6 +127,9 @@
     <string name="divider">Divider component for separating visuals</string>
     <string name="notification_channel">Now Playing</string>
     <string name="notification_channel_description">Shows what story is currently playing</string>
+    <!-- Map -->
+    <string name="map_list_title">From the Map</string>
+    <string name="map_list_subtitle">Adjust the map for more stories</string>
     <!-- Player -->
     <string name="allowed_caller_log">
         Caller has a valid certificate, but its package doesn\'t match any expected package for the

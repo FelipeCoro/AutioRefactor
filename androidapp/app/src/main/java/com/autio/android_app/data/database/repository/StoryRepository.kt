@@ -1,8 +1,10 @@
 package com.autio.android_app.data.database.repository
 
+import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.model.history.History
+import com.autio.android_app.data.model.story.Category
 import com.autio.android_app.data.model.story.DownloadedStory
 import com.autio.android_app.data.model.story.Story
 import com.google.android.gms.maps.model.LatLng
@@ -12,10 +14,32 @@ import javax.inject.Inject
 
 class StoryRepository @Inject constructor(
     private val storyDao: StoryDao,
-    private val downloadedStoryDao: DownloadedStoryDao
+    private val downloadedStoryDao: DownloadedStoryDao,
+    private val categoryDao: CategoryDao
 ) {
     private val executor =
         Executors.newSingleThreadExecutor()
+
+    val userCategories =
+        categoryDao.readUserCategories()
+
+    fun addUserCategories(
+        categories: Array<Category>
+    ) {
+        executor.execute {
+            categoryDao.addCategories(
+                categories
+            )
+        }
+    }
+
+    suspend fun updateCategories(
+        categories: Array<Category>
+    ) {
+        categoryDao.update(
+            categories
+        )
+    }
 
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng,
@@ -27,6 +51,12 @@ class StoryRepository @Inject constructor(
             neCoordinates.latitude,
             neCoordinates.longitude
         )
+    }
+
+    val allStories = storyDao.readLiveStories()
+
+    suspend fun getAllStories() : List<Story> {
+        return storyDao.allStories()
     }
 
     suspend fun getStoryById(
@@ -127,6 +157,23 @@ class StoryRepository @Inject constructor(
         }
     }
 
+    suspend fun markStoryAsListenedAtLeast30Secs(
+        storyId: String
+    ) {
+        storyDao.markStoryAsListenedAtLeast30Secs(
+            storyId
+        )
+
+        if (getDownloadedStoryById(
+                storyId
+            ) != null
+        ) {
+            downloadedStoryDao.markStoryAsListenedAtLeast30Secs(
+                storyId
+            )
+        }
+    }
+
     suspend fun removeStoryFromHistory(
         id: String
     ) {
@@ -181,6 +228,11 @@ class StoryRepository @Inject constructor(
                 id
             )
         }
+    }
+
+    fun removeAllBookmarks() {
+        storyDao.removeAllBookmarks()
+        downloadedStoryDao.removeAllBookmarks()
     }
 
     suspend fun giveLikeToStory(
@@ -239,6 +291,12 @@ class StoryRepository @Inject constructor(
         }
     }
 
+    fun removeAllDownloads() {
+        executor.execute {
+            downloadedStoryDao.clearTable()
+        }
+    }
+
     suspend fun getDownloadedStoryById(
         id: String
     ): DownloadedStory? {
@@ -271,6 +329,13 @@ class StoryRepository @Inject constructor(
                 storyId,
                 recordUrl
             )
+        }
+    }
+
+    fun clearUserData() {
+        executor.execute {
+            storyDao.clearUserData()
+            downloadedStoryDao.clearTable()
         }
     }
 

@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
+import com.autio.android_app.data.model.PlaylistOption
 import com.autio.android_app.data.model.StoryOption
 import com.autio.android_app.data.model.story.DownloadedStory
 import com.autio.android_app.data.model.story.Story
@@ -26,13 +27,10 @@ import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.FirebaseStoryRepository
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
-import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.view.usecases.home.adapter.StoryAdapter
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.StoryViewModel
-import com.autio.android_app.util.InjectorUtils
-import com.autio.android_app.util.openLocationInMapsApp
-import com.autio.android_app.util.shareStory
+import com.autio.android_app.util.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -44,9 +42,6 @@ class BookmarksFragment :
             requireContext()
         )
     }
-
-    private val apiService =
-        ApiService()
 
     private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
     private val storyViewModel by viewModels<StoryViewModel> {
@@ -99,14 +94,18 @@ class BookmarksFragment :
             binding.rvStories
         storyAdapter =
             StoryAdapter(
+                bottomNavigationViewModel.playingStory,
                 onStoryPlay = { id ->
-                    showPaywallOrProceedWithNormalProcess {
+                    showPaywallOrProceedWithNormalProcess(
+                        requireActivity(),
+                        isActionExclusiveForSignedInUser = true
+                    ) {
                         bottomNavigationViewModel.playMediaId(
                             id
                         )
                     }
                 },
-                onOptionClick = ::onOptionClicked
+                onOptionClick = ::onStoryOptionClicked
             )
         recyclerView.adapter =
             storyAdapter
@@ -123,15 +122,15 @@ class BookmarksFragment :
         storyViewModel.bookmarkedStories.observe(
             viewLifecycleOwner
         ) { stories ->
-            val totalTime =
-                stories.sumOf { it.duration } / 60
-            binding.tvToolbarSubtitle.text =
-                resources.getQuantityString(
-                    R.plurals.toolbar_stories_with_time_subtitle,
-                    stories.size,
-                    stories.size,
-                    totalTime
-                )
+//            val totalTime =
+//                stories.sumOf { it.duration } / 60
+//            binding.tvToolbarSubtitle.text =
+//                resources.getQuantityString(
+//                    R.plurals.toolbar_stories_with_time_subtitle,
+//                    stories.size,
+//                    stories.size,
+//                    totalTime
+//                )
             binding.pbLoadingStories.visibility =
                 View.GONE
             if (stories.isEmpty()) {
@@ -147,16 +146,27 @@ class BookmarksFragment :
                 binding.llNoContent.visibility =
                     View.VISIBLE
             } else {
+                binding.btnPlaylistOptions.setOnClickListener {
+                    showPlaylistOptions(
+                        requireContext(),
+                        binding.root,
+                        it,
+                        listOf(
+                            PlaylistOption.DOWNLOAD,
+                            PlaylistOption.REMOVE
+                        ),
+                        onOptionClicked = ::onPlaylistOptionClicked
+                    )
+                }
                 val storiesWithoutRecords =
                     stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
-                    apiService.getStoriesByIds(
+                    ApiService.getStoriesByIds(
                         prefRepository.userId,
                         prefRepository.userApiToken,
                         storiesWithoutRecords.map { it.originalId }
                     ) { storiesFromAPI ->
                         if (storiesFromAPI != null) {
-
                             for (story in storiesFromAPI) {
                                 storyViewModel.cacheRecordOfStory(
                                     story.id,
@@ -178,14 +188,58 @@ class BookmarksFragment :
         return binding.root
     }
 
-    private fun onOptionClicked(
+    private fun onPlaylistOptionClicked(
+        option: PlaylistOption
+    ) {
+        showPaywallOrProceedWithNormalProcess(
+            requireActivity(),
+            isActionExclusiveForSignedInUser = true
+        ) {
+            binding.pbLoadingProcess.visibility =
+                View.VISIBLE
+            when (option) {
+                PlaylistOption.DOWNLOAD -> {
+
+                }
+                PlaylistOption.REMOVE -> {
+                    FirebaseStoryRepository.removeAllBookmarks(
+                        prefRepository.firebaseKey,
+                        onSuccessListener = {
+                            storyViewModel.removeAllBookmarks()
+                            binding.pbLoadingProcess.visibility =
+                                View.GONE
+                            showFeedbackSnackBar(
+                                "Removed All Bookmarks"
+                            )
+                        },
+                        onFailureListener = {
+                            binding.pbLoadingProcess.visibility =
+                                View.GONE
+                            showFeedbackSnackBar(
+                                "Connection Failure"
+                            )
+                        }
+                    )
+                }
+                else -> Log.d(
+                    "BookmarksFragment",
+                    "option not available for this playlist"
+                )
+            }
+        }
+    }
+
+    private fun onStoryOptionClicked(
         option: StoryOption,
         story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess {
+        showPaywallOrProceedWithNormalProcess(
+            requireActivity(),
+            isActionExclusiveForSignedInUser = true
+        ) {
             when (option) {
                 StoryOption.DELETE, StoryOption.REMOVE_BOOKMARK -> {
-                    FirebaseStoryRepository.removeBookmark(
+                    FirebaseStoryRepository.removeBookmarkFromStory(
                         prefRepository.firebaseKey,
                         story.id,
                         onSuccessListener = {
@@ -202,6 +256,24 @@ class BookmarksFragment :
                             )
                         }
                     )
+//                    ApiService.removeBookmarkFromStory(
+//                        prefRepository.userId,
+//                        prefRepository.userApiToken,
+//                        story.originalId
+//                    ) {
+//                        if (it?.removed == true) {
+//                            storyViewModel.removeBookmarkFromStory(
+//                                story.id
+//                            )
+//                            showFeedbackSnackBar(
+//                                "Removed From Bookmarks"
+//                            )
+//                        } else {
+//                            showFeedbackSnackBar(
+//                                "Connection Failure"
+//                            )
+//                        }
+//                    }
                 }
                 StoryOption.LIKE -> {
                     FirebaseStoryRepository.giveLikeToStory(
@@ -221,6 +293,24 @@ class BookmarksFragment :
                             )
                         }
                     )
+//                    ApiService.likeStory(
+//                        prefRepository.userId,
+//                        prefRepository.userApiToken,
+//                        story.originalId
+//                    ) {
+//                        if (it == true) {
+//                            storyViewModel.setLikeToStory(
+//                                story.id
+//                            )
+//                            showFeedbackSnackBar(
+//                                "Added To Favorites"
+//                            )
+//                        } else {
+//                            showFeedbackSnackBar(
+//                                "Connection Failure"
+//                            )
+//                        }
+//                    }
                 }
                 StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(
@@ -289,16 +379,6 @@ class BookmarksFragment :
                     "no action defined for this option"
                 )
             }
-        }
-    }
-
-    private fun showPaywallOrProceedWithNormalProcess(
-        normalProcess: () -> Unit
-    ) {
-        if (prefRepository.remainingStories <= 0) {
-            (requireActivity() as BottomNavigation).showPayWall()
-        } else {
-            normalProcess.invoke()
         }
     }
 

@@ -3,14 +3,14 @@ package com.autio.android_app.ui.view.usecases.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.autio.android_app.data.model.OptionClickListener
 import com.autio.android_app.data.model.StoryOption
+import com.autio.android_app.data.model.StoryOptionClickListener
 import com.autio.android_app.databinding.ItemListPopupWindowBinding
 
 class StoryOptionsAdapter<T>(
     private val story: T,
     private var options: List<StoryOption>,
-    private val onOptionClickListener: OptionClickListener<T>? = null
+    private val onStoryOptionClickListener: StoryOptionClickListener<T>? = null
 ) :
     RecyclerView.Adapter<StoryOptionsAdapter<T>.OptionViewHolder>() {
 
@@ -23,9 +23,14 @@ class StoryOptionsAdapter<T>(
             model: StoryOption
         ) {
             binding.root.setOnClickListener {
-                onOptionClickListener?.onItemClick(model, story)
+                onStoryOptionClickListener?.onItemClick(
+                    model,
+                    story
+                )
             }
-            binding.ivOptionIcon.setImageResource(model.option.resourceId)
+            binding.ivOptionIcon.setImageResource(
+                model.option.resourceId
+            )
             binding.tvOptionTitle.text =
                 model.option.title
         }

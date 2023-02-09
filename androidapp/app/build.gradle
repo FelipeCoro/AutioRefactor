@@ -7,6 +7,13 @@ plugins {
     id 'com.google.gms.google-services'
 }
 
+def localProperties = new Properties()
+try {
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+} catch (Exception ignored) {
+    logger.warn("No Local Properties File Found!")
+}
+
 android {
     compileSdk 33
 
@@ -14,8 +21,20 @@ android {
         applicationId "autio.audio.travel.guide"
         minSdk 26
         targetSdk 33
-        versionCode 9
-        versionName "1.9"
+        versionCode 15
+        versionName "1.15"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation":
+                                      "$projectDir/schemas".toString()]
+            }
+        }
+        if (!localProperties['base64EncodedPublicKey']) {
+            logger.warn('base64EncodedPublicKey must be set for signature verification. ' +
+                    'You can add it to local.properties once you have gotten it from Play. ' +
+                    'Example: base64EncodedPublicKey=[key value]')
+        }
+        buildConfigField "String", "BASE64_ENCODED_PUBLIC_KEY", "\"" + localProperties['base64EncodedPublicKey'] + "\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -41,19 +60,32 @@ android {
         viewBinding true
     }
     namespace 'com.autio.android_app'
+    flavorDimensions 'env'
+    productFlavors {
+        staging {
+            dimension 'env'
+            buildConfigField "String", "base_url", '"https://staging-app.autio.com"'
+        }
+        production {
+            dimension 'env'
+            buildConfigField "String", "base_url", '"https://app.autio.com"'
+        }
+    }
 }
 
 dependencies {
     implementation "androidx.media:media:1.6.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.4.1'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.4.2'
     def nav_version = "2.5.3"
     def lottieVersion = "5.2.0"
     def room_version = "2.5.0"
+    def billing_version = "5.1.0"
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.0'
+    // Don't upgrade to major version since there are some forced features included > 1.7.0 we don't want in app
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
@@ -61,12 +93,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.github.smarteist:autoimageslider:1.4.0'
     // Firebase
-    implementation 'com.google.firebase:firebase-bom:31.1.1'
+    implementation 'com.google.firebase:firebase-bom:31.2.0'
     // dependency for loading image from url
     implementation 'com.github.bumptech.glide:glide:4.12.0'
     implementation 'androidx.preference:preference:1.2.0'
-    // Blur for views
-    implementation 'com.github.Dimezis:BlurView:version-2.0.3'
     // Kotlin
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
@@ -83,8 +113,8 @@ dependencies {
     // Location
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     // Google Play Billing
-    implementation 'com.android.billingclient:billing:5.1.0'
-    implementation 'com.android.billingclient:billing-ktx:5.1.0'
+//    implementation 'com.android.billingclient:billing:5.1.0'
+//    implementation 'com.android.billingclient:billing-ktx:5.1.0'
     // Google Maps
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
@@ -93,22 +123,21 @@ dependencies {
     // HTTP requests
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
     implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-    implementation 'com.github.kittinunf.fuel:fuel:2.2.1' //Core package
-    implementation 'com.github.kittinunf.fuel:fuel-android:2.2.1' //Android
-    implementation 'com.github.kittinunf.fuel:fuel-gson:2.2.1' //Fuel Gson
-    //Corrutinas
+    //Fuel Gson
+    //Co-routines
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
-    //DataStore
+    // DataStore
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
-    //Google Play Services
-    //Lottie
+    // Revenue Cat
+    implementation "com.revenuecat.purchases:purchases:5.4.0"
+    // Lottie
     implementation "com.airbnb.android:lottie:$lottieVersion"
-    //dagger hilt
+    // Dagger hilt
     implementation "com.google.dagger:hilt-android:2.42"
     kapt "com.google.dagger:hilt-android-compiler:2.42"
     implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
-    //Room
+    // Room
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     // Pagination

@@ -15,17 +15,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
+import com.autio.android_app.data.model.PlaylistOption
 import com.autio.android_app.data.model.StoryOption
 import com.autio.android_app.data.model.story.DownloadedStory
+import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.FirebaseStoryRepository
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.ui.view.usecases.home.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.StoryViewModel
-import com.autio.android_app.util.InjectorUtils
-import com.autio.android_app.util.openLocationInMapsApp
-import com.autio.android_app.util.shareStory
+import com.autio.android_app.util.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -120,14 +120,30 @@ class DownloadedStoriesFragment :
             ) { stories ->
                 recyclerView.adapter =
                     storyAdapter
-                binding.tvToolbarSubtitle.text =
-                    resources.getQuantityString(
-                        R.plurals.toolbar_stories_subtitle,
-                        stories.size,
-                        stories.size
-                    )
+//                binding.tvToolbarSubtitle.text =
+//                    resources.getQuantityString(
+//                        R.plurals.toolbar_stories_subtitle,
+//                        stories.size,
+//                        stories.size
+//                    )
                 binding.pbLoadingStories.visibility =
                     View.GONE
+                binding.btnPlaylistOptions.setOnClickListener { view ->
+                    showPlaylistOptions(
+                        requireContext(),
+                        binding.root,
+                        view,
+                        listOf(
+                            PlaylistOption.REMOVE
+                        ).map {
+                            it.also { option ->
+                                option.disabled =
+                                    stories.isEmpty()
+                            }
+                        },
+                        onOptionClicked = ::onPlaylistOptionClicked
+                    )
+                }
                 if (stories.isEmpty()) {
                     binding.ivNoContentIcon.setImageResource(
                         R.drawable.ic_download
@@ -158,6 +174,7 @@ class DownloadedStoriesFragment :
     ) {
         when (option) {
             StoryOption.BOOKMARK -> {
+                // TODO: change Firebase code with commented code once stable
                 FirebaseStoryRepository.bookmarkStory(
                     prefRepository.firebaseKey,
                     story.id,
@@ -176,9 +193,27 @@ class DownloadedStoriesFragment :
                         )
                     }
                 )
+//                ApiService.bookmarkStory(
+//                    prefRepository.userId,
+//                    prefRepository.userApiToken,
+//                    story.originalId
+//                ) {
+//                    if (it != null) {
+//                        storyViewModel.bookmarkStory(
+//                            story.id
+//                        )
+//                        showFeedbackSnackBar(
+//                            "Added To Bookmarks"
+//                        )
+//                    } else {
+//                        showFeedbackSnackBar(
+//                            "Connection Failure"
+//                        )
+//                    }
+//                }
             }
             StoryOption.REMOVE_BOOKMARK -> {
-                FirebaseStoryRepository.removeBookmark(
+                FirebaseStoryRepository.removeBookmarkFromStory(
                     prefRepository.firebaseKey,
                     story.id,
                     onSuccessListener = {
@@ -195,6 +230,24 @@ class DownloadedStoriesFragment :
                         )
                     }
                 )
+//                ApiService.removeBookmarkFromStory(
+//                    prefRepository.userId,
+//                    prefRepository.userApiToken,
+//                    story.id
+//                ) {
+//                    if (it?.removed == true) {
+//                        storyViewModel.removeBookmarkFromStory(
+//                            story.id
+//                        )
+//                        showFeedbackSnackBar(
+//                            "Removed From Bookmarks"
+//                        )
+//                    } else {
+//                        showFeedbackSnackBar(
+//                            "Connection Failure"
+//                        )
+//                    }
+//                }
             }
             StoryOption.LIKE -> {
                 FirebaseStoryRepository.giveLikeToStory(
@@ -214,6 +267,24 @@ class DownloadedStoriesFragment :
                         )
                     }
                 )
+//                ApiService.likeStory(
+//                    prefRepository.userId,
+//                    prefRepository.userApiToken,
+//                    story.id
+//                ) {
+//                    if (it == true) {
+//                        storyViewModel.setLikeToStory(
+//                            story.id
+//                        )
+//                        showFeedbackSnackBar(
+//                            "Added To Favorites"
+//                        )
+//                    } else {
+//                        showFeedbackSnackBar(
+//                            "Connection Failure"
+//                        )
+//                    }
+//                }
             }
             StoryOption.REMOVE_LIKE -> {
                 FirebaseStoryRepository.removeLikeFromStory(
@@ -257,6 +328,32 @@ class DownloadedStoriesFragment :
                 "HistoryFragment",
                 "no action defined for this option"
             )
+        }
+    }
+
+    private fun onPlaylistOptionClicked(
+        option: PlaylistOption
+    ) {
+        showPaywallOrProceedWithNormalProcess(
+            requireActivity(),
+            isActionExclusiveForSignedInUser = true
+        ) {
+            binding.pbLoadingProcess.visibility =
+                View.VISIBLE
+            when (option) {
+                PlaylistOption.REMOVE -> {
+                    storyViewModel.removeAllDownloads()
+                    binding.pbLoadingProcess.visibility =
+                        View.GONE
+                    showFeedbackSnackBar(
+                        "Removed Downloads"
+                    )
+                }
+                else -> Log.d(
+                    "DownloadedStoriesFragment",
+                    "option not available for this playlist"
+                )
+            }
         }
     }
 

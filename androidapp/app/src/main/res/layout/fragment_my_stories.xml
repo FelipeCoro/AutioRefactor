@@ -14,27 +14,27 @@
         android:gravity="center"
         android:orientation="vertical"
         android:visibility="gone"
+        android:paddingHorizontal="44dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible">
 
         <TextView
+            style="@style/TextViewInterRegular"
             android:id="@+id/textViewMyStories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="center"
-            android:text="@string/you_re_not_currently_signed_in_create_an_naccount_or_sign_in_to_manage_your_settings"
-            android:textColor="@color/gray_letter" />
+            android:text="@string/my_stories_user_not_logged_message" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="64dp"
             android:gravity="center"
             android:orientation="horizontal"
-            android:weightSum="2"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -43,19 +43,19 @@
             <Button
                 android:id="@+id/btn_signup"
                 style="@style/Button.Active.Filled"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:text="@string/sign_up"
                 android:textAllCaps="false" />
 
             <Button
                 android:id="@+id/btn_sign_in"
-                style="@style/Button.Gray"
-                android:layout_width="match_parent"
+                style="@style/Button.Strong"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="8dp"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:text="@string/sign_in"
                 android:textAllCaps="false" />
@@ -69,7 +69,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="visible"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone">
 
         <Toolbar
             android:id="@+id/toolbar"

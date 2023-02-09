@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/tvWatchWorks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/watch_how_it_works"
+        android:textColor="@color/normal_text"
+        android:textSize="16sp" />
+
+    <ImageView
+        android:layout_width="19dp"
+        android:layout_height="19dp"
+        android:layout_marginStart="4dp"
+        android:layout_toEndOf="@+id/tvWatchWorks"
+        android:src="@drawable/ic_player_play"
+        app:tint="@color/button_background" />
+
+</RelativeLayout>

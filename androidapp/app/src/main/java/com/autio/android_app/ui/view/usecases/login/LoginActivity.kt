@@ -26,8 +26,6 @@ class LoginActivity :
     }
 
     private lateinit var binding: ActivityLoginBinding
-    private val apiService =
-        ApiService()
 
     private lateinit var firstRecyclerView: RecyclerView
     private lateinit var secondRecyclerView: RecyclerView
@@ -132,7 +130,7 @@ class LoginActivity :
 
     private fun loginGuest() {
         showLoadingView()
-        apiService.guest {
+        ApiService.loginAsGuest {
             if (it != null) {
                 saveGuestInfo(
                     it
@@ -164,6 +162,7 @@ class LoginActivity :
             guestResponse.firebaseKey
         prefRepository.userApiToken =
             guestResponse.apiToken
-        prefRepository.remainingStories = 5
+        prefRepository.remainingStories =
+            5
     }
 }

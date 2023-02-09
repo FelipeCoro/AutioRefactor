@@ -1,27 +1,28 @@
 package com.autio.android_app.ui.view.usecases.home.adapter
 
-import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.OptionClickListener
 import com.autio.android_app.data.model.StoryOption
 import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
 class StoryAdapter(
+    private var playingStory: MutableLiveData<Story?>,
     private var onStoryPlay: ((String) -> Unit)?,
-    private var onOptionClick: ((StoryOption, Story) -> Unit)?
+    private var onOptionClick: ((StoryOption, Story) -> Unit)?,
+    private var shouldPinLocationBeShown: Boolean = false
 ) :
     ListAdapter<Story, StoryAdapter.StoryViewHolder>(
         StoryComparator()
@@ -29,8 +30,10 @@ class StoryAdapter(
 
     class StoryViewHolder(
         itemView: View,
-        private var onStoryPlay: ((String) -> Unit)?,
-        private var onOptionClick: ((StoryOption, Story) -> Unit)?
+        private val playingStory: MutableLiveData<Story?>,
+        private val onStoryPlay: ((String) -> Unit)?,
+        private val onOptionClick: ((StoryOption, Story) -> Unit)?,
+        private val shouldPinLocationBeShown: Boolean
     ) : RecyclerView.ViewHolder(
         itemView
     ) {
@@ -58,10 +61,16 @@ class StoryAdapter(
             itemView.findViewById<ImageView>(
                 R.id.ivStoryItemOptions
             )
+        private val ivPlayIcon =
+            itemView.findViewById<ImageView>(
+                R.id.ivPlayIcon
+            )
 
         fun bind(
             model: Story
         ) {
+            val wasStoryListenedAtLeast30Seconds =
+                model.listenedAtLeast30Secs == true
             Glide.with(
                 itemView
             )
@@ -70,10 +79,10 @@ class StoryAdapter(
                 )
                 .apply(
                     RequestOptions().placeholder(
-                        R.drawable.maps_placeholder
+                        R.color.autio_blue_20
                     )
                         .error(
-                            R.drawable.maps_placeholder
+                            R.color.autio_blue_20
                         )
                 )
                 .into(
@@ -84,94 +93,69 @@ class StoryAdapter(
                     model.id
                 )
             }
-            storyTitle.text =
-                model.title
+            storyTitle.apply {
+                text =
+                    model.title
+                if (wasStoryListenedAtLeast30Seconds) {
+                    setTextColor(
+                        resources.getColor(
+                            R.color.autio_blue_60,
+                            null
+                        )
+                    )
+                }
+            }
             storyAuthor.text =
                 model.author
-            storyPin.setImageResource(
-                R.drawable.ic_non_listened_pin
-            )
+            if (shouldPinLocationBeShown) {
+                storyPin.visibility =
+                    View.VISIBLE
+            }
             ivStoryItemOptions.setOnClickListener {
                 showStoryOptions(
+                    itemView.context,
+                    itemView.parent as ViewGroup,
+                    it,
                     model,
+                    arrayListOf(
+                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                        StoryOption.DOWNLOAD,
+                        StoryOption.DIRECTIONS,
+                        StoryOption.SHARE
+                    ),
                     onOptionClick = onOptionClick
                 )
             }
-        }
-
-        private fun showStoryOptions(
-            story: Story,
-            onOptionClick: ((StoryOption, Story) -> Unit)? = null
-        ) {
-            val context =
-                itemView.context
-            val inflater =
-                context.getSystemService(
-                    Context.LAYOUT_INFLATER_SERVICE
-                ) as LayoutInflater
-            val view =
-                inflater.inflate(
-                    R.layout.list_popup_window,
-                    itemView.parent as ViewGroup,
-                    false
-                )
-            val popup =
-                PopupWindow(
-                    view,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    true
-                )
-            val recyclerView =
-                view.findViewById<RecyclerView>(
-                    R.id.rvWindowPopupList
-                )
-            val storyOptions =
-                arrayListOf(
-                    StoryOption.DELETE,
-                    if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                    if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                    StoryOption.DOWNLOAD,
-                    StoryOption.DIRECTIONS,
-                    StoryOption.SHARE
-                )
-            val storyOptionsAdapter =
-                StoryOptionsAdapter(
-                    story,
-                    storyOptions,
-                    object :
-                        OptionClickListener<Story> {
-                        override fun onItemClick(
-                            option: StoryOption,
-                            story: Story
-                        ) {
-                            popup.dismiss()
-                            onOptionClick?.invoke(
-                                option,
-                                story
-                            )
-                        }
-                    }
-                )
-            recyclerView.adapter =
-                storyOptionsAdapter
-            popup.setBackgroundDrawable(
-                ColorDrawable()
-            )
-            popup.isOutsideTouchable =
-                true
-            popup.showAsDropDown(
-                ivStoryItemOptions,
-                -200,
-                0
-            )
+            playingStory.observe(
+                itemView.context as LifecycleOwner
+            ) {
+                if (it?.id == model.id) {
+                    storyPin.setImageResource(
+                        R.drawable.ic_now_listening_pin
+                    )
+                    ivPlayIcon.setImageResource(
+                        R.drawable.ic_pause_mini
+                    )
+                } else {
+                    storyPin.setImageResource(
+                        if (wasStoryListenedAtLeast30Seconds) R.drawable.ic_listened_pin
+                        else R.drawable.ic_non_listened_pin
+                    )
+                    ivPlayIcon.setImageResource(
+                        R.drawable.ic_play_mini
+                    )
+                }
+            }
         }
 
         companion object {
             fun create(
                 parent: ViewGroup,
+                playingStory: MutableLiveData<Story?>,
                 onStoryPlay: ((String) -> Unit)?,
-                onOptionClick: ((StoryOption, Story) -> Unit)?
+                onOptionClick: ((StoryOption, Story) -> Unit)?,
+                shouldPinLocationBeShown: Boolean
             ): StoryViewHolder {
                 val view =
                     LayoutInflater.from(
@@ -184,8 +168,10 @@ class StoryAdapter(
                         )
                 return StoryViewHolder(
                     view,
+                    playingStory,
                     onStoryPlay,
-                    onOptionClick
+                    onOptionClick,
+                    shouldPinLocationBeShown
                 )
             }
         }
@@ -217,8 +203,10 @@ class StoryAdapter(
     ): StoryViewHolder {
         return StoryViewHolder.create(
             parent,
+            playingStory,
             onStoryPlay,
-            onOptionClick
+            onOptionClick,
+            shouldPinLocationBeShown
         )
     }
 

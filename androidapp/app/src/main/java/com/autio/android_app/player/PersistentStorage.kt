@@ -8,7 +8,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 import android.support.v4.media.MediaDescriptionCompat
 import com.autio.android_app.extensions.asAlbumArtContentUri
-import com.autio.android_app.player.MediaNotificationManager.Companion.NOTIFICATION_LARGE_ICON_SIZE
+import com.autio.android_app.notifications.MediaNotificationManager.Companion.NOTIFICATION_LARGE_ICON_SIZE
 import com.autio.android_app.player.PlayerService.Companion.MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers

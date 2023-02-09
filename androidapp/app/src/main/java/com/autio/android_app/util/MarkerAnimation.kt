@@ -53,11 +53,12 @@ class MarkerAnimation {
                         interpolator.getInterpolation(
                             t
                         )
-                    marker.position = latLngInterpolator.interpolate(
-                        v,
-                        startPosition,
-                        finalPosition
-                    )
+                    marker.position =
+                        latLngInterpolator.interpolate(
+                            v,
+                            startPosition,
+                            finalPosition
+                        )
 
                     // Repeat till progress is complete.
                     if (t < 1) {
@@ -89,7 +90,8 @@ class MarkerAnimation {
                     startPosition,
                     finalPosition
                 )
-            marker.position = newPosition
+            marker.position =
+                newPosition
         }
         valueAnimator.setFloatValues(
             0f,

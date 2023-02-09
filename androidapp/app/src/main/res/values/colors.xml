@@ -40,7 +40,7 @@
         #080F45
     </color>
     <color name="red">
-        #AEFF0000
+        #F62B16
     </color>
     <color name="blue_background">
         #393F6A
@@ -138,7 +138,7 @@
         #FFFFFF
     </color>
     <color name="persistent_player_next">
-        #090E42
+        #393F6A
     </color>
     <color name="location_icon">
         #090E42

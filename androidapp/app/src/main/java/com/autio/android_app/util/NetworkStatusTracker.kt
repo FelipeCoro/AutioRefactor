@@ -42,7 +42,9 @@ class NetworkStatusTracker(
                     override fun onAvailable(
                         network: Network
                     ) {
-                        super.onAvailable(network)
+                        super.onAvailable(
+                            network
+                        )
                         trySend(
                             NetworkStatus.Available
                         ).isSuccess
@@ -51,7 +53,9 @@ class NetworkStatusTracker(
                     override fun onLost(
                         network: Network
                     ) {
-                        super.onLost(network)
+                        super.onLost(
+                            network
+                        )
                         trySend(
                             NetworkStatus.Unavailable
                         ).isSuccess

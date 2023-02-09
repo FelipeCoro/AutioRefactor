@@ -1,6 +1,5 @@
 package com.autio.android_app.ui.view.usecases.home.fragment
 
-import android.content.Context
 import android.content.res.Resources
 import android.graphics.Paint
 import android.location.Address
@@ -11,7 +10,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupWindow
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -22,20 +20,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.OptionClickListener
 import com.autio.android_app.data.model.StoryOption
 import com.autio.android_app.data.model.story.DownloadedStory
 import com.autio.android_app.data.model.story.NowPlayingMetadata
 import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.FirebaseStoryRepository
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
 import com.autio.android_app.extensions.getAddress
 import com.autio.android_app.extensions.timestampToMSS
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
-import com.autio.android_app.ui.view.usecases.home.adapter.StoryOptionsAdapter
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
 import com.autio.android_app.ui.viewmodel.StoryViewModel
@@ -173,7 +169,9 @@ class PlayerFragment :
                 likes.filter { it.value }.size.toString()
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnHeart.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess {
+                    showPaywallOrProceedWithNormalProcess(
+                        requireActivity()
+                    ) {
                         if (likes[prefRepository.firebaseKey] == true) {
                             FirebaseStoryRepository.removeLikeFromStory(
                                 story.id,
@@ -210,6 +208,24 @@ class PlayerFragment :
                                     )
                                 }
                             )
+//                            ApiService.likeStory(
+//                                prefRepository.userId,
+//                                prefRepository.userApiToken,
+//                                story.originalId
+//                            ) {
+//                                if (it == true) {
+//                                    storyViewModel.setLikeToStory(
+//                                        story.id
+//                                    )
+//                                    showFeedbackSnackBar(
+//                                        "Added To Favorites"
+//                                    )
+//                                } else {
+//                                    showFeedbackSnackBar(
+//                                        "Connection Failure"
+//                                    )
+//                                }
+//                            }
                         }
                     }
                 }
@@ -229,9 +245,11 @@ class PlayerFragment :
             }
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnBookmark.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess {
+                    showPaywallOrProceedWithNormalProcess(
+                        requireActivity()
+                    ) {
                         if (isBookmarked) {
-                            FirebaseStoryRepository.removeBookmark(
+                            FirebaseStoryRepository.removeBookmarkFromStory(
                                 prefRepository.firebaseKey,
                                 story.id,
                                 onSuccessListener = {
@@ -248,7 +266,26 @@ class PlayerFragment :
                                     )
                                 }
                             )
+//                            ApiService.removeBookmarkFromStory(
+//                                prefRepository.userId,
+//                                prefRepository.userApiToken,
+//                                story.originalId
+//                            ) {
+//                                if (it?.removed == true) {
+//                                    storyViewModel.removeBookmarkFromStory(
+//                                        story.id
+//                                    )
+//                                    showFeedbackSnackBar(
+//                                        "Removed From Bookmarks"
+//                                    )
+//                                } else {
+//                                    showFeedbackSnackBar(
+//                                        "Connection Failure"
+//                                    )
+//                                }
+//                            }
                         } else {
+                            // TODO: change Firebase code with commented code once stable
                             FirebaseStoryRepository.bookmarkStory(
                                 prefRepository.firebaseKey,
                                 story.id,
@@ -267,6 +304,24 @@ class PlayerFragment :
                                     )
                                 }
                             )
+//                            ApiService.bookmarkStory(
+//                                prefRepository.userId,
+//                                prefRepository.userApiToken,
+//                                story.originalId
+//                            ) {
+//                                if (it != null) {
+//                                    storyViewModel.bookmarkStory(
+//                                        story.id
+//                                    )
+//                                    showFeedbackSnackBar(
+//                                        "Added To Bookmarks"
+//                                    )
+//                                } else {
+//                                    showFeedbackSnackBar(
+//                                        "Connection Failure"
+//                                    )
+//                                }
+//                            }
                         }
                     }
                 }
@@ -307,40 +362,14 @@ class PlayerFragment :
                     .toInt()
         }
 
-        binding.sBTrack.setOnSeekBarChangeListener(
-            object :
-                SeekBar.OnSeekBarChangeListener {
-                override fun onStartTrackingTouch(
-                    p0: SeekBar?
-                ) {
-                }
-
-                override fun onStopTrackingTouch(
-                    p0: SeekBar?
-                ) {
-                }
-
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    if (fromUser) {
-                        showPaywallOrProceedWithNormalProcess {
-                            bottomNavigationViewModel.setPlaybackPosition(
-                                progress
-                            )
-                        }
-                    }
-                }
-            })
-
         binding.btnChangeSpeed.setOnClickListener {
             playerFragmentViewModel.changePlaybackSpeed()
         }
 
         binding.btnRewind.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess {
+            showPaywallOrProceedWithNormalProcess(
+                requireActivity()
+            ) {
                 bottomNavigationViewModel.rewindFifteenSeconds()
             }
         }
@@ -354,7 +383,9 @@ class PlayerFragment :
         }
 
         binding.btnNext.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess {
+            showPaywallOrProceedWithNormalProcess(
+                requireActivity()
+            ) {
                 bottomNavigationViewModel.skipToNextStory()
             }
         }
@@ -404,6 +435,35 @@ class PlayerFragment :
                     true
                 sBTrack.max =
                     story.duration
+                sBTrack.setOnSeekBarChangeListener(
+                    object :
+                        SeekBar.OnSeekBarChangeListener {
+                        override fun onStartTrackingTouch(
+                            p0: SeekBar?
+                        ) {
+                        }
+
+                        override fun onStopTrackingTouch(
+                            p0: SeekBar?
+                        ) {
+                        }
+
+                        override fun onProgressChanged(
+                            seekBar: SeekBar?,
+                            progress: Int,
+                            fromUser: Boolean
+                        ) {
+                            if (fromUser) {
+                                showPaywallOrProceedWithNormalProcess(
+                                    requireActivity()
+                                ) {
+                                    bottomNavigationViewModel.setPlaybackPosition(
+                                        progress
+                                    )
+                                }
+                            }
+                        }
+                    })
                 tvStoryTitle.text =
                     story.title
                 tvStoryAuthor.apply {
@@ -467,7 +527,7 @@ class PlayerFragment :
                             }
                         }
                         FirebaseStoryRepository.getCategory(
-                            story.category?.id
+                            "${story.category?.id}"
                         ) { category ->
                             lifecycleScope.launch {
                                 withContext(
@@ -498,29 +558,38 @@ class PlayerFragment :
                     text =
                         story.description
                 }
-                binding.btnShare.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess {
+                btnShare.setOnClickListener {
+                    showPaywallOrProceedWithNormalProcess(
+                        requireActivity()
+                    ) {
                         shareStory(
                             requireContext(),
                             story.id
                         )
                     }
                 }
-                binding.btnFeedback.setOnClickListener {
+                btnFeedback.setOnClickListener {
                     writeEmailToCustomerSupport(
                         requireContext()
                     )
                 }
-                binding.btnOptions.setOnClickListener {
+                btnOptions.setOnClickListener {
                     showStoryOptions(
-                        story
+                        requireContext(),
+                        binding.root,
+                        it,
+                        story,
+                        arrayListOf(
+                            if (story.isDownloaded == true) StoryOption.REMOVE_DOWNLOAD else StoryOption.DOWNLOAD,
+                            StoryOption.DIRECTIONS
+                        ),
+                        onOptionClick = ::onOptionClicked
                     )
                 }
                 mapCard.visibility =
                     View.VISIBLE
             } else {
-                sBTrack.isEnabled =
-                    false
+                sBTrack.setOnSeekBarChangeListener(null)
                 ivStoryImage.setImageResource(
                     0
                 )
@@ -655,115 +724,61 @@ class PlayerFragment :
             ?: ""
     }
 
-    private fun showStoryOptions(
-        story: Story
-    ) {
-        val inflater =
-            requireContext().getSystemService(
-                Context.LAYOUT_INFLATER_SERVICE
-            ) as LayoutInflater
-        val view =
-            inflater.inflate(
-                R.layout.list_popup_window,
-                binding.root,
-                false
-            )
-        val recyclerView =
-            view.findViewById<RecyclerView>(
-                R.id.rvWindowPopupList
-            )
-        val popup =
-            PopupWindow(
-                view,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        val options: MutableList<StoryOption> =
-            arrayListOf(
-                if (story.isDownloaded == true) StoryOption.REMOVE_DOWNLOAD else StoryOption.DOWNLOAD,
-                StoryOption.DIRECTIONS
-            )
-        val storyOptionsAdapter =
-            StoryOptionsAdapter(
-                story,
-                options,
-                object :
-                    OptionClickListener<Story> {
-                    override fun onItemClick(
-                        option: StoryOption,
-                        story: Story
-                    ) {
-                        popup.dismiss()
-                        onOptionClicked(
-                            option,
-                            story
-                        )
-                    }
-                }
-            )
-        recyclerView.adapter =
-            storyOptionsAdapter
-        popup.isOutsideTouchable =
-            true
-        popup.isFocusable =
-            true
-        popup.showAsDropDown(
-            binding.btnOptions,
-            -200,
-            50
-        )
-    }
-
     private fun onOptionClicked(
         option: StoryOption,
         story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess {
-            when (option) {
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
-                    try {
-                        val downloadedStory =
-                            DownloadedStory.fromStory(
-                                requireContext(),
-                                story
-                            )
-                        lifecycleScope.launch {
-                            storyViewModel.downloadStory(
-                                downloadedStory!!
+        when (option) {
+            StoryOption.DOWNLOAD -> {
+                showPaywallOrProceedWithNormalProcess(
+                    requireActivity(),
+                    isActionExclusiveForSignedInUser = true
+                ) {
+                    lifecycleScope.launch {
+                        try {
+                            val downloadedStory =
+                                DownloadedStory.fromStory(
+                                    requireContext(),
+                                    story
+                                )
+                            lifecycleScope.launch {
+                                storyViewModel.downloadStory(
+                                    downloadedStory!!
+                                )
+                                showFeedbackSnackBar(
+                                    "Story Saved To My Device"
+                                )
+                            }
+                        } catch (e: Exception) {
+                            Log.e(
+                                "PlayerFragment",
+                                "exception: ",
+                                e
                             )
                             showFeedbackSnackBar(
-                                "Story Saved To My Device"
+                                "Failed Downloading Story"
                             )
                         }
-                    } catch (e: Exception) {
-                        Log.e(
-                            "PlayerFragment",
-                            "exception: ",
-                            e
-                        )
-                        showFeedbackSnackBar(
-                            "Failed Downloading Story"
-                        )
                     }
                 }
-                StoryOption.REMOVE_DOWNLOAD -> {
-                    storyViewModel.removeDownloadedStory(
-                        story.id
-                    )
-                    showFeedbackSnackBar(
-                        "Story Removed From My Device"
-                    )
-                }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(),
-                    story.lat,
-                    story.lon
+            }
+            StoryOption.REMOVE_DOWNLOAD -> {
+                storyViewModel.removeDownloadedStory(
+                    story.id
                 )
-                else -> Log.d(
-                    "PlayerFragment",
-                    "optionSelectedNotAdded"
+                showFeedbackSnackBar(
+                    "Story Removed From My Device"
                 )
             }
+            StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                requireActivity(),
+                story.lat,
+                story.lon
+            )
+            else -> Log.d(
+                "PlayerFragment",
+                "optionSelectedNotAdded"
+            )
         }
     }
 
@@ -796,16 +811,6 @@ class PlayerFragment :
                             )
                         }
                 }
-        }
-    }
-
-    private fun showPaywallOrProceedWithNormalProcess(
-        normalProcess: () -> Unit
-    ) {
-        if (prefRepository.remainingStories <= 0) {
-            (requireActivity() as BottomNavigation).showPayWall()
-        } else {
-            normalProcess.invoke()
         }
     }
 

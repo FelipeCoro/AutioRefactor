@@ -1,13 +1,15 @@
 package com.autio.android_app.ui.view.usecases.home
 
+import android.Manifest
 import android.content.Intent
 import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
-import android.util.Log
-import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -16,11 +18,15 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
+import com.autio.android_app.ui.view.usecases.home.fragment.MapFragment
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel
 import com.autio.android_app.ui.viewmodel.MyState
 import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
+import com.autio.android_app.ui.viewmodel.PurchaseViewModel
+import com.autio.android_app.util.Constants
 import com.autio.android_app.util.InjectorUtils
+import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 
 class BottomNavigation :
@@ -31,6 +37,13 @@ class BottomNavigation :
             this
         )
     }
+
+    private val purchaseViewModel by viewModels<PurchaseViewModel> {
+        InjectorUtils.providePurchaseViewModel(
+            this
+        )
+    }
+
     private val networkViewModel by viewModels<NetworkStatusViewModel> {
         InjectorUtils.provideNetworkStatusViewModel(
             this
@@ -42,6 +55,8 @@ class BottomNavigation :
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
 
+    private lateinit var navHostFragment: NavHostFragment
+
     private var connected =
         false
 
@@ -51,6 +66,8 @@ class BottomNavigation :
         super.onCreate(
             savedInstanceState
         )
+
+        purchaseViewModel.getUserInfo()
 
         networkViewModel.state.observe(
             this
@@ -78,9 +95,23 @@ class BottomNavigation :
             binding.root
         )
 
+        updateSnackBarMessageDisplay()
+
         updateAvailableStoriesUI(
             bottomNavigationViewModel.initialRemainingStories
         )
+
+        purchaseViewModel.customerInfo.observe(
+            this
+        ) {
+            it?.let {
+                binding.rlSeePlans.visibility =
+                    if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true)
+                        GONE
+                    else VISIBLE
+            }
+        }
+
         bottomNavigationViewModel.remainingStoriesLiveData.observe(
             this
         ) {
@@ -140,7 +171,7 @@ class BottomNavigation :
     }
 
     private fun setListeners() {
-        val navHostFragment =
+        navHostFragment =
             supportFragmentManager.findFragmentById(
                 R.id.mainContainer
             ) as NavHostFragment
@@ -153,7 +184,7 @@ class BottomNavigation :
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             if (controller.graph[R.id.player] == destination) {
                 hidePlayerComponent()
-            } else if (binding.floatingPersistentPlayer.visibility != View.VISIBLE) {
+            } else if (binding.persistentPlayer.visibility != VISIBLE) {
                 showPlayerComponent()
             }
         }
@@ -175,9 +206,57 @@ class BottomNavigation :
                 this,
                 SubscribeActivity::class.java
             )
+        subscribeIntent.putExtra(
+            "ACTIVITY_NAME",
+            BottomNavigation::class.simpleName
+        )
         startActivity(
             subscribeIntent
         )
+    }
+
+    private fun updateSnackBarMessageDisplay() {
+        with(
+            binding
+        ) {
+            if (!TrackingUtility.hasCoreLocationPermissions(
+                    this@BottomNavigation
+                )
+            ) {
+                rlAllowLocationAccess.visibility =
+                    VISIBLE
+                rlAllowLocationAccess.setOnClickListener {
+                    requestPermissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                    )
+                }
+                ivCloseLocationMessage.setOnClickListener {
+                    rlAllowLocationAccess.visibility =
+                        GONE
+                }
+            }
+            if (Build.VERSION.SDK_INT >= 33 && !TrackingUtility.hasNotificationPermissions(
+                    this@BottomNavigation
+                )
+            ) {
+                rlAllowNotifications.visibility =
+                    VISIBLE
+                rlAllowNotifications.setOnClickListener {
+                    requestPermissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.POST_NOTIFICATIONS
+                        )
+                    )
+                }
+                ivCloseNotificationsMessage.setOnClickListener {
+                    rlAllowNotifications.visibility =
+                        GONE
+                }
+            }
+        }
     }
 
     private fun updateAvailableStoriesUI(
@@ -186,17 +265,18 @@ class BottomNavigation :
         with(
             binding
         ) {
-            val tickMarks = arrayOf(
-                tickMark1,
-                tickMark2,
-                tickMark3,
-                tickMark4,
-                tickMark5
-            )
+            val tickMarks =
+                arrayOf(
+                    tickMark1,
+                    tickMark2,
+                    tickMark3,
+                    tickMark4,
+                    tickMark5
+                )
 
             if (remainingStories < 0) {
                 llTickMarks.visibility =
-                    View.GONE
+                    GONE
             } else {
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
@@ -218,7 +298,7 @@ class BottomNavigation :
                     }
                 }
                 llTickMarks.visibility =
-                    View.VISIBLE
+                    VISIBLE
             }
         }
     }
@@ -226,63 +306,92 @@ class BottomNavigation :
     private fun updateConnectionUI(
         connectionAvailable: Boolean
     ) {
-        if (!connectionAvailable) {
-            binding.tvFeedbackMessage.text =
-                resources.getString(
-                    R.string.snack_bar_no_connection
-                )
-            binding.rlStatusFeedback.apply {
-                setBackgroundColor(
-                    ContextCompat.getColor(
-                        this@BottomNavigation,
-                        R.color.autio_blue_20
-                    )
-                )
-                visibility =
-                    View.VISIBLE
-            }
-        } else {
-            binding.rlStatusFeedback.visibility =
-                View.GONE
-        }
+        binding.rlNoInternetConnection.visibility =
+            if (!connectionAvailable)
+                VISIBLE
+            else
+                GONE
     }
 
     private fun updatePlayer(
         story: Story?
     ) {
-        binding.tvFloatingPlayerTitle.text =
-            story?.title
-        binding.tvFloatingPlayerNarrator.text =
-            story?.narrator
+        with(
+            binding
+        ) {
+            tvFloatingPlayerTitle.text =
+                story?.title
+                    ?: resources.getText(
+                        R.string.no_story_loaded
+                    )
+            tvFloatingPlayerNarrator.text =
+                story?.narrator
+            tvFloatingPlayerNarrator.visibility =
+                if (story?.narrator?.isNotEmpty() == true) VISIBLE else GONE
+        }
     }
 
     private fun hidePlayerComponent() {
-        binding.floatingPersistentPlayer.animate()
+        binding.persistentPlayer.animate()
             .alpha(
                 0.0f
             )
             .translationY(
-                binding.floatingPersistentPlayer.height.toFloat()
+                binding.persistentPlayer.height.toFloat()
             )
             .withEndAction {
                 binding.mainContainer.requestLayout()
-                binding.floatingPersistentPlayer.visibility =
-                    View.GONE
+                binding.persistentPlayer.visibility =
+                    GONE
             }
     }
 
     private fun showPlayerComponent() {
-        binding.floatingPersistentPlayer.visibility =
-            View.VISIBLE
-        binding.floatingPersistentPlayer.animate()
+        binding.persistentPlayer.visibility =
+            VISIBLE
+        binding.persistentPlayer.animate()
             .alpha(
                 1.0f
             )
             .translationYBy(
-                -binding.floatingPersistentPlayer.height.toFloat()
+                -binding.persistentPlayer.height.toFloat()
             )
             .withEndAction {
                 binding.mainContainer.requestLayout()
             }
     }
+
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissionResults ->
+            if (permissionResults.keys.contains(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            ) {
+                if (permissionResults[Manifest.permission.ACCESS_FINE_LOCATION]!!) {
+                    binding.rlAllowLocationAccess.visibility =
+                        GONE
+                    val mapFragment =
+                        navHostFragment.childFragmentManager.fragments.first() as? MapFragment
+                    if (mapFragment != null) {
+                        mapFragment.locationPermissionGranted =
+                            true
+                        mapFragment.updateLocationUI()
+                    }
+                }
+            }
+            if (permissionResults.keys.contains(
+                    Manifest.permission.POST_NOTIFICATIONS
+                )
+            ) {
+                if (permissionResults[Manifest.permission.POST_NOTIFICATIONS]!!) {
+                    binding.rlAllowNotifications.visibility =
+                        GONE
+                }
+            }
+        }
 }

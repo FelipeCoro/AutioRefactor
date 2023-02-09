@@ -48,23 +48,23 @@ class SliderAdapter(
     }
 
     override fun onBindViewHolder(
-        viewHolder: SliderViewHolder?,
+        viewHolder: SliderViewHolder,
         position: Int
     ) {
-        Glide.with(
-            viewHolder!!.imageView
-        )
-            .load(
-                images[position]
-            )
-            .centerCrop()
-            .into(
-                viewHolder.imageView
-            )
         viewHolder.textViewTitle.text =
             titleList[position]
         viewHolder.textViewSubText.text =
             textSubList[position]
+        Glide.with(
+            viewHolder.imageView
+        )
+            .load(
+                images[position]
+            )
+            .fitCenter()
+            .into(
+                viewHolder.imageView
+            )
     }
 
     class SliderViewHolder(

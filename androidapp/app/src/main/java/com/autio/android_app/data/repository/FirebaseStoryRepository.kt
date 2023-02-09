@@ -4,7 +4,7 @@ import android.util.Log
 import com.autio.android_app.data.model.bookmarks.Bookmark
 import com.autio.android_app.data.model.history.History
 import com.autio.android_app.data.model.likes.Like
-import com.autio.android_app.data.model.story.CategoryResponse
+import com.autio.android_app.data.model.story.Category
 import com.autio.android_app.data.model.story.Story
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -16,6 +16,7 @@ import kotlinx.coroutines.tasks.await
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
+// TODO: Delete repository once endpoints from staging are in production
 class FirebaseStoryRepository {
     companion object {
         private val rootRef =
@@ -62,8 +63,8 @@ class FirebaseStoryRepository {
                     story?.id =
                         it.key!!
                     story?.category =
-                        CategoryResponse(
-                            it.child(
+                        Category(
+                            firebaseId = it.child(
                                 "categoryId"
                             ).value as? String
                                 ?: "",
@@ -98,7 +99,7 @@ class FirebaseStoryRepository {
 
         suspend fun getCategory(
             categoryId: String?,
-            onSuccessListener: ((CategoryResponse) -> Unit)? = null,
+            onSuccessListener: ((Category) -> Unit)? = null,
         ) {
             try {
                 if (categoryId == null) return
@@ -109,13 +110,12 @@ class FirebaseStoryRepository {
                         .get()
                         .await()
                 if (category.exists()) onSuccessListener?.invoke(
-                    CategoryResponse(
-                        category.key!!,
-                        category.child(
+                    Category(
+                        title = category.child(
                             "title"
                         ).value as? String
                             ?: "",
-                        category.child(
+                        order = category.child(
                             "order"
                         ).value as? Int
                             ?: 0
@@ -217,7 +217,7 @@ class FirebaseStoryRepository {
             }
         }
 
-        fun removeBookmark(
+        fun removeBookmarkFromStory(
             userId: String,
             storyId: String,
             onSuccessListener: (() -> Unit)? = null,
@@ -230,6 +230,32 @@ class FirebaseStoryRepository {
                     .child(
                         storyId
                     )
+                    .removeValue()
+                    .addOnSuccessListener {
+                        onSuccessListener?.invoke()
+                    }
+                    .addOnFailureListener {
+                        onFailureListener?.invoke()
+                    }
+            } catch (e: Exception) {
+                Log.e(
+                    "FirebaseStoryRepository",
+                    "exception: ",
+                    e
+                )
+                onFailureListener?.invoke()
+            }
+        }
+
+        fun removeAllBookmarks(
+            userId: String,
+            onSuccessListener: (() -> Unit)? = null,
+            onFailureListener: (() -> Unit)? = null
+        ) {
+            try {
+                bookmarksRef.child(
+                    userId
+                )
                     .removeValue()
                     .addOnSuccessListener {
                         onSuccessListener?.invoke()
@@ -373,6 +399,37 @@ class FirebaseStoryRepository {
             }
         }
 
+        fun removeAllLikes(
+            userId: String,
+            storyIds: List<String>,
+            onSuccessListener: (() -> Unit)? = null,
+            onFailureListener: (() -> Unit)? = null
+        ) {
+            try {
+                val userLikedStories =
+                    storyIds.associate {
+                        "$it/$userId" to null
+                    }
+                likesRef
+                    .updateChildren(
+                        userLikedStories
+                    )
+                    .addOnSuccessListener {
+                        onSuccessListener?.invoke()
+                    }
+                    .addOnFailureListener {
+                        onFailureListener?.invoke()
+                    }
+            } catch (e: Exception) {
+                Log.e(
+                    "FirebaseStoryRepository",
+                    "exception: ",
+                    e
+                )
+                onFailureListener?.invoke()
+            }
+        }
+
         suspend fun getUserStoriesHistory(
             userId: String
         ): Array<History> {
@@ -399,9 +456,10 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                val listenedAt = DateTimeFormatter.ISO_INSTANT.format(
-                    Instant.now()
-                )
+                val listenedAt =
+                    DateTimeFormatter.ISO_INSTANT.format(
+                        Instant.now()
+                    )
                 playedHistoryRef.child(
                     userId
                 )
@@ -417,7 +475,9 @@ class FirebaseStoryRepository {
                         )
                     )
                     .addOnSuccessListener {
-                        onSuccessListener?.invoke(listenedAt)
+                        onSuccessListener?.invoke(
+                            listenedAt
+                        )
                     }
                     .addOnFailureListener {
                         onFailureListener?.invoke()

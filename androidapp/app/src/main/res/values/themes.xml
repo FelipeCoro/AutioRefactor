@@ -102,6 +102,21 @@
             16sp
         </item>
     </style>
+
+    <style name="TextViewInterNotSelected" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue_40
+        </item>
+        <item name="android:textSize">
+            16sp
+        </item>
+        <item name="android:textStyle">
+            bold
+        </item>
+    </style>
     <!-- TexView Inter Regular  -->
     <style name="TextViewInterRegularLight" parent="ThemeOverlay.AppCompat">
         <item name="android:fontFamily">
@@ -111,7 +126,7 @@
             @color/gray_letter
         </item>
         <item name="android:textSize">
-            14sp
+            16sp
         </item>
     </style>
 
@@ -186,7 +201,7 @@
 
     <style name="BoldTitle2" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">
-            @font/playfair_bold
+            @font/new_york_large_medium
         </item>
         <item name="android:textSize">
             20sp
@@ -199,9 +214,21 @@
         </item>
     </style>
 
-    <style name="SelectedStoryTitle" parent="TextAppearance.AppCompat">
+    <style name="SFPROTitle" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">
-            @font/playfair_medium
+            @font/sf_pro_text_bold
+        </item>
+        <item name="android:textSize">
+            30sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <style name="StoryTitle" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/new_york_large_medium
         </item>
         <item name="android:textSize">
             18sp
@@ -211,7 +238,7 @@
         </item>
     </style>
 
-    <style name="SelectedStoryNarrator" parent="TextAppearance.AppCompat">
+    <style name="StoryNarrator" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">
             @font/sf_pro_text_regular
         </item>
@@ -221,11 +248,14 @@
         <item name="android:textColor">
             @color/autio_blue_40
         </item>
+        <item name="android:textAllCaps">
+            true
+        </item>
     </style>
 
     <style name="SmallerTitle" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">
-            @font/playfair_medium
+            @font/new_york_large_medium
         </item>
         <item name="android:textSize">
             20sp
@@ -235,7 +265,22 @@
         </item>
     </style>
 
-    <style name="BodyText" parent="TextAppearance.AppCompat">
+    <style name="SFSubtitle" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_compact_text_regular
+        </item>
+        <item name="android:textSize">
+            12sp
+        </item>
+        <item name="android:textColor">
+            @color/gray_letter
+        </item>
+        <item name="android:textAllCaps">
+            true
+        </item>
+    </style>
+
+    <style name="NoContentText" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">
             @font/sf_pro_text_regular
         </item>
@@ -247,7 +292,19 @@
         </item>
     </style>
 
-    <style name="ButtonText" parent="TextAppearance.AppCompat">
+    <style name="TextButton" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            16sp
+        </item>
+        <item name="android:textColor">
+            @color/gray_letter
+        </item>
+    </style>
+
+    <style name="ButtonContentText" parent="TextAppearance.AppCompat">
         <item name="android:fontFamily">
             @font/sf_pro_text_regular
         </item>
@@ -256,6 +313,54 @@
         </item>
         <item name="android:textColor">
             @color/autio_blue
+        </item>
+    </style>
+
+    <style name="BottomSnackBarText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            14sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+    </style>
+
+    <style name="WarningText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            16sp
+        </item>
+        <item name="android:textColor">
+            @color/red
+        </item>
+    </style>
+
+    <style name="PopupOptionText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            14sp
+        </item>
+        <item name="android:textColor">
+            @color/normal_text
+        </item>
+    </style>
+
+    <style name="SmallProText" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            12sp
+        </item>
+        <item name="android:textColor">
+            @color/gray_letter
         </item>
     </style>
 
@@ -274,7 +379,7 @@
             @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
-            5dp
+            10dp
         </item>
         <item name="textAllCaps">
             false
@@ -284,6 +389,9 @@
         </item>
         <item name="android:letterSpacing">
             0
+        </item>
+        <item name="android:maxWidth">
+            232dp
         </item>
     </style>
     <!-- Outlined button with hard stroke -->
@@ -323,6 +431,39 @@
         </item>
         <item name="android:paddingVertical">
             12dp
+        </item>
+    </style>
+
+    <style name="Button.Active.Outlined.StrongStroke.White" parent="ThemeOverlay.AppCompat">
+        <item name="backgroundTint">
+            @color/transparent
+        </item>
+        <item name="android:stateListAnimator">
+            @null
+        </item>
+        <item name="android:textColor">
+            @color/autio_white
+        </item>
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            15sp
+        </item>
+        <item name="cornerRadius">
+            10dp
+        </item>
+        <item name="textAllCaps">
+            false
+        </item>
+        <item name="strokeWidth">
+            1dp
+        </item>
+        <item name="strokeColor">
+            @color/autio_white
+        </item>
+        <item name="android:letterSpacing">
+            0
         </item>
     </style>
     <!-- Outlined button with soft stroke -->
@@ -463,27 +604,6 @@
         </item>
     </style>
 
-    <!-- Button Style   -->
-    <style name="Button.Gray" parent="ThemeOverlay.AppCompat">
-        <item name="android:backgroundTint">
-            @color/gray_letter
-        </item>
-        <item name="android:textColor">
-            @color/white
-        </item>
-        <item name="android:fontFamily">
-            @font/sf_pro_text_regular
-        </item>
-        <item name="cornerRadius">
-            5dp
-        </item>
-        <item name="textAllCaps">
-            false
-        </item>
-        <item name="android:letterSpacing">
-            0
-        </item>
-    </style>
     <!-- Button Style White-->
     <style name="Button.White" parent="ThemeOverlay.AppCompat">
         <item name="android:backgroundTint">
@@ -492,11 +612,17 @@
         <item name="android:textColor">
             @color/blue
         </item>
+        <item name="strokeWidth">
+            1dp
+        </item>
+        <item name="strokeColor">
+            @color/autio_white
+        </item>
         <item name="android:fontFamily">
             @font/sf_pro_text_regular
         </item>
         <item name="cornerRadius">
-            5dp
+            10dp
         </item>
         <item name="textAllCaps">
             false
@@ -523,7 +649,10 @@
             @color/button_border
         </item>
         <item name="cornerRadius">
-            5dp
+            10dp
+        </item>
+        <item name="android:textSize">
+            15sp
         </item>
         <item name="textAllCaps">
             false
@@ -553,13 +682,16 @@
             @color/button_border
         </item>
         <item name="cornerRadius">
-            5dp
+            10dp
         </item>
         <item name="textAllCaps">
             false
         </item>
         <item name="android:letterSpacing">
             0
+        </item>
+        <item name="android:maxWidth">
+            232dp
         </item>
     </style>
     <!-- Button Shape Strong Style   -->
@@ -580,7 +712,7 @@
             @color/blue
         </item>
         <item name="cornerRadius">
-            5dp
+            10dp
         </item>
         <item name="android:textSize">
             15sp
@@ -590,6 +722,12 @@
         </item>
         <item name="android:letterSpacing">
             0
+        </item>
+        <item name="android:minWidth">
+            132dp
+        </item>
+        <item name="android:maxWidth">
+            132dp
         </item>
     </style>
 
@@ -605,7 +743,7 @@
         </item>
     </style>
     <!-- BottomNavigationView  -->
-    <style name="BottomNavigationViewAutio" parent="ThemeOverlay.AppCompat">
+    <style name="BottomNavigationViewAutio" parent="Widget.Design.BottomNavigationView">
         <item name="background">
             @color/bn_background
         </item>
@@ -613,7 +751,19 @@
             @color/unselected_item
         </item>
         <item name="itemIconTint">
-            @color/unselected_item
+            @drawable/bottom_navigation_selector
+        </item>
+        <item name="itemTextColor">
+            @drawable/bottom_navigation_selector
+        </item>
+        <item name="itemTextAppearanceActive">
+            @style/TextViewInterRegular
+        </item>
+        <item name="itemTextAppearance">
+            @style/TextViewInterNotSelected
+        </item>
+        <item name="android:minHeight">
+            0dp
         </item>
     </style>
     <!--  CardView Subscribe  -->

@@ -6,127 +6,118 @@
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
     tools:context=".ui.view.usecases.home.fragment.AccountFragment">
+
     <LinearLayout
         android:id="@+id/linear_layout_sign_in"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
         android:visibility="gone"
-        android:weightSum="3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-        <androidx.constraintlayout.widget.ConstraintLayout
+
+        <TextView
+            android:id="@+id/tvUnassignedMessage"
+            style="@style/TextViewInterRegular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingHorizontal="50dp">
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/guest_authenticate_message"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/textView2"
-                style="@style/TextViewInterRegular"
-                android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="36dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvUnassignedMessage">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignIn"
+                style="@style/Button.Shape"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="60dp"
-                android:gravity="center"
-                android:text="@string/guest_authenticate_message"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginEnd="7dp"
+                android:layout_weight="1"
+                android:text="@string/sign_in" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSignUp"
+                style="@style/Button.Active.Filled"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="45dp"
-                android:orientation="horizontal"
-                android:weightSum="2"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSignIn"
-                    style="@style/Button.Shape"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_weight="1"
-                    android:text="@string/sign_in" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSignUp"
-                    style="@style/Button.Active.Filled"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
-                    android:layout_weight="1"
-                    android:text="@string/sign_up" />
-            </LinearLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_marginStart="7dp"
+                android:layout_weight="1"
+                android:text="@string/sign_up" />
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/divider" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <TextView
+            android:id="@+id/textView3"
+            style="@style/TextViewInterRegular"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:paddingHorizontal="50dp">
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:text="@string/autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/textView3"
-                style="@style/TextViewInterRegular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
-                android:gravity="center"
-                android:text="@string/autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <Button
-                style="@style/Button.Strong"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="45dp"
-                android:text="@string/see_plans"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            style="@style/Button.Strong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="28dp"
+            android:layout_marginBottom="36dp"
+            android:text="@string/see_plans"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/divider" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/tvContactSupport"
+            style="@style/TextViewInterRegularLight"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="50dp">
+            android:layout_marginHorizontal="50dp"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:text="@string/contact_support"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/tv_guest_contact_autio"
-                style="@style/TextViewInterRegularLight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/guest_contact_autio"
-                android:layout_marginTop="40dp"
-                android:layout_marginBottom="45dp"
-                android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <include
+            android:id="@+id/lyYoutubeGuest"
+            layout="@layout/youtube_link_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="@+id/tvQuestionsAbout"
+            app:layout_constraintStart_toStartOf="@+id/tvQuestionsAbout"
+            app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout" />
 
     </LinearLayout>
 
@@ -142,50 +133,78 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/iv_account"
+            <FrameLayout
+                android:id="@+id/flBanner"
                 android:layout_width="match_parent"
-                android:layout_height="375dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/account_image_2"
+                android:layout_height="424dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintBottom_toBottomOf="@+id/iv_account"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/iv_account">
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <ImageView
+                    android:id="@+id/iv_account"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/lora_regular"
-                    android:text="@string/a_story_for_everyone"
-                    android:textColor="@color/white"
-                    android:textSize="24sp" />
+                    android:scaleType="fitXY"
+                    android:src="@drawable/account_header" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:text="@string/share_20_off_autio_s_annual_nsubscription_with_a_friend"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_account"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
 
-                <Button
-                    style="@style/Button.White"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="42dp"
-                    android:text="@string/send_20_off_to_a_friend" />
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/new_york_small_medium"
+                        android:gravity="center"
+                        android:text="@string/account_header_title"
+                        android:textColor="@color/white"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:gravity="center"
+                        android:lineSpacingExtra="3sp"
+                        android:paddingHorizontal="23dp"
+                        android:text="@string/account_header_subtitle"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="42dp"
+                        android:orientation="vertical">
+
+                        <Button
+                            android:id="@+id/btnGift"
+                            style="@style/Button.White"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="12dp"
+                            android:text="@string/gift_autio"
+                            app:icon="@drawable/ic_gift"
+                            app:iconTint="@color/blue" />
+
+                        <Button
+                            android:id="@+id/btnSendDiscount"
+                            style="@style/Button.Active.Outlined.StrongStroke.White"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="20dp"
+                            android:text="@string/send_20_off_to_a_friend" />
+                    </LinearLayout>
+                </LinearLayout>
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/ly_account_status"
@@ -195,16 +214,17 @@
                 android:layout_marginTop="21dp"
                 android:gravity="center"
                 android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/iv_account">
+                app:layout_constraintTop_toBottomOf="@+id/flBanner">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/account_status"
-                    android:textSize="12sp"
-                    android:textColor="@color/gray_letter" />
+                    android:textColor="@color/gray_letter"
+                    android:textSize="12sp" />
 
                 <TextView
+                    android:id="@+id/tvPlanStatus"
                     style="@style/TextViewLoraBoldTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -216,86 +236,100 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="18dp"
-                    android:background="@color/divider" />
+                    android:background="@color/normal_text" />
 
                 <TextView
+                    android:id="@+id/tvManageSubscription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:textSize="16sp"
-                    android:text="@string/manage_subscription" />
+                    android:text="@string/manage_subscription"
+                    android:textSize="16sp" />
             </LinearLayout>
 
-            <LinearLayout
+            <View
+                android:id="@+id/viewDivider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="38dp"
+                android:background="@color/autio_blue_7"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ly_account_status" />
+
+            <RelativeLayout
                 android:id="@+id/lyProfile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="42dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/ly_account_status">
+                app:layout_constraintTop_toBottomOf="@id/viewDivider1">
 
                 <TextView
+                    android:id="@+id/tvProfileHeader"
                     style="@style/TextViewLoraBoldTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginBottom="17dp"
                     android:text="@string/profile"
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/tvProfileSubtitle"
+                    style="@style/SFSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:text="@string/name"
-                    android:textColor="@color/normal_text"
-                    android:textSize="12sp" />
+                    android:layout_below="@id/tvProfileHeader"
+                    android:layout_marginStart="18dp"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/personal_information" />
 
                 <EditText
-                    android:id="@+id/et_name"
+                    android:id="@+id/etName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/tvProfileSubtitle"
+                    android:layout_marginHorizontal="18dp"
                     android:backgroundTint="@color/gray_letter"
                     android:fontFamily="@font/sf_pro_text_regular"
+                    android:paddingBottom="7dp"
                     android:textColor="@color/gray_letter"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:text="@string/email"
-                    android:textColor="@color/normal_text"
                     android:textSize="12sp" />
 
                 <EditText
                     android:id="@+id/et_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/etName"
+                    android:layout_marginHorizontal="18dp"
                     android:backgroundTint="@color/gray_letter"
                     android:fontFamily="@font/sf_pro_text_regular"
+                    android:paddingBottom="7dp"
                     android:textColor="@color/gray_letter"
                     android:textSize="12sp" />
 
                 <LinearLayout
-                    android:id="@+id/ly_update_profile"
+                    android:id="@+id/llUpdateProfileButtons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/et_email"
+                    android:layout_marginHorizontal="50dp"
                     android:layout_marginVertical="8dp"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:visibility="gone"
-                    android:weightSum="2">
+                    android:weightSum="2"
+                    tools:visibility="visible">
 
                     <Button
                         android:id="@+id/btn_update_profile"
                         style="@style/Button.Active.Filled"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginEnd="7dp"
                         android:layout_weight="1"
-                        android:text="Update"
+                        android:text="@string/update"
                         android:textColor="@color/white" />
 
                     <Button
@@ -303,15 +337,17 @@
                         style="@style/Button.Shape.transparent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginStart="7dp"
                         android:layout_weight="1"
-                        android:text="Cancel" />
+                        android:text="@string/cancel" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ly_change_password"
+                    android:id="@+id/llChangePasswordForm"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/llUpdateProfileButtons"
+                    android:layout_marginHorizontal="18dp"
                     android:orientation="vertical"
                     android:visibility="gone">
 
@@ -320,7 +356,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:text="CURRENT PASSWORD"
+                        android:text="@string/current_password"
+                        android:textAllCaps="true"
                         android:textColor="@color/normal_text"
                         android:textSize="12sp" />
 
@@ -338,7 +375,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:text="NEW PASSWORD"
+                        android:text="@string/new_password"
+                        android:textAllCaps="true"
                         android:textColor="@color/normal_text"
                         android:textSize="12sp" />
 
@@ -356,7 +394,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:text="CONFIRM PASSWORD"
+                        android:text="@string/confirm_password"
+                        android:textAllCaps="true"
                         android:textColor="@color/normal_text"
                         android:textSize="12sp" />
 
@@ -371,20 +410,21 @@
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/ly_btns_change_password"
+                    android:id="@+id/llChangePasswordButtons"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/llChangePasswordForm"
+                    android:layout_marginHorizontal="50dp"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:visibility="gone"
-                    android:weightSum="2">
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/btn_update_password"
-                        style="@style/Button.Gray"
+                        style="@style/Button.Active.Filled"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
+                        android:layout_marginEnd="7dp"
                         android:layout_weight="1"
                         android:text="@string/update" />
 
@@ -393,7 +433,7 @@
                         style="@style/Button.Shape.transparent"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginHorizontal="8dp"
+                        android:layout_marginStart="7dp"
                         android:layout_weight="1"
                         android:text="@string/cancel" />
 
@@ -404,11 +444,12 @@
                     style="@style/Button.Shape.transparent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_below="@id/llChangePasswordButtons"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginTop="16dp"
                     android:text="@string/change_password" />
 
-            </LinearLayout>
+            </RelativeLayout>
 
             <LinearLayout
                 android:id="@+id/lyInterests"
@@ -423,102 +464,90 @@
                     style="@style/TextViewLoraBoldTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/interests"
+                    android:text="@string/categories"
                     android:textSize="20sp" />
 
                 <TextView
+                    style="@style/SFSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:text="@string/organize_your_interests_from_the_top_down"
-                    android:textColor="@color/normal_text"
-                    android:textSize="12sp" />
+                    android:layout_marginTop="15dp"
+                    android:text="@string/organize_your_interests_from_the_top_down" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view_interests"
+                    android:id="@+id/rvInterests"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginVertical="8dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@color/fragment_background"
+                    android:nestedScrollingEnabled="false"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/item_interest" />
 
                 <Button
-                    style="@style/Button.Gray"
+                    android:id="@+id/btnSaveCategoriesChanges"
+                    style="@style/Button.Active.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/saves_changes" />
+                    android:layout_marginTop="30dp"
+                    android:text="@string/save_changes"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
             </LinearLayout>
 
             <View
                 android:id="@+id/viewDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="60dp"
                 android:background="@color/divider"
                 app:layout_constraintTop_toBottomOf="@+id/lyInterests" />
 
             <TextView
                 android:id="@+id/tvQuestionsAbout"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginTop="24dp"
-                android:text="@string/user_questions"
+                android:gravity="center"
+                android:text="@string/contact_support"
                 android:textColor="@color/gray_letter"
-                android:textSize="12sp"
+                android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/viewDivider" />
 
-            <RelativeLayout
-                android:id="@+id/rlWatchHowWorks"
+            <include
+                android:id="@+id/lyYoutubeLink"
+                layout="@layout/youtube_link_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:gravity="center"
                 app:layout_constraintEnd_toEndOf="@+id/tvQuestionsAbout"
                 app:layout_constraintStart_toStartOf="@+id/tvQuestionsAbout"
-                app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout">
-
-                <TextView
-                    android:id="@+id/tvWatchWorks"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/watch_how_it_works"
-                    android:textColor="@color/normal_text"
-                    android:textSize="16sp" />
-
-                <ImageView
-                    android:layout_width="19dp"
-                    android:layout_height="19dp"
-                    android:layout_marginStart="4dp"
-                    android:layout_toEndOf="@+id/tvWatchWorks"
-                    android:src="@drawable/ic_player_play"
-                    app:tint="@color/button_background" />
-
-            </RelativeLayout>
+                app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout" />
 
             <LinearLayout
-                android:id="@+id/lyConactButtons"
-                android:layout_width="wrap_content"
+                android:id="@+id/lyContactButtons"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginTop="40dp"
                 android:orientation="horizontal"
-                android:weightSum="2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/rlWatchHowWorks">
+                app:layout_constraintTop_toBottomOf="@+id/lyYoutubeLink">
 
                 <Button
                     android:id="@+id/btn_contact"
                     style="@style/Button.Shape.transparent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="4dp"
+                    android:layout_marginEnd="7dp"
                     android:layout_weight="1"
-                    android:paddingHorizontal="16dp"
                     android:text="@string/contact" />
 
                 <Button
@@ -526,32 +555,31 @@
                     style="@style/Button.Active.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
+                    android:layout_marginStart="7dp"
                     android:layout_weight="1"
-                    android:paddingHorizontal="16dp"
                     android:text="@string/log_out" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tvRestorePurchase"
+                style="@style/TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="36dp"
+                android:text="@string/restore_purchase_underlined"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="@+id/lyContactButtons"
+                app:layout_constraintStart_toStartOf="@+id/lyContactButtons"
+                app:layout_constraintTop_toBottomOf="@+id/lyContactButtons" />
+
+            <TextView
+                android:id="@+id/btnDeleteAccount"
+                style="@style/WarningText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/restore_purchase"
-                android:textColor="@color/gray_letter"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="@+id/lyConactButtons"
-                app:layout_constraintStart_toStartOf="@+id/lyConactButtons"
-                app:layout_constraintTop_toBottomOf="@+id/lyConactButtons" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:layout_marginBottom="180dp"
                 android:text="@string/delete_my_account"
-                android:textColor="@color/red"
-                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/tvRestorePurchase"
                 app:layout_constraintStart_toStartOf="@+id/tvRestorePurchase"

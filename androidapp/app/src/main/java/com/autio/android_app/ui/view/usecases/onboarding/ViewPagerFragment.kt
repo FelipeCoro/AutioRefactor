@@ -42,7 +42,8 @@ class ViewPagerFragment :
 
         binding.viewPager.adapter =
             adapter
-        binding.viewPager.isUserInputEnabled = false
+        binding.viewPager.isUserInputEnabled =
+            false
 
         return binding.root
     }

@@ -5,12 +5,16 @@ import java.io.Serializable
 
 data class PlaysResponse(
     val play: Play,
-    @SerializedName("plays_remaining")
-    val playsRemaining : Int
+    @SerializedName(
+        "plays_remaining"
+    )
+    val playsRemaining: Int
 ) : Serializable
 
 data class Play(
     val id: Int,
-    @SerializedName("firebase_story_identifier")
+    @SerializedName(
+        "firebase_story_identifier"
+    )
     val firebaseId: String
 )

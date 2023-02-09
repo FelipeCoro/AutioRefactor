@@ -37,7 +37,7 @@
         #171E50
     </color>
     <color name="red">
-        #AEFF0000
+        #F62B16
     </color>
     <color name="blue_background">
         #393F6A
@@ -135,7 +135,7 @@
         #090E42
     </color>
     <color name="persistent_player_next">
-        #FFFFFF
+        #393F6A
     </color>
     <color name="location_icon">
         #FFFFFF

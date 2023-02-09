@@ -1,6 +1,5 @@
 package com.autio.android_app.data.database.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.autio.android_app.data.model.story.Story
 import kotlinx.coroutines.flow.Flow
@@ -15,9 +14,14 @@ interface StoryDao {
     ): Array<Long>
 
     @Query(
+        "SELECT * FROM stories"
+    )
+    suspend fun allStories(): List<Story>
+
+    @Query(
         "SELECT * FROM stories ORDER BY id ASC"
     )
-    fun readLiveStories(): LiveData<List<Story>>
+    fun readLiveStories(): Flow<List<Story>>
 
     @Query(
         "SELECT * FROM stories WHERE " +
@@ -107,6 +111,11 @@ interface StoryDao {
     )
 
     @Query(
+        "UPDATE stories SET isBookmarked = 0"
+    )
+    fun removeAllBookmarks()
+
+    @Query(
         "SELECT * FROM stories WHERE isLiked = 1"
     )
     fun getFavoriteStories(): Flow<List<Story>>
@@ -126,7 +135,7 @@ interface StoryDao {
     @Query(
         "SELECT * FROM stories WHERE listenedAt != '' ORDER BY listenedAt DESC"
     )
-    fun getHistory() : Flow<List<Story>>
+    fun getHistory(): Flow<List<Story>>
 
     @Query(
         "UPDATE stories SET listenedAt = :listenedAt WHERE id = :storyId"
@@ -134,6 +143,13 @@ interface StoryDao {
     fun setListenedAtData(
         storyId: String,
         listenedAt: String
+    )
+
+    @Query(
+        "UPDATE stories SET listenedAtLeast30Secs = true WHERE id = :storyId"
+    )
+    fun markStoryAsListenedAtLeast30Secs(
+        storyId: String
     )
 
     @Query(
@@ -191,6 +207,11 @@ interface StoryDao {
         id: Int,
         recordUrl: String
     )
+
+    @Query(
+        "UPDATE stories SET isLiked = 0, isBookmarked = 0, isDownloaded = 0, listenedAt = '', listenedAtLeast30Secs = false"
+    )
+    fun clearUserData()
 
     @Query(
         "UPDATE stories SET recordUrl = ''"

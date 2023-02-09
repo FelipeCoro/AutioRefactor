@@ -35,7 +35,7 @@ object InjectorUtils {
                 context,
                 PlayerService::class.java
             ),
-            (applicationContext as CoreApplication).storyRepository
+            (applicationContext as CoreApplication).appContainer.storyRepository
         )
     }
 
@@ -45,7 +45,18 @@ object InjectorUtils {
         val applicationContext =
             context.applicationContext as Application
         return StoryViewModel.Factory(
-            (applicationContext as CoreApplication).storyRepository
+            (applicationContext as CoreApplication).appContainer.storyRepository
+        )
+    }
+
+    fun providePurchaseViewModel(
+        context: Context
+    ): PurchaseViewModel.Factory {
+        val applicationContext =
+            context.applicationContext as CoreApplication
+
+        return PurchaseViewModel.Factory(
+            applicationContext.appContainer.revenueCatRepository
         )
     }
 
@@ -53,7 +64,7 @@ object InjectorUtils {
         context: Context
     ): BottomNavigationViewModel.Factory {
         val applicationContext =
-            context.applicationContext as Application
+            context.applicationContext as CoreApplication
         val playerServiceConnection =
             providePlayerServiceConnection(
                 applicationContext
@@ -61,7 +72,19 @@ object InjectorUtils {
         return BottomNavigationViewModel.Factory(
             applicationContext,
             playerServiceConnection,
-            (applicationContext as CoreApplication).storyRepository
+            applicationContext.appContainer.storyRepository,
+//            applicationContext.appContainer.applicationRepository
+        )
+    }
+
+    fun provideAccountFragmentViewModel(
+        context: Context
+    ): AccountFragmentViewModel.Factory {
+        val applicationContext =
+            context.applicationContext as Application
+        return AccountFragmentViewModel.Factory(
+            applicationContext,
+            (applicationContext as CoreApplication).appContainer.storyRepository
         )
     }
 
@@ -79,7 +102,7 @@ object InjectorUtils {
             applicationContext as Application,
             mediaId,
             playerServiceConnection,
-            (applicationContext as CoreApplication).storyRepository
+            (applicationContext as CoreApplication).appContainer.storyRepository
         )
     }
 

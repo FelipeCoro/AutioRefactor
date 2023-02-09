@@ -4,29 +4,34 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.view.ViewGroup
-import androidx.core.widget.doOnTextChanged
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.model.account.ChangePasswordDto
-import com.autio.android_app.data.model.account.UpdateProfileDto
-import com.autio.android_app.data.model.interest.InterestProvider
+import com.autio.android_app.data.model.story.Category
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
 import com.autio.android_app.extensions.makeLinks
-import com.autio.android_app.ui.view.usecases.home.adapter.InterestAdapter
+import com.autio.android_app.ui.view.usecases.home.adapter.CategoryAdapter
 import com.autio.android_app.ui.view.usecases.login.LoginActivity
 import com.autio.android_app.ui.view.usecases.login.SignInActivity
 import com.autio.android_app.ui.view.usecases.login.SignUpActivity
+import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
+import com.autio.android_app.ui.viewmodel.PurchaseViewModel
+import com.autio.android_app.ui.viewmodel.StoryViewModel
 import com.autio.android_app.util.*
+import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.bumptech.glide.Glide
-import java.util.*
+import com.revenuecat.purchases.CustomerInfo
+import java.io.File
 
 class AccountFragment :
     Fragment() {
@@ -36,21 +41,136 @@ class AccountFragment :
         )
     }
 
-    private var _binding: FragmentAccountBinding? =
-        null
-    private val binding get() = _binding!!
-    private val interestList =
-        InterestProvider.getInterests()
+    private val accountFragmentViewModel by viewModels<AccountFragmentViewModel> {
+        InjectorUtils.provideAccountFragmentViewModel(
+            requireContext()
+        )
+    }
+    private val storyViewModel by viewModels<StoryViewModel> {
+        InjectorUtils.provideStoryViewModel(
+            requireContext()
+        )
+    }
+    private val purchaseViewModel by viewModels<PurchaseViewModel> {
+        InjectorUtils.providePurchaseViewModel(
+            requireContext()
+        )
+    }
 
-    private val apiService =
-        ApiService()
+    private lateinit var binding: FragmentAccountBinding
+
+    private var name =
+        ""
+    private var email =
+        ""
+    private val originalCategories =
+        arrayListOf<Category>()
+    private val tempCategories =
+        arrayListOf<Category>()
+
+    private val itemTouchHelper by lazy {
+        val simpleItemTouchCallback =
+            object :
+                SimpleCallback(
+                    UP or DOWN or START or END,
+                    0
+                ) {
+                override fun onMove(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder,
+                    target: RecyclerView.ViewHolder
+                ): Boolean {
+                    val adapter =
+                        recyclerView.adapter as CategoryAdapter
+                    val from =
+                        viewHolder.absoluteAdapterPosition
+                    val to =
+                        target.absoluteAdapterPosition
+                    adapter.moveItem(
+                        from,
+                        to
+                    )
+                    adapter.notifyItemMoved(
+                        from,
+                        to
+                    )
+
+                    val category =
+                        tempCategories[from]
+                    tempCategories.remove(
+                        category
+                    )
+                    tempCategories.add(
+                        to,
+                        category
+                    )
+
+                    return true
+                }
+
+                override fun onSwiped(
+                    viewHolder: RecyclerView.ViewHolder,
+                    direction: Int
+                ) {
+                }
+
+                override fun onSelectedChanged(
+                    viewHolder: RecyclerView.ViewHolder?,
+                    actionState: Int
+                ) {
+                    super.onSelectedChanged(
+                        viewHolder,
+                        actionState
+                    )
+
+                    if (actionState == ACTION_STATE_DRAG) {
+                        viewHolder?.itemView?.alpha =
+                            0.5f
+                    }
+                }
+
+                override fun clearView(
+                    recyclerView: RecyclerView,
+                    viewHolder: RecyclerView.ViewHolder
+                ) {
+                    super.clearView(
+                        recyclerView,
+                        viewHolder
+                    )
+
+                    if (originalCategories == tempCategories) {
+                        binding.btnSaveCategoriesChanges.visibility =
+                            GONE
+                    } else {
+                        binding.btnSaveCategoriesChanges.visibility =
+                            VISIBLE
+                    }
+
+                    viewHolder.itemView.alpha =
+                        1.0f
+                }
+            }
+
+        ItemTouchHelper(
+            simpleItemTouchCallback
+        )
+    }
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+        super.onCreate(
+            savedInstanceState
+        )
+        accountFragmentViewModel.fetchUserData()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding =
+        binding =
             FragmentAccountBinding.inflate(
                 inflater,
                 container,
@@ -75,82 +195,177 @@ class AccountFragment :
     }
 
     private fun setListeners() {
-        binding.etName.doOnTextChanged { text, _, _, _ ->
-            run {
-                if (text?.toString()
-                        ?.equals(
-                            prefRepository.userName
-                        ) == false
-                ) binding.lyUpdateProfile.visibility =
-                    VISIBLE
+        // Updates UI based on subscription status
+        purchaseViewModel.customerInfo.observe(
+            viewLifecycleOwner
+        ) {
+            it?.let {
+                updateSubscriptionUI(
+                    it
+                )
             }
         }
 
-        binding.etEmail.doOnTextChanged { text, _, _, _ ->
-            run {
-                if (text?.toString()
-                        ?.equals(
-                            prefRepository.userEmail
-                        ) == false
-                ) binding.lyUpdateProfile.visibility =
-                    VISIBLE
+        // Listeners for buttons for subscription's buttons (status, gift, discount)
+        setSubscriptionRelatedListeners()
+
+        // Listeners for personal information text fields
+        setProfileListeners()
+
+        // Listeners for password form's buttons and text fields
+        setPasswordFormListeners()
+
+        // Categories order
+        binding.btnSaveCategoriesChanges.setOnClickListener {
+            updateCategories()
+        }
+
+        // Youtube links and other media listeners
+        setMediaLinksListeners()
+
+        // Write email to Autio's support team
+        setCustomerSupportListeners()
+
+        binding.btnDeleteAccount.setOnClickListener {
+//            apiService.deleteAccount()
+        }
+    }
+
+    private fun setSubscriptionRelatedListeners() {
+        with(
+            binding
+        ) {
+            btnGift.setOnClickListener {
+                openUrl(
+                    requireContext(),
+                    "https://app.autio.com/give"
+                )
             }
-        }
 
-        binding.btnChangePassword.setOnClickListener {
-            binding.lyChangePassword.visibility =
-                VISIBLE
-            binding.lyBtnsChangePassword.visibility =
-                VISIBLE
-            binding.btnChangePassword.visibility =
-                GONE
-        }
-
-        binding.btnCancelPassword.setOnClickListener {
-            binding.lyChangePassword.visibility =
-                GONE
-            binding.lyBtnsChangePassword.visibility =
-                GONE
-            binding.btnChangePassword.visibility =
-                VISIBLE
-        }
-
-        binding.btnUpdatePassword.setOnClickListener {
-            changeUserPassword()
-        }
-
-        binding.btnCancelUpdate.setOnClickListener {
-            binding.lyUpdateProfile.visibility =
-                GONE
-            getUserInfo()
-        }
-
-        binding.btnUpdateProfile.setOnClickListener {
-            updateUserData()
-        }
-
-        binding.rlWatchHowWorks.setOnClickListener {
-            openUrl(
-                requireContext(),
-                "https://www.youtube.com/watch?v=SvbahDL4aYc&ab_channel=Autio"
-            )
-        }
-
-        binding.btnContact.setOnClickListener {
-            writeEmailToCustomerSupport(
-                requireContext()
-            )
-        }
-
-        binding.tvGuestContactAutio.makeLinks(
-            Pair(
-                "Contact Autio",
-                View.OnClickListener {
-                    writeEmailToCustomerSupport(
-                        requireContext()
+            tvManageSubscription.setOnClickListener {
+                if (activity != null) {
+                    showPaywall(
+                        requireActivity()
                     )
-                })
-        )
+                }
+            }
+
+            btnSendDiscount.setOnClickListener {
+                // TODO: Create discount code from Google Play
+            }
+        }
+    }
+
+    private fun setProfileListeners() {
+        with(
+            binding
+        ) {
+            etName.doAfterTextChanged {
+                checkIfDataChanged()
+            }
+
+            etEmail.doAfterTextChanged {
+                checkIfDataChanged()
+            }
+
+            btnUpdateProfile.setOnClickListener {
+                updateUserData()
+            }
+
+            btnCancelUpdate.setOnClickListener {
+                llUpdateProfileButtons.visibility =
+                    GONE
+                getUserInfo()
+            }
+        }
+    }
+
+    private fun checkIfDataChanged() {
+        with(
+            binding
+        ) {
+            llUpdateProfileButtons.visibility =
+                if (etName.text.toString() != name
+                    || etEmail.text.toString() != email
+                ) VISIBLE else GONE
+        }
+    }
+
+    private fun setPasswordFormListeners() {
+        with(
+            binding
+        ) {
+            btnChangePassword.setOnClickListener {
+                llChangePasswordForm.visibility =
+                    VISIBLE
+                llChangePasswordButtons.visibility =
+                    VISIBLE
+                btnChangePassword.visibility =
+                    GONE
+            }
+
+            btnCancelPassword.setOnClickListener {
+                llChangePasswordForm.visibility =
+                    GONE
+                llChangePasswordButtons.visibility =
+                    GONE
+                btnChangePassword.visibility =
+                    VISIBLE
+            }
+
+            btnUpdatePassword.setOnClickListener {
+                changeUserPassword()
+            }
+        }
+    }
+
+    private fun setMediaLinksListeners() {
+        with(
+            binding
+        ) {
+            lyYoutubeLink.root.setOnClickListener {
+                openUrl(
+                    requireContext(),
+                    "https://www.youtube.com/watch?v=SvbahDL4aYc&ab_channel=Autio"
+                )
+            }
+
+            lyYoutubeGuest.root.setOnClickListener {
+                openUrl(
+                    requireContext(),
+                    "https://www.youtube.com/watch?v=SvbahDL4aYc&ab_channel=Autio"
+                )
+            }
+        }
+    }
+
+    private fun setCustomerSupportListeners() {
+        with(
+            binding
+        ) {
+            btnContact.setOnClickListener {
+                writeEmailToCustomerSupport(
+                    requireContext()
+                )
+            }
+
+            val contactSupport =
+                Pair(
+                    "Contact Autio",
+                    OnClickListener {
+                        writeEmailToCustomerSupport(
+                            requireContext()
+                        )
+                    })
+
+            tvQuestionsAbout.makeLinks(
+                contactSupport
+            )
+
+            tvContactSupport.makeLinks(
+                contactSupport
+            )
+        }
     }
 
     private fun updateUserData() {
@@ -165,24 +380,54 @@ class AccountFragment :
             )
         } else {
             val name =
-                binding.etName.text.toString()
+                "${binding.etName.text}"
             val email =
-                binding.etEmail.text.toString()
-            val infoUser =
-                UpdateProfileDto(
-                    email,
-                    name
-                )
-            apiService.updateProfile(
-                getUserId(),
-                getApiToken(),
-                getUserId(),
-                infoUser
-            ) {
-                if (it != null) {
-                    saveUserInfo(
-                        it
+                "${binding.etEmail.text}"
+            accountFragmentViewModel.updateProfile(
+                name,
+                email,
+                originalCategories,
+                onSuccess = {
+                    binding.llUpdateProfileButtons.visibility =
+                        GONE
+                    showToast(
+                        requireContext(),
+                        "Profile has been updated"
                     )
+                },
+                onFailure = {
+                    showError(
+                        requireContext()
+                    )
+                }
+            )
+        }
+    }
+
+    private fun updateSubscriptionUI(
+        customerInfo: CustomerInfo
+    ) {
+        with(
+            binding
+        ) {
+            if (customerInfo.entitlements[REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
+                tvPlanStatus.text =
+                    resources.getText(
+                        R.string.status_subscribed
+                    )
+                tvRestorePurchase.visibility =
+                    GONE
+            } else {
+                tvPlanStatus.text =
+                    resources.getText(
+                        R.string.no_plan_selected
+                    )
+                tvRestorePurchase.apply {
+                    setOnClickListener {
+                        purchaseViewModel.restorePurchase()
+                    }
+                    visibility =
+                        VISIBLE
                 }
             }
         }
@@ -214,15 +459,15 @@ class AccountFragment :
                     confirmPassword
                 )
             if (newPassword == confirmPassword) {
-                apiService.changePassword(
-                    getUserId(),
-                    getApiToken(),
+                ApiService.changePassword(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
                     passwordInfo
                 ) {
                     if (it != null) {
-                        binding.lyChangePassword.visibility =
+                        binding.llChangePasswordForm.visibility =
                             GONE
-                        binding.lyBtnsChangePassword.visibility =
+                        binding.llChangePasswordButtons.visibility =
                             GONE
                         binding.btnChangePassword.visibility =
                             VISIBLE
@@ -236,9 +481,38 @@ class AccountFragment :
         }
     }
 
+    private fun updateCategories() {
+        // This was implemented as this because of a bug in backend
+        // where order in which data was passed actually mattered
+        // TODO: Update to more optimal code after bug fix reported from backend
+        accountFragmentViewModel.saveCategoriesOrder(
+            tempCategories.mapIndexed { i, cat ->
+                Category(
+                    id = cat.id,
+                    order = i + 1,
+                    title = cat.title
+                )
+            }
+                .sortedBy { it.id },
+            onSuccess = {
+                showToast(
+                    requireContext(),
+                    "Profile has been updated"
+                )
+            },
+            onFailure = {
+                showError(
+                    requireContext()
+                )
+            }
+        )
+    }
+
     private fun getUserInfo() {
-        val name =
-            prefRepository.userName
+        name =
+            prefRepository.userName.trim()
+        email =
+            prefRepository.userEmail
         val email =
             prefRepository.userEmail
         binding.etName.setText(
@@ -254,26 +528,26 @@ class AccountFragment :
             binding.ivAccount
         )
             .load(
-                R.drawable.account_image_2
+                R.drawable.account_header
             )
             .fitCenter()
             .into(
                 binding.ivAccount
             )
 
-        if (isUserGuest()) {
+        if (prefRepository.isUserGuest) {
             binding.scrollViewAccount.visibility =
                 GONE
             binding.linearLayoutSignIn.visibility =
                 VISIBLE
         } else {
+            getUserInfo()
+
             binding.scrollViewAccount.visibility =
                 VISIBLE
             binding.linearLayoutSignIn.visibility =
                 GONE
         }
-
-        getUserInfo()
     }
 
     private fun intentFunctions() {
@@ -289,54 +563,65 @@ class AccountFragment :
     }
 
     private fun initRecyclerViewInterest() {
-        val adapter =
-            InterestAdapter(
-                interestList
-            )
-        val swipeGesture =
-            object :
-                SwipeGesture(
-                    context
-                ) {
-                override fun onMove(
-                    recyclerView: RecyclerView,
-                    viewHolder: RecyclerView.ViewHolder,
-                    target: RecyclerView.ViewHolder
-                ): Boolean {
-                    val fromPos =
-                        viewHolder.adapterPosition
-                    val toPos =
-                        target.adapterPosition
-                    Collections.swap(
-                        interestList,
-                        fromPos,
-                        toPos
-                    )
-                    adapter.notifyItemMoved(
-                        fromPos,
-                        toPos
-                    )
-
-                    return false
-                }
-
-            }
-        val touchHelper =
-            ItemTouchHelper(
-                swipeGesture
-            )
-        touchHelper.attachToRecyclerView(
-            binding.recyclerViewInterests
-        )
-        binding.recyclerViewInterests.layoutManager =
+        binding.rvInterests.layoutManager =
             LinearLayoutManager(
                 context
             )
-        binding.recyclerViewInterests.adapter =
-            adapter
+        storyViewModel.userCategories.observe(
+            viewLifecycleOwner
+        ) { roomCategories ->
+            if (originalCategories != roomCategories) {
+                binding.btnSaveCategoriesChanges.visibility =
+                    GONE
+                originalCategories.clear()
+                originalCategories.addAll(
+                    roomCategories
+                )
+                tempCategories.clear()
+                tempCategories.addAll(
+                    originalCategories
+                )
+                val adapter =
+                    CategoryAdapter()
+                adapter.differ.submitList(
+                    originalCategories
+                )
+                binding.rvInterests.adapter =
+                    adapter
+                itemTouchHelper.attachToRecyclerView(
+                    binding.rvInterests
+                )
+            }
+        }
     }
 
     private fun logOut() {
+        // Cleans stories downloaded data from device
+        val audioDir =
+            File(
+                requireContext().filesDir,
+                "audio"
+            )
+        val imagesDir =
+            File(
+                requireContext().filesDir,
+                "images"
+            )
+        if (audioDir.exists() && audioDir.listFiles() != null) {
+            for (file in audioDir.listFiles()!!) {
+                file.deleteRecursively()
+            }
+        }
+        if (imagesDir.exists() && imagesDir.listFiles() != null) {
+            for (file in imagesDir.listFiles()!!) {
+                file.deleteRecursively()
+            }
+        }
+        storyViewModel.clearUserData()
+
+        purchaseViewModel.logOut()
+
+        // Clears shared preferences user's data
         prefRepository.clearData()
         startActivity(
             Intent(
@@ -367,23 +652,5 @@ class AccountFragment :
         startActivity(
             signUpIntent
         )
-    }
-
-    private fun isUserGuest(): Boolean =
-        prefRepository.isUserGuest
-
-    private fun getUserId(): Int =
-        prefRepository.userId
-
-    private fun getApiToken(): String =
-        "Bearer " + prefRepository.userApiToken
-
-    private fun saveUserInfo(
-        updateProfileDto: UpdateProfileDto
-    ) {
-        prefRepository.userName =
-            updateProfileDto.name
-        prefRepository.userEmail =
-            updateProfileDto.email
     }
 }

@@ -9,8 +9,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 
 sealed class MyState {
-    object Fetched : MyState()
-    object Error : MyState()
+    object Fetched :
+        MyState()
+
+    object Error :
+        MyState()
 }
 
 class NetworkStatusViewModel(
@@ -19,12 +22,15 @@ class NetworkStatusViewModel(
     @OptIn(
         FlowPreview::class
     )
-    val state = networkStatusTracker.networkStatus
-        .map(
-            onAvailable = {MyState.Fetched},
-            onUnavailable = {MyState.Error}
-        )
-        .asLiveData(Dispatchers.IO)
+    val state =
+        networkStatusTracker.networkStatus
+            .map(
+                onAvailable = { MyState.Fetched },
+                onUnavailable = { MyState.Error }
+            )
+            .asLiveData(
+                Dispatchers.IO
+            )
 
     class Factory(
         private val networkStatusTracker: NetworkStatusTracker
@@ -32,8 +38,12 @@ class NetworkStatusViewModel(
         @Suppress(
             "unchecked_cast"
         )
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return NetworkStatusViewModel(networkStatusTracker) as T
+        override fun <T : ViewModel> create(
+            modelClass: Class<T>
+        ): T {
+            return NetworkStatusViewModel(
+                networkStatusTracker
+            ) as T
         }
     }
 }

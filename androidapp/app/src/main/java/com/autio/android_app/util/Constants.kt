@@ -4,12 +4,6 @@ import com.autio.android_app.R
 
 
 object Constants {
-    const val baseUrl =
-        "https://app.autio.com/"
-    const val REQUEST_CODE_LOCATION_PERMISSION =
-        0
-    const val REQUEST_CODE_NOTIFICATION_PERMISSION =
-        1
     const val USER_PREFERENCES =
         "USER_PREFERENCES"
     const val ON_BOARDING_FINISHED =
@@ -29,17 +23,33 @@ object Constants {
     const val REMAINING_STORIES =
         "REMAINING_STORIES"
 
-    val categoryIcons = hashMapOf(
-        "HISTORY" to R.drawable.ic_category_history,
-        "LOCAL INSIGHTS" to R.drawable.ic_category_local_insights,
-        "COLORFUL CHARACTERS" to R.drawable.ic_category_colorful_characters,
-        "CULTURE" to R.drawable.ic_category_culture,
-        "NATURAL WONDERS" to R.drawable.ic_category_natural_wonders,
-        "SPECIAL PLACES OF INTEREST" to R.drawable.ic_category_special_places,
-        "SPORTS" to R.drawable.ic_category_sports,
-        "MUSIC" to R.drawable.ic_category_music
-    )
+    val categoryIcons =
+        hashMapOf(
+            "HISTORY" to R.drawable.ic_category_history,
+            "LOCAL INSIGHTS" to R.drawable.ic_category_local_insights,
+            "COLORFUL CHARACTERS" to R.drawable.ic_category_colorful_characters,
+            "CULTURE" to R.drawable.ic_category_culture,
+            "NATURAL WONDERS" to R.drawable.ic_category_natural_wonders,
+            "SPECIAL PLACES OF INTEREST" to R.drawable.ic_category_special_places,
+            "SPORTS" to R.drawable.ic_category_sports,
+            "MUSIC" to R.drawable.ic_category_music
+        )
+
+    // In-App Products
+    // The following SKU strings must match the ones we have in the Google Play developer console.
+    // SKUs for non-subscription purchases
+    const val SINGLE_TRIP_PRODUCT =
+        "autio_single_trip_30d_one_time"
+    const val ADVENTURER_TRIP_PRODUCT =
+        "autio_adventurer_3y_one_time"
+    const val TRAVELER_TRIP_SUBSCRIPTION =
+        "autio_traveler_sub_1y_cancellable"
+
+    const val REVENUE_CAT_ENTITLEMENT =
+        "Unlimited Stories"
 }
 
-const val DEFAULT_LOCATION_LAT = 34.4208
-const val DEFAULT_LOCATION_LNG = 119.6982
+const val DEFAULT_LOCATION_LAT =
+    34.420830
+const val DEFAULT_LOCATION_LNG =
+    -119.698189

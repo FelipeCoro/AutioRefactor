@@ -6,23 +6,22 @@
     android:layout_height="wrap_content"
     android:background="@color/popup_background"
     android:gravity="center_vertical"
-    android:paddingVertical="8dp"
-    android:paddingHorizontal="5dp">
+    android:paddingHorizontal="14dp"
+    android:paddingVertical="15dp">
 
     <ImageView
         android:id="@+id/ivOptionIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="5dp"
-        android:layout_marginEnd="15dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginEnd="12dp"
         app:tint="@color/button_background"
         tools:src="@drawable/ic_download" />
 
     <TextView
         android:id="@+id/tvOptionTitle"
+        style="@style/PopupOptionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="15dp"
-        android:layout_gravity="center_vertical"
+        android:layout_gravity="start|center_vertical"
         tools:text="Download" />
 </LinearLayout>

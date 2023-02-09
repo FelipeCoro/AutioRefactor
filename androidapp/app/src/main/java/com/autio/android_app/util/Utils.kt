@@ -3,16 +3,16 @@ package com.autio.android_app.util
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.ui.view.usecases.home.BottomNavigation
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.getCustomerInfoWith
 
 fun checkEmptyField(
     etText: EditText
@@ -165,35 +165,6 @@ private fun capitalize(
     }
 }
 
-fun getIconFromDrawable(
-    drawable: Drawable?
-): BitmapDescriptor? {
-    if (drawable == null) return null
-    val canvas =
-        Canvas()
-    val bitmap =
-        Bitmap.createBitmap(
-            drawable.intrinsicWidth,
-            drawable.intrinsicHeight,
-            Bitmap.Config.ARGB_8888
-        )
-    canvas.setBitmap(
-        bitmap
-    )
-    drawable.setBounds(
-        0,
-        0,
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight
-    )
-    drawable.draw(
-        canvas
-    )
-    return BitmapDescriptorFactory.fromBitmap(
-        bitmap
-    )
-}
-
 fun shareStory(
     context: Context,
     storyId: String
@@ -241,4 +212,48 @@ fun openLocationInMapsApp(
             mapIntent
         )
     }
+}
+
+fun showPaywall(
+    activity: Activity
+) {
+    (activity as BottomNavigation).showPayWall()
+}
+
+fun showPaywallOrProceedWithNormalProcess(
+    activity: Activity,
+    isActionExclusiveForSignedInUser: Boolean = false,
+    normalProcess: () -> Unit
+) {
+    Purchases.sharedInstance.getCustomerInfoWith {
+        if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
+            normalProcess.invoke()
+        } else {
+            try {
+                val prefRepository =
+                    PrefRepository(
+                        activity
+                    )
+                val isUserGuest =
+                    prefRepository.isUserGuest
+                val remainingStories =
+                    prefRepository.remainingStories
+                if ((isActionExclusiveForSignedInUser && isUserGuest)
+                    || remainingStories <= 0
+                ) {
+                    showPaywall(
+                        activity
+                    )
+                } else {
+                    normalProcess.invoke()
+                }
+            } catch (exception: java.lang.ClassCastException) {
+                Log.e(
+                    "CastException",
+                    "Activity is not a subtype of BottomNavigation"
+                )
+            }
+        }
+    }
+
 }

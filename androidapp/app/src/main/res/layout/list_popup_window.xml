@@ -10,7 +10,6 @@
         android:id="@+id/rvWindowPopupList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_list_popup_window"
-        tools:itemCount="5"/>
+        tools:itemCount="5"
+        tools:listitem="@layout/item_list_popup_window" />
 </androidx.cardview.widget.CardView>

@@ -88,15 +88,20 @@ internal class AlbumArtContentProvider :
                         TimeUnit.SECONDS
                     )
 
-            file = cacheFile
+            file =
+                cacheFile
         }
-        return ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
+        return ParcelFileDescriptor.open(
+            file,
+            ParcelFileDescriptor.MODE_READ_ONLY
+        )
     }
 
     override fun insert(
         uri: Uri,
         values: ContentValues?
-    ): Uri? = null
+    ): Uri? =
+        null
 
     override fun query(
         uri: Uri,
@@ -104,22 +109,26 @@ internal class AlbumArtContentProvider :
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?,
-    ): Cursor? = null
+    ): Cursor? =
+        null
 
     override fun delete(
         uri: Uri,
         selection: String?,
         selectionArgs: Array<out String>?
-    ) = 0
+    ) =
+        0
 
     override fun update(
         p0: Uri,
         p1: ContentValues?,
         p2: String?,
         p3: Array<out String>?
-    ) = 0
+    ) =
+        0
 
     override fun getType(
         uri: Uri
-    ): String? = null
+    ): String? =
+        null
 }

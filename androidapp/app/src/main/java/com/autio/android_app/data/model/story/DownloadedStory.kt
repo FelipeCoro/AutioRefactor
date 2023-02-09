@@ -36,18 +36,12 @@ data class DownloadedStory(
     @Embedded(
         prefix = "category_"
     )
-    val category: CategoryResponse,
+    val category: Category,
     val isLiked: Boolean?,
     val isBookmarked: Boolean?,
-    val listenedAt: String?
+    val listenedAt: String?,
+    val listenedAtLeast30Secs: Boolean? = null
 ) : Serializable {
-    data class CategoryResponse(
-        @PrimaryKey
-        val id: String,
-        val title: String?,
-        val order: Int?,
-    )
-
     override fun equals(
         other: Any?
     ): Boolean {
@@ -139,7 +133,11 @@ data class DownloadedStory(
                                 " ",
                                 "_"
                             ) + "art.jpg"
-                        val imagesDir = File(context.filesDir, "images")
+                        val imagesDir =
+                            File(
+                                context.filesDir,
+                                "images"
+                            )
                         if (!imagesDir.exists()) {
                             imagesDir.mkdir()
                         }
@@ -207,7 +205,11 @@ data class DownloadedStory(
                                 " ",
                                 "_"
                             ) + ".mp3"
-                        val audioDir = File(context.filesDir, "audio")
+                        val audioDir =
+                            File(
+                                context.filesDir,
+                                "audio"
+                            )
                         if (!audioDir.exists()) {
                             audioDir.mkdir()
                         }
@@ -271,14 +273,16 @@ data class DownloadedStory(
                 narrator = story.narrator,
                 author = story.author,
                 state = story.state,
-                category = CategoryResponse(
+                category = Category(
                     story.category!!.id,
                     story.category!!.title,
+                    story.category!!.firebaseId,
                     story.category!!.order
                 ),
                 isLiked = story.isLiked,
                 isBookmarked = story.isBookmarked,
-                listenedAt = story.listenedAt
+                listenedAt = story.listenedAt,
+                listenedAtLeast30Secs = story.listenedAtLeast30Secs
             )
         }
     }

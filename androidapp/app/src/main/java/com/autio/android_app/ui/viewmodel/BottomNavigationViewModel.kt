@@ -9,6 +9,7 @@ import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.*
+import androidx.lifecycle.Observer
 import com.autio.android_app.R
 import com.autio.android_app.data.database.repository.StoryRepository
 import com.autio.android_app.data.model.history.History
@@ -22,6 +23,7 @@ import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import kotlinx.coroutines.*
+import java.util.*
 
 /**
  * [ViewModel] that watches a [PlayerServiceConnection] to become connected
@@ -30,7 +32,8 @@ import kotlinx.coroutines.*
 class BottomNavigationViewModel(
     private val app: Application,
     playerServiceConnection: PlayerServiceConnection,
-    private val storyRepository: StoryRepository
+    private val storyRepository: StoryRepository,
+//    private val applicationRepository: CoreApplicationRepository
 ) : AndroidViewModel(
     app
 ) {
@@ -45,69 +48,13 @@ class BottomNavigationViewModel(
     val remainingStoriesLiveData =
         prefRepository.remainingStoriesLiveData
 
-    private val apiService =
-        ApiService()
-
     private val storiesJob =
         SupervisorJob()
 
     fun onCreate() {
-        viewModelScope.launch {
-            getInitialData()
-        }
-    }
-
-    private val _storiesInScreen =
-        MutableLiveData<Map<String, Story>>(
-            emptyMap()
-        )
-    val storiesInScreen: LiveData<Map<String, Story>> =
-        _storiesInScreen
-
-    fun setStoryInView(
-        story: Story
-    ) {
-        _storiesInScreen.value =
-            _storiesInScreen.value?.plus(
-                story.id to story
-            )
-                ?: mapOf(
-                    story.id to story
-                )
-    }
-
-    fun removeStoryFromView(
-        story: Story
-    ) {
-        _storiesInScreen.value =
-            _storiesInScreen.value?.minus(
-                story.id
-            )
-                ?: emptyMap()
-    }
-
-    fun fetchRecordsOfStories() {
-        _storiesInScreen.value?.let { stories ->
-            if (stories.isEmpty()) return
-            val storiesWithoutRecords =
-                stories.filter { it.value.recordUrl.isEmpty() }
-            if (storiesWithoutRecords.isNotEmpty()) {
-                apiService.getStoriesByIds(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    storiesWithoutRecords.map { it.value.originalId }
-                ) { storiesFromAPI ->
-                    if (storiesFromAPI != null) {
-                        for (story in storiesFromAPI) {
-                            storyRepository.cacheRecordOfStory(
-                                story.id,
-                                story.recordUrl
-                            )
-                        }
-                    }
-                }
-            }
-        }
+//        viewModelScope.launch {
+//            getInitialData()
+//        }
     }
 
     private var postedPlay =
@@ -192,58 +139,63 @@ class BottomNavigationViewModel(
         postedPlay =
             true
         if (storyToPost != null) {
-            viewModelScope.launch {
-                withContext(
-                    Dispatchers.IO
+            viewModelScope.launch(
+                Dispatchers.IO
+            ) {
+                val downloadedStory =
+                    storyRepository.getDownloadedStoryById(
+                        playingStory.value!!.id
+                    )
+                val connectivityManager =
+                    app.getSystemService(
+                        Context.CONNECTIVITY_SERVICE
+                    ) as ConnectivityManager
+                val networkInfo =
+                    connectivityManager.activeNetwork
+                val network =
+                    if (networkInfo == null) "disconnected" else {
+                        val actNw =
+                            connectivityManager.getNetworkCapabilities(
+                                networkInfo
+                            )
+                        when {
+                            actNw?.hasTransport(
+                                NetworkCapabilities.TRANSPORT_WIFI
+                            ) == true -> "wifi"
+                            actNw?.hasTransport(
+                                NetworkCapabilities.TRANSPORT_CELLULAR
+                            ) == true -> "cellular"
+                            else -> "disconnected"
+                        }
+                    }
+                ApiService.postStoryPlayed(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    PlaysDto(
+                        storyToPost.id,
+                        wasPresent = true,
+                        autoPlay = true,
+                        downloadedStory != null,
+                        network,
+                        storyToPost.lat,
+                        storyToPost.lon
+                    )
                 ) {
-                    val downloadedStory =
-                        storyRepository.getDownloadedStoryById(
-                            playingStory.value!!.id
-                        )
-                    val connectivityManager =
-                        app.getSystemService(
-                            Context.CONNECTIVITY_SERVICE
-                        ) as ConnectivityManager
-                    val networkInfo =
-                        connectivityManager.activeNetwork
-                    val network =
-                        if (networkInfo == null) "disconnected" else {
-                            val actNw =
-                                connectivityManager.getNetworkCapabilities(
-                                    networkInfo
-                                )
-                            when {
-                                actNw?.hasTransport(
-                                    NetworkCapabilities.TRANSPORT_WIFI
-                                ) == true -> "wifi"
-                                actNw?.hasTransport(
-                                    NetworkCapabilities.TRANSPORT_CELLULAR
-                                ) == true -> "cellular"
-                                else -> "disconnected"
-                            }
+                    if (it != null) {
+                        viewModelScope.launch(
+                            Dispatchers.IO
+                        ) {
+                            storyRepository.markStoryAsListenedAtLeast30Secs(
+                                storyToPost.id
+                            )
                         }
-                    apiService.postStoryPlayed(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        PlaysDto(
-                            storyToPost.id,
-                            wasPresent = true,
-                            autoPlay = true,
-                            downloadedStory != null,
-                            network,
-                            storyToPost.lat,
-                            storyToPost.lon
-                        )
-                    ) {
-                        if (it != null) {
-                            prefRepository.remainingStories =
-                                it.playsRemaining
-                        }
+                        prefRepository.remainingStories =
+                            it.playsRemaining
                     }
                 }
             }
         } else {
-            apiService.postStoryPlayed(
+            ApiService.postStoryPlayed(
                 prefRepository.userId,
                 prefRepository.userApiToken,
                 PlaysDto()
@@ -483,6 +435,7 @@ class BottomNavigationViewModel(
         withContext(
             Dispatchers.IO
         ) {
+            // TODO: change Firebase code with commented code once endpoint is stable
             val stories =
                 FirebaseStoryRepository.getStoriesAfterModifiedDate(
                     date.toInt()
@@ -490,6 +443,28 @@ class BottomNavigationViewModel(
             storyRepository.addStories(
                 stories
             )
+//            val dateFormat =
+//                SimpleDateFormat(
+//                    "yyyy/MM/dd'T'HH:mm:ss",
+//                    Locale.getDefault()
+//                )
+//            val formattedDate =
+//                dateFormat.format(
+//                    Date(
+//                        (date.toLong() * 1000)
+//                    )
+//                )
+//            apiService.getStoriesAfterDate(
+//                prefRepository.userId,
+//                prefRepository.userApiToken,
+//                formattedDate
+//            ) {
+//                if (it != null) {
+//                    storyRepository.addStories(
+//                        it.toTypedArray()
+//                    )
+//                }
+//            }
         }
     }
 
@@ -497,6 +472,7 @@ class BottomNavigationViewModel(
         withContext(
             Dispatchers.IO
         ) {
+            // TODO: change Firebase code with commented code once stable
             val userBookmarkedStories =
                 FirebaseStoryRepository.getUserBookmarks(
                     prefRepository.firebaseKey
@@ -504,6 +480,16 @@ class BottomNavigationViewModel(
             storyRepository.setBookmarksDataToLocalStories(
                 userBookmarkedStories.map { it.storyId }
             )
+//            apiService.getStoriesFromUserBookmarks(
+//                prefRepository.userId,
+//                prefRepository.userApiToken
+//            ) { stories ->
+//                if (stories != null) {
+//                    storyRepository.setBookmarksDataToLocalStories(
+//                        stories.map { it.id }
+//                    )
+//                }
+//            }
         }
     }
 
@@ -519,6 +505,16 @@ class BottomNavigationViewModel(
                 userFavoriteStories.filter { it.isGiven == true }
                     .map { it.storyId }
             )
+//            ApiService.likedStoriesByUser(
+//                prefRepository.userId,
+//                prefRepository.userApiToken
+//            ) { stories ->
+//                if (stories != null) {
+//                    storyRepository.setLikesDataToLocalStories(
+//                        stories.map { it.id }
+//                    )
+//                }
+//            }
         }
     }
 
@@ -544,10 +540,21 @@ class BottomNavigationViewModel(
         }
     }
 
+//    fun debugConsumePremium() {
+//        applicationRepository.debugConsumeSingleTrip()
+//    }
+
+//    val messages: LiveData<Int>
+//        get() = applicationRepository.messages.asLiveData()
+
+//    val billingLifecycleObserver: LifecycleObserver
+//        get() = applicationRepository.billingLifecycleObserver
+
     class Factory(
         private val app: Application,
         private val playerServiceConnection: PlayerServiceConnection,
-        private val storyRepository: StoryRepository
+        private val storyRepository: StoryRepository,
+//        private val applicationRepository: CoreApplicationRepository
     ) : ViewModelProvider.NewInstanceFactory() {
 
         @Suppress(
@@ -559,7 +566,8 @@ class BottomNavigationViewModel(
             return BottomNavigationViewModel(
                 app,
                 playerServiceConnection,
-                storyRepository
+                storyRepository,
+//                applicationRepository
             ) as T
         }
     }
