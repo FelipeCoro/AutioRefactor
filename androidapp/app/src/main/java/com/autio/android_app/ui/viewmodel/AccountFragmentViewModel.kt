@@ -9,7 +9,7 @@ import com.autio.android_app.data.database.repository.StoryRepository
 import com.autio.android_app.data.model.account.ProfileDto
 import com.autio.android_app.data.model.story.Category
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

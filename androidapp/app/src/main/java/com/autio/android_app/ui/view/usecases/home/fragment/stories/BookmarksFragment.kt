@@ -24,8 +24,8 @@ import com.autio.android_app.data.model.StoryOption
 import com.autio.android_app.data.model.story.DownloadedStory
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.FirebaseStoryRepository
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.ui.view.usecases.home.adapter.StoryAdapter
 import com.autio.android_app.ui.viewmodel.BottomNavigationViewModel

@@ -1,4 +1,4 @@
-package com.autio.android_app.data.repository
+package com.autio.android_app.data.repository.legacy
 
 import android.util.Log
 import com.autio.android_app.data.model.bookmarks.Bookmark

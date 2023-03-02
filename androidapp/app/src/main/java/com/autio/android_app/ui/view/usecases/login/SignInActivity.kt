@@ -9,7 +9,7 @@ import com.autio.android_app.data.model.account.GuestResponse
 import com.autio.android_app.data.model.account.LoginDto
 import com.autio.android_app.data.model.account.LoginResponse
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.ActivitySignInBinding
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel

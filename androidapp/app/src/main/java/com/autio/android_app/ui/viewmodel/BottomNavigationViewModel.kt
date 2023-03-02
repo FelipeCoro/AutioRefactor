@@ -16,8 +16,8 @@ import com.autio.android_app.data.model.history.History
 import com.autio.android_app.data.model.plays.PlaysDto
 import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.FirebaseStoryRepository
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData

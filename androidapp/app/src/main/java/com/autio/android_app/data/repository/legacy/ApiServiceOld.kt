@@ -1,7 +1,8 @@
-package com.autio.android_app.data.repository
+package com.autio.android_app.data.repository.legacy
 
 import android.util.Log
 import com.autio.android_app.core.RetrofitHelper
+import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.model.account.*
 import com.autio.android_app.data.model.api_response.*
 import com.autio.android_app.data.model.author.Author
@@ -13,10 +14,10 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ApiService {
+class ApiServiceOld {
     companion object {
         private val TAG =
-            ApiService::class.simpleName
+            ApiServiceOld::class.simpleName
 
         private val retrofit =
             RetrofitHelper.buildService(

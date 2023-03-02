@@ -1,4 +1,4 @@
-package com.autio.android_app.data.repository
+package com.autio.android_app.data.api
 
 import com.autio.android_app.data.model.account.*
 import com.autio.android_app.data.model.api_response.*
@@ -7,7 +7,7 @@ import com.autio.android_app.data.model.category.StoryCategory
 import com.autio.android_app.data.model.narrator.Narrator
 import com.autio.android_app.data.model.plays.PlaysDto
 import com.autio.android_app.data.model.story.Story
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiClient {
@@ -19,42 +19,34 @@ interface ApiClient {
      * profile data
      * @param loginDto object including the email and password
      */
-    @POST(
-        "/api/v1/login"
-    )
-    fun login(
+    @POST("/api/v1/login")
+    suspend fun login(
         @Body loginDto: LoginDto
-    ): Call<LoginResponse>
+    ): Response<LoginResponse>
 
     /**
      * Authenticates user as guest and returns the guest's
      * data
      */
-    @POST(
-        "/api/v1/guests"
-    )
-    fun createGuestAccount(): Call<GuestResponse>
+    @POST("/api/v1/guests")
+    suspend fun createGuestAccount(): Response<GuestResponse>
 
     /**
      * Creates user in backend and returns the user's
      * profile data
      * @param createAccountDto object including user's data (name, email, password)
      */
-    @POST(
-        "/api/v1/accounts"
-    )
-    fun createAccount(
+    @POST("/api/v1/accounts")
+    suspend fun createAccount(
         @Body createAccountDto: CreateAccountDto
-    ): Call<LoginResponse>
+    ): Response<LoginResponse>
 
     /**
      * Changes password for future authentication
      * @param changePasswordDto includes the current password for validation and the new password to update
      */
-    @POST(
-        "/api/v1/passwords/change"
-    )
-    fun changePassword(
+    @POST("/api/v1/passwords/change")
+    suspend fun changePassword(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -62,16 +54,14 @@ interface ApiClient {
             "Authorization"
         ) apiToken: String,
         @Body changePasswordDto: ChangePasswordDto
-    ): Call<ChangePasswordResponse>
+    ): Response<ChangePasswordResponse>
 
     // TODO: Check which is the correct call for this and create ResponseObject
     /**
      * Deletes the account and its associated data
      */
-    @POST(
-        "/api/v1/delete-account"
-    )
-    fun deleteAccount(
+    @POST("/api/v1/delete-account")
+    suspend fun deleteAccount(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -88,10 +78,8 @@ interface ApiClient {
             "getProfileDataV2"
         )
     )
-    @GET(
-        "/api/v1/{user_id}"
-    )
-    fun getProfileData(
+    @GET("/api/v1/{user_id}")
+    suspend fun getProfileData(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -109,10 +97,8 @@ interface ApiClient {
      * data)
      * @param userId user's id
      */
-    @GET(
-        "/api/v1/usersV2/{user_id}"
-    )
-    fun getProfileDataV2(
+    @GET("/api/v1/usersV2/{user_id}")
+    suspend fun getProfileDataV2(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -122,7 +108,7 @@ interface ApiClient {
         @Path(
             "user_id"
         ) userId: Int,
-    ): Call<ProfileDto>
+    ): Response<ProfileDto>
 
     @Deprecated(
         "Updates user's profile with new displaying data and preferences on stories' categories",
@@ -130,10 +116,8 @@ interface ApiClient {
             "updateProfileV2"
         )
     )
-    @POST(
-        "/api/v1/users"
-    )
-    fun updateProfile(
+    @POST("/api/v1/users")
+    suspend fun updateProfile(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -144,17 +128,15 @@ interface ApiClient {
             "user_id"
         ) userId: Int,
         @Body profileDto: ProfileDto
-    ): Call<ProfileDto>
+    ): Response<ProfileDto>
 
     /**
      * Updates user's profile with new displaying data
      * and preferences on stories' categories
      * @param profileDto includes email, name and preferred ordered categories to update
      */
-    @PUT(
-        "/api/v1/usersV2/{user_id}"
-    )
-    fun updateProfileV2(
+    @PUT("/api/v1/usersV2/{user_id}")
+    suspend fun updateProfileV2(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -165,7 +147,7 @@ interface ApiClient {
             "user_id"
         ) userId: Int,
         @Body profileDto: ProfileDto
-    ): Call<ProfileDto>
+    ): Response<ProfileDto>
 
     // STORY CALLS
 
@@ -173,10 +155,8 @@ interface ApiClient {
      * Returns a list with data of all stories matching the ids inside the query
      * @param ids list of ids of each story that should be fetched
      */
-    @GET(
-        "/api/v1/stories/by-ids-v2"
-    )
-    fun getStoriesByIds(
+    @GET("/api/v1/stories/by-ids-v2")
+    suspend fun getStoriesByIds(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -186,7 +166,7 @@ interface ApiClient {
         @Query(
             "ids[]"
         ) ids: List<Int>
-    ): Call<List<Story>>
+    ): Response<List<Story>>
 
     @Deprecated(
         "Captures stories and its content after a certain datetime",
@@ -194,10 +174,8 @@ interface ApiClient {
             "getStoriesDiff"
         )
     )
-    @GET(
-        "/api/v1/stories/diff"
-    )
-    fun getStoriesSinceDate(
+    @GET("/api/v1/stories/diff")
+    suspend fun getStoriesSinceDate(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -210,16 +188,14 @@ interface ApiClient {
         @Query(
             "page"
         ) page: Int
-    ): Call<List<Story>>
+    ): Response<List<Story>>
 
     /**
      * Captures stories and its content after a certain date
      * @param date date and time from which the filter should start from
      */
-    @GET(
-        "/api/v1/stories/diff"
-    )
-    fun getStoriesDiff(
+    @GET("/api/v1/stories/diff")
+    suspend fun getStoriesDiff(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -229,12 +205,10 @@ interface ApiClient {
         @Query(
             "date"
         ) date: String
-    ): Call<List<Story>>
+    ): Response<List<Story>>
 
-    @GET(
-        "/api/v1/contributors/{contributor_id}/latest-stories"
-    )
-    fun getStoriesByContributor(
+    @GET("/api/v1/contributors/{contributor_id}/latest-stories")
+    suspend fun getStoriesByContributor(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -247,12 +221,10 @@ interface ApiClient {
         @Query(
             "page"
         ) page: Int,
-    ): Call<ContributorApiResponse>
+    ): Response<ContributorApiResponse>
 
-    @GET(
-        "/api/v1/stories/{story_id}/author"
-    )
-    fun getAuthorOfStory(
+    @GET("/api/v1/stories/{story_id}/author")
+    suspend fun getAuthorOfStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -262,12 +234,10 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int,
-    ): Call<Author>
+    ): Response<Author>
 
-    @GET(
-        "/api/v1/stories/{story_id}/narrator"
-    )
-    fun getNarratorOfStory(
+    @GET("/api/v1/stories/{story_id}/narrator")
+    suspend fun getNarratorOfStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -277,24 +247,20 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int,
-    ): Call<Narrator>
+    ): Response<Narrator>
 
-    @GET(
-        "/api/v1/categories"
-    )
-    fun getCategories(
+    @GET("/api/v1/categories")
+    suspend fun getCategories(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
         @Header(
             "Authorization"
         ) apiToken: String,
-    ): Call<List<StoryCategory>>
+    ): Response<List<StoryCategory>>
 
-    @POST(
-        "/api/v1/plays"
-    )
-    fun postStoryPlayed(
+    @POST("/api/v1/plays")
+    suspend fun postStoryPlayed(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -302,26 +268,22 @@ interface ApiClient {
             "Authorization"
         ) apiToken: String,
         @Body playsDto: PlaysDto
-    ): Call<PlaysResponse>
+    ): Response<PlaysResponse>
 
     // FAVORITE CALLS
 
-    @GET(
-        "/api/v1/likes"
-    )
-    fun likedStoriesByUser(
+    @GET("/api/v1/likes")
+    suspend fun likedStoriesByUser(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
         @Header(
             "Authorization"
         ) apiToken: String
-    ): Call<List<Story>>
+    ): Response<List<Story>>
 
-    @GET(
-        "/api/v1/likes/{story_id}/is-liked"
-    )
-    fun isStoryLikedByUser(
+    @GET("/api/v1/likes/{story_id}/is-liked")
+    suspend fun isStoryLikedByUser(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -331,12 +293,10 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ): Call<StoryLikedResponse>
+    ): Response<StoryLikedResponse>
 
-    @GET(
-        "/api/v1/likes/{story_id}/count"
-    )
-    fun likesByStory(
+    @GET("/api/v1/likes/{story_id}/count")
+    suspend fun likesByStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -346,12 +306,10 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ): Call<StoryLikesResponse>
+    ): Response<StoryLikesResponse>
 
-    @POST(
-        "/api/v1/likes/{story_id}"
-    )
-    fun giveLikeToStory(
+    @POST("/api/v1/likes/{story_id}")
+    suspend fun giveLikeToStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -361,12 +319,10 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ): Call<LikeResponse>
+    ): Response<LikeResponse>
 
-    @DELETE(
-        "/api/v1/likes/{story_id}"
-    )
-    fun removeLikeFromStory(
+    @DELETE("/api/v1/likes/{story_id}")
+    suspend fun removeLikeFromStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -376,26 +332,22 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ) : Call<LikeResponse>
+    ) : Response<LikeResponse>
 
     // HISTORY CALLS
 
-    @GET(
-        "/api/v1/playedHistory"
-    )
-    fun getUserHistory(
+    @GET("/api/v1/playedHistory")
+    suspend fun getUserHistory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
         @Header(
             "Authorization"
         ) apiToken: String
-    ) : Call<List<Story>>
+    ) : Response<List<Story>>
 
-    @PUT(
-        "/api/v1/playedHistory/{story_id}"
-    )
-    fun addStoryToHistory(
+    @PUT("/api/v1/playedHistory/{story_id}")
+    suspend fun addStoryToHistory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -405,24 +357,20 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ) : Call<AddHistoryResponse>
+    ) : Response<AddHistoryResponse>
 
-    @DELETE(
-        "/api/v1/playedHistory/all"
-    )
-    fun clearHistory(
+    @DELETE("/api/v1/playedHistory/all")
+    suspend fun clearHistory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
         @Header(
             "Authorization"
         ) apiToken: String
-    ) : Call<ClearHistoryResponse>
+    ) : Response<ClearHistoryResponse>
 
-    @DELETE(
-        "/api/v1/playedHistory/{story_id}"
-    )
-    fun removeStoryFromHistory(
+    @DELETE("/api/v1/playedHistory/{story_id}")
+    suspend fun removeStoryFromHistory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -432,26 +380,22 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ) : Call<RemoveHistoryResponse>
+    ) : Response<RemoveHistoryResponse>
 
     // BOOKMARK CALLS
 
-    @GET(
-        "/api/v1/library"
-    )
-    fun getStoriesFromUserBookmarks(
+    @GET("/api/v1/library")
+    suspend fun getStoriesFromUserBookmarks(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
         @Header(
             "Authorization"
         ) apiToken: String
-    ) : Call<List<Story>>
+    ) : Response<List<Story>>
 
-    @POST(
-        "/api/v1/library/{user_id}"
-    )
-    fun bookmarkStory(
+    @POST("/api/v1/library/{user_id}")
+    suspend fun bookmarkStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -461,12 +405,10 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ) : Call<AddBookmarkResponse>
+    ) : Response<AddBookmarkResponse>
 
-    @DELETE(
-        "/api/v1/library/{user_id}"
-    )
-    fun removeBookmarkFromStory(
+    @DELETE("/api/v1/library/{user_id}")
+    suspend fun removeBookmarkFromStory(
         @Header(
             "X-User-Id"
         ) xUserId: Int,
@@ -476,5 +418,5 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int
-    ) : Call<RemoveBookmarkResponse>
+    ) : Response<RemoveBookmarkResponse>
 }

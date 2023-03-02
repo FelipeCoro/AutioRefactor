@@ -6,8 +6,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.autio.android_app.data.repository.FirebaseStoryRepository
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.view.usecases.login.LoginActivity
 import com.autio.android_app.ui.view.usecases.onboarding.OnBoardingActivity

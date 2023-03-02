@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.model.account.CreateAccountDto
 import com.autio.android_app.data.model.account.LoginResponse
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.ActivitySignUpBinding
 import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel

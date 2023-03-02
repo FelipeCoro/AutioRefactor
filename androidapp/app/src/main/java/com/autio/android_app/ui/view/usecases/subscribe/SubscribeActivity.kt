@@ -11,7 +11,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.PrefRepository
+import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.ActivitySubscribeBinding
 import com.autio.android_app.databinding.MothPopupBinding
 import com.autio.android_app.extensions.makeLinks
