@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout>
 <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/image_name"
     android:layout_width="wrap_content"
@@ -9,3 +10,4 @@
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp"
     android:contentDescription="Image used for background purposes" />
+</layout>
