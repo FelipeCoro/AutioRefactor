@@ -9,7 +9,7 @@ import com.autio.android_app.databinding.ItemListPopupWindowBinding
 
 class PlaylistOptionsAdapter(
     private var options: List<com.autio.android_app.data.api.model.PlaylistOption>,
-    private val onOptionClickListener: com.autio.android_app.data.api.model.PlaylistOptionClickListener? = null
+    private val onOptionClickListener: (() -> Unit?)
 ) : RecyclerView.Adapter<PlaylistOptionsAdapter.OptionViewHolder>() {
 
     inner class OptionViewHolder(

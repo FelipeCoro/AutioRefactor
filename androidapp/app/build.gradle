@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'com.google.gms.google-services'
+    id 'kotlinx-serialization'
 }
 
 def localProperties = new Properties()
@@ -150,4 +151,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.18.4'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.18.4'
     api "com.google.android.exoplayer:extension-cast:2.18.4"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
+
 }
