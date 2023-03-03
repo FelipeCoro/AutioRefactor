@@ -85,10 +85,7 @@ class BottomNavigation : AppCompatActivity() {
 
         bottomNavigationViewModel.mediaButtonRes.observe(
             this
-        ) { res ->
-            binding.btnFloatingPlayerPlay.setImageResource(
-                res
-            )
+        ) { res -> binding.btnFloatingPlayerPlay.setImageResource(res)
         }
     }
 
