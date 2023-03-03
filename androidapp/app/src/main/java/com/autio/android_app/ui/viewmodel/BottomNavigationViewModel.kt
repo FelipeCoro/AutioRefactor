@@ -12,9 +12,9 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
-import com.autio.android_app.data.entities.history.History
-import com.autio.android_app.data.entities.plays.PlaysDto
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.data.database.entities.history.History
+import com.autio.android_app.data.database.entities.plays.PlaysDto
+import com.autio.android_app.data.database.entities.story.Story
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.legacy.PrefRepository

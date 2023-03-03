@@ -1,283 +1,286 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activityRoot"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.view.usecases.home.BottomNavigation">
+<layout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/mainContainer"
-        android:name="androidx.navigation.fragment.NavHostFragment"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activityRoot"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:defaultNavHost="true"
-        app:layout_constraintBottom_toTopOf="@+id/rlSeePlans"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navGraph="@navigation/nav_graph_bottom" />
+        android:layout_height="match_parent"
+        tools:context=".ui.view.usecases.home.BottomNavigation">
 
-    <LinearLayout
-        android:id="@+id/persistentPlayer"
-        android:background="@drawable/persistent_player_background"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/flImportantMessage"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent">
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/mainContainer"
+            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:defaultNavHost="true"
+            app:layout_constraintBottom_toTopOf="@+id/rlSeePlans"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navGraph="@navigation/nav_graph_bottom" />
 
         <LinearLayout
+            android:id="@+id/persistentPlayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="13dp">
-
-            <ImageView
-                android:id="@+id/btnFloatingPlayerPlay"
-                android:layout_width="41dp"
-                android:layout_height="41dp"
-                android:layout_marginVertical="16dp"
-                android:layout_marginEnd="11.5dp"
-                android:src="@drawable/ic_player_play"
-                app:tint="@color/normal_text" />
+            android:background="@drawable/persistent_player_background"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/flImportantMessage"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:paddingHorizontal="13dp">
 
-                <TextView
-                    android:id="@+id/tvFloatingPlayerTitle"
-                    style="@style/SmallerTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:text="@string/no_story_loaded"
-                    tools:text="San Francisco from the Beginning" />
+                <ImageView
+                    android:id="@+id/btnFloatingPlayerPlay"
+                    android:layout_width="41dp"
+                    android:layout_height="41dp"
+                    android:layout_marginVertical="16dp"
+                    android:layout_marginEnd="11.5dp"
+                    android:src="@drawable/ic_player_play"
+                    app:tint="@color/normal_text" />
 
-                <TextView
-                    android:id="@+id/tvFloatingPlayerNarrator"
-                    style="@style/StoryNarrator"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
-                    tools:text="Kevin Costner" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvFloatingPlayerTitle"
+                        style="@style/SmallerTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:text="@string/no_story_loaded"
+                        tools:text="San Francisco from the Beginning" />
+
+                    <TextView
+                        android:id="@+id/tvFloatingPlayerNarrator"
+                        style="@style/StoryNarrator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        tools:text="Kevin Costner" />
+                </LinearLayout>
             </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/llNextStoryLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/persistent_player_next"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:id="@+id/columnNextStory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@id/ivNextIcon"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="end">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Up Next / "
+                        android:textColor="@color/autio_blue_40" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        tools:text="NEARBY — " />
+
+                    <TextView
+                        android:id="@+id/tvNextStory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="true"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        tools:text="Wave Organ - Natural Music" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivNextIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="14dp"
+                    android:src="@drawable/ic_forward"
+                    app:tint="@color/player_next_icon" />
+            </RelativeLayout>
+
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/llNextStoryLabel"
+        <FrameLayout
+            android:id="@+id/flImportantMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/persistent_player_next"
-            android:gravity="center_vertical"
-            android:paddingStart="14dp"
-            android:paddingTop="10dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp">
+            app:layout_constraintBottom_toTopOf="@id/rlSeePlans"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <RelativeLayout
+                android:id="@+id/rlNoInternetConnection"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal"
+                android:background="@color/autio_blue_20"
+                android:paddingHorizontal="17dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="15dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/snack_bar_no_connection" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlAllowNotifications"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal"
+                android:background="@color/autio_white"
+                android:paddingHorizontal="17dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="15dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/BottomSnackBarText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/snack_bar_allow_notifications" />
+
+                <ImageView
+                    android:id="@+id/ivCloseNotificationsMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_close" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rlAllowLocationAccess"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="fill_horizontal"
+                android:background="@color/autio_white"
+                android:paddingHorizontal="17dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="15dp"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/BottomSnackBarText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/snack_bar_allow_location_access" />
+
+                <ImageView
+                    android:id="@+id/ivCloseLocationMessage"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/ic_close" />
+            </RelativeLayout>
+        </FrameLayout>
+
+        <RelativeLayout
+            android:id="@+id/rlSeePlans"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/normal_text"
+            android:gravity="center"
+            android:padding="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:id="@+id/columnNextStory"
-                android:layout_width="wrap_content"
+                android:id="@+id/llTickMarks"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignStart="@id/ivNextIcon"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:gravity="end">
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:layout_marginBottom="8dp"
+                android:divider="@drawable/tick_marks_spacer"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Up Next / "
-                    android:textColor="@color/autio_blue_40" />
+                <View
+                    android:id="@+id/tickMark1"
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/autio_blue_20" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    tools:text="NEARBY — " />
+                <View
+                    android:id="@+id/tickMark2"
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/autio_blue_20" />
 
-                <TextView
-                    android:id="@+id/tvNextStory"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAllCaps="true"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    tools:text="Wave Organ - Natural Music" />
+                <View
+                    android:id="@+id/tickMark3"
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/autio_blue_20" />
+
+                <View
+                    android:id="@+id/tickMark4"
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/autio_blue_20" />
+
+                <View
+                    android:id="@+id/tickMark5"
+                    android:layout_width="16dp"
+                    android:layout_height="2dp"
+                    android:background="@color/autio_blue_20" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/ivNextIcon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="14dp"
-                android:src="@drawable/ic_forward"
-                app:tint="@color/player_next_icon" />
-        </RelativeLayout>
-
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/flImportantMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/rlSeePlans"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <RelativeLayout
-            android:id="@+id/rlNoInternetConnection"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_horizontal"
-            android:background="@color/autio_blue_20"
-            android:paddingHorizontal="17dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="15dp"
-            android:visibility="gone">
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/snack_bar_no_connection" />
+                android:layout_below="@id/llTickMarks"
+                android:layout_centerHorizontal="true"
+                android:text="@string/enjoy_5_stories_free_tap_for_plans"
+                android:textColor="@color/text_map_fragment" />
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/rlAllowNotifications"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_horizontal"
-            android:background="@color/autio_white"
-            android:paddingHorizontal="17dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="15dp"
-            android:visibility="gone"
-            tools:visibility="visible">
-
-            <TextView
-                style="@style/BottomSnackBarText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/snack_bar_allow_notifications" />
-
-            <ImageView
-                android:id="@+id/ivCloseNotificationsMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_close" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/rlAllowLocationAccess"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="fill_horizontal"
-            android:background="@color/autio_white"
-            android:paddingHorizontal="17dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="15dp"
-            android:visibility="gone">
-
-            <TextView
-                style="@style/BottomSnackBarText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/snack_bar_allow_location_access" />
-
-            <ImageView
-                android:id="@+id/ivCloseLocationMessage"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/ic_close" />
-        </RelativeLayout>
-    </FrameLayout>
-
-    <RelativeLayout
-        android:id="@+id/rlSeePlans"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/normal_text"
-        android:gravity="center"
-        android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <LinearLayout
-            android:id="@+id/llTickMarks"
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerInParent="true"
-            android:layout_marginBottom="8dp"
-            android:divider="@drawable/tick_marks_spacer"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:showDividers="middle"
-            android:visibility="gone"
-            tools:visibility="visible">
+            android:background="@color/bn_background"
+            android:longClickable="false"
+            app:labelVisibilityMode="labeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:menu="@menu/bottom_nav_menu" />
 
-            <View
-                android:id="@+id/tickMark1"
-                android:layout_width="16dp"
-                android:layout_height="2dp"
-                android:background="@color/autio_blue_20" />
-
-            <View
-                android:id="@+id/tickMark2"
-                android:layout_width="16dp"
-                android:layout_height="2dp"
-                android:background="@color/autio_blue_20" />
-
-            <View
-                android:id="@+id/tickMark3"
-                android:layout_width="16dp"
-                android:layout_height="2dp"
-                android:background="@color/autio_blue_20" />
-
-            <View
-                android:id="@+id/tickMark4"
-                android:layout_width="16dp"
-                android:layout_height="2dp"
-                android:background="@color/autio_blue_20" />
-
-            <View
-                android:id="@+id/tickMark5"
-                android:layout_width="16dp"
-                android:layout_height="2dp"
-                android:background="@color/autio_blue_20" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/llTickMarks"
-            android:layout_centerHorizontal="true"
-            android:text="@string/enjoy_5_stories_free_tap_for_plans"
-            android:textColor="@color/text_map_fragment" />
-    </RelativeLayout>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bn_background"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu"
-        android:longClickable="false"/>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

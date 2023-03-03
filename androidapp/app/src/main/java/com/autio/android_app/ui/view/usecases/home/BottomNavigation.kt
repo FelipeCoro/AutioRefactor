@@ -11,12 +11,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.get
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
 import com.autio.android_app.ui.view.usecases.home.fragment.MapFragment
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
@@ -29,8 +30,7 @@ import com.autio.android_app.util.InjectorUtils
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 
-class BottomNavigation :
-    AppCompatActivity() {
+class BottomNavigation : AppCompatActivity() {
 
     private val bottomNavigationViewModel by viewModels<BottomNavigationViewModel> {
         InjectorUtils.provideBottomNavigationViewModel(
@@ -49,51 +49,28 @@ class BottomNavigation :
             this
         )
     }
-    private var castContext: CastContext? =
-        null
+    private var castContext: CastContext? = null
 
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
 
     private lateinit var navHostFragment: NavHostFragment
 
-    private var connected =
-        false
+    private var connected = false
 
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-        super.onCreate(
-            savedInstanceState
-        )
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         purchaseViewModel.getUserInfo()
 
-        networkViewModel.state.observe(
+
+        bindObservables()
+
+        castContext = CastContext.getSharedInstance(
             this
-        ) { state ->
-            connected =
-                when (state) {
-                    MyState.Fetched -> true
-                    MyState.Error -> false
-                }
-            updateConnectionUI(
-                connected
-            )
-        }
-
-        castContext =
-            CastContext.getSharedInstance(
-                this
-            )
-
-        binding =
-            ActivityBottomNavigationBinding.inflate(
-                layoutInflater
-            )
-        setContentView(
-            binding.root
         )
+
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_bottom_navigation)
 
         updateSnackBarMessageDisplay()
 
@@ -101,17 +78,36 @@ class BottomNavigation :
             bottomNavigationViewModel.initialRemainingStories
         )
 
-        purchaseViewModel.customerInfo.observe(
+
+
+        setListeners()
+        volumeControlStream = AudioManager.STREAM_MUSIC
+
+        bottomNavigationViewModel.mediaButtonRes.observe(
             this
-        ) {
-            it?.let {
-                binding.rlSeePlans.visibility =
-                    if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true)
-                        GONE
-                    else VISIBLE
+        ) { res ->
+            binding.btnFloatingPlayerPlay.setImageResource(
+                res
+            )
+        }
+    }
+
+    private fun bindObservables() {
+        networkViewModel.state.observe(
+            this
+        ) { state ->
+            connected = when (state) {
+                MyState.Fetched -> true
+                MyState.Error -> false
             }
+            updateConnectionUI(
+                connected
+            )
         }
 
+        bottomNavigationViewModel.playingStory.observe(this) { mediaItem ->
+            updatePlayer(mediaItem)
+        }
         bottomNavigationViewModel.remainingStoriesLiveData.observe(
             this
         ) {
@@ -119,25 +115,14 @@ class BottomNavigation :
                 it
             )
         }
-
-        setListeners()
-
-        volumeControlStream =
-            AudioManager.STREAM_MUSIC
-
-        bottomNavigationViewModel.playingStory.observe(
+        purchaseViewModel.customerInfo.observe(
             this
-        ) { mediaItem ->
-            updatePlayer(
-                mediaItem
-            )
-        }
-        bottomNavigationViewModel.mediaButtonRes.observe(
-            this
-        ) { res ->
-            binding.btnFloatingPlayerPlay.setImageResource(
-                res
-            )
+        ) {
+            it?.let {
+                binding.rlSeePlans.visibility =
+                    if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) GONE
+                    else VISIBLE
+            }
         }
     }
 
@@ -171,15 +156,12 @@ class BottomNavigation :
     }
 
     private fun setListeners() {
-        navHostFragment =
-            supportFragmentManager.findFragmentById(
-                R.id.mainContainer
-            ) as NavHostFragment
-        navController =
-            navHostFragment.navController
+        navHostFragment = supportFragmentManager.findFragmentById(
+            R.id.mainContainer
+        ) as NavHostFragment
+        navController = navHostFragment.navController
         setupWithNavController(
-            binding.bottomNavigationView,
-            navController
+            binding.bottomNavigationView, navController
         )
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             if (controller.graph[R.id.player] == destination) {
@@ -201,30 +183,18 @@ class BottomNavigation :
     }
 
     fun showPayWall() {
-        val subscribeIntent =
-            Intent(
-                this,
-                SubscribeActivity::class.java
-            )
-        subscribeIntent.putExtra(
-            "ACTIVITY_NAME",
-            BottomNavigation::class.simpleName
-        )
-        startActivity(
-            subscribeIntent
-        )
+        val subscribeIntent = Intent(this, SubscribeActivity::class.java)
+        subscribeIntent.putExtra("ACTIVITY_NAME", BottomNavigation::class.simpleName)
+        startActivity(subscribeIntent)
     }
 
     private fun updateSnackBarMessageDisplay() {
-        with(
-            binding
-        ) {
+        with(binding) {
             if (!TrackingUtility.hasCoreLocationPermissions(
                     this@BottomNavigation
                 )
             ) {
-                rlAllowLocationAccess.visibility =
-                    VISIBLE
+                rlAllowLocationAccess.visibility = VISIBLE
                 rlAllowLocationAccess.setOnClickListener {
                     requestPermissionLauncher.launch(
                         arrayOf(
@@ -234,16 +204,14 @@ class BottomNavigation :
                     )
                 }
                 ivCloseLocationMessage.setOnClickListener {
-                    rlAllowLocationAccess.visibility =
-                        GONE
+                    rlAllowLocationAccess.visibility = GONE
                 }
             }
             if (Build.VERSION.SDK_INT >= 33 && !TrackingUtility.hasNotificationPermissions(
                     this@BottomNavigation
                 )
             ) {
-                rlAllowNotifications.visibility =
-                    VISIBLE
+                rlAllowNotifications.visibility = VISIBLE
                 rlAllowNotifications.setOnClickListener {
                     requestPermissionLauncher.launch(
                         arrayOf(
@@ -252,8 +220,7 @@ class BottomNavigation :
                     )
                 }
                 ivCloseNotificationsMessage.setOnClickListener {
-                    rlAllowNotifications.visibility =
-                        GONE
+                    rlAllowNotifications.visibility = GONE
                 }
             }
         }
@@ -265,40 +232,29 @@ class BottomNavigation :
         with(
             binding
         ) {
-            val tickMarks =
-                arrayOf(
-                    tickMark1,
-                    tickMark2,
-                    tickMark3,
-                    tickMark4,
-                    tickMark5
-                )
+            val tickMarks = arrayOf(
+                tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
+            )
 
             if (remainingStories < 0) {
-                llTickMarks.visibility =
-                    GONE
+                llTickMarks.visibility = GONE
             } else {
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
                         tickMark.setBackgroundColor(
                             ResourcesCompat.getColor(
-                                resources,
-                                R.color.contrasting_text,
-                                null
+                                resources, R.color.contrasting_text, null
                             )
                         )
                     } else {
                         tickMark.setBackgroundColor(
                             ResourcesCompat.getColor(
-                                resources,
-                                R.color.autio_blue_20,
-                                null
+                                resources, R.color.autio_blue_20, null
                             )
                         )
                     }
                 }
-                llTickMarks.visibility =
-                    VISIBLE
+                llTickMarks.visibility = VISIBLE
             }
         }
     }
@@ -306,11 +262,8 @@ class BottomNavigation :
     private fun updateConnectionUI(
         connectionAvailable: Boolean
     ) {
-        binding.rlNoInternetConnection.visibility =
-            if (!connectionAvailable)
-                VISIBLE
-            else
-                GONE
+        binding.rlNoInternetConnection.visibility = if (!connectionAvailable) VISIBLE
+        else GONE
     }
 
     private fun updatePlayer(
@@ -319,44 +272,33 @@ class BottomNavigation :
         with(
             binding
         ) {
-            tvFloatingPlayerTitle.text =
-                story?.title
-                    ?: resources.getText(
-                        R.string.no_story_loaded
-                    )
-            tvFloatingPlayerNarrator.text =
-                story?.narrator
+            tvFloatingPlayerTitle.text = story?.title ?: resources.getText(
+                R.string.no_story_loaded
+            )
+            tvFloatingPlayerNarrator.text = story?.narrator
             tvFloatingPlayerNarrator.visibility =
                 if (story?.narrator?.isNotEmpty() == true) VISIBLE else GONE
         }
     }
 
     private fun hidePlayerComponent() {
-        binding.persistentPlayer.animate()
-            .alpha(
+        binding.persistentPlayer.animate().alpha(
                 0.0f
-            )
-            .translationY(
+            ).translationY(
                 binding.persistentPlayer.height.toFloat()
-            )
-            .withEndAction {
+            ).withEndAction {
                 binding.mainContainer.requestLayout()
-                binding.persistentPlayer.visibility =
-                    GONE
+                binding.persistentPlayer.visibility = GONE
             }
     }
 
     private fun showPlayerComponent() {
-        binding.persistentPlayer.visibility =
-            VISIBLE
-        binding.persistentPlayer.animate()
-            .alpha(
+        binding.persistentPlayer.visibility = VISIBLE
+        binding.persistentPlayer.animate().alpha(
                 1.0f
-            )
-            .translationYBy(
+            ).translationYBy(
                 -binding.persistentPlayer.height.toFloat()
-            )
-            .withEndAction {
+            ).withEndAction {
                 binding.mainContainer.requestLayout()
             }
     }
@@ -364,34 +306,30 @@ class BottomNavigation :
     /**
      * Handles the result of the request for location permissions.
      */
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissionResults ->
-            if (permissionResults.keys.contains(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            ) {
-                if (permissionResults[Manifest.permission.ACCESS_FINE_LOCATION]!!) {
-                    binding.rlAllowLocationAccess.visibility =
-                        GONE
-                    val mapFragment =
-                        navHostFragment.childFragmentManager.fragments.first() as? MapFragment
-                    if (mapFragment != null) {
-                        mapFragment.locationPermissionGranted =
-                            true
-                        mapFragment.updateLocationUI()
-                    }
-                }
-            }
-            if (permissionResults.keys.contains(
-                    Manifest.permission.POST_NOTIFICATIONS
-                )
-            ) {
-                if (permissionResults[Manifest.permission.POST_NOTIFICATIONS]!!) {
-                    binding.rlAllowNotifications.visibility =
-                        GONE
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissionResults ->
+        if (permissionResults.keys.contains(
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            if (permissionResults[Manifest.permission.ACCESS_FINE_LOCATION]!!) {
+                binding.rlAllowLocationAccess.visibility = GONE
+                val mapFragment =
+                    navHostFragment.childFragmentManager.fragments.first() as? MapFragment
+                if (mapFragment != null) {
+                    mapFragment.locationPermissionGranted = true
+                    mapFragment.updateLocationUI()
                 }
             }
         }
+        if (permissionResults.keys.contains(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        ) {
+            if (permissionResults[Manifest.permission.POST_NOTIFICATIONS]!!) {
+                binding.rlAllowNotifications.visibility = GONE
+            }
+        }
+    }
 }
