@@ -2,8 +2,8 @@ package com.autio.android_app
 
 import android.app.Application
 import com.autio.android_app.billing.RevenueCatRepository
-import com.autio.android_app.data.database.StoryDataBase
-import com.autio.android_app.data.database.repository.StoryRepository
+import com.autio.android_app.data.database.DataBase
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -24,13 +24,13 @@ class CoreApplication :
             )
 
         val database by lazy {
-            StoryDataBase.getInstance(
+            DataBase.getInstance(
                 this@CoreApplication,
                 applicationScope
             )
         }
-        val storyRepository by lazy {
-            StoryRepository(
+        val autioLocalDataSourceImpl by lazy {
+            AutioLocalDataSourceImpl(
                 database.storyDao(),
                 database.downloadedStoryDao(),
                 database.categoryDao()

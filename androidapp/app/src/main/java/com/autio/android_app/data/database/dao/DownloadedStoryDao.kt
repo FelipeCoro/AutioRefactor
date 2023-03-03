@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.autio.android_app.data.model.story.DownloadedStory
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,20 +13,20 @@ interface DownloadedStoryDao {
         onConflict = OnConflictStrategy.REPLACE
     )
     fun addStory(
-        story: DownloadedStory
+        story: DownloadedStoryEntity
     ): Long
 
     @Query(
         "SELECT * FROM downloaded_stories ORDER BY id ASC"
     )
-    fun readLiveStories(): Flow<List<DownloadedStory>>
+    fun readLiveStories(): Flow<List<DownloadedStoryEntity>>
 
     @Query(
         "SELECT * FROM downloaded_stories WHERE id = :id"
     )
     suspend fun getStoryById(
         id: String
-    ): DownloadedStory?
+    ): DownloadedStoryEntity?
 
     @Query(
         "UPDATE downloaded_stories SET isBookmarked = 1 WHERE id = :id"

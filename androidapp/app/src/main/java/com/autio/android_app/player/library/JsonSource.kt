@@ -3,8 +3,8 @@ package com.autio.android_app.player.library
 import android.content.Context
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
-import com.autio.android_app.data.database.StoryDataBase
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.database.DataBase
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.extensions.albumArtUri
 import com.autio.android_app.extensions.displayIconUri
 import com.autio.android_app.extensions.from
@@ -110,7 +110,7 @@ internal class JsonSource(
      */
     private suspend fun downloadJson(): JsonCatalog {
         val stories =
-            StoryDataBase.getInstance(
+            DataBase.getInstance(
                 context,
                 CoroutineScope(
                     SupervisorJob()

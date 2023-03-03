@@ -21,10 +21,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.autio.android_app.R
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.story.DownloadedStory
-import com.autio.android_app.data.model.story.NowPlayingMetadata
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.entities.story.NowPlayingMetadata
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
@@ -579,8 +578,8 @@ class PlayerFragment :
                         it,
                         story,
                         arrayListOf(
-                            if (story.isDownloaded == true) StoryOption.REMOVE_DOWNLOAD else StoryOption.DOWNLOAD,
-                            StoryOption.DIRECTIONS
+                            if (story.isDownloaded == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD else com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
+                            com.autio.android_app.data.api.model.StoryOption.DIRECTIONS
                         ),
                         onOptionClick = ::onOptionClicked
                     )
@@ -724,11 +723,11 @@ class PlayerFragment :
     }
 
     private fun onOptionClicked(
-        option: StoryOption,
+        option: com.autio.android_app.data.api.model.StoryOption,
         story: Story
     ) {
         when (option) {
-            StoryOption.DOWNLOAD -> {
+            com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> {
                 showPaywallOrProceedWithNormalProcess(
                     requireActivity(),
                     isActionExclusiveForSignedInUser = true
@@ -761,7 +760,7 @@ class PlayerFragment :
                     }
                 }
             }
-            StoryOption.REMOVE_DOWNLOAD -> {
+            com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
                 storyViewModel.removeDownloadedStory(
                     story.id
                 )
@@ -769,7 +768,7 @@ class PlayerFragment :
                     "Story Removed From My Device"
                 )
             }
-            StoryOption.DIRECTIONS -> openLocationInMapsApp(
+            com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
                 requireActivity(),
                 story.lat,
                 story.lon

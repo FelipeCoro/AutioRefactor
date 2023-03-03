@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.autio.android_app.data.model.account.CreateAccountDto
-import com.autio.android_app.data.model.account.LoginResponse
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.ActivitySignUpBinding
@@ -89,7 +87,7 @@ class SignUpActivity :
             val email =
                 "${binding.tvEmail.text}"
             val createAccountDto =
-                CreateAccountDto(
+                com.autio.android_app.data.api.model.account.CreateAccountDto(
                     email,
                     email,
                     password,
@@ -125,7 +123,7 @@ class SignUpActivity :
     }
 
     private fun saveUserInfo(
-        loginResponse: LoginResponse
+        loginResponse: com.autio.android_app.data.api.model.account.LoginResponse
     ) {
         prefRepository.isUserGuest =
             false

@@ -16,10 +16,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.PlaylistOption
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.story.DownloadedStory
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.legacy.PrefRepository
@@ -136,8 +134,8 @@ class HistoryFragment :
                     binding.root,
                     view,
                     listOf(
-                        PlaylistOption.DOWNLOAD,
-                        PlaylistOption.CLEAR_HISTORY
+                        com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
+                        com.autio.android_app.data.api.model.PlaylistOption.CLEAR_HISTORY
                     ).map {
                         it.also { option ->
                             option.disabled =
@@ -204,7 +202,7 @@ class HistoryFragment :
     }
 
     private fun onOptionClicked(
-        option: StoryOption,
+        option: com.autio.android_app.data.api.model.StoryOption,
         story: Story
     ) {
         showPaywallOrProceedWithNormalProcess(
@@ -212,7 +210,7 @@ class HistoryFragment :
             isActionExclusiveForSignedInUser = true
         ) {
             when (option) {
-                StoryOption.DELETE -> {
+                com.autio.android_app.data.api.model.StoryOption.DELETE -> {
                     FirebaseStoryRepository.removeStoryFromUserHistory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -231,7 +229,7 @@ class HistoryFragment :
                         }
                     )
                 }
-                StoryOption.BOOKMARK -> {
+                com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
                     // TODO: change Firebase code with commented code once stable
                     FirebaseStoryRepository.bookmarkStory(
                         prefRepository.firebaseKey,
@@ -270,7 +268,7 @@ class HistoryFragment :
 //                        }
 //                    }
                 }
-                StoryOption.REMOVE_BOOKMARK -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
                     FirebaseStoryRepository.removeBookmarkFromStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -307,7 +305,7 @@ class HistoryFragment :
 //                        }
 //                    }
                 }
-                StoryOption.LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
                     FirebaseStoryRepository.giveLikeToStory(
                         story.id,
                         prefRepository.firebaseKey,
@@ -344,7 +342,7 @@ class HistoryFragment :
 //                        }
 //                    }
                 }
-                StoryOption.REMOVE_LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -363,7 +361,7 @@ class HistoryFragment :
                         }
                     )
                 }
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
+                com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
                             DownloadedStory.fromStory(
@@ -387,7 +385,7 @@ class HistoryFragment :
                         )
                     }
                 }
-                StoryOption.REMOVE_DOWNLOAD -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
                         story.id
                     )
@@ -395,12 +393,12 @@ class HistoryFragment :
                         "Story Removed From My Device"
                     )
                 }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
                     requireActivity(),
                     story.lat,
                     story.lon
                 )
-                StoryOption.SHARE -> {
+                com.autio.android_app.data.api.model.StoryOption.SHARE -> {
                     shareStory(
                         requireContext(),
                         story.id
@@ -411,7 +409,7 @@ class HistoryFragment :
     }
 
     private fun onPlaylistOptionClicked(
-        option: PlaylistOption
+        option: com.autio.android_app.data.api.model.PlaylistOption
     ) {
         showPaywallOrProceedWithNormalProcess(
             requireActivity(),
@@ -420,10 +418,10 @@ class HistoryFragment :
             binding.pbLoadingProcess.visibility =
                 View.VISIBLE
             when (option) {
-                PlaylistOption.DOWNLOAD -> {
+                com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD -> {
 
                 }
-                PlaylistOption.CLEAR_HISTORY -> {
+                com.autio.android_app.data.api.model.PlaylistOption.CLEAR_HISTORY -> {
                     FirebaseStoryRepository.removeWholeUserHistory(
                         prefRepository.firebaseKey,
                         onSuccessListener = {

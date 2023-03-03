@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -21,7 +20,7 @@ import com.bumptech.glide.request.RequestOptions
 class StoryAdapter(
     private var playingStory: MutableLiveData<Story?>,
     private var onStoryPlay: ((String) -> Unit)?,
-    private var onOptionClick: ((StoryOption, Story) -> Unit)?,
+    private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
     private var shouldPinLocationBeShown: Boolean = false
 ) :
     ListAdapter<Story, StoryAdapter.StoryViewHolder>(
@@ -32,7 +31,7 @@ class StoryAdapter(
         itemView: View,
         private val playingStory: MutableLiveData<Story?>,
         private val onStoryPlay: ((String) -> Unit)?,
-        private val onOptionClick: ((StoryOption, Story) -> Unit)?,
+        private val onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
         private val shouldPinLocationBeShown: Boolean
     ) : RecyclerView.ViewHolder(
         itemView
@@ -118,11 +117,11 @@ class StoryAdapter(
                     it,
                     model,
                     arrayListOf(
-                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                        StoryOption.DOWNLOAD,
-                        StoryOption.DIRECTIONS,
-                        StoryOption.SHARE
+                        if (model.isBookmarked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
+                        if (model.isLiked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
+                        com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
+                        com.autio.android_app.data.api.model.StoryOption.DIRECTIONS,
+                        com.autio.android_app.data.api.model.StoryOption.SHARE
                     ),
                     onOptionClick = onOptionClick
                 )
@@ -154,7 +153,7 @@ class StoryAdapter(
                 parent: ViewGroup,
                 playingStory: MutableLiveData<Story?>,
                 onStoryPlay: ((String) -> Unit)?,
-                onOptionClick: ((StoryOption, Story) -> Unit)?,
+                onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
                 shouldPinLocationBeShown: Boolean
             ): StoryViewHolder {
                 val view =

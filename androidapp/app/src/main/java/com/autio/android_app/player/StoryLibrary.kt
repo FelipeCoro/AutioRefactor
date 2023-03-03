@@ -7,7 +7,7 @@ import android.net.Uri
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import com.autio.android_app.R
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.Story
 import java.io.IOException
 import java.net.URL
 import java.util.*

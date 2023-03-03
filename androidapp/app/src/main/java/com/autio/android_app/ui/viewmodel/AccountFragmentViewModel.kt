@@ -5,9 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.account.ProfileDto
-import com.autio.android_app.data.model.story.Category
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
+import com.autio.android_app.data.entities.story.Category
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class AccountFragmentViewModel(
     private val app: Application,
-    private val storyRepository: StoryRepository
+    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
 ) : AndroidViewModel(
     app
 ) {
@@ -31,7 +30,7 @@ class AccountFragmentViewModel(
             prefRepository.userApiToken
         ) { profile ->
             if (profile?.categories != null) {
-                storyRepository.addUserCategories(
+                autioLocalDataSourceImpl.addUserCategories(
                     profile.categories.toTypedArray()
                 )
             }
@@ -46,7 +45,7 @@ class AccountFragmentViewModel(
         onFailure: () -> Unit
     ) {
         val infoUser =
-            ProfileDto(
+            com.autio.android_app.data.api.model.account.ProfileDto(
                 email,
                 name,
                 categories
@@ -74,7 +73,7 @@ class AccountFragmentViewModel(
         onFailure: () -> Unit
     ) {
         val infoUser =
-            ProfileDto(
+            com.autio.android_app.data.api.model.account.ProfileDto(
                 prefRepository.userEmail,
                 prefRepository.userName,
                 categories
@@ -88,7 +87,7 @@ class AccountFragmentViewModel(
                 viewModelScope.launch(
                     Dispatchers.IO
                 ) {
-                    storyRepository.updateCategories(
+                    autioLocalDataSourceImpl.updateCategories(
                         it.categories.toTypedArray()
                     )
                 }
@@ -101,7 +100,7 @@ class AccountFragmentViewModel(
 
     class Factory(
         private val app: Application,
-        private val storyRepository: StoryRepository
+        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
     ) : ViewModelProvider.NewInstanceFactory() {
 
         @Suppress(
@@ -112,7 +111,7 @@ class AccountFragmentViewModel(
         ): T {
             return AccountFragmentViewModel(
                 app,
-                storyRepository
+                autioLocalDataSourceImpl
             ) as T
         }
     }

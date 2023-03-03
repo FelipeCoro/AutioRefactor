@@ -11,8 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.story.DownloadedStory
+import com.autio.android_app.data.entities.story.DownloadedStory
 import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -20,7 +19,7 @@ import java.io.File
 
 class DownloadedStoryAdapter(
     private var onStoryPlay: ((String) -> Unit)?,
-    private var onOptionClick: ((StoryOption, DownloadedStory) -> Unit)?
+    private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)?
 ) : ListAdapter<DownloadedStory, DownloadedStoryAdapter.DownloadedStoryViewHolder>(
     DownloadedStoryComparator()
 ) {
@@ -28,7 +27,7 @@ class DownloadedStoryAdapter(
     class DownloadedStoryViewHolder(
         itemView: View,
         private var onStoryPlay: ((String) -> Unit)?,
-        private var onOptionClick: ((StoryOption, DownloadedStory) -> Unit)?
+        private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)?
     ) : RecyclerView.ViewHolder(
         itemView
     ) {
@@ -103,12 +102,12 @@ class DownloadedStoryAdapter(
                     it,
                     model,
                     arrayListOf(
-                        StoryOption.DELETE,
-                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                        StoryOption.REMOVE_DOWNLOAD,
-                        StoryOption.DIRECTIONS,
-                        StoryOption.SHARE
+                        com.autio.android_app.data.api.model.StoryOption.DELETE,
+                        if (model.isBookmarked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
+                        if (model.isLiked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
+                        com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD,
+                        com.autio.android_app.data.api.model.StoryOption.DIRECTIONS,
+                        com.autio.android_app.data.api.model.StoryOption.SHARE
                     ),
                     onOptionClick = onOptionClick
                 )
@@ -119,7 +118,7 @@ class DownloadedStoryAdapter(
             fun create(
                 parent: ViewGroup,
                 onStoryPlay: ((String) -> Unit)?,
-                onOptionClick: ((StoryOption, DownloadedStory) -> Unit)?
+                onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)?
             ): DownloadedStoryViewHolder {
                 val view =
                     LayoutInflater.from(

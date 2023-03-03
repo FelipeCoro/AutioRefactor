@@ -5,8 +5,8 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.SubscriptionCallback
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
-import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
@@ -17,7 +17,7 @@ class MapFragmentViewModel(
     application: Application,
     private val mediaId: String,
     playerServiceConnection: PlayerServiceConnection,
-    private val storyRepository: StoryRepository
+    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
 ) : AndroidViewModel(
     application
 ) {
@@ -126,7 +126,7 @@ class MapFragmentViewModel(
         latLngBounds: LatLngBounds
     ) {
         val storiesInBounds =
-            storyRepository.getStoriesInLatLngBoundaries(
+            autioLocalDataSourceImpl.getStoriesInLatLngBoundaries(
                 latLngBounds.southwest,
                 latLngBounds.northeast
             )
@@ -151,7 +151,7 @@ class MapFragmentViewModel(
                 ) { storiesFromAPI ->
                     if (storiesFromAPI != null) {
                         for (story in storiesFromAPI) {
-                            storyRepository.cacheRecordOfStory(
+                            autioLocalDataSourceImpl.cacheRecordOfStory(
                                 story.id,
                                 story.recordUrl
                             )
@@ -166,7 +166,7 @@ class MapFragmentViewModel(
         private val application: Application,
         private val mediaId: String,
         private val playerServiceConnection: PlayerServiceConnection,
-        private val storyRepository: StoryRepository
+        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
     ) : ViewModelProvider.NewInstanceFactory() {
         @Suppress(
             "unchecked_cast"
@@ -178,7 +178,7 @@ class MapFragmentViewModel(
                 application,
                 mediaId,
                 playerServiceConnection,
-                storyRepository
+                autioLocalDataSourceImpl
             ) as T
         }
     }

@@ -1,11 +1,11 @@
 package com.autio.android_app.data.repository.legacy
 
 import android.util.Log
-import com.autio.android_app.data.model.bookmarks.Bookmark
-import com.autio.android_app.data.model.history.History
-import com.autio.android_app.data.model.likes.Like
-import com.autio.android_app.data.model.story.Category
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.api.model.bookmarks.BookmarkDto
+import com.autio.android_app.data.entities.history.History
+import com.autio.android_app.data.entities.likes.Like
+import com.autio.android_app.data.entities.story.Category
+import com.autio.android_app.data.entities.story.Story
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -76,13 +76,13 @@ class FirebaseStoryRepository {
 
         suspend fun getUserBookmarks(
             userId: String
-        ): Array<Bookmark> {
+        ): Array<BookmarkDto> {
             return bookmarksRef.child(
                 userId
             )
                 .get()
                 .await().children.map {
-                    Bookmark(
+                    BookmarkDto(
                         storyId = it.key!!,
                         isOwn = it.child(
                             "isOwn"

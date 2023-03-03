@@ -3,13 +3,13 @@ package com.autio.android_app.ui.view.usecases.home.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.autio.android_app.data.model.PlaylistOption
-import com.autio.android_app.data.model.PlaylistOptionClickListener
+import com.autio.android_app.data.api.model.PlaylistOption
+import com.autio.android_app.data.api.model.PlaylistOptionClickListener
 import com.autio.android_app.databinding.ItemListPopupWindowBinding
 
 class PlaylistOptionsAdapter(
-    private var options: List<PlaylistOption>,
-    private val onOptionClickListener: PlaylistOptionClickListener? = null
+    private var options: List<com.autio.android_app.data.api.model.PlaylistOption>,
+    private val onOptionClickListener: com.autio.android_app.data.api.model.PlaylistOptionClickListener? = null
 ) : RecyclerView.Adapter<PlaylistOptionsAdapter.OptionViewHolder>() {
 
     inner class OptionViewHolder(
@@ -18,7 +18,7 @@ class PlaylistOptionsAdapter(
         binding.root
     ) {
         fun render(
-            model: PlaylistOption
+            model: com.autio.android_app.data.api.model.PlaylistOption
         ) {
             binding.root.setOnClickListener {
                 onOptionClickListener?.onOptionClick(

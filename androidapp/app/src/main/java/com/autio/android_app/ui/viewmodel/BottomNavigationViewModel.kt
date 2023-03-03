@@ -11,10 +11,10 @@ import android.util.Log
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.autio.android_app.R
-import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.history.History
-import com.autio.android_app.data.model.plays.PlaysDto
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
+import com.autio.android_app.data.entities.history.History
+import com.autio.android_app.data.entities.plays.PlaysDto
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.legacy.PrefRepository
@@ -32,7 +32,7 @@ import java.util.*
 class BottomNavigationViewModel(
     private val app: Application,
     playerServiceConnection: PlayerServiceConnection,
-    private val storyRepository: StoryRepository,
+    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl,
 //    private val applicationRepository: CoreApplicationRepository
 ) : AndroidViewModel(
     app
@@ -143,7 +143,7 @@ class BottomNavigationViewModel(
                 Dispatchers.IO
             ) {
                 val downloadedStory =
-                    storyRepository.getDownloadedStoryById(
+                    autioLocalDataSourceImpl.getDownloadedStoryById(
                         playingStory.value!!.id
                     )
                 val connectivityManager =
@@ -185,7 +185,7 @@ class BottomNavigationViewModel(
                         viewModelScope.launch(
                             Dispatchers.IO
                         ) {
-                            storyRepository.markStoryAsListenedAtLeast30Secs(
+                            autioLocalDataSourceImpl.markStoryAsListenedAtLeast30Secs(
                                 storyToPost.id
                             )
                         }
@@ -295,7 +295,7 @@ class BottomNavigationViewModel(
                     viewModelScope.launch(
                         Dispatchers.IO
                     ) {
-                        storyRepository.addStoryToHistory(
+                        autioLocalDataSourceImpl.addStoryToHistory(
                             History(
                                 mediaItem.mediaId,
                                 timestamp
@@ -345,7 +345,7 @@ class BottomNavigationViewModel(
                     viewModelScope.launch(
                         Dispatchers.IO
                     ) {
-                        storyRepository.addStoryToHistory(
+                        autioLocalDataSourceImpl.addStoryToHistory(
                             History(
                                 mediaId,
                                 timestamp
@@ -428,7 +428,7 @@ class BottomNavigationViewModel(
      */
     private suspend fun getRemoteStories() {
         val lastFetchedStory =
-            storyRepository.getLastModifiedStory()
+            autioLocalDataSourceImpl.getLastModifiedStory()
         val date =
             lastFetchedStory?.modifiedDate
                 ?: 63808881662
@@ -440,7 +440,7 @@ class BottomNavigationViewModel(
                 FirebaseStoryRepository.getStoriesAfterModifiedDate(
                     date.toInt()
                 )
-            storyRepository.addStories(
+            autioLocalDataSourceImpl.addStories(
                 stories
             )
 //            val dateFormat =
@@ -477,7 +477,7 @@ class BottomNavigationViewModel(
                 FirebaseStoryRepository.getUserBookmarks(
                     prefRepository.firebaseKey
                 )
-            storyRepository.setBookmarksDataToLocalStories(
+            autioLocalDataSourceImpl.setBookmarksDataToLocalStories(
                 userBookmarkedStories.map { it.storyId }
             )
 //            apiService.getStoriesFromUserBookmarks(
@@ -501,7 +501,7 @@ class BottomNavigationViewModel(
                 FirebaseStoryRepository.getUserFavoriteStories(
                     prefRepository.firebaseKey
                 )
-            storyRepository.setLikesDataToLocalStories(
+            autioLocalDataSourceImpl.setLikesDataToLocalStories(
                 userFavoriteStories.filter { it.isGiven == true }
                     .map { it.storyId }
             )
@@ -526,7 +526,7 @@ class BottomNavigationViewModel(
                 FirebaseStoryRepository.getUserStoriesHistory(
                     prefRepository.firebaseKey
                 )
-            storyRepository.setListenedAtToLocalStories(
+            autioLocalDataSourceImpl.setListenedAtToLocalStories(
                 userHistory
             )
         }
@@ -536,7 +536,7 @@ class BottomNavigationViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.deleteCachedData()
+            autioLocalDataSourceImpl.deleteCachedData()
         }
     }
 
@@ -553,7 +553,7 @@ class BottomNavigationViewModel(
     class Factory(
         private val app: Application,
         private val playerServiceConnection: PlayerServiceConnection,
-        private val storyRepository: StoryRepository,
+        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl,
 //        private val applicationRepository: CoreApplicationRepository
     ) : ViewModelProvider.NewInstanceFactory() {
 
@@ -566,7 +566,7 @@ class BottomNavigationViewModel(
             return BottomNavigationViewModel(
                 app,
                 playerServiceConnection,
-                storyRepository,
+                autioLocalDataSourceImpl,
 //                applicationRepository
             ) as T
         }

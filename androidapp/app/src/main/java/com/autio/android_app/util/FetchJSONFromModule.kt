@@ -2,7 +2,7 @@ package com.autio.android_app.util
 
 import android.content.Context
 import com.autio.android_app.R
-import com.autio.android_app.data.model.State
+import com.autio.android_app.data.api.model.State
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 
@@ -26,10 +26,10 @@ class FetchJSONFromModule {
 
         fun parseJSON(
             context: Context
-        ): List<State> {
+        ): List<com.autio.android_app.data.api.model.State> {
             val typeOfMap =
                 object :
-                    TypeToken<List<State>>() {}.type
+                    TypeToken<List<com.autio.android_app.data.api.model.State>>() {}.type
             return GsonBuilder().create()
                 .fromJson(
                     readJSONFromAsset(

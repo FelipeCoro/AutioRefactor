@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.autio.android_app.data.model.story.Category
+import com.autio.android_app.data.entities.story.Category
 import com.autio.android_app.databinding.ItemInterestBinding
 
 class CategoryAdapter :

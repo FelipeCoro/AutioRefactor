@@ -16,7 +16,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.get
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
 import com.autio.android_app.ui.view.usecases.home.fragment.MapFragment
 import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity

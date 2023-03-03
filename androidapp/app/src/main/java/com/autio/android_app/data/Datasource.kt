@@ -1,7 +1,8 @@
 package com.autio.android_app.data
 
 import com.autio.android_app.R
-import com.autio.android_app.data.model.design.LocationView
+import com.autio.android_app.data.api.model.modelLegacy.LocationView
+
 
 class Datasource {
     fun loadLocationViews(): List<LocationView> {

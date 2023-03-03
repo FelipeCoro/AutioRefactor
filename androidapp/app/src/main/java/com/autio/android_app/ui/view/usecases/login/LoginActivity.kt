@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.Datasource
-import com.autio.android_app.data.model.account.GuestResponse
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.ActivityLoginBinding
@@ -152,7 +151,7 @@ class LoginActivity :
     }
 
     private fun saveGuestInfo(
-        guestResponse: GuestResponse
+        guestResponse: com.autio.android_app.data.api.model.account.GuestResponse
     ) {
         prefRepository.isUserGuest =
             true

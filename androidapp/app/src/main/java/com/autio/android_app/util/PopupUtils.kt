@@ -9,12 +9,8 @@ import android.widget.PopupWindow
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.PlaylistOption
-import com.autio.android_app.data.model.PlaylistOptionClickListener
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.StoryOptionClickListener
-import com.autio.android_app.data.model.story.DownloadedStory
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.ui.view.usecases.home.adapter.PlaylistOptionsAdapter
 import com.autio.android_app.ui.view.usecases.home.adapter.StoryOptionsAdapter
 
@@ -22,8 +18,8 @@ fun showPlaylistOptions(
     context: Context,
     root: ViewGroup,
     anchor: View,
-    options: List<PlaylistOption>,
-    onOptionClicked: ((PlaylistOption) -> Unit)?,
+    options: List<com.autio.android_app.data.api.model.PlaylistOption>,
+    onOptionClicked: ((com.autio.android_app.data.api.model.PlaylistOption) -> Unit)?,
     onDismiss: (() -> Unit)? = null
 ) {
     val inflater =
@@ -50,9 +46,9 @@ fun showPlaylistOptions(
         PlaylistOptionsAdapter(
             options,
             object :
-                PlaylistOptionClickListener {
+                com.autio.android_app.data.api.model.PlaylistOptionClickListener {
                 override fun onOptionClick(
-                    option: PlaylistOption
+                    option: com.autio.android_app.data.api.model.PlaylistOption
                 ) {
                     popup.dismiss()
                     onOptionClicked?.invoke(
@@ -86,8 +82,8 @@ fun showStoryOptions(
     root: ViewGroup,
     anchor: View,
     story: Story,
-    options: List<StoryOption>,
-    onOptionClick: ((StoryOption, Story) -> Unit)? = null,
+    options: List<com.autio.android_app.data.api.model.StoryOption>,
+    onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)? = null,
     onDismiss: (() -> Unit)? = null
 ) {
     val inflater =
@@ -116,9 +112,9 @@ fun showStoryOptions(
             story,
             options,
             object :
-                StoryOptionClickListener<Story> {
+                com.autio.android_app.data.api.model.StoryOptionClickListener<Story> {
                 override fun onItemClick(
-                    option: StoryOption,
+                    option: com.autio.android_app.data.api.model.StoryOption,
                     story: Story
                 ) {
                     popup.dismiss()
@@ -157,8 +153,8 @@ fun showStoryOptions(
     root: ViewGroup,
     anchor: View,
     story: DownloadedStory,
-    options: List<StoryOption>,
-    onOptionClick: ((StoryOption, DownloadedStory) -> Unit)? = null,
+    options: List<com.autio.android_app.data.api.model.StoryOption>,
+    onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)? = null,
     onDismiss: (() -> Unit)? = null
 ) {
     val inflater =
@@ -187,9 +183,9 @@ fun showStoryOptions(
             story,
             options,
             object :
-                StoryOptionClickListener<DownloadedStory> {
+                com.autio.android_app.data.api.model.StoryOptionClickListener<DownloadedStory> {
                 override fun onItemClick(
-                    option: StoryOption,
+                    option: com.autio.android_app.data.api.model.StoryOption,
                     story: DownloadedStory
                 ) {
                     popup.dismiss()

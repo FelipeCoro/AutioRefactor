@@ -5,9 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.autio.android_app.data.model.account.GuestResponse
-import com.autio.android_app.data.model.account.LoginDto
-import com.autio.android_app.data.model.account.LoginResponse
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.ActivitySignInBinding
@@ -89,7 +86,7 @@ class SignInActivity :
             val password =
                 binding.editTextPassword.text.toString()
             val loginRequest =
-                LoginDto(
+                com.autio.android_app.data.api.model.account.LoginDto(
                     email,
                     password
                 )
@@ -151,7 +148,7 @@ class SignInActivity :
      * Sets guest's data in the shared preferences
      */
     private fun saveGuestInfo(
-        guestResponse: GuestResponse
+        guestResponse: com.autio.android_app.data.api.model.account.GuestResponse
     ) {
         prefRepository.isUserGuest =
             true
@@ -169,7 +166,7 @@ class SignInActivity :
      * Saves user's data in the shared preferences
      */
     private fun saveUserInfo(
-        loginResponse: LoginResponse
+        loginResponse: com.autio.android_app.data.api.model.account.LoginResponse
     ) {
         prefRepository.isUserGuest =
             false

@@ -19,10 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
-import com.autio.android_app.data.model.PlaylistOption
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.story.DownloadedStory
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.legacy.PrefRepository
@@ -152,8 +150,8 @@ class BookmarksFragment :
                         binding.root,
                         it,
                         listOf(
-                            PlaylistOption.DOWNLOAD,
-                            PlaylistOption.REMOVE
+                            com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
+                            com.autio.android_app.data.api.model.PlaylistOption.REMOVE
                         ),
                         onOptionClicked = ::onPlaylistOptionClicked
                     )
@@ -189,7 +187,7 @@ class BookmarksFragment :
     }
 
     private fun onPlaylistOptionClicked(
-        option: PlaylistOption
+        option: com.autio.android_app.data.api.model.PlaylistOption
     ) {
         showPaywallOrProceedWithNormalProcess(
             requireActivity(),
@@ -198,10 +196,10 @@ class BookmarksFragment :
             binding.pbLoadingProcess.visibility =
                 View.VISIBLE
             when (option) {
-                PlaylistOption.DOWNLOAD -> {
+                com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD -> {
 
                 }
-                PlaylistOption.REMOVE -> {
+                com.autio.android_app.data.api.model.PlaylistOption.REMOVE -> {
                     FirebaseStoryRepository.removeAllBookmarks(
                         prefRepository.firebaseKey,
                         onSuccessListener = {
@@ -230,7 +228,7 @@ class BookmarksFragment :
     }
 
     private fun onStoryOptionClicked(
-        option: StoryOption,
+        option: com.autio.android_app.data.api.model.StoryOption,
         story: Story
     ) {
         showPaywallOrProceedWithNormalProcess(
@@ -238,7 +236,7 @@ class BookmarksFragment :
             isActionExclusiveForSignedInUser = true
         ) {
             when (option) {
-                StoryOption.DELETE, StoryOption.REMOVE_BOOKMARK -> {
+                com.autio.android_app.data.api.model.StoryOption.DELETE, com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
                     FirebaseStoryRepository.removeBookmarkFromStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -275,7 +273,7 @@ class BookmarksFragment :
 //                        }
 //                    }
                 }
-                StoryOption.LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
                     FirebaseStoryRepository.giveLikeToStory(
                         story.id,
                         prefRepository.firebaseKey,
@@ -312,7 +310,7 @@ class BookmarksFragment :
 //                        }
 //                    }
                 }
-                StoryOption.REMOVE_LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(
                         story.id,
                         prefRepository.firebaseKey,
@@ -331,7 +329,7 @@ class BookmarksFragment :
                         }
                     )
                 }
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
+                com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
                             DownloadedStory.fromStory(
@@ -355,7 +353,7 @@ class BookmarksFragment :
                         )
                     }
                 }
-                StoryOption.REMOVE_DOWNLOAD -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
                         story.id
                     )
@@ -363,12 +361,12 @@ class BookmarksFragment :
                         "Story Removed From My Device"
                     )
                 }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
                     requireActivity(),
                     story.lat,
                     story.lon
                 )
-                StoryOption.SHARE -> {
+                com.autio.android_app.data.api.model.StoryOption.SHARE -> {
                     shareStory(
                         requireContext(),
                         story.id

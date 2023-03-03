@@ -1,55 +1,55 @@
 package com.autio.android_app.ui.viewmodel
 
 import androidx.lifecycle.*
-import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.history.History
-import com.autio.android_app.data.model.story.DownloadedStory
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
+import com.autio.android_app.data.entities.history.History
+import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.entities.story.Story
 import kotlinx.coroutines.*
 
 class StoryViewModel(
-    private val storyRepository: StoryRepository
+    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
 ) : ViewModel() {
 
     val userCategories =
-        storyRepository.userCategories.asLiveData()
+        autioLocalDataSourceImpl.userCategories.asLiveData()
 
-    val allStories = storyRepository.allStories.asLiveData()
+    val allStories = autioLocalDataSourceImpl.allStories.asLiveData()
 
     suspend fun getAllStories() : List<Story> {
-        return storyRepository.getAllStories()
+        return autioLocalDataSourceImpl.getAllStories()
     }
 
     fun getStoriesByIds(
         ids: Array<Int>
     ): LiveData<Array<Story>> =
-        storyRepository.getStoriesByIds(
+        autioLocalDataSourceImpl.getStoriesByIds(
             ids
         )
             .asLiveData()
 
     val downloadedStories =
-        storyRepository.getDownloadedStories.asLiveData()
+        autioLocalDataSourceImpl.getDownloadedStories.asLiveData()
 
     fun downloadStory(
         story: DownloadedStory
     ) =
-        storyRepository.downloadStory(
+        autioLocalDataSourceImpl.downloadStory(
             story
         )
 
     fun removeDownloadedStory(
         id: String
     ) =
-        storyRepository.removeDownloadedStory(
+        autioLocalDataSourceImpl.removeDownloadedStory(
             id
         )
 
     fun removeAllDownloads() =
-        storyRepository.removeAllDownloads()
+        autioLocalDataSourceImpl.removeAllDownloads()
 
     val bookmarkedStories =
-        storyRepository.bookmarkedStories.asLiveData()
+        autioLocalDataSourceImpl.bookmarkedStories.asLiveData()
 
     fun bookmarkStory(
         id: String
@@ -57,7 +57,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.bookmarkStory(
+            autioLocalDataSourceImpl.bookmarkStory(
                 id
             )
         }
@@ -69,7 +69,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.removeBookmarkFromStory(
+            autioLocalDataSourceImpl.removeBookmarkFromStory(
                 id
             )
         }
@@ -79,12 +79,12 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.removeAllBookmarks()
+            autioLocalDataSourceImpl.removeAllBookmarks()
         }
     }
 
     val favoriteStories =
-        storyRepository.favoriteStories.asLiveData()
+        autioLocalDataSourceImpl.favoriteStories.asLiveData()
 
     fun setLikeToStory(
         id: String
@@ -92,7 +92,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.giveLikeToStory(
+            autioLocalDataSourceImpl.giveLikeToStory(
                 id
             )
         }
@@ -104,14 +104,14 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.removeLikeFromStory(
+            autioLocalDataSourceImpl.removeLikeFromStory(
                 id
             )
         }
     }
 
     val storiesHistory =
-        storyRepository.history.asLiveData()
+        autioLocalDataSourceImpl.history.asLiveData()
 
     fun addStoryToHistory(
         history: History
@@ -119,7 +119,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.addStoryToHistory(
+            autioLocalDataSourceImpl.addStoryToHistory(
                 history
             )
         }
@@ -131,7 +131,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.removeStoryFromHistory(
+            autioLocalDataSourceImpl.removeStoryFromHistory(
                 id
             )
         }
@@ -141,7 +141,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.clearStoryHistory()
+            autioLocalDataSourceImpl.clearStoryHistory()
         }
 
     fun cacheRecordOfStory(
@@ -151,7 +151,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.cacheRecordOfStory(
+            autioLocalDataSourceImpl.cacheRecordOfStory(
                 storyId,
                 recordUrl
             )
@@ -165,7 +165,7 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.cacheRecordOfStory(
+            autioLocalDataSourceImpl.cacheRecordOfStory(
                 storyId,
                 recordUrl
             )
@@ -180,12 +180,12 @@ class StoryViewModel(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            storyRepository.clearUserData()
+            autioLocalDataSourceImpl.clearUserData()
         }
     }
 
     class Factory(
-        private val storyRepository: StoryRepository
+        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
     ) : ViewModelProvider.NewInstanceFactory() {
 
         override fun <T : ViewModel> create(
@@ -199,7 +199,7 @@ class StoryViewModel(
                     "unchecked_cast"
                 )
                 return StoryViewModel(
-                    storyRepository
+                    autioLocalDataSourceImpl
                 ) as T
             }
             throw IllegalArgumentException(

@@ -26,11 +26,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.StoryOption
-import com.autio.android_app.data.model.story.DownloadedStory
-import com.autio.android_app.data.model.story.Story
-import com.autio.android_app.data.model.story.StoryClusterItem
-import com.autio.android_app.data.model.story.StoryClusterRenderer
+import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.data.entities.story.StoryClusterItem
+import com.autio.android_app.data.entities.story.StoryClusterRenderer
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.FragmentMapBinding
@@ -788,11 +787,11 @@ class MapFragment :
                 it,
                 story,
                 arrayListOf(
-                    if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                    if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                    StoryOption.DOWNLOAD,
-                    StoryOption.DIRECTIONS,
-                    StoryOption.SHARE
+                    if (story.isBookmarked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
+                    if (story.isLiked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
+                    com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
+                    com.autio.android_app.data.api.model.StoryOption.DIRECTIONS,
+                    com.autio.android_app.data.api.model.StoryOption.SHARE
                 ),
                 onOptionClick = ::onOptionClicked,
                 onDismiss = { storyDisplayTimer?.finishTimer() }
@@ -1140,7 +1139,7 @@ class MapFragment :
     }
 
     private fun onOptionClicked(
-        option: StoryOption,
+        option: com.autio.android_app.data.api.model.StoryOption,
         story: Story
     ) {
         storyDisplayTimer?.finishTimer()
@@ -1149,7 +1148,7 @@ class MapFragment :
             true
         ) {
             when (option) {
-                StoryOption.BOOKMARK -> {
+                com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
                     // TODO: change Firebase code with commented code once stable
                     FirebaseStoryRepository.bookmarkStory(
                         prefRepository.firebaseKey,
@@ -1195,7 +1194,7 @@ class MapFragment :
 //                        }
 //                    }
                 }
-                StoryOption.REMOVE_BOOKMARK -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
                     FirebaseStoryRepository.removeBookmarkFromStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -1239,7 +1238,7 @@ class MapFragment :
 //                        }
 //                    }
                 }
-                StoryOption.LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
                     FirebaseStoryRepository.giveLikeToStory(
                         story.id,
                         prefRepository.firebaseKey,
@@ -1283,7 +1282,7 @@ class MapFragment :
 //                        }
 //                    }
                 }
-                StoryOption.REMOVE_LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -1309,7 +1308,7 @@ class MapFragment :
                         }
                     )
                 }
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
+                com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
                             DownloadedStory.fromStory(
@@ -1340,7 +1339,7 @@ class MapFragment :
                         )
                     }
                 }
-                StoryOption.REMOVE_DOWNLOAD -> {
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
                         story.id
                     )
@@ -1355,12 +1354,12 @@ class MapFragment :
                         "Story Removed From My Device"
                     )
                 }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
                     requireActivity(),
                     story.lat,
                     story.lon
                 )
-                StoryOption.SHARE -> {
+                com.autio.android_app.data.api.model.StoryOption.SHARE -> {
                     shareStory(
                         requireContext(),
                         story.id

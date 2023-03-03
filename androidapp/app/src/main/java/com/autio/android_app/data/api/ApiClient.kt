@@ -1,12 +1,14 @@
 package com.autio.android_app.data.api
 
-import com.autio.android_app.data.model.account.*
-import com.autio.android_app.data.model.api_response.*
-import com.autio.android_app.data.model.author.Author
-import com.autio.android_app.data.model.category.StoryCategory
-import com.autio.android_app.data.model.narrator.Narrator
-import com.autio.android_app.data.model.plays.PlaysDto
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
+import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
+import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
+import com.autio.android_app.data.api.model.history.ClearHistoryResponse
+import com.autio.android_app.data.api.model.history.AddHistoryResponse
+import com.autio.android_app.data.api.model.story.StoryLikedResponse
+import com.autio.android_app.data.api.model.account.*
+import com.autio.android_app.data.api.model.story.PlaysDto
+import com.autio.android_app.data.api.model.story.*
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -21,15 +23,15 @@ interface ApiClient {
      */
     @POST("/api/v1/login")
     suspend fun login(
-        @Body loginDto: LoginDto
-    ): Response<LoginResponse>
+        @Body loginDto: com.autio.android_app.data.api.model.account.LoginDto
+    ): Response<com.autio.android_app.data.api.model.account.LoginResponse>
 
     /**
      * Authenticates user as guest and returns the guest's
      * data
      */
     @POST("/api/v1/guests")
-    suspend fun createGuestAccount(): Response<GuestResponse>
+    suspend fun createGuestAccount(): Response<com.autio.android_app.data.api.model.account.GuestResponse>
 
     /**
      * Creates user in backend and returns the user's
@@ -38,8 +40,8 @@ interface ApiClient {
      */
     @POST("/api/v1/accounts")
     suspend fun createAccount(
-        @Body createAccountDto: CreateAccountDto
-    ): Response<LoginResponse>
+        @Body createAccountDto: com.autio.android_app.data.api.model.account.CreateAccountDto
+    ): Response<com.autio.android_app.data.api.model.account.LoginResponse>
 
     /**
      * Changes password for future authentication
@@ -53,8 +55,8 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String,
-        @Body changePasswordDto: ChangePasswordDto
-    ): Response<ChangePasswordResponse>
+        @Body changePasswordDto: com.autio.android_app.data.api.model.account.ChangePasswordDto
+    ): Response<com.autio.android_app.data.api.model.account.ChangePasswordResponse>
 
     // TODO: Check which is the correct call for this and create ResponseObject
     /**
@@ -108,7 +110,7 @@ interface ApiClient {
         @Path(
             "user_id"
         ) userId: Int,
-    ): Response<ProfileDto>
+    ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
 
     @Deprecated(
         "Updates user's profile with new displaying data and preferences on stories' categories",
@@ -127,8 +129,8 @@ interface ApiClient {
         @Path(
             "user_id"
         ) userId: Int,
-        @Body profileDto: ProfileDto
-    ): Response<ProfileDto>
+        @Body profileDto: com.autio.android_app.data.api.model.account.ProfileDto
+    ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
 
     /**
      * Updates user's profile with new displaying data
@@ -146,8 +148,8 @@ interface ApiClient {
         @Path(
             "user_id"
         ) userId: Int,
-        @Body profileDto: ProfileDto
-    ): Response<ProfileDto>
+        @Body profileDto: com.autio.android_app.data.api.model.account.ProfileDto
+    ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
 
     // STORY CALLS
 
@@ -166,7 +168,7 @@ interface ApiClient {
         @Query(
             "ids[]"
         ) ids: List<Int>
-    ): Response<List<Story>>
+    ): Response<List<StoryDto>>
 
     @Deprecated(
         "Captures stories and its content after a certain datetime",
@@ -188,7 +190,7 @@ interface ApiClient {
         @Query(
             "page"
         ) page: Int
-    ): Response<List<Story>>
+    ): Response<List<StoryDto>>
 
     /**
      * Captures stories and its content after a certain date
@@ -205,7 +207,7 @@ interface ApiClient {
         @Query(
             "date"
         ) date: String
-    ): Response<List<Story>>
+    ): Response<List<StoryDto>>
 
     @GET("/api/v1/contributors/{contributor_id}/latest-stories")
     suspend fun getStoriesByContributor(
@@ -221,7 +223,7 @@ interface ApiClient {
         @Query(
             "page"
         ) page: Int,
-    ): Response<ContributorApiResponse>
+    ): Response<ContributorResponse>
 
     @GET("/api/v1/stories/{story_id}/author")
     suspend fun getAuthorOfStory(
@@ -234,7 +236,7 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int,
-    ): Response<Author>
+    ): Response<AuthorDto>
 
     @GET("/api/v1/stories/{story_id}/narrator")
     suspend fun getNarratorOfStory(
@@ -247,7 +249,7 @@ interface ApiClient {
         @Path(
             "story_id"
         ) storyId: Int,
-    ): Response<Narrator>
+    ): Response<NarratorDto>
 
     @GET("/api/v1/categories")
     suspend fun getCategories(
@@ -257,7 +259,7 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String,
-    ): Response<List<StoryCategory>>
+    ): Response<List<StoryCategoryDto>>
 
     @POST("/api/v1/plays")
     suspend fun postStoryPlayed(
@@ -280,7 +282,7 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String
-    ): Response<List<Story>>
+    ): Response<List<StoryDto>>
 
     @GET("/api/v1/likes/{story_id}/is-liked")
     suspend fun isStoryLikedByUser(
@@ -344,7 +346,7 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String
-    ) : Response<List<Story>>
+    ) : Response<List<StoryDto>>
 
     @PUT("/api/v1/playedHistory/{story_id}")
     suspend fun addStoryToHistory(
@@ -392,7 +394,7 @@ interface ApiClient {
         @Header(
             "Authorization"
         ) apiToken: String
-    ) : Response<List<Story>>
+    ) : Response<List<StoryDto>>
 
     @POST("/api/v1/library/{user_id}")
     suspend fun bookmarkStory(

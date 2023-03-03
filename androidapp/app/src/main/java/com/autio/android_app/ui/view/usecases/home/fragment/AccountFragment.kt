@@ -14,8 +14,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.model.account.ChangePasswordDto
-import com.autio.android_app.data.model.story.Category
+import com.autio.android_app.data.entities.story.Category
 import com.autio.android_app.data.repository.ApiService
 import com.autio.android_app.data.repository.legacy.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
@@ -453,7 +452,7 @@ class AccountFragment :
             val confirmPassword =
                 binding.etConfirmPassword.text.toString()
             val passwordInfo =
-                ChangePasswordDto(
+                com.autio.android_app.data.api.model.account.ChangePasswordDto(
                     currentPassword,
                     newPassword,
                     confirmPassword

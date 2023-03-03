@@ -17,7 +17,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.autio.android_app.R
-import com.autio.android_app.data.database.StoryDataBase
+import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.extensions.*
 import com.autio.android_app.notifications.MediaNotificationManager
 import com.autio.android_app.player.library.BrowseTree
@@ -615,7 +615,7 @@ open class PlayerService :
         ) {
             serviceScope.launch {
                 val itemToPlay =
-                    StoryDataBase.getInstance(
+                    DataBase.getInstance(
                         this@PlayerService,
                         CoroutineScope(
                             SupervisorJob()

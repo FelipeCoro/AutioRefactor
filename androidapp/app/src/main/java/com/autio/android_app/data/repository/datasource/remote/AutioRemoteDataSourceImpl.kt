@@ -1,50 +1,35 @@
 package com.autio.android_app.data.repository.datasource.remote
 
 import com.autio.android_app.data.api.ApiClient
-import com.autio.android_app.data.model.account.ChangePasswordDto
-import com.autio.android_app.data.model.account.ChangePasswordResponse
-import com.autio.android_app.data.model.account.CreateAccountDto
-import com.autio.android_app.data.model.account.GuestResponse
-import com.autio.android_app.data.model.account.LoginDto
-import com.autio.android_app.data.model.account.LoginResponse
-import com.autio.android_app.data.model.account.ProfileDto
-import com.autio.android_app.data.model.api_response.AddBookmarkResponse
-import com.autio.android_app.data.model.api_response.AddHistoryResponse
-import com.autio.android_app.data.model.api_response.ClearHistoryResponse
-import com.autio.android_app.data.model.api_response.ContributorApiResponse
-import com.autio.android_app.data.model.api_response.LikeResponse
-import com.autio.android_app.data.model.api_response.PlaysResponse
-import com.autio.android_app.data.model.api_response.RemoveBookmarkResponse
-import com.autio.android_app.data.model.api_response.RemoveHistoryResponse
-import com.autio.android_app.data.model.api_response.StoryLikedResponse
-import com.autio.android_app.data.model.api_response.StoryLikesResponse
-import com.autio.android_app.data.model.author.Author
-import com.autio.android_app.data.model.category.StoryCategory
-import com.autio.android_app.data.model.narrator.Narrator
-import com.autio.android_app.data.model.plays.PlaysDto
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
+import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
+import com.autio.android_app.data.api.model.history.AddHistoryResponse
+import com.autio.android_app.data.api.model.history.ClearHistoryResponse
+import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
+import com.autio.android_app.data.api.model.story.PlaysDto
+import com.autio.android_app.data.api.model.story.*
 import retrofit2.Response
 import javax.inject.Inject
 
 class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiClient) : AutioRemoteDataSource {
 
-    override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
+    override suspend fun login(loginDto: com.autio.android_app.data.api.model.account.LoginDto): Response<com.autio.android_app.data.api.model.account.LoginResponse> {
         return apiClient.login(loginDto)
     }
 
-    override suspend fun createGuestAccount(): Response<GuestResponse> {
+    override suspend fun createGuestAccount(): Response<com.autio.android_app.data.api.model.account.GuestResponse> {
         return apiClient.createGuestAccount()
     }
 
-    override suspend fun createAccount(createAccountDto: CreateAccountDto): Response<LoginResponse> {
+    override suspend fun createAccount(createAccountDto: com.autio.android_app.data.api.model.account.CreateAccountDto): Response<com.autio.android_app.data.api.model.account.LoginResponse> {
         return apiClient.createAccount(createAccountDto)
     }
 
     override suspend fun changePassword(
         xUserId: Int,
         apiToken: String,
-        changePasswordDto: ChangePasswordDto
-    ): Response<ChangePasswordResponse> {
+        changePasswordDto: com.autio.android_app.data.api.model.account.ChangePasswordDto
+    ): Response<com.autio.android_app.data.api.model.account.ChangePasswordResponse> {
         return apiClient.changePassword(xUserId, apiToken, changePasswordDto)
     }
 
@@ -60,7 +45,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         userId: Int
-    ): Response<ProfileDto> {
+    ): Response<com.autio.android_app.data.api.model.account.ProfileDto> {
         return apiClient.getProfileDataV2(xUserId, apiToken, userId)
     }
 
@@ -68,8 +53,8 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         userId: Int,
-        profileDto: ProfileDto
-    ): Response<ProfileDto> {
+        profileDto: com.autio.android_app.data.api.model.account.ProfileDto
+    ): Response<com.autio.android_app.data.api.model.account.ProfileDto> {
         return apiClient.updateProfile(xUserId, apiToken, userId, profileDto)
     }
 
@@ -77,8 +62,8 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         userId: Int,
-        profileDto: ProfileDto
-    ): Response<ProfileDto> {
+        profileDto: com.autio.android_app.data.api.model.account.ProfileDto
+    ): Response<com.autio.android_app.data.api.model.account.ProfileDto> {
         return apiClient.updateProfileV2(xUserId, apiToken, userId, profileDto)
     }
 
@@ -86,7 +71,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         ids: List<Int>
-    ): Response<List<Story>> {
+    ): Response<List<StoryDto>> {
         return apiClient.getStoriesByIds(xUserId, apiToken, ids)
     }
 
@@ -95,7 +80,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         apiToken: String,
         date: Int,
         page: Int
-    ): Response<List<Story>> {
+    ): Response<List<StoryDto>> {
         return apiClient.getStoriesSinceDate(xUserId, apiToken, date, page)
     }
 
@@ -103,7 +88,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         date: String
-    ): Response<List<Story>> {
+    ): Response<List<StoryDto>> {
         return apiClient.getStoriesDiff(xUserId, apiToken, date)
     }
 
@@ -112,7 +97,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         apiToken: String,
         contributorId: Int,
         page: Int
-    ): Response<ContributorApiResponse> {
+    ): Response<ContributorResponse> {
         return apiClient.getStoriesByContributor(xUserId, apiToken, contributorId, page)
     }
 
@@ -120,7 +105,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ): Response<Author> {
+    ): Response<AuthorDto> {
         return apiClient.getAuthorOfStory(xUserId, apiToken, storyId)
     }
 
@@ -128,14 +113,14 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ): Response<Narrator> {
+    ): Response<NarratorDto> {
         return apiClient.getNarratorOfStory(xUserId, apiToken, storyId)
     }
 
     override suspend fun getCategories(
         xUserId: Int,
         apiToken: String
-    ): Response<List<StoryCategory>> {
+    ): Response<List<StoryCategoryDto>> {
         return apiClient.getCategories(xUserId, apiToken)
     }
 
@@ -150,7 +135,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
     override suspend fun likedStoriesByUser(
         xUserId: Int,
         apiToken: String
-    ): Response<List<Story>> {
+    ): Response<List<StoryDto>> {
         return apiClient.likedStoriesByUser(xUserId, apiToken)
     }
 
@@ -189,7 +174,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
     override suspend fun getUserHistory(
         xUserId: Int,
         apiToken: String
-    ): Response<List<Story>> {
+    ): Response<List<StoryDto>> {
         return apiClient.getUserHistory(xUserId, apiToken)
     }
 
@@ -219,7 +204,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
     override suspend fun getStoriesFromUserBookmarks(
         xUserId: Int,
         apiToken: String
-    ): Response<List<Story>> {
+    ): Response<List<StoryDto>> {
         return apiClient.getStoriesFromUserBookmarks(xUserId, apiToken)
     }
 

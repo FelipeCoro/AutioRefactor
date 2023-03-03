@@ -35,7 +35,7 @@ object InjectorUtils {
                 context,
                 PlayerService::class.java
             ),
-            (applicationContext as CoreApplication).appContainer.storyRepository
+            (applicationContext as CoreApplication).appContainer.autioLocalDataSourceImpl
         )
     }
 
@@ -45,7 +45,7 @@ object InjectorUtils {
         val applicationContext =
             context.applicationContext as Application
         return StoryViewModel.Factory(
-            (applicationContext as CoreApplication).appContainer.storyRepository
+            (applicationContext as CoreApplication).appContainer.autioLocalDataSourceImpl
         )
     }
 
@@ -72,7 +72,7 @@ object InjectorUtils {
         return BottomNavigationViewModel.Factory(
             applicationContext,
             playerServiceConnection,
-            applicationContext.appContainer.storyRepository,
+            applicationContext.appContainer.autioLocalDataSourceImpl,
 //            applicationContext.appContainer.applicationRepository
         )
     }
@@ -84,7 +84,7 @@ object InjectorUtils {
             context.applicationContext as Application
         return AccountFragmentViewModel.Factory(
             applicationContext,
-            (applicationContext as CoreApplication).appContainer.storyRepository
+            (applicationContext as CoreApplication).appContainer.autioLocalDataSourceImpl
         )
     }
 
@@ -102,7 +102,7 @@ object InjectorUtils {
             applicationContext as Application,
             mediaId,
             playerServiceConnection,
-            (applicationContext as CoreApplication).appContainer.storyRepository
+            (applicationContext as CoreApplication).appContainer.autioLocalDataSourceImpl
         )
     }
 

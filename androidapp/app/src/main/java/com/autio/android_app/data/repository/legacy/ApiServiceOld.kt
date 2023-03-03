@@ -3,13 +3,18 @@ package com.autio.android_app.data.repository.legacy
 import android.util.Log
 import com.autio.android_app.core.RetrofitHelper
 import com.autio.android_app.data.api.ApiClient
-import com.autio.android_app.data.model.account.*
-import com.autio.android_app.data.model.api_response.*
-import com.autio.android_app.data.model.author.Author
-import com.autio.android_app.data.model.category.StoryCategory
-import com.autio.android_app.data.model.narrator.Narrator
-import com.autio.android_app.data.model.plays.PlaysDto
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
+import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
+import com.autio.android_app.data.api.model.history.AddHistoryResponse
+import com.autio.android_app.data.api.model.history.ClearHistoryResponse
+import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
+import com.autio.android_app.data.api.model.story.*
+import com.autio.android_app.data.api.model.account.*
+import com.autio.android_app.data.api.model.api_response.*
+import com.autio.android_app.data.api.model.category.StoryCategory
+import com.autio.android_app.data.api.model.narrator.Narrator
+import com.autio.android_app.data.api.model.plays.PlaysDto
+import com.autio.android_app.data.api.model.story.Story
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -32,17 +37,17 @@ class ApiServiceOld {
          * @param loginDto email and password of an already existing user
          */
         fun login(
-            loginDto: LoginDto,
-            onResult: (LoginResponse?) -> Unit
+            loginDto: com.autio.android_app.data.api.model.account.LoginDto,
+            onResult: (com.autio.android_app.data.api.model.account.LoginResponse?) -> Unit
         ) {
             retrofit.login(
                 loginDto
             )
                 .enqueue(
                     object :
-                        Callback<LoginResponse> {
+                        Callback<com.autio.android_app.data.api.model.account.LoginResponse> {
                         override fun onFailure(
-                            call: Call<LoginResponse>,
+                            call: Call<com.autio.android_app.data.api.model.account.LoginResponse>,
                             t: Throwable
                         ) {
                             onResult(
@@ -51,8 +56,8 @@ class ApiServiceOld {
                         }
 
                         override fun onResponse(
-                            call: Call<LoginResponse>,
-                            response: Response<LoginResponse>
+                            call: Call<com.autio.android_app.data.api.model.account.LoginResponse>,
+                            response: Response<com.autio.android_app.data.api.model.account.LoginResponse>
                         ) {
                             if (!response.isSuccessful) {
                                 onResult(
@@ -76,15 +81,15 @@ class ApiServiceOld {
          * server
          */
         fun loginAsGuest(
-            onResult: (GuestResponse?) -> Unit
+            onResult: (com.autio.android_app.data.api.model.account.GuestResponse?) -> Unit
         ) {
             retrofit.createGuestAccount()
                 .enqueue(
                     object :
-                        Callback<GuestResponse> {
+                        Callback<com.autio.android_app.data.api.model.account.GuestResponse> {
                         override fun onResponse(
-                            call: Call<GuestResponse>,
-                            response: Response<GuestResponse>
+                            call: Call<com.autio.android_app.data.api.model.account.GuestResponse>,
+                            response: Response<com.autio.android_app.data.api.model.account.GuestResponse>
                         ) {
                             if (response.isSuccessful) {
                                 val guestInfo =
@@ -96,7 +101,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<GuestResponse>,
+                            call: Call<com.autio.android_app.data.api.model.account.GuestResponse>,
                             t: Throwable
                         ) {
                             onResult(
@@ -112,18 +117,18 @@ class ApiServiceOld {
          * it is assumed the email is already being used by an existing account.
          */
         fun createAccount(
-            createAccountDto: CreateAccountDto,
-            onResult: (LoginResponse?) -> Unit
+            createAccountDto: com.autio.android_app.data.api.model.account.CreateAccountDto,
+            onResult: (com.autio.android_app.data.api.model.account.LoginResponse?) -> Unit
         ) {
             retrofit.createAccount(
                 createAccountDto
             )
                 .enqueue(
                     object :
-                        Callback<LoginResponse> {
+                        Callback<com.autio.android_app.data.api.model.account.LoginResponse> {
                         override fun onResponse(
-                            call: Call<LoginResponse>,
-                            response: Response<LoginResponse>
+                            call: Call<com.autio.android_app.data.api.model.account.LoginResponse>,
+                            response: Response<com.autio.android_app.data.api.model.account.LoginResponse>
                         ) {
                             if (response.isSuccessful) {
                                 val userInfo =
@@ -135,7 +140,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<LoginResponse>,
+                            call: Call<com.autio.android_app.data.api.model.account.LoginResponse>,
                             t: Throwable
                         ) {
                             onResult(
@@ -153,8 +158,8 @@ class ApiServiceOld {
         fun changePassword(
             xUserId: Int,
             apiToken: String,
-            changePasswordDto: ChangePasswordDto,
-            onResult: (ChangePasswordResponse?) -> Unit
+            changePasswordDto: com.autio.android_app.data.api.model.account.ChangePasswordDto,
+            onResult: (com.autio.android_app.data.api.model.account.ChangePasswordResponse?) -> Unit
         ) =
             retrofit.changePassword(
                 xUserId,
@@ -163,10 +168,10 @@ class ApiServiceOld {
             )
                 .enqueue(
                     object :
-                        Callback<ChangePasswordResponse> {
+                        Callback<com.autio.android_app.data.api.model.account.ChangePasswordResponse> {
                         override fun onResponse(
-                            call: Call<ChangePasswordResponse>,
-                            response: Response<ChangePasswordResponse>
+                            call: Call<com.autio.android_app.data.api.model.account.ChangePasswordResponse>,
+                            response: Response<com.autio.android_app.data.api.model.account.ChangePasswordResponse>
                         ) {
                             if (response.isSuccessful) {
                                 val res =
@@ -178,7 +183,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<ChangePasswordResponse>,
+                            call: Call<com.autio.android_app.data.api.model.account.ChangePasswordResponse>,
                             t: Throwable
                         ) {
                             onResult(
@@ -204,7 +209,7 @@ class ApiServiceOld {
         fun getProfileData(
             xUserId: Int,
             apiToken: String,
-            onResult: (ProfileDto?) -> Unit
+            onResult: (com.autio.android_app.data.api.model.account.ProfileDto?) -> Unit
         ) =
             retrofit.getProfileDataV2(
                 xUserId,
@@ -213,10 +218,10 @@ class ApiServiceOld {
             )
                 .enqueue(
                     object :
-                        Callback<ProfileDto> {
+                        Callback<com.autio.android_app.data.api.model.account.ProfileDto> {
                         override fun onResponse(
-                            call: Call<ProfileDto>,
-                            response: Response<ProfileDto>
+                            call: Call<com.autio.android_app.data.api.model.account.ProfileDto>,
+                            response: Response<com.autio.android_app.data.api.model.account.ProfileDto>
                         ) {
                             if (response.isSuccessful) {
                                 val userInfo =
@@ -228,7 +233,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<ProfileDto>,
+                            call: Call<com.autio.android_app.data.api.model.account.ProfileDto>,
                             t: Throwable
                         ) {
                             onResult(
@@ -246,8 +251,8 @@ class ApiServiceOld {
         fun updateProfile(
             xUserId: Int,
             apiToken: String,
-            profileDto: ProfileDto,
-            onResult: (ProfileDto?) -> Unit
+            profileDto: com.autio.android_app.data.api.model.account.ProfileDto,
+            onResult: (com.autio.android_app.data.api.model.account.ProfileDto?) -> Unit
         ) =
             retrofit.updateProfileV2(
                 xUserId,
@@ -257,10 +262,10 @@ class ApiServiceOld {
             )
                 .enqueue(
                     object :
-                        Callback<ProfileDto> {
+                        Callback<com.autio.android_app.data.api.model.account.ProfileDto> {
                         override fun onResponse(
-                            call: Call<ProfileDto>,
-                            response: Response<ProfileDto>
+                            call: Call<com.autio.android_app.data.api.model.account.ProfileDto>,
+                            response: Response<com.autio.android_app.data.api.model.account.ProfileDto>
                         ) {
                             if (response.isSuccessful) {
                                 val userInfo =
@@ -272,7 +277,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<ProfileDto>,
+                            call: Call<com.autio.android_app.data.api.model.account.ProfileDto>,
                             t: Throwable
                         ) {
                             onResult(
@@ -392,7 +397,7 @@ class ApiServiceOld {
             apiToken: String,
             contributorId: Int,
             page: Int,
-            onResult: (ContributorApiResponse?) -> Unit
+            onResult: (com.autio.android_app.data.api.model.api_response.ContributorApiResponse?) -> Unit
         ) =
             retrofit.getStoriesByContributor(
                 xUserId,
@@ -402,10 +407,10 @@ class ApiServiceOld {
             )
                 .enqueue(
                     object :
-                        Callback<ContributorApiResponse> {
+                        Callback<com.autio.android_app.data.api.model.api_response.ContributorApiResponse> {
                         override fun onResponse(
-                            call: Call<ContributorApiResponse>,
-                            response: Response<ContributorApiResponse>
+                            call: Call<com.autio.android_app.data.api.model.api_response.ContributorApiResponse>,
+                            response: Response<com.autio.android_app.data.api.model.api_response.ContributorApiResponse>
                         ) {
                             if (response.isSuccessful) {
                                 val authorApiResponse =
@@ -417,7 +422,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<ContributorApiResponse>,
+                            call: Call<com.autio.android_app.data.api.model.api_response.ContributorApiResponse>,
                             t: Throwable
                         ) {
                             onResult(
@@ -434,7 +439,7 @@ class ApiServiceOld {
             xUserId: Int,
             apiToken: String,
             storyId: Int,
-            onResult: (Author?) -> Unit
+            onResult: (AuthorDto?) -> Unit
         ) =
             retrofit.getAuthorOfStory(
                 xUserId,
@@ -443,10 +448,10 @@ class ApiServiceOld {
             )
                 .enqueue(
                     object :
-                        Callback<Author> {
+                        Callback<AuthorDto> {
                         override fun onResponse(
-                            call: Call<Author>,
-                            response: Response<Author>
+                            call: Call<AuthorDto>,
+                            response: Response<AuthorDto>
                         ) {
                             if (response.isSuccessful) {
                                 val author =
@@ -458,7 +463,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<Author>,
+                            call: Call<AuthorDto>,
                             t: Throwable
                         ) =
                             onResult(
@@ -546,7 +551,7 @@ class ApiServiceOld {
             xUserId: Int,
             apiToken: String,
             playsDto: PlaysDto,
-            onResult: (PlaysResponse?) -> Unit
+            onResult: (com.autio.android_app.data.api.model.api_response.PlaysResponse?) -> Unit
         ) =
             retrofit.postStoryPlayed(
                 xUserId,
@@ -555,10 +560,10 @@ class ApiServiceOld {
             )
                 .enqueue(
                     object :
-                        Callback<PlaysResponse> {
+                        Callback<com.autio.android_app.data.api.model.api_response.PlaysResponse> {
                         override fun onResponse(
-                            call: Call<PlaysResponse>,
-                            response: Response<PlaysResponse>
+                            call: Call<com.autio.android_app.data.api.model.api_response.PlaysResponse>,
+                            response: Response<com.autio.android_app.data.api.model.api_response.PlaysResponse>
                         ) {
                             if (response.isSuccessful) {
                                 val body =
@@ -570,7 +575,7 @@ class ApiServiceOld {
                         }
 
                         override fun onFailure(
-                            call: Call<PlaysResponse>,
+                            call: Call<com.autio.android_app.data.api.model.api_response.PlaysResponse>,
                             t: Throwable
                         ) {
                             onResult(

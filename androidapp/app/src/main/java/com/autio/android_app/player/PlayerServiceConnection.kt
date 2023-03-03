@@ -11,8 +11,8 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
-import com.autio.android_app.data.database.repository.StoryRepository
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
+import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.extensions.id
 import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
 import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnectionCallback
@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 class PlayerServiceConnection(
     context: Context,
     serviceComponent: ComponentName,
-    private val storyRepository: StoryRepository
+    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
 ) {
 
     val isConnected =
@@ -182,7 +182,7 @@ class PlayerServiceConnection(
                     Dispatchers.Main + SupervisorJob()
                 ).launch {
                     val currentStory =
-                        storyRepository
+                        autioLocalDataSourceImpl
                             .getStoryById(
                                 metadata.id!!
                             )
@@ -239,7 +239,7 @@ class PlayerServiceConnection(
         fun getInstance(
             context: Context,
             serviceComponent: ComponentName,
-            storyRepository: StoryRepository
+            autioLocalDataSourceImpl: AutioLocalDataSourceImpl
         ) =
             instance
                 ?: synchronized(
@@ -249,7 +249,7 @@ class PlayerServiceConnection(
                         ?: PlayerServiceConnection(
                             context,
                             serviceComponent,
-                            storyRepository
+                            autioLocalDataSourceImpl
                         )
                             .also {
                                 instance =

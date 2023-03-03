@@ -1,7 +1,7 @@
 package com.autio.android_app.data.database.dao
 
 import androidx.room.*
-import com.autio.android_app.data.model.story.Story
+import com.autio.android_app.data.database.entities.StoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -10,18 +10,18 @@ interface StoryDao {
         onConflict = OnConflictStrategy.REPLACE
     )
     fun addStories(
-        story: Array<Story>
+        story: Array<StoryEntity>
     ): Array<Long>
 
     @Query(
         "SELECT * FROM stories"
     )
-    suspend fun allStories(): List<Story>
+    suspend fun allStories(): List<StoryEntity>
 
     @Query(
         "SELECT * FROM stories ORDER BY id ASC"
     )
-    fun readLiveStories(): Flow<List<Story>>
+    fun readLiveStories(): Flow<List<StoryEntity>>
 
     @Query(
         "SELECT * FROM stories WHERE " +
@@ -34,31 +34,31 @@ interface StoryDao {
         lng1: Double,
         lat2: Double,
         lng2: Double
-    ): List<Story>
+    ): List<StoryEntity>
 
     @Query(
         "SELECT * FROM stories"
     )
-    suspend fun readStories(): List<Story>
+    suspend fun readStories(): List<StoryEntity>
 
     @Query(
         "SELECT * FROM stories WHERE originalId IN (:ids)"
     )
     fun readStoriesWithIds(
         ids: Array<Int>
-    ): Flow<Array<Story>>
+    ): Flow<Array<StoryEntity>>
 
     @Query(
         "SELECT * FROM stories WHERE id = (:id)"
     )
     suspend fun getStoryById(
         id: String
-    ): Story?
+    ): StoryEntity?
 
     @Query(
         "SELECT * FROM stories WHERE modifiedDate = (SELECT MAX(modifiedDate) FROM stories)"
     )
-    suspend fun readLastModifiedStory(): Story?
+    suspend fun readLastModifiedStory(): StoryEntity?
 
     @Query(
         "DELETE FROM stories"
@@ -68,7 +68,7 @@ interface StoryDao {
     @Query(
         "SELECT * FROM stories WHERE isBookmarked = 1"
     )
-    fun getBookmarkedStories(): Flow<List<Story>>
+    fun getBookmarkedStories(): Flow<List<StoryEntity>>
 
     @Transaction
     fun setBookmarksData(
@@ -118,7 +118,7 @@ interface StoryDao {
     @Query(
         "SELECT * FROM stories WHERE isLiked = 1"
     )
-    fun getFavoriteStories(): Flow<List<Story>>
+    fun getFavoriteStories(): Flow<List<StoryEntity>>
 
     @Transaction
     fun setLikesData(
@@ -135,7 +135,7 @@ interface StoryDao {
     @Query(
         "SELECT * FROM stories WHERE listenedAt != '' ORDER BY listenedAt DESC"
     )
-    fun getHistory(): Flow<List<Story>>
+    fun getHistory(): Flow<List<StoryEntity>>
 
     @Query(
         "UPDATE stories SET listenedAt = :listenedAt WHERE id = :storyId"
