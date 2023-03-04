@@ -3,12 +3,14 @@ package com.autio.android_app.data.repository
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.Story
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import javax.inject.Inject
@@ -26,7 +28,7 @@ class AutioRepositoryImpl @Inject constructor(
 
 
     override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
-       return autioRemoteDataSource.login(loginDto)
+        return autioRemoteDataSource.login(loginDto)
     }
 
     override suspend fun fetchUserData() {
@@ -87,6 +89,36 @@ class AutioRepositoryImpl @Inject constructor(
             }
         }.onFailure { onFailure.invoke() }
     }
+
+    override suspend fun getStoriesByIds(
+        userId: Int,
+        apiToken: String,
+        storiesWithoutRecords: List<Story>
+    ) {
+        runCatching {
+            autioRemoteDataSource.getStoriesByIds(userId,
+                apiToken,
+                storiesWithoutRecords.map { it.originalId })
+        }.onSuccess {
+            val storiesFromService = it.body()
+            if (storiesFromService != null) {
+                for (story in storiesFromService) {
+                    autioLocalDataSource.cacheRecordOfStory(
+                        story.id, story.recordUrl
+                    )
+                }
+            }
+        }.onFailure { }
+    }
+
+    override suspend fun getStoriesInLatLngBoundaries(
+        swCoordinates: LatLng,
+        neCoordinates: LatLng
+    ): List<StoryEntity> {
+      return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
+    }
+
+
 }
 
 
