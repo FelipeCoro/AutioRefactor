@@ -1,6 +1,5 @@
 package com.autio.android_app.data.di
 
-import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSourceImpl
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -9,9 +8,7 @@ import com.autio.android_app.data.repository.revenue.RevenueCatRepository
 import com.autio.android_app.data.repository.revenue.RevenueCatRepositoryImpl
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 
 @Module

@@ -12,10 +12,12 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.id
 import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
 import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnectionCallback
+import com.autio.android_app.ui.stories.models.Story
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -41,92 +43,62 @@ import kotlinx.coroutines.launch
  *  [MediaBrowserConnectionCallback] and [MediaBrowserCompat] objects.
  */
 class PlayerServiceConnection(
-    context: Context,
+    @ApplicationContext context: Context,
     serviceComponent: ComponentName,
-    private val autioLocalDataSourceImpl: AutioLocalDataSource
+    private val autioRepository: AutioRepository
 ) {
 
-    val isConnected =
-        MutableLiveData<Boolean>()
-            .apply {
-                postValue(
-                    false
-                )
-            }
-    val networkFailure =
-        MutableLiveData<Boolean>()
-            .apply {
-                postValue(
-                    false
-                )
-            }
+    val isConnected = MutableLiveData<Boolean>().apply {
+        postValue(false)
+    }
+    val networkFailure = MutableLiveData<Boolean>().apply {
+        postValue(false)
+    }
 
-    val playbackState =
-        MutableLiveData<PlaybackStateCompat>()
-            .apply {
-                postValue(
-                    EMPTY_PLAYBACK_STATE
-                )
-            }
-    val nowPlaying =
-        MutableLiveData<Story?>()
-            .apply {
-                postValue(
-                    null
-                )
-            }
+    val playbackState = MutableLiveData<PlaybackStateCompat>().apply {
+        postValue(EMPTY_PLAYBACK_STATE)
+    }
+    val nowPlaying = MutableLiveData<Story?>().apply { postValue(null) }
 
     val transportControls: MediaControllerCompat.TransportControls
         get() = mediaController.transportControls
 
-    private val mediaBrowserConnectionCallback =
-        MediaBrowserConnectionCallback(
-            context
-        )
-    private val mediaBrowser =
-        MediaBrowserCompat(
-            context,
-            serviceComponent,
-            mediaBrowserConnectionCallback,
-            null
-        ).apply { connect() }
+    private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(
+        context
+    )
+    private val mediaBrowser = MediaBrowserCompat(
+        context, serviceComponent, mediaBrowserConnectionCallback, null
+    ).apply { connect() }
     private lateinit var mediaController: MediaControllerCompat
 
     fun subscribe(
-        parentId: String,
-        callback: MediaBrowserCompat.SubscriptionCallback
+        parentId: String, callback: MediaBrowserCompat.SubscriptionCallback
     ) {
         mediaBrowser.subscribe(
-            parentId,
-            callback
+            parentId, callback
         )
     }
 
     fun unsubscribe(
-        parentId: String,
-        callback: MediaBrowserCompat.SubscriptionCallback
+        parentId: String, callback: MediaBrowserCompat.SubscriptionCallback
     ) {
         mediaBrowser.unsubscribe(
-            parentId,
-            callback
+            parentId, callback
         )
     }
 
     private inner class MediaBrowserConnectionCallback(
         private val context: Context
-    ) :
-        MediaBrowserCompat.ConnectionCallback() {
+    ) : MediaBrowserCompat.ConnectionCallback() {
         /**
          * Invoked after [MediaBrowserCompat.connect] when the request has successfully
          * completed.
          */
         override fun onConnected() {
             // Get a MediaController for the MediaSession.
-            mediaController =
-                MediaControllerCompat(
-                    context,
-                    mediaBrowser.sessionToken
-                )
+            mediaController = MediaControllerCompat(
+                context, mediaBrowser.sessionToken
+            )
             mediaController.registerCallback(
                 MediaControllerCallback()
             )
@@ -154,15 +126,13 @@ class PlayerServiceConnection(
         }
     }
 
-    private inner class MediaControllerCallback :
-        MediaControllerCompat.Callback() {
+    private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
 
         override fun onPlaybackStateChanged(
             state: PlaybackStateCompat?
         ) {
             playbackState.postValue(
-                state
-                    ?: EMPTY_PLAYBACK_STATE
+                state ?: EMPTY_PLAYBACK_STATE
             )
         }
 
@@ -181,15 +151,9 @@ class PlayerServiceConnection(
                 CoroutineScope(
                     Dispatchers.Main + SupervisorJob()
                 ).launch {
-                    val currentStory =
-                        autioLocalDataSourceImpl
-                            .getStoryById(
-                                metadata.id!!
-                            )
+                    val currentStory = autioRepository.getStoryById(metadata.id!!)
                     currentStory?.let {
-                        nowPlaying.postValue(
-                            it
-                        )
+                        nowPlaying.postValue(it)
                     }
                 }
             }
@@ -199,18 +163,15 @@ class PlayerServiceConnection(
             queue: MutableList<MediaSessionCompat.QueueItem>?
         ) {
             Log.d(
-                "PlayerConnection",
-                "onQueueChanged: $queue"
+                "PlayerConnection", "onQueueChanged: $queue"
             )
         }
 
         override fun onSessionEvent(
-            event: String?,
-            extras: Bundle?
+            event: String?, extras: Bundle?
         ) {
             super.onSessionEvent(
-                event,
-                extras
+                event, extras
             )
             when (event) {
                 NETWORK_FAILURE -> networkFailure.postValue(
@@ -233,49 +194,30 @@ class PlayerServiceConnection(
     companion object {
         // For Singleton instantiation.
         @Volatile
-        private var instance: PlayerServiceConnection? =
-            null
+        private var instance: PlayerServiceConnection? = null
 
         fun getInstance(
             context: Context,
             serviceComponent: ComponentName,
             autioLocalDataSourceImpl: AutioLocalDataSourceImpl
-        ) =
-            instance
-                ?: synchronized(
-                    this
-                ) {
-                    instance
-                        ?: PlayerServiceConnection(
-                            context,
-                            serviceComponent,
-                            autioLocalDataSourceImpl
-                        )
-                            .also {
-                                instance =
-                                    it
-                            }
-                }
+        ) = instance ?: synchronized(
+            this
+        ) {
+            instance ?: PlayerServiceConnection(
+                context, serviceComponent, autioLocalDataSourceImpl
+            ).also {
+                instance = it
+            }
+        }
     }
 }
 
-val EMPTY_PLAYBACK_STATE: PlaybackStateCompat =
-    PlaybackStateCompat.Builder()
-        .setState(
-            PlaybackStateCompat.STATE_NONE,
-            0,
-            0f
-        )
-        .build()
+val EMPTY_PLAYBACK_STATE: PlaybackStateCompat = PlaybackStateCompat.Builder().setState(
+    PlaybackStateCompat.STATE_NONE, 0, 0f
+).build()
 
-val NOTHING_PLAYING: MediaMetadataCompat =
-    MediaMetadataCompat.Builder()
-        .putString(
-            MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
-            ""
-        )
-        .putLong(
-            MediaMetadataCompat.METADATA_KEY_DURATION,
-            0
-        )
-        .build()
+val NOTHING_PLAYING: MediaMetadataCompat = MediaMetadataCompat.Builder().putString(
+    MediaMetadataCompat.METADATA_KEY_MEDIA_ID, ""
+).putLong(
+    MediaMetadataCompat.METADATA_KEY_DURATION, 0
+).build()
