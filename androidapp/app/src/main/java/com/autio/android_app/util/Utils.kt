@@ -10,7 +10,6 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import com.autio.android_app.data.repository.legacy.PrefRepository
-import com.autio.android_app.ui.view.usecases.home.BottomNavigation
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
 
@@ -217,7 +216,7 @@ fun openLocationInMapsApp(
 fun showPaywall(
     activity: Activity
 ) {
-    (activity as BottomNavigation).showPayWall()
+    (activity as com.autio.android_app.ui.stories.BottomNavigation).showPayWall()
 }
 
 fun showPaywallOrProceedWithNormalProcess(

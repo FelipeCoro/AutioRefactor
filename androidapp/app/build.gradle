@@ -6,6 +6,7 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'com.google.gms.google-services'
     id 'kotlinx-serialization'
+    id 'kotlin-parcelize'
 }
 
 def localProperties = new Properties()

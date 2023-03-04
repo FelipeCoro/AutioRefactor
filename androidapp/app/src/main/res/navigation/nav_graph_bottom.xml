@@ -86,7 +86,7 @@
     </fragment>
     <fragment
         android:id="@+id/bookmarks_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.BookmarksFragment"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.BookmarksFragment"
         android:label="fragment_bookmarks"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -95,7 +95,7 @@
     </fragment>
     <fragment
         android:id="@+id/favorites_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.FavoritesFragment"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.FavoritesFragment"
         android:label="fragment_favorites"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -104,7 +104,7 @@
     </fragment>
     <fragment
         android:id="@+id/history_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.HistoryFragment"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -113,7 +113,7 @@
     </fragment>
     <fragment
         android:id="@+id/downloaded_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.DownloadedStoriesFragment"
+        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.DownloadedStoriesFragment"
         android:label="fragment_downloaded_stories"
         tools:layout="@layout/fragment_playlist">
 

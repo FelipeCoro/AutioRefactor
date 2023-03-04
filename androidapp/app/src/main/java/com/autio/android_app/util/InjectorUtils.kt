@@ -6,6 +6,8 @@ import android.content.Context
 import com.autio.android_app.CoreApplication
 import com.autio.android_app.player.PlayerService
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
+import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.viewmodel.*
 
 /**

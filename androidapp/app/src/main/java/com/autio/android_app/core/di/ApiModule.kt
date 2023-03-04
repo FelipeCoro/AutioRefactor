@@ -10,9 +10,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import com.autio.android_app.BuildConfig
 import com.autio.android_app.core.RequestInterceptor
 import com.autio.android_app.data.api.ApiClient
+import dagger.hilt.components.SingletonComponent
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 object ApiModule {
 
     @Provides
@@ -21,15 +22,12 @@ object ApiModule {
     @Provides
     fun provideRetrofit(baseUrl: String, loggingInterceptor: RequestInterceptor): ApiClient {
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
+        val client = OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(client)
-            .build()
+        val retrofit =
+            Retrofit.Builder().baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(client).build()
 
         return retrofit.create(ApiClient::class.java)
     }
