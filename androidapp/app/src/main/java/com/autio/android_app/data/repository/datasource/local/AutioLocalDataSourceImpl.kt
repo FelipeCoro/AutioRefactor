@@ -6,9 +6,8 @@ import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.util.coroutines.IoDispatcher
 import com.autio.android_app.data.database.entities.StoryEntity
-import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.util.coroutines.IoDispatcher
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -16,12 +15,10 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class AutioLocalDataSourceImpl @Inject constructor(
-
     private val storyDao: StoryDao,
     private val downloadedStoryDao: DownloadedStoryDao,
     private val categoryDao: CategoryDao,
-
-    @IoDispatcher val coroutineDispatcher: CoroutineDispatcher
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
@@ -61,7 +58,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override fun addStories(
-        stories: Array<StoryEntity>
+        stories: List<StoryEntity>
     ) {
         executor.execute { storyDao.addStories(stories) }
     }
@@ -76,26 +73,19 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     val favoriteStories = storyDao.getFavoriteStories()
 
-    override fun setLikesDataToLocalStories(
-        storiesIds: List<String>
-    ) {
+    override fun setLikesDataToLocalStories(storiesIds: List<String>) {
         executor.execute {
             storyDao.setLikesData(storiesIds)
         }
     }
 
     override suspend fun setListenedAtToLocalStories(
-        storiesHistory: Array<HistoryEntity>
+        storiesHistory: List<HistoryEntity>
     ) {
         for (history in storiesHistory) {
-            storyDao.setListenedAtData(
-                history.storyId, history.playedAt
-            )
+            storyDao.setListenedAtData(history.storyId, history.playedAt)
 
-            if (getDownloadedStoryById(
-                    history.storyId
-                ) != null
-            ) {
+            if (getDownloadedStoryById(history.storyId) != null) {
                 downloadedStoryDao.setListenedAtData(
                     history.storyId, history.playedAt
                 )
@@ -105,54 +95,32 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     val history = storyDao.getHistory()
 
-    override suspend fun addStoryToHistory(
-        history: HistoryEntity
-    ) {
+    override suspend fun addStoryToHistory(history: HistoryEntity) {
         storyDao.setListenedAtData(
             history.storyId, history.playedAt
         )
 
-        if (getDownloadedStoryById(
-                history.storyId
-            ) != null
-        ) {
+        if (getDownloadedStoryById(history.storyId) != null) {
             downloadedStoryDao.setListenedAtData(
                 history.storyId, history.playedAt
             )
         }
     }
 
-    override suspend fun markStoryAsListenedAtLeast30Secs(
-        storyId: String
-    ) {
-        storyDao.markStoryAsListenedAtLeast30Secs(
-            storyId
-        )
+    override suspend fun markStoryAsListenedAtLeast30Secs(storyId: String) {
+        storyDao.markStoryAsListenedAtLeast30Secs(storyId)
 
-        if (getDownloadedStoryById(
-                storyId
-            ) != null
+        if (getDownloadedStoryById(storyId) != null
         ) {
-            downloadedStoryDao.markStoryAsListenedAtLeast30Secs(
-                storyId
-            )
+            downloadedStoryDao.markStoryAsListenedAtLeast30Secs(storyId)
         }
     }
 
-    override suspend fun removeStoryFromHistory(
-        id: String
-    ) {
-        storyDao.removeListenedAtData(
-            id
-        )
+    override suspend fun removeStoryFromHistory(id: String) {
+        storyDao.removeListenedAtData(id)
 
-        if (getDownloadedStoryById(
-                id
-            ) != null
-        ) {
-            downloadedStoryDao.removeListenedAtData(
-                id
-            )
+        if (getDownloadedStoryById(id) != null) {
+            downloadedStoryDao.removeListenedAtData(id)
         }
     }
 
@@ -161,37 +129,18 @@ class AutioLocalDataSourceImpl @Inject constructor(
         downloadedStoryDao.clearStoryHistory()
     }
 
-    override suspend fun bookmarkStory(
-        id: String
-    ) {
-        storyDao.setBookmarkToStory(
-            id
-        )
-
-        if (getDownloadedStoryById(
-                id
-            ) != null
-        ) {
-            downloadedStoryDao.setBookmarkToStory(
-                id
-            )
+    override suspend fun bookmarkStory(id: String) {
+        storyDao.setBookmarkToStory(id)
+        if (getDownloadedStoryById(id) != null) {
+            downloadedStoryDao.setBookmarkToStory(id)
         }
     }
 
-    override suspend fun removeBookmarkFromStory(
-        id: String
-    ) {
-        storyDao.removeBookmarkFromStory(
-            id
-        )
+    override suspend fun removeBookmarkFromStory(id: String) {
+        storyDao.removeBookmarkFromStory(id)
 
-        if (getDownloadedStoryById(
-                id
-            ) != null
-        ) {
-            downloadedStoryDao.removeBookmarkFromStory(
-                id
-            )
+        if (getDownloadedStoryById(id) != null) {
+            downloadedStoryDao.removeBookmarkFromStory(id)
         }
     }
 
@@ -200,59 +149,33 @@ class AutioLocalDataSourceImpl @Inject constructor(
         downloadedStoryDao.removeAllBookmarks()
     }
 
-    override suspend fun giveLikeToStory(
-        id: String
-    ) {
-        storyDao.setLikeToStory(
-            id
-        )
+    override suspend fun giveLikeToStory(id: String) {
+        storyDao.setLikeToStory(id)
 
-        if (getDownloadedStoryById(
-                id
-            ) != null
-        ) {
-            downloadedStoryDao.setLikeToStory(
-                id
-            )
+        if (getDownloadedStoryById(id) != null) {
+            downloadedStoryDao.setLikeToStory(id)
         }
     }
 
-    override suspend fun removeLikeFromStory(
-        id: String
-    ) {
-        storyDao.removeLikeFromStory(
-            id
-        )
+    override suspend fun removeLikeFromStory(id: String) {
+        storyDao.removeLikeFromStory(id)
 
-        if (getDownloadedStoryById(
-                id
-            ) != null
-        ) {
-            downloadedStoryDao.removeLikeFromStory(
-                id
-            )
+        if (getDownloadedStoryById(id) != null) {
+            downloadedStoryDao.removeLikeFromStory(id)
         }
     }
 
     // Downloaded stories
 
-    override fun downloadStory(
-        story: DownloadedStoryEntity
-    ) {
+    override fun downloadStory(story: DownloadedStoryEntity) {
         executor.execute {
-            downloadedStoryDao.addStory(
-                story
-            )
+            downloadedStoryDao.addStory(story)
         }
     }
 
-    override fun removeDownloadedStory(
-        id: String
-    ) {
+    override fun removeDownloadedStory(id: String) {
         executor.execute {
-            downloadedStoryDao.removeStory(
-                id
-            )
+            downloadedStoryDao.removeStory(id)
         }
     }
 
@@ -262,33 +185,21 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDownloadedStoryById(
-        id: String
-    ): DownloadedStoryEntity? {
-        return downloadedStoryDao.getStoryById(
-            id
-        )
+    override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {
+        return downloadedStoryDao.getStoryById(id)
     }
 
     val getDownloadedStories = downloadedStoryDao.readLiveStories()
 
-    override fun cacheRecordOfStory(
-        storyId: String, recordUrl: String
-    ) {
+    override fun cacheRecordOfStory(storyId: String, recordUrl: String) {
         executor.execute {
-            storyDao.addRecordOfStory(
-                storyId, recordUrl
-            )
+            storyDao.addRecordOfStory(storyId, recordUrl)
         }
     }
 
-    override fun cacheRecordOfStory(
-        storyId: Int, recordUrl: String
-    ) {
+    override fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
         executor.execute {
-            storyDao.addRecordOfStory(
-                storyId, recordUrl
-            )
+            storyDao.addRecordOfStory(storyId, recordUrl)
         }
     }
 

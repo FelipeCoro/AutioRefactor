@@ -1,16 +1,19 @@
 package com.autio.android_app.data.di
 
-import android.content.ComponentCallbacks
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.autio.android_app.data.database.DataBase
+import com.autio.android_app.data.database.dao.CategoryDao
+import com.autio.android_app.data.database.dao.DownloadedStoryDao
+import com.autio.android_app.data.database.dao.StoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
-import javax.inject.Scope
 import javax.inject.Singleton
 
 @Module
@@ -23,7 +26,7 @@ object PersistenceModule {
     fun providesDatabase(
         @ApplicationContext context: Context,
         coroutineScope: CoroutineScope,
-        callback: DataBase.StoryDatabaseCallback
+        callback: RoomDatabase.Callback
     ): DataBase {
         return Room.databaseBuilder(context, DataBase::class.java, CONST_DATABASE_NAME)
             .fallbackToDestructiveMigration()
@@ -33,10 +36,29 @@ object PersistenceModule {
     }
 
     @Provides
+    @Singleton
     fun provideStoryDatabaseCallBack(
         @ApplicationContext context: Context,
         coroutineScope: CoroutineScope,
-    ): DataBase.StoryDatabaseCallback {
-        return DataBase.StoryDatabaseCallback(context, coroutineScope)
+    ): RoomDatabase.Callback {
+        return object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+
+            }
+        }
     }
+
+    @Singleton
+    @Provides
+    fun providesStoryDao(database: DataBase): StoryDao = database.storyDao()
+
+    @Singleton
+    @Provides
+    fun providesCategoryDao(database: DataBase): CategoryDao = database.categoryDao()
+
+    @Singleton
+    @Provides
+    fun providesDownloadedStoryDao(database: DataBase): DownloadedStoryDao =
+        database.downloadedStoryDao()
 }

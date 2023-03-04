@@ -20,7 +20,7 @@ interface AutioLocalDataSource {
     suspend fun getStoryById(id: String): StoryEntity?
     fun getStoriesByIds(ids: List<Int>): Flow<List<StoryEntity>>
     suspend fun getLastModifiedStory(): StoryEntity?
-    fun addStories(stories: Array<StoryEntity>)
+    fun addStories(stories: List<StoryEntity>)
     fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
