@@ -19,6 +19,9 @@ interface PrefRepository {
     var userName: String
     var userEmail: String
     var userApiToken: String
+    var isUserGuest:Boolean
+    var remainingStories:Int
+    val remainingStoriesLiveData: SharedPreferenceIntLiveData
 
     fun String.put(
         int: Int

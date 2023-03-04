@@ -3,6 +3,8 @@ package com.autio.android_app.domain.repository
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
+import com.autio.android_app.data.api.model.story.PlaysDto
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.Story
@@ -18,15 +20,15 @@ interface AutioRepository {
     suspend fun updateProfile(infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit)
 
     suspend fun updateCategoriesOrder(
-        infoUser: ProfileDto,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     )
 
     suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
 
     suspend fun getStoriesInLatLngBoundaries(
-        swCoordinates: LatLng,
-        neCoordinates: LatLng
+        swCoordinates: LatLng, neCoordinates: LatLng
     ): List<StoryEntity>
+    suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto)
+
+    suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity?
 }

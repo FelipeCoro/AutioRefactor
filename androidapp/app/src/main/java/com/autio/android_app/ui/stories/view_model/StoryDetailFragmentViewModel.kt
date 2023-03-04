@@ -21,7 +21,6 @@ private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
 
 @HiltViewModel
 class StoryDetailFragmentViewModel(
-    private val app: Application,
     playerServiceConnection: PlayerServiceConnection
 ) : ViewModel() {
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
@@ -95,7 +94,7 @@ class StoryDetailFragmentViewModel(
                 currentPos
             )
             if (updatePosition) checkPlaybackPosition()
-        }, com.autio.android_app.ui.viewmodel.POSITION_UPDATE_INTERVAL_MILLIS
+        }, POSITION_UPDATE_INTERVAL_MILLIS
     )
 
     /**
@@ -154,21 +153,5 @@ class StoryDetailFragmentViewModel(
 
     fun initView(storyParam: Story?) {
         TODO("Not yet implemented")
-    }
-
-    class Factory(
-        private val app: Application, private val playerServiceConnection: PlayerServiceConnection
-    ) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress(
-            "unchecked_cast"
-        )
-        override fun <T : ViewModel> create(
-            modelClass: Class<T>
-        ): T {
-            return StoryDetailFragmentViewModel(
-                app, playerServiceConnection
-            ) as T
-        }
     }
 }

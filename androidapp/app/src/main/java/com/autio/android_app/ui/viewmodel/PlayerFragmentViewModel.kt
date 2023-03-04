@@ -16,7 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private const val POSITION_UPDATE_INTERVAL_MILLIS = 17L
+const val POSITION_UPDATE_INTERVAL_MILLIS = 17L
 
 @HiltViewModel
 class PlayerFragmentViewModel @Inject constructor(

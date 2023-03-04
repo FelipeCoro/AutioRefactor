@@ -3,6 +3,8 @@ package com.autio.android_app.data.repository
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
+import com.autio.android_app.data.api.model.story.PlaysDto
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
@@ -115,11 +117,32 @@ class AutioRepositoryImpl @Inject constructor(
         swCoordinates: LatLng,
         neCoordinates: LatLng
     ): List<StoryEntity> {
-      return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
+        return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
 
+    override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {
+        return autioLocalDataSource.getDownloadedStoryById(id)
+    }
 
+    override suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto) {
+        runCatching {
+            autioRemoteDataSource.postStoryPlayed(
+                prefRepository.userId,
+                prefRepository.userApiToken,
+                playsDto
+            )
+        }.onSuccess { response ->
+            if (response.isSuccessful) {
+                if (playsDto.firebaseId != null) {
+                    autioLocalDataSource.markStoryAsListenedAtLeast30Secs(playsDto.firebaseId)
+                }
+                prefRepository.remainingStories = response.body()?.playsRemaining!!
+            }
+        }.onFailure { }
+    }
 }
+
+
 
 
 

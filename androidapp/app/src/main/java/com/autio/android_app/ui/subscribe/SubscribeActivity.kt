@@ -26,6 +26,7 @@ import com.autio.android_app.util.openUrl
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Package
 import com.smarteist.autoimageslider.SliderView
+import dagger.hilt.EntryPoint
 
 @EntryPoint
 class SubscribeActivity : AppCompatActivity() {
