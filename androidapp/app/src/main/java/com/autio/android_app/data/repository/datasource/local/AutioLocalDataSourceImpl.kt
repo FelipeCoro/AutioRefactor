@@ -22,7 +22,13 @@ class AutioLocalDataSourceImpl @Inject constructor(
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
-    override val allStories = storyDao.readLiveStories()
+    override val allLiveStories = storyDao.readLiveStories()
+    override val getDownloadedStories = downloadedStoryDao.readLiveStories()
+    override val bookmarkedStories = storyDao.getBookmarkedStories()
+    override val favoriteStories = storyDao.getFavoriteStories()
+    override val history = storyDao.getHistory()
+
+
     override fun addUserCategories(categories: List<CategoryEntity>) {
         executor.execute { categoryDao.addCategories(categories) }
     }
@@ -63,15 +69,11 @@ class AutioLocalDataSourceImpl @Inject constructor(
         executor.execute { storyDao.addStories(stories) }
     }
 
-    val bookmarkedStories = storyDao.getBookmarkedStories()
-
     override fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
         executor.execute {
             storyDao.setBookmarksData(storiesIds)
         }
     }
-
-    val favoriteStories = storyDao.getFavoriteStories()
 
     override fun setLikesDataToLocalStories(storiesIds: List<String>) {
         executor.execute {
@@ -93,7 +95,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    val history = storyDao.getHistory()
+
 
     override suspend fun addStoryToHistory(history: HistoryEntity) {
         storyDao.setListenedAtData(
@@ -188,8 +190,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
     override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {
         return downloadedStoryDao.getStoryById(id)
     }
-
-    val getDownloadedStories = downloadedStoryDao.readLiveStories()
 
     override fun cacheRecordOfStory(storyId: String, recordUrl: String) {
         executor.execute {

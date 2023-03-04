@@ -5,7 +5,8 @@ import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.HistoryEntity
+import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -31,10 +32,21 @@ class AutioRepositoryImpl @Inject constructor(
         }
 
     override val allStories: Flow<List<Story>>
-        get() = autioLocalDataSource.allStories.transform { entities ->
+        get() = autioLocalDataSource.allLiveStories.transform { entities ->
             entities.onEach { it.toModel() }
         }
 
+    override val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
+        get() = autioLocalDataSource.getDownloadedStories.transform { entities ->
+
+            entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
+        }
+    override val bookmarkedStories: Flow<List<MapPoint>>
+        get() = TODO("Not yet implemented")
+    override val favoriteStories: Flow<List<MapPoint>>
+        get() = TODO("Not yet implemented")
+    override val history: Flow<List<MapPoint>>
+        get() = TODO("Not yet implemented")
 
     override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
         return autioRemoteDataSource.login(loginDto)
@@ -123,12 +135,24 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng,
         neCoordinates: LatLng
-    ): List<StoryEntity> {
+    ): List<MapPoint> {
         return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
 
     override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {
         return autioLocalDataSource.getDownloadedStoryById(id)
+    }
+
+    override suspend fun downloadStory(story: DownloadedStoryEntity) {
+        autioLocalDataSource.downloadStory(TODO("Map back from DownloadedStoryEntity to a DownloadedHistory Domain Model"))
+    }
+
+    override suspend fun getAllStories(): List<MapPoint> {
+        return autioLocalDataSource.getAllStories()
+    }
+
+    override suspend fun removeDownloadedStory(id: String) {
+        return autioLocalDataSource.removeDownloadedStory(id)
     }
 
     override suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto) {
@@ -146,6 +170,50 @@ class AutioRepositoryImpl @Inject constructor(
                 prefRepository.remainingStories = response.body()?.playsRemaining!!
             }
         }.onFailure { }
+    }
+
+    override suspend fun removeAllDownloads() {
+        autioLocalDataSource.removeAllDownloads()
+    }
+
+    override suspend fun removeBookmarkFromStory(id: String) {
+        autioLocalDataSource.removeBookmarkFromStory(id)
+    }
+
+    override suspend fun removeAllBookmarks() {
+        autioLocalDataSource.removeAllBookmarks()
+    }
+
+    override suspend fun bookmarkStory(id: String) {
+        autioLocalDataSource.bookmarkStory(id)
+    }
+
+    override suspend fun giveLikeToStory(id: String) {
+        autioLocalDataSource.giveLikeToStory(id)
+    }
+
+    override suspend fun removeLikeFromStory(id: String) {
+        autioLocalDataSource.removeLikeFromStory(id)
+    }
+
+    override suspend fun addStoryToHistory(historyEntity: HistoryEntity) {
+        autioLocalDataSource.addStoryToHistory(historyEntity)
+    }
+
+    override suspend fun removeStoryFromHistory(id: String) {
+        autioLocalDataSource.removeStoryFromHistory(id)
+    }
+
+    override suspend fun clearStoryHistory() {
+        autioLocalDataSource.clearStoryHistory()
+    }
+
+    override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
+        autioLocalDataSource.cacheRecordOfStory(storyId,recordUrl)
+    }
+
+    override suspend fun clearUserData() {
+        autioLocalDataSource.clearUserData()
     }
 }
 

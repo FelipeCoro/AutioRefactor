@@ -9,13 +9,16 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutioLocalDataSource {
     val userCategories: Flow<List<CategoryEntity>>
+    val allLiveStories: Flow<List<MapPoint>>
+    val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
+    val bookmarkedStories: Flow<List<MapPoint>>
+    val favoriteStories: Flow<List<MapPoint>>
+    val history: Flow<List<MapPoint>>
     fun addUserCategories(categories: List<CategoryEntity>)
     suspend fun updateCategories(categories: List<CategoryEntity>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPoint>
-
-    val allStories: Flow<List<MapPoint>>
     suspend fun getAllStories(): List<MapPoint>
     suspend fun getStoryById(id: String): MapPoint?
     fun getStoriesByIds(ids: List<Int>): Flow<List<MapPoint>>
