@@ -1,31 +1,29 @@
 package com.autio.android_app.ui.viewmodel
 
-import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.stories.models.Story
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PlayerFragmentViewModel(
-    app: Application,
+private const val POSITION_UPDATE_INTERVAL_MILLIS = 17L
+
+@HiltViewModel
+class PlayerFragmentViewModel @Inject constructor(
+    private val prefRepository: PrefRepository,
     playerServiceConnection: PlayerServiceConnection
-) : AndroidViewModel(
-    app
-) {
-    private val prefRepository by lazy {
-        PrefRepository(
-            app
-        )
-    }
+) : ViewModel() {
+
 
     private var playbackState: PlaybackStateCompat =
         EMPTY_PLAYBACK_STATE
@@ -269,25 +267,7 @@ class PlayerFragmentViewModel(
             }
         }
     }
-
-    class Factory(
-        private val app: Application,
-        private val playerServiceConnection: PlayerServiceConnection
-    ) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress(
-            "unchecked_cast"
-        )
-        override fun <T : ViewModel> create(
-            modelClass: Class<T>
-        ): T {
-            return PlayerFragmentViewModel(
-                app,
-                playerServiceConnection
-            ) as T
-        }
-    }
 }
 
-private const val POSITION_UPDATE_INTERVAL_MILLIS =
-    17L
+
+

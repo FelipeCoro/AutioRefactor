@@ -1,7 +1,7 @@
 package com.autio.android_app
 
 import android.app.Application
-import com.autio.android_app.billing.RevenueCatRepository
+import com.autio.android_app.data.repository.revenue.RevenueCatRepository
 import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
 import dagger.hilt.android.HiltAndroidApp

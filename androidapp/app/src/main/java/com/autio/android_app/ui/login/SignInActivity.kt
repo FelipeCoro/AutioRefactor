@@ -6,7 +6,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivitySignInBinding
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.util.InjectorUtils

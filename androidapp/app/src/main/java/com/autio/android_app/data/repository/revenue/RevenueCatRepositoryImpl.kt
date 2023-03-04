@@ -1,4 +1,4 @@
-package com.autio.android_app.billing
+package com.autio.android_app.data.repository.revenue
 
 import android.app.Activity
 import android.app.Application
@@ -7,15 +7,15 @@ import androidx.lifecycle.MutableLiveData
 import com.revenuecat.purchases.*
 import com.revenuecat.purchases.models.StoreTransaction
 
-class RevenueCatRepository private constructor(
+class RevenueCatRepositoryImpl private constructor(
     application: Application
-) {
+) : RevenueCatRepository {
     private val _customerInfo =
         MutableLiveData<CustomerInfo>().apply {
             value =
                 null
         }
-    val customerInfo: LiveData<CustomerInfo> =
+    override val customerInfo: LiveData<CustomerInfo> =
         _customerInfo
 
     /**
@@ -25,12 +25,12 @@ class RevenueCatRepository private constructor(
      * @param onError an optional error callback
      * @param onSuccess an optional successful callback
      */
-    fun login(
+    override fun login(
         userId: String,
-        name: String? = null,
-        email: String? = null,
-        onError: ((PurchasesError) -> Unit)? = null,
-        onSuccess: ((CustomerInfo, Boolean) -> Unit)? = null
+        name: String?,
+        email: String?,
+        onError: ((PurchasesError) -> Unit)?,
+        onSuccess: ((CustomerInfo, Boolean) -> Unit)?
     ) {
         with(Purchases.sharedInstance) {
             logInWith(
@@ -68,12 +68,12 @@ class RevenueCatRepository private constructor(
      * method will replace the user's id, but it doesn't
      * hurt to keep this line of code
      */
-    fun logOut() {
+    override fun logOut() {
         Purchases.sharedInstance.logOut()
     }
 
-    fun getOfferings(
-        onError: ((PurchasesError) -> Unit) = { },
+    override fun getOfferings(
+        onError: ((PurchasesError) -> Unit),
         onSuccess: (Offerings) -> Unit
     ) {
         Purchases.sharedInstance.getOfferingsWith(
@@ -82,11 +82,11 @@ class RevenueCatRepository private constructor(
         )
     }
 
-    fun purchasePackage(
+    override fun purchasePackage(
         activity: Activity,
         packageToPurchase: Package,
-        onError: ((PurchasesError, Boolean) -> Unit) = { _, _ -> },
-        onSuccess: ((StoreTransaction, CustomerInfo) -> Unit) = { _, _ -> }
+        onError: ((PurchasesError, Boolean) -> Unit),
+        onSuccess: ((StoreTransaction, CustomerInfo) -> Unit)
     ) {
         Purchases.sharedInstance.purchasePackageWith(
             activity,
@@ -104,9 +104,9 @@ class RevenueCatRepository private constructor(
         )
     }
 
-    fun restorePurchase(
-        onError: ((PurchasesError) -> Unit) = { },
-        onSuccess: ((CustomerInfo) -> Unit) = { }
+    override fun restorePurchase(
+        onError: ((PurchasesError) -> Unit),
+        onSuccess: ((CustomerInfo) -> Unit)
     ) {
         Purchases.sharedInstance.restorePurchasesWith(
             onError
@@ -123,7 +123,7 @@ class RevenueCatRepository private constructor(
     /**
      * The latest CustomerInfo from RevenueCat.
      */
-    fun getUserInfo() {
+    override fun getUserInfo() {
         Purchases.sharedInstance.getCustomerInfoWith {
             _customerInfo.postValue(
                 it
@@ -131,7 +131,7 @@ class RevenueCatRepository private constructor(
         }
     }
 
-    private fun updateUserInfo(
+    override fun updateUserInfo(
         customerInfo: CustomerInfo
     ) {
         _customerInfo.postValue(
@@ -149,7 +149,7 @@ class RevenueCatRepository private constructor(
      * For better understanding on Android-specific errors, follow next link:
      * https://www.revenuecat.com/docs/errors#android-errors
      */
-    private fun displayError(
+    override fun displayError(
         error: PurchasesError
     ) {
         with(
@@ -182,11 +182,11 @@ class RevenueCatRepository private constructor(
 
     companion object {
         @Volatile
-        private var sInstance: RevenueCatRepository? =
+        override var sInstance: RevenueCatRepository? =
             null
 
         @JvmStatic
-        fun getInstance(
+        override fun getInstance(
             application: Application
         ) =
             sInstance

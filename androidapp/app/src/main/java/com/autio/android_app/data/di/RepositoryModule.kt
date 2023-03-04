@@ -17,4 +17,14 @@ abstract class RepositoryModule {
     abstract fun bindsAutioRemoteDataSource(
         remoteDataSourceImpl: AutioRemoteDataSourceImpl
     ): AutioRemoteDataSource
+
+    @Binds
+    abstract fun bindsRevenueCatRepository(
+        revenueCatRepository: RevenueCatRepositoryImpl
+    ): RevenueCatRepository
+
+    @Binds
+    abstract fun bindsPrefRepository(
+        prefRepository: PrefRepositoryImpl
+    ): PrefRepository
 }

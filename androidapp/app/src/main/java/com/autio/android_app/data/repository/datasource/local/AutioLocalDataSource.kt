@@ -4,10 +4,16 @@ import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.StoryEntity
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
 interface AutioLocalDataSource {
     val userCategories: Flow<List<CategoryEntity>>
+    fun addUserCategories(categories: Array<CategoryEntity>)
+    suspend fun updateCategories(categories: Array<CategoryEntity>)
+    suspend fun getStoriesInLatLngBoundaries(
+        swCoordinates: LatLng, neCoordinates: LatLng
+    ): List<StoryEntity>
     suspend fun getAllStories(): List<StoryEntity>
     suspend fun getStoryById(id: String): StoryEntity?
     fun getStoriesByIds(ids: Array<Int>): Flow<Array<StoryEntity>>

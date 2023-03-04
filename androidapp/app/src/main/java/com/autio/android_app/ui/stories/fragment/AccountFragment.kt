@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.entities.story.Category
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
 import com.autio.android_app.extensions.makeLinks
 import com.autio.android_app.ui.view.usecases.home.adapter.CategoryAdapter
