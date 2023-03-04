@@ -2,9 +2,10 @@ package com.autio.android_app.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.ui.stories.models.Category
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ class AccountFragmentViewModel(
 
 
     fun fetchUserData() {
-        ApiService.getProfileData(
+        ApiClient (
             prefRepository.userId,
             prefRepository.userApiToken
         ) { profile ->
@@ -42,7 +43,7 @@ class AccountFragmentViewModel(
                 name,
                 categories
             )
-        ApiService.updateProfile(
+        ApiClient.updateProfile(
             prefRepository.userId,
             prefRepository.userApiToken,
             infoUser
@@ -70,7 +71,7 @@ class AccountFragmentViewModel(
                 prefRepository.userName,
                 categories
             )
-        ApiService.updateProfile(
+        ApiClient.updateProfile(
             prefRepository.userId,
             prefRepository.userApiToken,
             infoUser
