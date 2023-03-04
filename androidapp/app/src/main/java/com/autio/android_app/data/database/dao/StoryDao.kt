@@ -45,8 +45,8 @@ interface StoryDao {
         "SELECT * FROM stories WHERE originalId IN (:ids)"
     )
     fun readStoriesWithIds(
-        ids: Array<Int>
-    ): Flow<Array<StoryEntity>>
+        ids: List<Int>
+    ): Flow<List<StoryEntity>>
 
     @Query(
         "SELECT * FROM stories WHERE id = (:id)"

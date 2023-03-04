@@ -1,5 +1,9 @@
 package com.autio.android_app.data.repository.datasource.remote
 
+import com.autio.android_app.data.api.model.account.CreateAccountDto
+import com.autio.android_app.data.api.model.account.GuestResponse
+import com.autio.android_app.data.api.model.account.LoginDto
+import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
 import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
@@ -13,14 +17,14 @@ interface AutioRemoteDataSource {
 
 
     suspend fun login(
-        loginDto: com.autio.android_app.data.api.model.account.LoginDto
-    ): Response<com.autio.android_app.data.api.model.account.LoginResponse>
+        loginDto: LoginDto
+    ): Response<LoginResponse>
 
-    suspend fun createGuestAccount(): Response<com.autio.android_app.data.api.model.account.GuestResponse>
+    suspend fun createGuestAccount(): Response<GuestResponse>
 
     suspend fun createAccount(
-        createAccountDto: com.autio.android_app.data.api.model.account.CreateAccountDto
-    ): Response<com.autio.android_app.data.api.model.account.LoginResponse>
+        createAccountDto: CreateAccountDto
+    ): Response<LoginResponse>
 
     suspend fun changePassword(
         xUserId: Int,
@@ -42,7 +46,7 @@ interface AutioRemoteDataSource {
     suspend fun getProfileDataV2(
         xUserId: Int,
         apiToken: String,
-        userId: Int,
+        userId: Int = xUserId,
     ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
 
     suspend fun updateProfile(
@@ -55,8 +59,8 @@ interface AutioRemoteDataSource {
     suspend fun updateProfileV2(
         xUserId: Int,
         apiToken: String,
-        userId: Int,
-        profileDto: com.autio.android_app.data.api.model.account.ProfileDto
+        profileDto: com.autio.android_app.data.api.model.account.ProfileDto,
+        userId: Int =xUserId,
     ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
 
     suspend fun getStoriesByIds(

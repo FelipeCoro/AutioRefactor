@@ -81,7 +81,7 @@ interface ApiClient {
     suspend fun getProfileDataV2(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,
-        @Path("user_id") userId: Int,
+        @Path("user_id") userId: Int = xUserId,
     ): Response<ProfileDto>
 
     @Deprecated(
@@ -107,7 +107,7 @@ interface ApiClient {
     suspend fun updateProfileV2(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,
-        @Path("user_id") userId: Int,
+        @Path("user_id") userId: Int = xUserId,
         @Body profileDto: ProfileDto
     ): Response<ProfileDto>
     // STORY CALLS

@@ -26,11 +26,11 @@ class AutioLocalDataSourceImpl @Inject constructor(
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
     override val allStories = storyDao.readLiveStories()
-    override fun addUserCategories(categories: Array<CategoryEntity>) {
+    override fun addUserCategories(categories: List<CategoryEntity>) {
         executor.execute { categoryDao.addCategories(categories) }
     }
 
-    override suspend fun updateCategories(categories: Array<CategoryEntity>) {
+    override suspend fun updateCategories(categories: List<CategoryEntity>) {
         categoryDao.update(categories)
     }
 
@@ -52,7 +52,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getStoryById(id: String) = storyDao.getStoryById(id)
 
-    override fun getStoriesByIds(ids: Array<Int>): Flow<Array<StoryEntity>> {
+    override fun getStoriesByIds(ids: List<Int>): Flow<List<StoryEntity>> {
         return storyDao.readStoriesWithIds(ids)
     }
 

@@ -1,6 +1,9 @@
 package com.autio.android_app.data.repository.datasource.remote
 
 import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.api.model.account.LoginDto
+import com.autio.android_app.data.api.model.account.LoginResponse
+import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
@@ -13,7 +16,7 @@ import javax.inject.Inject
 
 class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiClient) : AutioRemoteDataSource {
 
-    override suspend fun login(loginDto: com.autio.android_app.data.api.model.account.LoginDto): Response<com.autio.android_app.data.api.model.account.LoginResponse> {
+    override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
         return apiClient.login(loginDto)
     }
 
@@ -45,7 +48,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         userId: Int
-    ): Response<com.autio.android_app.data.api.model.account.ProfileDto> {
+    ): Response<ProfileDto> {
         return apiClient.getProfileDataV2(xUserId, apiToken, userId)
     }
 
@@ -53,17 +56,17 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
         xUserId: Int,
         apiToken: String,
         userId: Int,
-        profileDto: com.autio.android_app.data.api.model.account.ProfileDto
-    ): Response<com.autio.android_app.data.api.model.account.ProfileDto> {
+        profileDto:ProfileDto
+    ): Response<ProfileDto> {
         return apiClient.updateProfile(xUserId, apiToken, userId, profileDto)
     }
 
     override suspend fun updateProfileV2(
         xUserId: Int,
         apiToken: String,
-        userId: Int,
-        profileDto: com.autio.android_app.data.api.model.account.ProfileDto
-    ): Response<com.autio.android_app.data.api.model.account.ProfileDto> {
+        profileDto: ProfileDto,
+        userId: Int
+    ): Response<ProfileDto> {
         return apiClient.updateProfileV2(xUserId, apiToken, userId, profileDto)
     }
 
