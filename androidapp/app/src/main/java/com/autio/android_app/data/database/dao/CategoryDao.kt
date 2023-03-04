@@ -11,8 +11,8 @@ interface CategoryDao {
     fun addCategories(categories: Array<CategoryEntity>): Array<Long>
 
     @Query("SELECT * FROM user_categories ORDER BY \"order\" ASC")
-    fun readUserCategories(): Flow<Array<CategoryEntity>>
+    fun readUserCategories(): Flow<List<CategoryEntity>>
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(items: Array<CategoryEntity>)
+    suspend fun update(items: List<CategoryEntity>)
 }

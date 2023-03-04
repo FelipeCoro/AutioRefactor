@@ -4,10 +4,12 @@ import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.ui.stories.models.Story
 import kotlinx.coroutines.flow.Flow
 
 interface AutioLocalDataSource {
     val userCategories: Flow<List<CategoryEntity>>
+    val allStories: Flow<List<StoryEntity>>
     suspend fun getAllStories(): List<StoryEntity>
     suspend fun getStoryById(id: String): StoryEntity?
     fun getStoriesByIds(ids: Array<Int>): Flow<Array<StoryEntity>>

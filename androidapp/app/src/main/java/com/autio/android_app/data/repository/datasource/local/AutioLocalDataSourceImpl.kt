@@ -6,22 +6,24 @@ import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.StoryEntity
-import com.autio.android_app.ui.view.usecases.home.fragment.stories.models.Story
+import com.autio.android_app.util.coroutines.IoDispatcher
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-
 class AutioLocalDataSourceImpl @Inject constructor(
+
     private val storyDao: StoryDao,
     private val downloadedStoryDao: DownloadedStoryDao,
-    private val categoryDao: CategoryDao
+    private val categoryDao: CategoryDao,
+
+    @IoDispatcher val coroutineDispatcher: CoroutineDispatcher
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
-    val userCategories = categoryDao.readUserCategories()
-
+    override val userCategories = categoryDao.readUserCategories()
+    override val allStories = storyDao.readLiveStories()
     fun addUserCategories(categories: Array<CategoryEntity>) {
         executor.execute { categoryDao.addCategories(categories) }
     }
@@ -41,7 +43,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
         )
     }
 
-    val allStories = storyDao.readLiveStories()
 
     override suspend fun getAllStories(): List<Story> {
         return storyDao.allStories().map { }

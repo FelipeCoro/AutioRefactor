@@ -24,21 +24,14 @@ abstract class DataBase : RoomDatabase() {
     abstract fun categoryDao(): CategoryDao
 
     private class StoryDatabaseCallback(
-        private val context: Context,
-        private val scope: CoroutineScope
+        private val context: Context, private val scope: CoroutineScope
     ) : Callback() {
-        override fun onCreate(
-            db: SupportSQLiteDatabase
-        ) {
-            super.onCreate(
-                db
-            )
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            super.onCreate(db)
             scope.launch {
                 INSTANCE?.let { database ->
-                    val storyDao =
-                        database.storyDao()
-                    storyDao
-                        .deleteAllStories()
+                    val storyDao = database.storyDao()
+                    storyDao.deleteAllStories()
 //                    val data =
 //                        mutableListOf<Story>()
 //                    context.assets.open(
@@ -111,45 +104,22 @@ abstract class DataBase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: DataBase? =
-            null
+        private var INSTANCE: DataBase? = null
 
         fun getInstance(
-            context: Context,
-            scope: CoroutineScope
-        ): DataBase =
-            INSTANCE
-                ?: synchronized(
-                    this
-                ) {
-                    INSTANCE
-                        ?: buildDatabase(
-                            context,
-                            scope
-                        ).also {
-                            INSTANCE =
-                                it
-                        }
-                }
+            context: Context, scope: CoroutineScope
+        ): DataBase = INSTANCE ?: synchronized(this) {
+            INSTANCE ?: buildDatabase(context, scope).also {
+                INSTANCE = it
+            }
+        }
 
-        private fun buildDatabase(
-            context: Context,
-            scope: CoroutineScope
-        ): DataBase {
+        private fun buildDatabase(context: Context, scope: CoroutineScope): DataBase {
             return Room.databaseBuilder(
-                context.applicationContext,
-                DataBase::class.java,
-                "STORIES"
-            )
-                .fallbackToDestructiveMigration()
-                .addCallback(
-                    StoryDatabaseCallback(
-                        context,
-                        scope
-                    )
-                )
-                .enableMultiInstanceInvalidation()
-                .build()
+                context.applicationContext, DataBase::class.java, "STORIES"
+            ).fallbackToDestructiveMigration().addCallback(
+                StoryDatabaseCallback(context, scope)
+            ).enableMultiInstanceInvalidation().build()
         }
     }
 }
