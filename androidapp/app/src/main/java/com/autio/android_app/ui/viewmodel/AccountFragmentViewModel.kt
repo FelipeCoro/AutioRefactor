@@ -1,28 +1,20 @@
 package com.autio.android_app.ui.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
-import com.autio.android_app.data.entities.story.Category
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
+import com.autio.android_app.data.repository.prefs.PrefRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@HiltViewModel
 class AccountFragmentViewModel(
-    private val app: Application,
-    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
-) : AndroidViewModel(
-    app
-) {
-    private val prefRepository by lazy {
-        PrefRepository(
-            app
-        )
-    }
+    private val autioLocalDataSourceImpl: AutioLocalDataSource,
+    private val prefRepository: PrefRepository,
+) : ViewModel() {
+
 
     fun fetchUserData() {
         ApiService.getProfileData(
@@ -95,24 +87,6 @@ class AccountFragmentViewModel(
             } else {
                 onFailure.invoke()
             }
-        }
-    }
-
-    class Factory(
-        private val app: Application,
-        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
-    ) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress(
-            "unchecked_cast"
-        )
-        override fun <T : ViewModel> create(
-            modelClass: Class<T>
-        ): T {
-            return AccountFragmentViewModel(
-                app,
-                autioLocalDataSourceImpl
-            ) as T
         }
     }
 }

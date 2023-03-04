@@ -12,7 +12,7 @@ import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.extensions.currentPlayBackPosition
 import com.autio.android_app.extensions.isPlayEnabled
 import com.autio.android_app.extensions.isPlaying

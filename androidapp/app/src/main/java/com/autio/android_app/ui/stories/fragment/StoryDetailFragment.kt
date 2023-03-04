@@ -30,7 +30,7 @@ class StoryDetailFragment : Fragment() {
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
+    private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
 //    private val storyDetailViewModel by viewModels<StoryDetailFragmentViewModel>()
 
     //    lateinit var binding:

@@ -1,4 +1,4 @@
-package com.autio.android_app.data.repository.legacy
+package com.autio.android_app.data.repository.prefs
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -11,10 +11,12 @@ import com.autio.android_app.util.Constants.USER_IS_GUEST
 import com.autio.android_app.util.Constants.USER_NAME
 import com.autio.android_app.util.Constants.USER_PREFERENCES
 import com.autio.android_app.util.SharedPreferenceIntLiveData
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class PrefRepository(
-    val context: Context
-) {
+class PrefRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context
+) : PrefRepository {
     private val pref: SharedPreferences =
         context.getSharedPreferences(
             USER_PREFERENCES,
@@ -23,7 +25,7 @@ class PrefRepository(
     private val editor =
         pref.edit()
 
-    private fun String.put(
+    override fun String.put(
         int: Int
     ) {
         editor.putInt(
@@ -33,7 +35,7 @@ class PrefRepository(
         editor.commit()
     }
 
-    private fun String.put(
+    override fun String.put(
         string: String
     ) {
         editor.putString(
@@ -43,7 +45,7 @@ class PrefRepository(
         editor.commit()
     }
 
-    private fun String.put(
+    override fun String.put(
         boolean: Boolean
     ) {
         editor.putBoolean(
@@ -53,31 +55,31 @@ class PrefRepository(
         editor.commit()
     }
 
-    private fun String.getInt() =
+    override fun String.getInt() =
         pref.getInt(
             this,
             0
         )
 
-    private fun String.getString() =
+    override fun String.getString() =
         pref.getString(
             this,
             ""
         )!!
 
-    private fun String.getBoolean() =
+    override fun String.getBoolean() =
         pref.getBoolean(
             this,
             false
         )
 
-    var userId: Int =
+    override var userId: Int =
         USER_ID.getInt()
         set(id) = USER_ID.put(
             id
         )
 
-    var userName: String =
+    override var userName: String =
         USER_NAME.getString()
         set(
             name
@@ -86,7 +88,7 @@ class PrefRepository(
                 name
             )
 
-    var userEmail: String =
+    override var userEmail: String =
         USER_EMAIL.getString()
         set(
             email
@@ -94,13 +96,13 @@ class PrefRepository(
             email
         )
 
-    var userApiToken: String =
+    override var userApiToken: String =
         USER_API_TOKEN.getString()
         set(apiToken) = USER_API_TOKEN.put(
             apiToken
         )
 
-    var firebaseKey: String =
+    override var firebaseKey: String =
         USER_FIREBASE_KEY.getString()
         set(firebaseKey) = USER_FIREBASE_KEY.put(
             firebaseKey
@@ -118,7 +120,7 @@ class PrefRepository(
             remainingStories
         )
 
-    fun clearData() {
+    override fun clearData() {
         editor.clear()
         editor.commit()
     }

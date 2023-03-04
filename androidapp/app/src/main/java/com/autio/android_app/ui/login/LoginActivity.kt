@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.Datasource
 import com.autio.android_app.data.repository.ApiService
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivityLoginBinding
 import com.autio.android_app.extensions.setAutomaticScroll
 import com.autio.android_app.ui.view.usecases.home.adapter.ImageAdapter

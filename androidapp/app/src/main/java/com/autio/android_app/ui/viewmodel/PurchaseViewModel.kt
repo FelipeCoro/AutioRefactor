@@ -2,14 +2,17 @@ package com.autio.android_app.ui.viewmodel
 
 import android.app.Activity
 import androidx.lifecycle.*
-import com.autio.android_app.billing.RevenueCatRepository
+import com.autio.android_app.data.repository.revenue.RevenueCatRepository
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
 import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.models.StoreTransaction
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class PurchaseViewModel(
+@HiltViewModel
+class PurchaseViewModel @Inject constructor(
     private val revenueCatRepository: RevenueCatRepository
 ) : ViewModel() {
 
@@ -65,6 +68,7 @@ class PurchaseViewModel(
             onSuccess
         )
     }
+}
 
 //    class ProductDetails internal constructor(
 //        product: String,
@@ -232,7 +236,7 @@ class PurchaseViewModel(
 //            ?: 0) <= ADVENTURER_TRIP_DURATION
 //    }
 
-    class Factory(
+/*    class Factory(
         private val revenueCatRepository: RevenueCatRepository
     ) :
         ViewModelProvider.NewInstanceFactory() {
@@ -259,4 +263,4 @@ class PurchaseViewModel(
 }
 
 private val TAG =
-    PurchaseViewModel::class.java.simpleName
+    PurchaseViewModel::class.java.simpleName*/

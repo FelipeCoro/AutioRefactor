@@ -43,7 +43,7 @@ import kotlinx.coroutines.launch
 class PlayerServiceConnection(
     context: Context,
     serviceComponent: ComponentName,
-    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
+    private val autioLocalDataSourceImpl: AutioLocalDataSource
 ) {
 
     val isConnected =

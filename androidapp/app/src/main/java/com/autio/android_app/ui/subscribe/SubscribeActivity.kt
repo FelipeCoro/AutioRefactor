@@ -11,7 +11,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivitySubscribeBinding
 import com.autio.android_app.databinding.MothPopupBinding
 import com.autio.android_app.extensions.makeLinks
@@ -27,8 +27,8 @@ import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Package
 import com.smarteist.autoimageslider.SliderView
 
-class SubscribeActivity :
-    AppCompatActivity() {
+@EntryPoint
+class SubscribeActivity : AppCompatActivity() {
     private val prefRepository by lazy {
         PrefRepository(
             this

@@ -1,26 +1,24 @@
 package com.autio.android_app.ui.viewmodel
 
-import android.app.Application
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.SubscriptionCallback
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
-import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
-import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLngBounds
+import dagger.hilt.android.lifecycle.HiltViewModel
 
+@HiltViewModel
 class MapFragmentViewModel(
-    application: Application,
     private val mediaId: String,
     playerServiceConnection: PlayerServiceConnection,
-    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
-) : AndroidViewModel(
-    application
-) {
+    private val autioLocalDataSourceImpl: AutioLocalDataSource
+) : ViewModel() {
 
     private val _storiesInScreen =
         MutableLiveData<List<Story>>()
@@ -159,27 +157,6 @@ class MapFragmentViewModel(
                     }
                 }
             }
-        }
-    }
-
-    class Factory(
-        private val application: Application,
-        private val mediaId: String,
-        private val playerServiceConnection: PlayerServiceConnection,
-        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl
-    ) : ViewModelProvider.NewInstanceFactory() {
-        @Suppress(
-            "unchecked_cast"
-        )
-        override fun <T : ViewModel> create(
-            modelClass: Class<T>
-        ): T {
-            return MapFragmentViewModel(
-                application,
-                mediaId,
-                playerServiceConnection,
-                autioLocalDataSourceImpl
-            ) as T
         }
     }
 }

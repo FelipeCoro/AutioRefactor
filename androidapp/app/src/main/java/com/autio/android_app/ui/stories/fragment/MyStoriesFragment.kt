@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.legacy.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
 import com.autio.android_app.ui.view.usecases.login.SignInActivity
 import com.autio.android_app.ui.view.usecases.login.SignUpActivity
