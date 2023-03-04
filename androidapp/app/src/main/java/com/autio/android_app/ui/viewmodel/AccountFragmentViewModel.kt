@@ -8,9 +8,10 @@ import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.stories.models.Category
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class AccountFragmentViewModel(
+class AccountFragmentViewModel @Inject constructor(
     private val autioRepository: AutioRepository,
     private val prefRepository: PrefRepository,
 ) : ViewModel() {
