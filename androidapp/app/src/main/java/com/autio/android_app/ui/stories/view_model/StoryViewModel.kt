@@ -2,7 +2,8 @@ package com.autio.android_app.ui.stories.view_model
 
 import androidx.lifecycle.*
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
-import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
+import com.autio.android_app.domain.repository.AutioRepository
+import com.autio.android_app.ui.stories.models.Story
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -10,19 +11,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StoryViewModel @Inject constructor(
+    private val autioRepository: AutioRepository,
     private val autioLocalDataSource: AutioLocalDataSource
 ) : ViewModel() {
 
-    val userCategories = autioLocalDataSource.userCategories.asLiveData()
-
-    val allStories = autioLocalDataSource.allStories.asLiveData()
+    val userCategories = autioRepository.userCategories.asLiveData()
+    val allStories = autioRepository.allStories.asLiveData()
 
     suspend fun getAllStories(): List<Story> {
         return autioLocalDataSource.getAllStories()
     }
 
-    fun getStoriesByIds(ids: Array<Int>): LiveData<Array<Story>> =
-        autioLocalDataSource.getStoriesByIds(ids).asLiveData()
+    fun getStoriesByIds(ids: Array<Int>): LiveData<Array<Story>> {
+        autioLocalDataSource.getStoriesByIds(ids).collect {
+        }
+    }
 
     val downloadedStories = autioLocalDataSource.getDownloadedStories.asLiveData()
 

@@ -15,16 +15,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [
-        StoryEntity::class,
-        DownloadedStoryEntity::class,
-        CategoryEntity::class
-    ],
+    entities = [StoryEntity::class, DownloadedStoryEntity::class, CategoryEntity::class],
     version = 24
 )
-abstract class DataBase :
-    RoomDatabase() {
-
+abstract class DataBase : RoomDatabase() {
     abstract fun storyDao(): StoryDao
     abstract fun downloadedStoryDao(): DownloadedStoryDao
     abstract fun categoryDao(): CategoryDao

@@ -7,22 +7,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface CategoryDao {
-    @Insert(
-        onConflict = OnConflictStrategy.REPLACE
-    )
-    fun addCategories(
-        categories: Array<CategoryEntity>
-    ): Array<Long>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addCategories(categories: Array<CategoryEntity>): Array<Long>
 
     @Query(
         "SELECT * FROM user_categories ORDER BY \"order\" ASC"
     )
     fun readUserCategories(): Flow<List<CategoryEntity>>
 
-    @Update(
-        onConflict = OnConflictStrategy.REPLACE
-    )
-    suspend fun update(
-        items: Array<CategoryEntity>
-    )
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun update(items: Array<CategoryEntity>)
 }
