@@ -3,6 +3,7 @@ package com.autio.android_app.ui.stories.view_model
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.Network
 import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
@@ -10,9 +11,11 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.*
 import com.autio.android_app.R
+import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.currentPlayBackPosition
 import com.autio.android_app.extensions.isPlayEnabled
 import com.autio.android_app.extensions.isPlaying
@@ -21,6 +24,7 @@ import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.util.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -35,9 +39,13 @@ private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
 class BottomNavigationViewModel @Inject constructor(
     private val app: Application,
     private val playerServiceConnection: PlayerServiceConnection,
-    private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl,
-    private val prefRepository: PrefRepository
-) : ViewModel() {
+    private val autioRepository: AutioRepository,
+    private val prefRepository: PrefRepository,
+    @IoDispatcher
+    private val coroutineDispatcher: CoroutineDispatcher
+) : AndroidViewModel(
+    app
+) {
 
     val initialRemainingStories = prefRepository.remainingStories
     val remainingStoriesLiveData = prefRepository.remainingStoriesLiveData
@@ -94,62 +102,47 @@ class BottomNavigationViewModel @Inject constructor(
     private fun postPlay() {
         val storyToPost = playingStory.value
         postedPlay = true
-        if (storyToPost != null) {
-            viewModelScope.launch(
-                Dispatchers.IO
-            ) {
-                val downloadedStory = autioLocalDataSourceImpl.getDownloadedStoryById(
-                    playingStory.value!!.id
-                )
-                val connectivityManager = app.getSystemService(
-                    Context.CONNECTIVITY_SERVICE
-                ) as ConnectivityManager
-                val networkInfo = connectivityManager.activeNetwork
-                val network = if (networkInfo == null) "disconnected" else {
-                    val actNw = connectivityManager.getNetworkCapabilities(
-                        networkInfo
-                    )
-                    when {
-                        actNw?.hasTransport(
-                            NetworkCapabilities.TRANSPORT_WIFI
-                        ) == true -> "wifi"
-                        actNw?.hasTransport(
-                            NetworkCapabilities.TRANSPORT_CELLULAR
-                        ) == true -> "cellular"
-                        else -> "disconnected"
-                    }
-                }
-                ApiService.postStoryPlayed(
-                    prefRepository.userId, prefRepository.userApiToken, PlaysDto(
-                        storyToPost.id,
-                        wasPresent = true,
-                        autoPlay = true,
-                        downloadedStory != null,
-                        network,
-                        storyToPost.lat,
-                        storyToPost.lon
-                    )
-                ) {
-                    if (it != null) {
-                        viewModelScope.launch(
-                            Dispatchers.IO
-                        ) {
-                            autioLocalDataSourceImpl.markStoryAsListenedAtLeast30Secs(
-                                storyToPost.id
-                            )
-                        }
-                        prefRepository.remainingStories = it.playsRemaining
-                    }
-                }
-            }
-        } else {
-            ApiService.postStoryPlayed(
-                prefRepository.userId, prefRepository.userApiToken, PlaysDto()
-            ) {
-                if (it != null) {
-                    prefRepository.remainingStories = it.playsRemaining
-                }
-            }
+        viewModelScope.launch(coroutineDispatcher) {
+            val downloadedStory = autioRepository.getDownloadedStoryById(playingStory.value!!.id)
+            val connectivityManager =
+                app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networkInfo = connectivityManager.activeNetwork
+            val network = getNetworkStatus(networkInfo, connectivityManager)
+
+            val playsDto = if (storyToPost != null)
+                PlaysDto(
+                    storyToPost.id,
+                    wasPresent = true,
+                    autoPlay = true,
+                    downloadedStory != null,
+                    network,
+                    storyToPost.lat,
+                    storyToPost.lon
+                ) else PlaysDto()
+
+            autioRepository.postStoryPlayed(
+                prefRepository.userId,
+                prefRepository.userApiToken,
+                playsDto
+            )
+        }
+    }
+
+    private fun getNetworkStatus(
+        networkInfo: Network?,
+        connectivityManager: ConnectivityManager
+    ) = if (networkInfo == null) "disconnected" else {
+        val actNw = connectivityManager.getNetworkCapabilities(
+            networkInfo
+        )
+        when {
+            actNw?.hasTransport(
+                NetworkCapabilities.TRANSPORT_WIFI
+            ) == true -> "wifi"
+            actNw?.hasTransport(
+                NetworkCapabilities.TRANSPORT_CELLULAR
+            ) == true -> "cellular"
+            else -> "disconnected"
         }
     }
 
@@ -189,7 +182,7 @@ class BottomNavigationViewModel @Inject constructor(
         )
     }
 
-    // Player code
+// Player code
 
     /**
      * This method takes a [MediaItemData] and does one of the following:
@@ -309,7 +302,7 @@ class BottomNavigationViewModel @Inject constructor(
         val transportControls = playerServiceConnection.transportControls
     }
 
-    // Backend calls
+// Backend calls
 
     private suspend fun getInitialData() {
         viewModelScope.launch {
@@ -407,7 +400,7 @@ class BottomNavigationViewModel @Inject constructor(
             val userFavoriteStories = FirebaseStoryRepository.getUserFavoriteStories(
                 prefRepository.firebaseKey
             )
-            autioLocalDataSourceImpl.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
+            autioRepository.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
                 .map { it.storyId })
 //            ApiService.likedStoriesByUser(
 //                prefRepository.userId,
@@ -429,9 +422,7 @@ class BottomNavigationViewModel @Inject constructor(
             val userHistory = FirebaseStoryRepository.getUserStoriesHistory(
                 prefRepository.firebaseKey
             )
-            autioLocalDataSourceImpl.setListenedAtToLocalStories(
-                userHistory
-            )
+            autioRepository.setListenedAtToLocalStories(userHistory)
         }
     }
 
@@ -439,7 +430,7 @@ class BottomNavigationViewModel @Inject constructor(
         viewModelScope.launch(
             Dispatchers.IO
         ) {
-            autioLocalDataSourceImpl.deleteCachedData()
+            autioRepository.deleteCachedData()
         }
     }
 

@@ -8,6 +8,8 @@ import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.StoryDao
+import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
