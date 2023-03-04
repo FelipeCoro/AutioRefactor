@@ -1,141 +1,143 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.view.usecases.login.SignUpActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/background_sign_in">
+        tools:context=".ui.view.usecases.login.SignUpActivity">
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/animationView"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
-            android:layout_marginStart="-90dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintStart_toEndOf="@+id/linearLayoutSignInFields"
-            app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_rawRes="@raw/story_wheel" />
-
-        <TextView
-            android:id="@+id/textViewSignIn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="61dp"
-            android:fontFamily="@font/lora_bold"
-            android:text="@string/create_your_account"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/linearLayoutSignInFields"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="42dp"
-            android:layout_marginTop="31dp"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@+id/textViewSignIn">
+            android:layout_height="match_parent"
+            android:background="@drawable/background_sign_in">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animationView"
+                android:layout_width="240dp"
+                android:layout_height="240dp"
+                android:layout_marginStart="-90dp"
+                android:layout_marginTop="12dp"
+                app:layout_constraintStart_toEndOf="@+id/linearLayoutSignInFields"
+                app:layout_constraintTop_toBottomOf="@+id/textViewSignIn"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/story_wheel" />
 
             <TextView
-                android:id="@+id/label_name"
+                android:id="@+id/textViewSignIn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:text="@string/name"
-                android:textColor="@color/gray_letter" />
+                android:layout_marginTop="61dp"
+                android:fontFamily="@font/lora_bold"
+                android:text="@string/create_your_account"
+                android:textColor="@color/white"
+                android:textSize="28sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-            <EditText
-                android:id="@+id/tv_name"
+            <LinearLayout
+                android:id="@+id/linearLayoutSignInFields"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:autofillHints="emailAddress"
-                android:backgroundTint="@color/gray_letter"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:inputType="text"
-                android:labelFor="@id/label_name"
-                android:textColor="@color/white" />
+                android:layout_marginHorizontal="42dp"
+                android:layout_marginTop="31dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/textViewSignIn">
 
-            <TextView
-                android:id="@+id/label_email"
+                <TextView
+                    android:id="@+id/label_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/name"
+                    android:textColor="@color/gray_letter" />
+
+                <EditText
+                    android:id="@+id/tv_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:backgroundTint="@color/gray_letter"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:inputType="text"
+                    android:labelFor="@id/label_name"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/label_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/email"
+                    android:textColor="@color/gray_letter" />
+
+                <EditText
+                    android:id="@+id/tv_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:backgroundTint="@color/gray_letter"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:inputType="textEmailAddress"
+                    android:labelFor="@id/label_email"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/label_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:text="@string/password"
+                    android:textColor="@color/gray_letter" />
+
+                <EditText
+                    android:id="@+id/tv_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="password"
+                    android:backgroundTint="@color/gray_letter"
+                    android:fontFamily="@font/sf_pro_text_regular"
+                    android:inputType="textPassword"
+                    android:labelFor="@id/label_password"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:text="@string/email"
-                android:textColor="@color/gray_letter" />
+                android:layout_marginTop="68dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayoutSignInFields">
 
-            <EditText
-                android:id="@+id/tv_email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="emailAddress"
-                android:backgroundTint="@color/gray_letter"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:inputType="textEmailAddress"
-                android:labelFor="@id/label_email"
-                android:textColor="@color/white" />
+                <Button
+                    android:id="@+id/btn_signup"
+                    style="@style/Button.White"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/sign_up"
+                    android:textAllCaps="false" />
 
-            <TextView
-                android:id="@+id/label_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:text="@string/password"
-                android:textColor="@color/gray_letter" />
+                <Button
+                    android:id="@+id/btn_cancel"
+                    style="@style/Button.Shape.transparent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="23dp"
+                    android:text="@string/cancel" />
+            </LinearLayout>
 
-            <EditText
-                android:id="@+id/tv_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autofillHints="password"
-                android:backgroundTint="@color/gray_letter"
-                android:fontFamily="@font/sf_pro_text_regular"
-                android:inputType="textPassword"
-                android:labelFor="@id/label_password"
-                android:textColor="@color/white" />
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="68dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayoutSignInFields">
-
-            <Button
-                android:id="@+id/btn_signup"
-                style="@style/Button.White"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/sign_up"
-                android:textAllCaps="false" />
-
-            <Button
-                android:id="@+id/btn_cancel"
-                style="@style/Button.Shape.transparent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="23dp"
-                android:text="@string/cancel" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <include
-        android:id="@+id/fl_loading"
-        layout="@layout/loading_barrier" />
-</FrameLayout>
+        <include
+            android:id="@+id/fl_loading"
+            layout="@layout/loading_barrier" />
+    </FrameLayout>
+</layout>

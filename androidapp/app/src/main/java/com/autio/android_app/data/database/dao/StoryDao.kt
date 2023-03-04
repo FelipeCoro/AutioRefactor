@@ -1,42 +1,42 @@
 package com.autio.android_app.data.database.dao
 
 import androidx.room.*
-import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.MapPoint
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addStories(story: List<StoryEntity>): List<Long>
+    fun addStories(story: List<MapPoint>): List<Long>
 
     @Query("SELECT * FROM stories")
-    suspend fun allStories(): List<StoryEntity>
+    suspend fun allStories(): List<MapPoint>
 
     @Query("SELECT * FROM stories ORDER BY id ASC")
-    fun readLiveStories(): Flow<List<StoryEntity>>
+    fun readLiveStories(): Flow<List<MapPoint>>
 
     @Query("SELECT * FROM stories WHERE " + "CASE WHEN :lat1 < :lat2 THEN lat BETWEEN :lat1 AND :lat2 ELSE lat BETWEEN :lat2 AND :lat1 END" + " AND " + "CASE WHEN :lng1 < :lng2 THEN lon BETWEEN :lng1 AND :lng2 ELSE lon BETWEEN :lng2 AND :lng1 END")
     suspend fun getStoriesInLatLngBoundaries(
         lat1: Double, lng1: Double, lat2: Double, lng2: Double
-    ): List<StoryEntity>
+    ): List<MapPoint>
 
     @Query("SELECT * FROM stories")
-    suspend fun readStories(): List<StoryEntity>
+    suspend fun readStories(): List<MapPoint>
 
     @Query("SELECT * FROM stories WHERE originalId IN (:ids)")
-    fun readStoriesWithIds(ids: List<Int>): Flow<List<StoryEntity>>
+    fun readStoriesWithIds(ids: List<Int>): Flow<List<MapPoint>>
 
     @Query("SELECT * FROM stories WHERE id = (:id)")
-    suspend fun getStoryById(id: String): StoryEntity?
+    suspend fun getStoryById(id: String): MapPoint?
 
     @Query("SELECT * FROM stories WHERE modifiedDate = (SELECT MAX(modifiedDate) FROM stories)")
-    suspend fun readLastModifiedStory(): StoryEntity?
+    suspend fun readLastModifiedStory(): MapPoint?
 
     @Query("DELETE FROM stories")
     fun deleteAllStories()
 
     @Query("SELECT * FROM stories WHERE isBookmarked = 1")
-    fun getBookmarkedStories(): Flow<List<StoryEntity>>
+    fun getBookmarkedStories(): Flow<List<MapPoint>>
 
     @Transaction
     fun setBookmarksData(storiesIds: List<String>) {
@@ -60,7 +60,7 @@ interface StoryDao {
     fun removeAllBookmarks()
 
     @Query("SELECT * FROM stories WHERE isLiked = 1")
-    fun getFavoriteStories(): Flow<List<StoryEntity>>
+    fun getFavoriteStories(): Flow<List<MapPoint>>
 
     @Transaction
     fun setLikesData(storiesIds: List<String>) {
@@ -69,7 +69,7 @@ interface StoryDao {
     }
 
     @Query("SELECT * FROM stories WHERE listenedAt != '' ORDER BY listenedAt DESC")
-    fun getHistory(): Flow<List<StoryEntity>>
+    fun getHistory(): Flow<List<MapPoint>>
 
     @Query("UPDATE stories SET listenedAt = :listenedAt WHERE id = :storyId")
     fun setListenedAtData(storyId: String, listenedAt: String)

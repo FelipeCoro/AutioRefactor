@@ -6,7 +6,7 @@ import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.util.coroutines.IoDispatcher
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,7 +33,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<StoryEntity> {
+    ): List<MapPoint> {
         return storyDao.getStoriesInLatLngBoundaries(
             swCoordinates.latitude,
             swCoordinates.longitude,
@@ -43,22 +43,22 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
 
-    override suspend fun getAllStories(): List<StoryEntity> {
+    override suspend fun getAllStories(): List<MapPoint> {
         return storyDao.allStories()
     }
 
     override suspend fun getStoryById(id: String) = storyDao.getStoryById(id)
 
-    override fun getStoriesByIds(ids: List<Int>): Flow<List<StoryEntity>> {
+    override fun getStoriesByIds(ids: List<Int>): Flow<List<MapPoint>> {
         return storyDao.readStoriesWithIds(ids)
     }
 
-    override suspend fun getLastModifiedStory(): StoryEntity? {
+    override suspend fun getLastModifiedStory(): MapPoint? {
         return storyDao.readLastModifiedStory()
     }
 
     override fun addStories(
-        stories: List<StoryEntity>
+        stories: List<MapPoint>
     ) {
         executor.execute { storyDao.addStories(stories) }
     }

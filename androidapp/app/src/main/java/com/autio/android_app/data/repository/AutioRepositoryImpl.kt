@@ -6,10 +6,12 @@ import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.Story
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.transform
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -19,14 +21,19 @@ class AutioRepositoryImpl @Inject constructor(
     private val prefRepository: PrefRepository,
 ) : AutioRepository {
 
-    override val userCategories: Flow<List<Category>>
-        get() = autioRemoteDataSource.getCategories()
+    override val userCategories: Flow<List<Category>> =
+        autioLocalDataSource.userCategories.transform { entities ->
+            entities.onEach { it.toModel() }
+        }
+
     override val allStories: Flow<List<Story>>
-        get() = TODO("Not yet implemented")
+        get() = autioLocalDataSource.allStories.transform { entities ->
+            entities.onEach { it.toModel() }
+        }
 
 
     override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
-       return autioRemoteDataSource.login(loginDto)
+        return autioRemoteDataSource.login(loginDto)
     }
 
     override suspend fun fetchUserData() {

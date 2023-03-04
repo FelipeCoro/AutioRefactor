@@ -7,10 +7,10 @@ import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.MapPoint
 
 @Database(
-    entities = [StoryEntity::class, DownloadedStoryEntity::class, CategoryEntity::class],
+    entities = [MapPoint::class, DownloadedStoryEntity::class, CategoryEntity::class],
     version = 24
 )
 abstract class DataBase : RoomDatabase() {

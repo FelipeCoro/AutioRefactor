@@ -4,7 +4,6 @@ import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,24 +14,23 @@ import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
 
 @HiltViewModel
-class StoryDetailFragmentViewModel(
-    private val app: Application,
-    playerServiceConnection: PlayerServiceConnection
+class StoryDetailFragmentViewModel @Inject constructor(
+    private val playerServiceConnection: PlayerServiceConnection
 ) : ViewModel() {
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
-    val currentStory = MutableLiveData<Story?>()
-    val mediaPosition = MutableLiveData<Long>().apply {
+    private val currentStory = MutableLiveData<Story?>()
+    private val mediaPosition = MutableLiveData<Long>().apply {
         postValue(0L)
     }
-    val mediaButtonRes = MutableLiveData<Int>().apply {
+    private val mediaButtonRes = MutableLiveData<Int>().apply {
         postValue(R.drawable.ic_album)
     }
-
 
     private var updatePosition = true
     private val handler = Handler(

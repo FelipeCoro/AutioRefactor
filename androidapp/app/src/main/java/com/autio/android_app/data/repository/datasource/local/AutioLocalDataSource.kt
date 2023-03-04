@@ -3,7 +3,7 @@ package com.autio.android_app.data.repository.datasource.local
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.MapPoint
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
@@ -13,14 +13,14 @@ interface AutioLocalDataSource {
     suspend fun updateCategories(categories: List<CategoryEntity>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<StoryEntity>
+    ): List<MapPoint>
 
-    val allStories: Flow<List<StoryEntity>>
-    suspend fun getAllStories(): List<StoryEntity>
-    suspend fun getStoryById(id: String): StoryEntity?
-    fun getStoriesByIds(ids: List<Int>): Flow<List<StoryEntity>>
-    suspend fun getLastModifiedStory(): StoryEntity?
-    fun addStories(stories: List<StoryEntity>)
+    val allStories: Flow<List<MapPoint>>
+    suspend fun getAllStories(): List<MapPoint>
+    suspend fun getStoryById(id: String): MapPoint?
+    fun getStoriesByIds(ids: List<Int>): Flow<List<MapPoint>>
+    suspend fun getLastModifiedStory(): MapPoint?
+    fun addStories(stories: List<MapPoint>)
     fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)

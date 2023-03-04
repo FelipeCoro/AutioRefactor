@@ -37,7 +37,8 @@ object InjectorUtils {
                 context,
                 PlayerService::class.java
             ),
-            (applicationContext as CoreApplication).appContainer.autioLocalDataSourceImpl
+            (applicationContext as CoreApplication)
+                .appContainer.autioLocalDataSourceImpl
         )
     }
 

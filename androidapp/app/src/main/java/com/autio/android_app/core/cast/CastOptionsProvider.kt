@@ -1,4 +1,4 @@
-package com.autio.android_app.cast
+package com.autio.android_app.core.cast
 
 import android.content.Context
 import com.google.android.exoplayer2.ext.cast.DefaultCastOptionsProvider.APP_ID_DEFAULT_RECEIVER_WITH_DRM

@@ -1,5 +1,7 @@
 package com.autio.android_app.data.repository.datasource.remote
 
+import com.autio.android_app.data.api.model.account.ChangePasswordDto
+import com.autio.android_app.data.api.model.account.ChangePasswordResponse
 import com.autio.android_app.data.api.model.account.CreateAccountDto
 import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
@@ -9,16 +11,22 @@ import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
 import com.autio.android_app.data.api.model.history.ClearHistoryResponse
 import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
+import com.autio.android_app.data.api.model.story.AuthorDto
+import com.autio.android_app.data.api.model.story.ContributorResponse
+import com.autio.android_app.data.api.model.story.LikeResponse
+import com.autio.android_app.data.api.model.story.NarratorDto
 import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.api.model.story.*
+import com.autio.android_app.data.api.model.story.PlaysResponse
+import com.autio.android_app.data.api.model.story.StoryCategoryDto
+import com.autio.android_app.data.api.model.story.StoryDto
+import com.autio.android_app.data.api.model.story.StoryLikedResponse
+import com.autio.android_app.data.api.model.story.StoryLikesResponse
 import retrofit2.Response
 
 interface AutioRemoteDataSource {
 
 
-    suspend fun login(
-        loginDto: LoginDto
-    ): Response<LoginResponse>
+    suspend fun login(loginDto: LoginDto): Response<LoginResponse>
 
     suspend fun createGuestAccount(): Response<GuestResponse>
 
@@ -29,8 +37,8 @@ interface AutioRemoteDataSource {
     suspend fun changePassword(
         xUserId: Int,
         apiToken: String,
-        changePasswordDto: com.autio.android_app.data.api.model.account.ChangePasswordDto
-    ): Response<com.autio.android_app.data.api.model.account.ChangePasswordResponse>
+        changePasswordDto: ChangePasswordDto
+    ): Response<ChangePasswordResponse>
 
     suspend fun deleteAccount(
         xUserId: Int,
@@ -60,7 +68,7 @@ interface AutioRemoteDataSource {
         xUserId: Int,
         apiToken: String,
         profileDto: com.autio.android_app.data.api.model.account.ProfileDto,
-        userId: Int =xUserId,
+        userId: Int = xUserId,
     ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
 
     suspend fun getStoriesByIds(
@@ -139,45 +147,45 @@ interface AutioRemoteDataSource {
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ) : Response<LikeResponse>
+    ): Response<LikeResponse>
 
     suspend fun getUserHistory(
         xUserId: Int,
         apiToken: String
-    ) : Response<List<StoryDto>>
+    ): Response<List<StoryDto>>
 
     suspend fun addStoryToHistory(
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ) : Response<AddHistoryResponse>
+    ): Response<AddHistoryResponse>
 
     suspend fun clearHistory(
         xUserId: Int,
         apiToken: String
-    ) : Response<ClearHistoryResponse>
+    ): Response<ClearHistoryResponse>
 
     suspend fun removeStoryFromHistory(
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ) : Response<RemoveHistoryResponse>
+    ): Response<RemoveHistoryResponse>
 
     suspend fun getStoriesFromUserBookmarks(
         xUserId: Int,
         apiToken: String
-    ) : Response<List<StoryDto>>
+    ): Response<List<StoryDto>>
 
     suspend fun bookmarkStory(
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ) : Response<AddBookmarkResponse>
+    ): Response<AddBookmarkResponse>
 
     suspend fun removeBookmarkFromStory(
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ) : Response<RemoveBookmarkResponse>
+    ): Response<RemoveBookmarkResponse>
 
 }
