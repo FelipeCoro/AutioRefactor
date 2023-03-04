@@ -1,14 +1,7 @@
 package com.autio.android_app.util
 
-import android.app.Application
-import android.content.ComponentName
 import android.content.Context
-import com.autio.android_app.CoreApplication
-import com.autio.android_app.player.PlayerService
-import com.autio.android_app.player.PlayerServiceConnection
-import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
-import com.autio.android_app.ui.viewmodel.*
+import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
 
 /**
  * Static methods used to inject classes needed for various Activities and Fragments
@@ -25,7 +18,7 @@ object InjectorUtils {
             networkStatusTracker
         )
     }
-
+/*
     private fun providePlayerServiceConnection(
         context: Context
     ): PlayerServiceConnection {
@@ -37,8 +30,7 @@ object InjectorUtils {
                 context,
                 PlayerService::class.java
             ),
-            (applicationContext as CoreApplication)
-                .appContainer.autioLocalDataSourceImpl
+            (applicationContext as CoreApplication).appContainer.autioLocalDataSourceImpl
         )
     }
 
@@ -123,5 +115,5 @@ object InjectorUtils {
             applicationContext as Application,
             playerServiceConnection
         )
-    }
+    }*/
 }

@@ -12,26 +12,11 @@ fun CategoryEntity.toModel(): Category {
 fun MapPoint.toModel(): Story {
     return Story(
         id,
-        originalId,
-        title,
-        description,
-        lat,
-        lon,
-        range,
-        imageUrl,
-        recordUrl,
-        duration,
-        publishedDate,
-        modifiedDate,
-        narrator,
-        author,
-        state,
-        countryCode,
-        category,
-        isLiked,
-        isBookmarked,
-        isDownloaded,
-        listenedAt,
-        listenedAtLeast30Secs
+        lat = lat,
+        lon = lon,
+        range = range,
+        publishedDate = publishedAt,
+        state = state,
+        countryCode = countryCode
     )
 }

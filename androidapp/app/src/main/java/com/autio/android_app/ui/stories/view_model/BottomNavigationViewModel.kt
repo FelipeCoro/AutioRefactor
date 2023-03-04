@@ -21,7 +21,9 @@ import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 /**
  * [ViewModel] that watches a [PlayerServiceConnection] to become connected
@@ -29,149 +31,96 @@ import kotlinx.coroutines.*
  */
 private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
 
-class BottomNavigationViewModel(
+@HiltViewModel
+class BottomNavigationViewModel @Inject constructor(
     private val app: Application,
-    playerServiceConnection: PlayerServiceConnection,
+    private val playerServiceConnection: PlayerServiceConnection,
     private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl,
-//    private val applicationRepository: CoreApplicationRepository
-) : AndroidViewModel(
-    app
-) {
-    private val prefRepository by lazy {
-        PrefRepository(
-            app
-        )
-    }
+    private val prefRepository: PrefRepository
+) : ViewModel() {
 
-    val initialRemainingStories =
-        prefRepository.remainingStories
-    val remainingStoriesLiveData =
-        prefRepository.remainingStoriesLiveData
+    val initialRemainingStories = prefRepository.remainingStories
+    val remainingStoriesLiveData = prefRepository.remainingStoriesLiveData
 
-    private val storiesJob =
-        SupervisorJob()
+    private val storiesJob = SupervisorJob()
 
     fun onCreate() {
-//        viewModelScope.launch {
-//            getInitialData()
-//        }
-    }
-
-    private var postedPlay =
-        false
-    private var playbackState =
-        EMPTY_PLAYBACK_STATE
-    val playingStory =
-        MutableLiveData<Story?>()
-    private val mediaPosition =
-        MutableLiveData<Int>().apply {
-            postValue(
-                0
-            )
-        }
-    val mediaButtonRes =
-        MutableLiveData<Int>().apply {
-            postValue(
-                R.drawable.ic_album
-            )
-        }
-
-    private var updatePosition =
-        true
-    private val handler =
-        Handler(
-            Looper.getMainLooper()
-        )
-
-    private val playbackStateObserver =
-        Observer<PlaybackStateCompat> {
-            playbackState =
-                it
-                    ?: EMPTY_PLAYBACK_STATE
-            val currentStory =
-                playerServiceConnection.nowPlaying.value
-            updateMediaState(
-                playbackState,
-                currentStory
-            )
-        }
-
-    private val mediaMetadataObserver =
-        Observer<Story?> {
-            updateMediaState(
-                playbackState,
-                it
-            )
-        }
-
-    private val playerServiceConnection =
-        playerServiceConnection.also {
-            it.playbackState.observeForever(
-                playbackStateObserver
-            )
-            it.nowPlaying.observeForever(
-                mediaMetadataObserver
-            )
+        playerServiceConnection.apply {
+            playbackState.observeForever(playbackStateObserver)
+            nowPlaying.observeForever(mediaMetadataObserver)
             checkPlaybackPosition()
         }
+    }
 
-    private fun checkPlaybackPosition(): Boolean =
-        handler.postDelayed(
-            {
-                val currPosition =
-                    playbackState.currentPlayBackPosition.toInt()
-                if (mediaPosition.value != currPosition)
-                    if (currPosition >= 30000 && !postedPlay) {
-                        postPlay()
-                    }
-                mediaPosition.postValue(
-                    currPosition
-                )
-                if (updatePosition)
-                    checkPlaybackPosition()
-            },
-            POSITION_UPDATE_INTERVAL_MILLIS
-        )
+    private var postedPlay = false
+    private var playbackState = EMPTY_PLAYBACK_STATE
+    val playingStory = MutableLiveData<Story?>()
+    private val mediaPosition = MutableLiveData<Int>().apply {
+        postValue(0)
+    }
+    val mediaButtonRes = MutableLiveData<Int>().apply {
+        postValue(R.drawable.ic_album)
+    }
+
+    private var updatePosition = true
+    private val handler = Handler(
+        Looper.getMainLooper()
+    )
+
+    private val playbackStateObserver = Observer<PlaybackStateCompat> {
+        playbackState = it ?: EMPTY_PLAYBACK_STATE
+        val currentStory = playerServiceConnection.nowPlaying.value
+        updateMediaState(playbackState, currentStory)
+    }
+
+    private val mediaMetadataObserver = Observer<Story?> {
+        updateMediaState(playbackState, it)
+    }
+
+
+    private fun checkPlaybackPosition(): Boolean = handler.postDelayed(
+        {
+            val currPosition = playbackState.currentPlayBackPosition.toInt()
+            if (mediaPosition.value != currPosition) {
+                if (currPosition >= 30000 && !postedPlay) {
+                    postPlay()
+                }
+            }
+            mediaPosition.postValue(currPosition)
+            if (updatePosition) checkPlaybackPosition()
+        }, POSITION_UPDATE_INTERVAL_MILLIS
+    )
 
     private fun postPlay() {
-        val storyToPost =
-            playingStory.value
-        postedPlay =
-            true
+        val storyToPost = playingStory.value
+        postedPlay = true
         if (storyToPost != null) {
             viewModelScope.launch(
                 Dispatchers.IO
             ) {
-                val downloadedStory =
-                    autioLocalDataSourceImpl.getDownloadedStoryById(
-                        playingStory.value!!.id
+                val downloadedStory = autioLocalDataSourceImpl.getDownloadedStoryById(
+                    playingStory.value!!.id
+                )
+                val connectivityManager = app.getSystemService(
+                    Context.CONNECTIVITY_SERVICE
+                ) as ConnectivityManager
+                val networkInfo = connectivityManager.activeNetwork
+                val network = if (networkInfo == null) "disconnected" else {
+                    val actNw = connectivityManager.getNetworkCapabilities(
+                        networkInfo
                     )
-                val connectivityManager =
-                    app.getSystemService(
-                        Context.CONNECTIVITY_SERVICE
-                    ) as ConnectivityManager
-                val networkInfo =
-                    connectivityManager.activeNetwork
-                val network =
-                    if (networkInfo == null) "disconnected" else {
-                        val actNw =
-                            connectivityManager.getNetworkCapabilities(
-                                networkInfo
-                            )
-                        when {
-                            actNw?.hasTransport(
-                                NetworkCapabilities.TRANSPORT_WIFI
-                            ) == true -> "wifi"
-                            actNw?.hasTransport(
-                                NetworkCapabilities.TRANSPORT_CELLULAR
-                            ) == true -> "cellular"
-                            else -> "disconnected"
-                        }
+                    when {
+                        actNw?.hasTransport(
+                            NetworkCapabilities.TRANSPORT_WIFI
+                        ) == true -> "wifi"
+                        actNw?.hasTransport(
+                            NetworkCapabilities.TRANSPORT_CELLULAR
+                        ) == true -> "cellular"
+                        else -> "disconnected"
                     }
+                }
                 ApiService.postStoryPlayed(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    PlaysDto(
+                    prefRepository.userId, prefRepository.userApiToken, PlaysDto(
                         storyToPost.id,
                         wasPresent = true,
                         autoPlay = true,
@@ -189,20 +138,16 @@ class BottomNavigationViewModel(
                                 storyToPost.id
                             )
                         }
-                        prefRepository.remainingStories =
-                            it.playsRemaining
+                        prefRepository.remainingStories = it.playsRemaining
                     }
                 }
             }
         } else {
             ApiService.postStoryPlayed(
-                prefRepository.userId,
-                prefRepository.userApiToken,
-                PlaysDto()
+                prefRepository.userId, prefRepository.userApiToken, PlaysDto()
             ) {
                 if (it != null) {
-                    prefRepository.remainingStories =
-                        it.playsRemaining
+                    prefRepository.remainingStories = it.playsRemaining
                 }
             }
         }
@@ -222,13 +167,11 @@ class BottomNavigationViewModel(
         )
 
         // Stop updating the position
-        updatePosition =
-            false
+        updatePosition = false
     }
 
     private fun updateMediaState(
-        playbackState: PlaybackStateCompat,
-        story: Story?
+        playbackState: PlaybackStateCompat, story: Story?
     ) {
         // Only update media item once we have duration available
         if (story?.duration != 0 && story?.id != null) {
@@ -255,41 +198,31 @@ class BottomNavigationViewModel(
      *   then pause playback, otherwise send "play" to resume playback.
      */
     private fun playMedia(
-        mediaItem: MediaItemData,
-        pauseAllowed: Boolean = true
+        mediaItem: MediaItemData, pauseAllowed: Boolean = true
     ) {
-        val nowPlaying =
-            playerServiceConnection.nowPlaying.value
-        val transportControls =
-            playerServiceConnection.transportControls
+        val nowPlaying = playerServiceConnection.nowPlaying.value
+        val transportControls = playerServiceConnection.transportControls
 
-        val isPrepared =
-            playerServiceConnection.playbackState.value?.isPrepared
-                ?: false
+        val isPrepared = playerServiceConnection.playbackState.value?.isPrepared ?: false
         if (isPrepared && mediaItem.mediaId == nowPlaying?.id) {
             playerServiceConnection.playbackState.value?.let { playbackState ->
                 when {
-                    playbackState.isPlaying ->
-                        if (pauseAllowed) transportControls.pause() else Unit
+                    playbackState.isPlaying -> if (pauseAllowed) transportControls.pause() else Unit
                     playbackState.isPlayEnabled -> transportControls.play()
                     else -> {
                         Log.w(
                             "BottomNavigationViewModel",
-                            "Playable item clicked but neither play nor pause" +
-                                    "are enabled! (mediaId=${mediaItem.mediaId})"
+                            "Playable item clicked but neither play nor pause" + "are enabled! (mediaId=${mediaItem.mediaId})"
                         )
                     }
                 }
             }
         } else {
-            postedPlay =
-                false
+            postedPlay = false
             transportControls.playFromMediaId(
-                mediaItem.mediaId,
-                null
+                mediaItem.mediaId, null
             )
-            FirebaseStoryRepository.addStoryToUserHistory(
-                prefRepository.firebaseKey,
+            FirebaseStoryRepository.addStoryToUserHistory(prefRepository.firebaseKey,
                 mediaItem.mediaId,
                 onSuccessListener = { timestamp ->
                     viewModelScope.launch(
@@ -297,27 +230,21 @@ class BottomNavigationViewModel(
                     ) {
                         autioLocalDataSourceImpl.addStoryToHistory(
                             History(
-                                mediaItem.mediaId,
-                                timestamp
+                                mediaItem.mediaId, timestamp
                             )
                         )
                     }
-                }
-            )
+                })
         }
     }
 
     fun playMediaId(
         mediaId: String
     ) {
-        val nowPlaying =
-            playerServiceConnection.nowPlaying.value
-        val transportControls =
-            playerServiceConnection.transportControls
+        val nowPlaying = playerServiceConnection.nowPlaying.value
+        val transportControls = playerServiceConnection.transportControls
 
-        val isPrepared =
-            playerServiceConnection.playbackState.value?.isPrepared
-                ?: false
+        val isPrepared = playerServiceConnection.playbackState.value?.isPrepared ?: false
         if (isPrepared && mediaId == nowPlaying?.id) {
             playerServiceConnection.playbackState.value?.let { playbackState ->
                 when {
@@ -332,14 +259,11 @@ class BottomNavigationViewModel(
                 }
             }
         } else {
-            postedPlay =
-                false
+            postedPlay = false
             transportControls.playFromMediaId(
-                mediaId,
-                null
+                mediaId, null
             )
-            FirebaseStoryRepository.addStoryToUserHistory(
-                prefRepository.firebaseKey,
+            FirebaseStoryRepository.addStoryToUserHistory(prefRepository.firebaseKey,
                 mediaId,
                 onSuccessListener = { timestamp ->
                     viewModelScope.launch(
@@ -347,19 +271,16 @@ class BottomNavigationViewModel(
                     ) {
                         autioLocalDataSourceImpl.addStoryToHistory(
                             History(
-                                mediaId,
-                                timestamp
+                                mediaId, timestamp
                             )
                         )
                     }
-                }
-            )
+                })
         }
     }
 
     fun rewindFifteenSeconds() {
-        val transportControls =
-            playerServiceConnection.transportControls
+        val transportControls = playerServiceConnection.transportControls
         mediaPosition.value?.let {
             transportControls.seekTo(
                 0L.coerceAtLeast(
@@ -370,16 +291,14 @@ class BottomNavigationViewModel(
     }
 
     fun skipToNextStory() {
-        val transportControls =
-            playerServiceConnection.transportControls
+        val transportControls = playerServiceConnection.transportControls
         transportControls.skipToNext()
     }
 
     fun setPlaybackPosition(
         progress: Int
     ) {
-        val transportControls =
-            playerServiceConnection.transportControls
+        val transportControls = playerServiceConnection.transportControls
         transportControls.seekTo(
             progress * 1000L
         )
@@ -387,30 +306,25 @@ class BottomNavigationViewModel(
 
     // TODO: Add items to queue
     fun addMediaToQueue() {
-        val transportControls =
-            playerServiceConnection.transportControls
+        val transportControls = playerServiceConnection.transportControls
     }
 
     // Backend calls
 
     private suspend fun getInitialData() {
         viewModelScope.launch {
-            val storiesFetch =
-                async(
-                    start = CoroutineStart.LAZY
-                ) { getRemoteStories() }
-            val favoritesFetch =
-                async(
-                    start = CoroutineStart.LAZY
-                ) { setLikesToStories() }
-            val bookmarksFetch =
-                async(
-                    start = CoroutineStart.LAZY
-                ) { setBookmarksToStories() }
-            val historyFetch =
-                async(
-                    start = CoroutineStart.LAZY
-                ) { setListenedAtToStories() }
+            val storiesFetch = async(
+                start = CoroutineStart.LAZY
+            ) { getRemoteStories() }
+            val favoritesFetch = async(
+                start = CoroutineStart.LAZY
+            ) { setLikesToStories() }
+            val bookmarksFetch = async(
+                start = CoroutineStart.LAZY
+            ) { setBookmarksToStories() }
+            val historyFetch = async(
+                start = CoroutineStart.LAZY
+            ) { setListenedAtToStories() }
             storiesFetch.await()
             favoritesFetch.await()
             bookmarksFetch.await()
@@ -427,19 +341,15 @@ class BottomNavigationViewModel(
      * after it
      */
     private suspend fun getRemoteStories() {
-        val lastFetchedStory =
-            autioLocalDataSourceImpl.getLastModifiedStory()
-        val date =
-            lastFetchedStory?.modifiedDate
-                ?: 63808881662
+        val lastFetchedStory = autioLocalDataSourceImpl.getLastModifiedStory()
+        val date = lastFetchedStory?.modifiedDate ?: 63808881662
         withContext(
             Dispatchers.IO
         ) {
             // TODO: change Firebase code with commented code once endpoint is stable
-            val stories =
-                FirebaseStoryRepository.getStoriesAfterModifiedDate(
-                    date.toInt()
-                )
+            val stories = FirebaseStoryRepository.getStoriesAfterModifiedDate(
+                date.toInt()
+            )
             autioLocalDataSourceImpl.addStories(
                 stories
             )
@@ -473,13 +383,10 @@ class BottomNavigationViewModel(
             Dispatchers.IO
         ) {
             // TODO: change Firebase code with commented code once stable
-            val userBookmarkedStories =
-                FirebaseStoryRepository.getUserBookmarks(
-                    prefRepository.firebaseKey
-                )
-            autioLocalDataSourceImpl.setBookmarksDataToLocalStories(
-                userBookmarkedStories.map { it.storyId }
+            val userBookmarkedStories = FirebaseStoryRepository.getUserBookmarks(
+                prefRepository.firebaseKey
             )
+            autioLocalDataSourceImpl.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.storyId })
 //            apiService.getStoriesFromUserBookmarks(
 //                prefRepository.userId,
 //                prefRepository.userApiToken
@@ -497,14 +404,11 @@ class BottomNavigationViewModel(
         withContext(
             Dispatchers.IO
         ) {
-            val userFavoriteStories =
-                FirebaseStoryRepository.getUserFavoriteStories(
-                    prefRepository.firebaseKey
-                )
-            autioLocalDataSourceImpl.setLikesDataToLocalStories(
-                userFavoriteStories.filter { it.isGiven == true }
-                    .map { it.storyId }
+            val userFavoriteStories = FirebaseStoryRepository.getUserFavoriteStories(
+                prefRepository.firebaseKey
             )
+            autioLocalDataSourceImpl.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
+                .map { it.storyId })
 //            ApiService.likedStoriesByUser(
 //                prefRepository.userId,
 //                prefRepository.userApiToken
@@ -522,10 +426,9 @@ class BottomNavigationViewModel(
         withContext(
             Dispatchers.IO
         ) {
-            val userHistory =
-                FirebaseStoryRepository.getUserStoriesHistory(
-                    prefRepository.firebaseKey
-                )
+            val userHistory = FirebaseStoryRepository.getUserStoriesHistory(
+                prefRepository.firebaseKey
+            )
             autioLocalDataSourceImpl.setListenedAtToLocalStories(
                 userHistory
             )

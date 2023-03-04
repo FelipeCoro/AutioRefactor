@@ -17,118 +17,59 @@ import javax.inject.Inject
 class PrefRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PrefRepository {
-    private val pref: SharedPreferences =
-        context.getSharedPreferences(
-            USER_PREFERENCES,
-            Context.MODE_PRIVATE
-        )
-    private val editor =
-        pref.edit()
+    private val pref: SharedPreferences = context.getSharedPreferences(
+        USER_PREFERENCES, Context.MODE_PRIVATE
+    )
+    private val editor = pref.edit()
 
-    override fun String.put(
-        int: Int
-    ) {
-        editor.putInt(
-            this,
-            int
-        )
+    override fun String.put(int: Int) {
+        editor.putInt(this, int)
         editor.commit()
     }
 
-    override fun String.put(
-        string: String
-    ) {
-        editor.putString(
-            this,
-            string
-        )
+    override fun String.put(string: String) {
+        editor.putString(this, string)
         editor.commit()
     }
 
-    override fun String.put(
-        boolean: Boolean
-    ) {
-        editor.putBoolean(
-            this,
-            boolean
-        )
+    override fun String.put(boolean: Boolean) {
+        editor.putBoolean(this, boolean)
         editor.commit()
     }
 
-    override fun String.getInt() =
-        pref.getInt(
-            this,
-            0
-        )
+    override fun String.getInt() = pref.getInt(this, 0)
 
-    override fun String.getString() =
-        pref.getString(
-            this,
-            ""
-        )!!
+    override fun String.getString() = pref.getString(this, "")!!
 
-    override fun String.getBoolean() =
-        pref.getBoolean(
-            this,
-            false
-        )
+    override fun String.getBoolean() = pref.getBoolean(this, false)
 
-    override var userId: Int =
-        USER_ID.getInt()
-        set(id) = USER_ID.put(
-            id
-        )
+    override var userId: Int = USER_ID.getInt()
+        set(id) = USER_ID.put(id)
 
-    override var userName: String =
-        USER_NAME.getString()
-        set(
-            name
-        ) =
-            USER_NAME.put(
-                name
-            )
+    override var userName: String = USER_NAME.getString()
+        set(name) = USER_NAME.put(name)
 
-    override var userEmail: String =
-        USER_EMAIL.getString()
-        set(
-            email
-        ) = USER_EMAIL.put(
-            email
-        )
+    override var userEmail: String = USER_EMAIL.getString()
+        set(email) = USER_EMAIL.put(email)
 
-    override var userApiToken: String =
-        USER_API_TOKEN.getString()
-        set(apiToken) = USER_API_TOKEN.put(
-            apiToken
-        )
+    override var userApiToken: String = USER_API_TOKEN.getString()
+        set(apiToken) = USER_API_TOKEN.put(apiToken)
 
-    override var firebaseKey: String =
-        USER_FIREBASE_KEY.getString()
-        set(firebaseKey) = USER_FIREBASE_KEY.put(
-            firebaseKey
-        )
+    override var firebaseKey: String = USER_FIREBASE_KEY.getString()
+        set(firebaseKey) = USER_FIREBASE_KEY.put(firebaseKey)
 
-    var isUserGuest: Boolean =
-        USER_IS_GUEST.getBoolean()
-        set(isGuest) = USER_IS_GUEST.put(
-            isGuest
-        )
+    override var isUserGuest: Boolean = USER_IS_GUEST.getBoolean()
+        set(isGuest) = USER_IS_GUEST.put(isGuest)
 
-    var remainingStories: Int =
-        REMAINING_STORIES.getInt()
-        set(remainingStories) = REMAINING_STORIES.put(
-            remainingStories
-        )
+    override var remainingStories: Int = REMAINING_STORIES.getInt()
+        set(remainingStories) = REMAINING_STORIES.put(remainingStories)
 
     override fun clearData() {
         editor.clear()
         editor.commit()
     }
 
-    val remainingStoriesLiveData =
-        SharedPreferenceIntLiveData(
-            pref,
-            REMAINING_STORIES,
-            -1
-        )
+    override val remainingStoriesLiveData = SharedPreferenceIntLiveData(
+        pref, REMAINING_STORIES, -1
+    )
 }

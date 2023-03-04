@@ -19,157 +19,122 @@ import com.autio.android_app.data.entities.story.DownloadedStory
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
-import com.autio.android_app.ui.view.usecases.home.adapter.DownloadedStoryAdapter
+import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DownloadedStoriesFragment :
-    Fragment() {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
+@EntryPoint
+class DownloadedStoriesFragment : Fragment() {
 
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
+    @Inject
+    private lateinit var prefRepository: PrefRepository
+
+    private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
-
     private lateinit var binding: FragmentPlaylistBinding
-
     private lateinit var activityLayout: ConstraintLayout
-
     private lateinit var storyAdapter: DownloadedStoryAdapter
     private lateinit var recyclerView: RecyclerView
-
     private lateinit var snackBarView: View
-    private var feedbackJob: Job? =
-        null
+    private var feedbackJob: Job? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding =
-            FragmentPlaylistBinding.inflate(
-                inflater,
-                container,
-                false
-            )
+        binding = FragmentPlaylistBinding.inflate(
+            inflater, container, false
+        )
 
-        snackBarView =
-            layoutInflater.inflate(
-                R.layout.feedback_snackbar,
-                binding.root,
-                false
-            )
+        snackBarView = layoutInflater.inflate(
+            R.layout.feedback_snackbar, binding.root, false
+        )
 
-        binding.tvToolbarTitle.text =
-            resources.getString(
-                R.string.my_stories_downloaded_stories
-            )
+        binding.tvToolbarTitle.text = resources.getString(
+            R.string.my_stories_downloaded_stories
+        )
         binding.btnBack.setOnClickListener {
             findNavController().navigate(
                 R.id.action_downloaded_playlist_to_my_stories
             )
         }
 
-        recyclerView =
-            binding.rvStories
-        storyAdapter =
-            DownloadedStoryAdapter(
-                onStoryPlay = { id ->
-                    bottomNavigationViewModel.playMediaId(
-                        id
-                    )
-                },
-                ::onOptionClicked
-            )
+        recyclerView = binding.rvStories
+        storyAdapter = DownloadedStoryAdapter(
+            onStoryPlay = { id ->
+                bottomNavigationViewModel.playMediaId(
+                    id
+                )
+            }, ::onOptionClicked
+        )
 
         return binding.root
     }
 
     override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
+        view: View, savedInstanceState: Bundle?
     ) {
         super.onViewCreated(
-            view,
-            savedInstanceState
+            view, savedInstanceState
         )
 
-        activityLayout =
-            requireActivity().findViewById(
-                R.id.activityRoot
-            )
+        activityLayout = requireActivity().findViewById(
+            R.id.activityRoot
+        )
 
-        storyViewModel.downloadedStories
-            .observe(
-                viewLifecycleOwner
-            ) { stories ->
-                recyclerView.adapter =
-                    storyAdapter
+        storyViewModel.downloadedStories.observe(
+            viewLifecycleOwner
+        ) { stories ->
+            recyclerView.adapter = storyAdapter
 //                binding.tvToolbarSubtitle.text =
 //                    resources.getQuantityString(
 //                        R.plurals.toolbar_stories_subtitle,
 //                        stories.size,
 //                        stories.size
 //                    )
-                binding.pbLoadingStories.visibility =
-                    View.GONE
-                binding.btnPlaylistOptions.setOnClickListener { view ->
-                    showPlaylistOptions(
-                        requireContext(),
-                        binding.root,
-                        view,
-                        listOf(
-                            com.autio.android_app.data.api.model.PlaylistOption.REMOVE
-                        ).map {
-                            it.also { option ->
-                                option.disabled =
-                                    stories.isEmpty()
-                            }
-                        },
-                        onOptionClicked = ::onPlaylistOptionClicked
-                    )
-                }
-                if (stories.isEmpty()) {
-                    binding.ivNoContentIcon.setImageResource(
-                        R.drawable.ic_download
-                    )
-                    binding.tvNoContentMessage.text =
-                        resources.getText(
-                            R.string.empty_downloads_message
-                        )
-                    binding.rlStories.visibility =
-                        View.GONE
-                    binding.llNoContent.visibility =
-                        View.VISIBLE
-                } else {
-                    storyAdapter.submitList(
-                        stories
-                    )
-                    binding.llNoContent.visibility =
-                        View.GONE
-                    binding.rlStories.visibility =
-                        View.VISIBLE
-                }
+            binding.pbLoadingStories.visibility = View.GONE
+            binding.btnPlaylistOptions.setOnClickListener { view ->
+                showPlaylistOptions(
+                    requireContext(), binding.root, view, listOf(
+                        com.autio.android_app.data.api.model.PlaylistOption.REMOVE
+                    ).map {
+                        it.also { option ->
+                            option.disabled = stories.isEmpty()
+                        }
+                    }, onOptionClicked = ::onPlaylistOptionClicked
+                )
             }
+            if (stories.isEmpty()) {
+                binding.ivNoContentIcon.setImageResource(
+                    R.drawable.ic_download
+                )
+                binding.tvNoContentMessage.text = resources.getText(
+                    R.string.empty_downloads_message
+                )
+                binding.rlStories.visibility = View.GONE
+                binding.llNoContent.visibility = View.VISIBLE
+            } else {
+                storyAdapter.submitList(
+                    stories
+                )
+                binding.llNoContent.visibility = View.GONE
+                binding.rlStories.visibility = View.VISIBLE
+            }
+        }
     }
 
     private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption,
-        story: DownloadedStory
+        option: com.autio.android_app.data.api.model.StoryOption, story: DownloadedStory
     ) {
         when (option) {
             com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
                 // TODO: change Firebase code with commented code once stable
-                FirebaseStoryRepository.bookmarkStory(
-                    prefRepository.firebaseKey,
+                FirebaseStoryRepository.bookmarkStory(prefRepository.firebaseKey,
                     story.id,
                     story.title,
                     onSuccessListener = {
@@ -184,8 +149,7 @@ class DownloadedStoriesFragment :
                         showFeedbackSnackBar(
                             "Connection Failure"
                         )
-                    }
-                )
+                    })
 //                ApiService.bookmarkStory(
 //                    prefRepository.userId,
 //                    prefRepository.userApiToken,
@@ -206,8 +170,7 @@ class DownloadedStoriesFragment :
 //                }
             }
             com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
-                FirebaseStoryRepository.removeBookmarkFromStory(
-                    prefRepository.firebaseKey,
+                FirebaseStoryRepository.removeBookmarkFromStory(prefRepository.firebaseKey,
                     story.id,
                     onSuccessListener = {
                         storyViewModel.removeBookmarkFromStory(
@@ -221,8 +184,7 @@ class DownloadedStoriesFragment :
                         showFeedbackSnackBar(
                             "Connection Failure"
                         )
-                    }
-                )
+                    })
 //                ApiService.removeBookmarkFromStory(
 //                    prefRepository.userId,
 //                    prefRepository.userApiToken,
@@ -243,8 +205,7 @@ class DownloadedStoriesFragment :
 //                }
             }
             com.autio.android_app.data.api.model.StoryOption.LIKE -> {
-                FirebaseStoryRepository.giveLikeToStory(
-                    story.id,
+                FirebaseStoryRepository.giveLikeToStory(story.id,
                     prefRepository.firebaseKey,
                     onSuccessListener = {
                         storyViewModel.setLikeToStory(
@@ -258,8 +219,7 @@ class DownloadedStoriesFragment :
                         showFeedbackSnackBar(
                             "Connection Failure"
                         )
-                    }
-                )
+                    })
 //                ApiService.likeStory(
 //                    prefRepository.userId,
 //                    prefRepository.userApiToken,
@@ -280,8 +240,7 @@ class DownloadedStoriesFragment :
 //                }
             }
             com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
-                FirebaseStoryRepository.removeLikeFromStory(
-                    prefRepository.firebaseKey,
+                FirebaseStoryRepository.removeLikeFromStory(prefRepository.firebaseKey,
                     story.id,
                     onSuccessListener = {
                         storyViewModel.removeLikeFromStory(
@@ -295,8 +254,7 @@ class DownloadedStoriesFragment :
                         showFeedbackSnackBar(
                             "Connection Failure"
                         )
-                    }
-                )
+                    })
             }
             com.autio.android_app.data.api.model.StoryOption.DELETE, com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
                 storyViewModel.removeDownloadedStory(
@@ -307,19 +265,15 @@ class DownloadedStoriesFragment :
                 )
             }
             com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                requireActivity(),
-                story.lat,
-                story.lon
+                requireActivity(), story.lat, story.lon
             )
             com.autio.android_app.data.api.model.StoryOption.SHARE -> {
                 shareStory(
-                    requireContext(),
-                    story.id
+                    requireContext(), story.id
                 )
             }
             else -> Log.d(
-                "HistoryFragment",
-                "no action defined for this option"
+                "HistoryFragment", "no action defined for this option"
             )
         }
     }
@@ -328,23 +282,19 @@ class DownloadedStoriesFragment :
         option: com.autio.android_app.data.api.model.PlaylistOption
     ) {
         showPaywallOrProceedWithNormalProcess(
-            requireActivity(),
-            isActionExclusiveForSignedInUser = true
+            requireActivity(), isActionExclusiveForSignedInUser = true
         ) {
-            binding.pbLoadingProcess.visibility =
-                View.VISIBLE
+            binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 com.autio.android_app.data.api.model.PlaylistOption.REMOVE -> {
                     storyViewModel.removeAllDownloads()
-                    binding.pbLoadingProcess.visibility =
-                        View.GONE
+                    binding.pbLoadingProcess.visibility = View.GONE
                     showFeedbackSnackBar(
                         "Removed Downloads"
                     )
                 }
                 else -> Log.d(
-                    "DownloadedStoriesFragment",
-                    "option not available for this playlist"
+                    "DownloadedStoriesFragment", "option not available for this playlist"
                 )
             }
         }
@@ -354,30 +304,25 @@ class DownloadedStoriesFragment :
         feedback: String
     ) {
         cancelJob()
-        snackBarView.alpha =
-            1F
+        snackBarView.alpha = 1F
         snackBarView.findViewById<TextView>(
             R.id.tvFeedback
-        ).text =
-            feedback
+        ).text = feedback
         activityLayout.addView(
             snackBarView
         )
-        feedbackJob =
-            lifecycleScope.launch {
-                delay(
-                    2000
+        feedbackJob = lifecycleScope.launch {
+            delay(
+                2000
+            )
+            snackBarView.animate().alpha(
+                0F
+            ).withEndAction {
+                activityLayout.removeView(
+                    snackBarView
                 )
-                snackBarView.animate()
-                    .alpha(
-                        0F
-                    )
-                    .withEndAction {
-                        activityLayout.removeView(
-                            snackBarView
-                        )
-                    }
             }
+        }
     }
 
     private fun cancelJob() {
