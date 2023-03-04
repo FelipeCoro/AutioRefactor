@@ -9,94 +9,47 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DownloadedStoryDao {
-    @Insert(
-        onConflict = OnConflictStrategy.REPLACE
-    )
-    fun addStory(
-        story: DownloadedStoryEntity
-    ): Long
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addStory(story: DownloadedStoryEntity): Long
 
-    @Query(
-        "SELECT * FROM downloaded_stories ORDER BY id ASC"
-    )
+    @Query("SELECT * FROM downloaded_stories ORDER BY id ASC")
     fun readLiveStories(): Flow<List<DownloadedStoryEntity>>
 
-    @Query(
-        "SELECT * FROM downloaded_stories WHERE id = :id"
-    )
-    suspend fun getStoryById(
-        id: String
-    ): DownloadedStoryEntity?
+    @Query("SELECT * FROM downloaded_stories WHERE id = :id")
+    suspend fun getStoryById(id: String): DownloadedStoryEntity?
 
-    @Query(
-        "UPDATE downloaded_stories SET isBookmarked = 1 WHERE id = :id"
-    )
-    fun setBookmarkToStory(
-        id: String
-    )
+    @Query("UPDATE downloaded_stories SET isBookmarked = 1 WHERE id = :id")
+    fun setBookmarkToStory(id: String)
 
-    @Query(
-        "UPDATE downloaded_stories SET isBookmarked = 0 WHERE id = :id"
-    )
-    fun removeBookmarkFromStory(
-        id: String
-    )
+    @Query("UPDATE downloaded_stories SET isBookmarked = 0 WHERE id = :id")
+    fun removeBookmarkFromStory(id: String)
 
-    @Query(
-        "UPDATE downloaded_stories SET isBookmarked = 0"
-    )
+    @Query("UPDATE downloaded_stories SET isBookmarked = 0")
     fun removeAllBookmarks()
 
-    @Query(
-        "UPDATE downloaded_stories SET isLiked = 1 WHERE id = :id"
-    )
-    fun setLikeToStory(
-        id: String
-    )
+    @Query("UPDATE downloaded_stories SET isLiked = 1 WHERE id = :id")
+    fun setLikeToStory(id: String)
 
-    @Query(
-        "UPDATE downloaded_stories SET isLiked = 0 WHERE id = :id"
-    )
+    @Query("UPDATE downloaded_stories SET isLiked = 0 WHERE id = :id")
     fun removeLikeFromStory(
         id: String
     )
 
-    @Query(
-        "UPDATE downloaded_stories SET listenedAt = :listenedAt WHERE id = :storyId"
-    )
-    fun setListenedAtData(
-        storyId: String,
-        listenedAt: String
-    )
+    @Query("UPDATE downloaded_stories SET listenedAt = :listenedAt WHERE id = :storyId")
+    fun setListenedAtData(storyId: String, listenedAt: String)
 
-    @Query(
-        "UPDATE downloaded_stories SET listenedAtLeast30Secs = true WHERE id = :storyId"
-    )
-    fun markStoryAsListenedAtLeast30Secs(
-        storyId: String
-    )
+    @Query("UPDATE downloaded_stories SET listenedAtLeast30Secs = true WHERE id = :storyId")
+    fun markStoryAsListenedAtLeast30Secs(storyId: String)
 
-    @Query(
-        "UPDATE downloaded_stories SET listenedAt = '' WHERE id = :storyId"
-    )
-    fun removeListenedAtData(
-        storyId: String
-    )
+    @Query("UPDATE downloaded_stories SET listenedAt = '' WHERE id = :storyId")
+    fun removeListenedAtData(storyId: String)
 
-    @Query(
-        "UPDATE downloaded_stories SET listenedAt = ''"
-    )
+    @Query("UPDATE downloaded_stories SET listenedAt = ''")
     fun clearStoryHistory()
 
-    @Query(
-        "DELETE FROM downloaded_stories WHERE id = :id"
-    )
-    fun removeStory(
-        id: String
-    )
+    @Query("DELETE FROM downloaded_stories WHERE id = :id")
+    fun removeStory(id: String)
 
-    @Query(
-        "DELETE FROM downloaded_stories"
-    )
+    @Query("DELETE FROM downloaded_stories")
     fun clearTable()
 }

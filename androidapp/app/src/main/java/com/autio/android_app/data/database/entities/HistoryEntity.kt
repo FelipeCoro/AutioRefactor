@@ -1,3 +1,9 @@
 package com.autio.android_app.data.database.entities
 
-data class HistoryEntity(val empty: String = "")
+import androidx.room.Entity
+
+@Entity
+data class HistoryEntity(
+    val storyId: String,
+    val playedAt: String
+)

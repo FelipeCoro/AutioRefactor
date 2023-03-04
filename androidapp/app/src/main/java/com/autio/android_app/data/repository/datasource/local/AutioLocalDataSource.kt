@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutioLocalDataSource {
     val userCategories: Flow<List<CategoryEntity>>
-    fun addUserCategories(categories: Array<CategoryEntity>)
-    suspend fun updateCategories(categories: Array<CategoryEntity>)
+    fun addUserCategories(categories: List<CategoryEntity>)
+    suspend fun updateCategories(categories: List<CategoryEntity>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<StoryEntity>
@@ -18,12 +18,12 @@ interface AutioLocalDataSource {
     val allStories: Flow<List<StoryEntity>>
     suspend fun getAllStories(): List<StoryEntity>
     suspend fun getStoryById(id: String): StoryEntity?
-    fun getStoriesByIds(ids: Array<Int>): Flow<Array<StoryEntity>>
+    fun getStoriesByIds(ids: List<Int>): Flow<List<StoryEntity>>
     suspend fun getLastModifiedStory(): StoryEntity?
-    fun addStories(stories: Array<StoryEntity>)
+    fun addStories(stories: List<StoryEntity>)
     fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     fun setLikesDataToLocalStories(storiesIds: List<String>)
-    suspend fun setListenedAtToLocalStories(storiesHistory: Array<HistoryEntity>)
+    suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
     suspend fun addStoryToHistory(history: HistoryEntity)
     suspend fun markStoryAsListenedAtLeast30Secs(storyId: String)
     suspend fun removeStoryFromHistory(id: String)
