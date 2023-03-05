@@ -22,34 +22,21 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.subscribe.SubscribeActivity
 import com.autio.android_app.ui.view.usecases.home.fragment.MapFragment
-import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
 import com.autio.android_app.ui.viewmodel.MyState
 import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.util.Constants
-import com.autio.android_app.util.InjectorUtils
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 
 class BottomNavigation : AppCompatActivity() {
 
-    private val bottomNavigationViewModel by viewModels<BottomNavigationViewModel> {
-        InjectorUtils.provideBottomNavigationViewModel(
-            this
-        )
-    }
+    private val bottomNavigationViewModel:BottomNavigationViewModel by viewModels()
 
-    private val purchaseViewModel by viewModels<PurchaseViewModel> {
-        InjectorUtils.providePurchaseViewModel(
-            this
-        )
-    }
+    private val purchaseViewModel:PurchaseViewModel by viewModels()
 
-    private val networkViewModel by viewModels<NetworkStatusViewModel> {
-        InjectorUtils.provideNetworkStatusViewModel(
-            this
-        )
-    }
+    private val networkViewModel:NetworkStatusViewModel by viewModels()
+
     private var castContext: CastContext? = null
 
     private lateinit var binding: ActivityBottomNavigationBinding

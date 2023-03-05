@@ -19,13 +19,13 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
-import com.autio.android_app.data.entities.story.Story
-import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentNarratorBinding
-import com.autio.android_app.ui.view.usecases.home.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
@@ -34,26 +34,21 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NarratorFragment :
-    Fragment() {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
+class NarratorFragment : Fragment() {
 
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
-    private val storyViewModel by viewModels<StoryViewModel> {
-        InjectorUtils.provideStoryViewModel(
-            requireContext()
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
 
+    //TODO(Move service calls)
+    @Inject
+    lateinit var apiClient: ApiClient
+
+    private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
+    private val storyViewModel: StoryViewModel by viewModels()
     private lateinit var binding: FragmentNarratorBinding
-
     private lateinit var activityLayout: ConstraintLayout
-
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
 
@@ -91,7 +86,7 @@ class NarratorFragment :
         snackBarView =
             layoutInflater.inflate(
                 R.layout.feedback_snackbar,
-                binding.root,
+                binding.root as ViewGroup,
                 false
             )
 
@@ -131,90 +126,87 @@ class NarratorFragment :
 
         storyId?.let {
             lifecycleScope.launch {
-                ApiService.getNarratorOfStory(
+                val narratorResponse = apiClient.getNarratorOfStory(
                     prefRepository.userId,
                     prefRepository.userApiToken,
                     it
-                ) { narrator ->
-                    if (narrator != null) {
-                        if (narrator.imageUrl != null) {
-                            Glide.with(
-                                this@NarratorFragment
+                )
+                if (narratorResponse.isSuccessful) {
+                    val narrator = narratorResponse.body()!!
+                    if (narrator.imageUrl != null) {
+                        Glide.with(
+                            this@NarratorFragment
+                        )
+                            .load(
+                                narrator.imageUrl
                             )
-                                .load(
-                                    narrator.imageUrl
+                            .transition(
+                                DrawableTransitionOptions.withCrossFade(
+                                    100
                                 )
-                                .transition(
-                                    DrawableTransitionOptions.withCrossFade(
-                                        100
-                                    )
+                            )
+                            .into(
+                                binding.ivNarratorPic
+                            )
+                    }
+                    binding.tvNarratorName.apply {
+                        visibility =
+                            View.VISIBLE
+                        text =
+                            narrator.name
+                    }
+                    binding.tvNarratorBio.apply {
+                        visibility =
+                            View.VISIBLE
+                        text =
+                            narrator.biography
+                    }
+                    if (narrator.url != null) {
+                        binding.btnVisitNarratorLink.apply {
+                            setOnClickListener {
+                                openUrl(
+                                    requireContext(),
+                                    narrator.url
                                 )
-                                .into(
-                                    binding.ivNarratorPic
-                                )
-                        }
-                        binding.tvNarratorName.apply {
+                            }
                             visibility =
                                 View.VISIBLE
-                            text =
-                                narrator.name
                         }
-                        binding.tvNarratorBio.apply {
-                            visibility =
-                                View.VISIBLE
-                            text =
-                                narrator.biography
+                    }
+                    val contributorApiResponse = apiClient.getStoriesByContributor(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        narrator.id,
+                        1
+                    )
+                    if (contributorApiResponse.isSuccessful) {
+                        for (story in contributorApiResponse.body()!!.data) {
+                            storyViewModel.cacheRecordOfStory(
+                                story.id,
+                                story.narrationUrl
+                                    ?: ""
+                            )
                         }
-                        if (narrator.url != null) {
-                            binding.btnVisitNarratorLink.apply {
-                                setOnClickListener {
-                                    openUrl(
-                                        requireContext(),
-                                        narrator.url
-                                    )
-                                }
-                                visibility =
-                                    View.VISIBLE
+                        storyViewModel.getStoriesByIds(
+                            contributorApiResponse.body()!!.data.map {
+                                it.id
                             }
-                        }
-                        ApiService.getStoriesByContributor(
-                            prefRepository.userId,
-                            prefRepository.userApiToken,
-                            narrator.id,
-                            1
-                        ) { contributorApiResponse ->
-                            if (contributorApiResponse != null) {
-                                for (story in contributorApiResponse.data) {
-                                    storyViewModel.cacheRecordOfStory(
-                                        story.id,
-                                        story.narrationUrl
-                                            ?: ""
-                                    )
+                        )
+                            .observe(
+                                viewLifecycleOwner
+                            ) { stories ->
+                                if (stories.isNotEmpty()) {
+                                    binding.tvPublishedStoriesSubtitle.visibility =
+                                        View.VISIBLE
                                 }
-                                storyViewModel.getStoriesByIds(
-                                    contributorApiResponse.data.map {
-                                        it.id
-                                    }
-                                        .toTypedArray()
+                                storyAdapter.submitList(
+                                    stories.toList()
                                 )
-                                    .observe(
-                                        viewLifecycleOwner
-                                    ) { stories ->
-                                        if (stories.isNotEmpty()) {
-                                            binding.tvPublishedStoriesSubtitle.visibility =
-                                                View.VISIBLE
-                                        }
-                                        storyAdapter.submitList(
-                                            stories.toList()
-                                        )
-                                    }
                             }
-                        }
                     }
                 }
             }
         }
-
         return binding.root
     }
 
@@ -362,7 +354,7 @@ class NarratorFragment :
                 com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
-                            DownloadedStory.fromStory(
+                            DownloadedStoryEntity.fromStory(
                                 requireContext(),
                                 story
                             )!!

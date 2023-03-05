@@ -26,19 +26,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
-import com.autio.android_app.data.entities.story.Story
-import com.autio.android_app.data.entities.story.StoryClusterItem
-import com.autio.android_app.data.entities.story.StoryClusterRenderer
+import com.autio.android_app.data.api.model.modelLegacy.StoryClusterRenderer
+import com.autio.android_app.data.api.model.pendings.StoryClusterItem
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMapBinding
 import com.autio.android_app.extensions.findNearestToCoordinates
 import com.autio.android_app.extensions.toPx
-import com.autio.android_app.ui.view.usecases.home.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
-import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
 import com.autio.android_app.util.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -51,28 +51,16 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.maps.android.clustering.ClusterManager
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
-class MapFragment :
-    Fragment(),
+class MapFragment : Fragment(),
     OnMapReadyCallback {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
 
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
-    private val mapFragmentViewModel by viewModels<MapFragmentViewModel> {
-        InjectorUtils.provideMapFragmentViewModel(
-            requireContext(),
-            mediaId
-        )
-    }
-    private val storyViewModel by viewModels<StoryViewModel> {
-        InjectorUtils.provideStoryViewModel(
-            requireContext()
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
+    private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
+    private val mapFragmentViewModel:MapFragmentViewModel by viewModels()
+    private val storyViewModel:StoryViewModel by viewModels()
 
     private lateinit var mediaId: String
     private lateinit var binding: FragmentMapBinding
@@ -160,7 +148,7 @@ class MapFragment :
         snackBarView =
             layoutInflater.inflate(
                 R.layout.feedback_snackbar,
-                binding.root,
+                binding.root as ViewGroup,
                 false
             )
 
@@ -1311,7 +1299,7 @@ class MapFragment :
                 com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
-                            DownloadedStory.fromStory(
+                            DownloadedStoryEntity.fromStory(
                                 requireContext(),
                                 story
                             )

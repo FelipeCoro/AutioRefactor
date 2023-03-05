@@ -8,8 +8,7 @@ import androidx.fragment.app.Fragment
 import com.autio.android_app.databinding.FragmentSearchBinding
 
 
-class SearchFragment :
-    Fragment() {
+class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? =
         null

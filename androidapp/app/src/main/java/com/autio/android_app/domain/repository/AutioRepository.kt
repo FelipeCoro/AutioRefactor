@@ -29,7 +29,7 @@ interface AutioRepository {
     )
 
     suspend fun getStoryById(id: String): MapPoint?
-    suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
+    suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<MapPoint>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPoint>

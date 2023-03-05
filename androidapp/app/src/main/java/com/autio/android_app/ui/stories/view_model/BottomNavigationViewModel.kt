@@ -24,7 +24,7 @@ import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.util.coroutines.IoDispatcher
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -443,26 +443,4 @@ class BottomNavigationViewModel @Inject constructor(
 
 //    val billingLifecycleObserver: LifecycleObserver
 //        get() = applicationRepository.billingLifecycleObserver
-
-    class Factory(
-        private val app: Application,
-        private val playerServiceConnection: PlayerServiceConnection,
-        private val autioLocalDataSourceImpl: AutioLocalDataSourceImpl,
-//        private val applicationRepository: CoreApplicationRepository
-    ) : ViewModelProvider.NewInstanceFactory() {
-
-        @Suppress(
-            "unchecked_cast"
-        )
-        override fun <T : ViewModel> create(
-            modelClass: Class<T>
-        ): T {
-            return BottomNavigationViewModel(
-                app,
-                playerServiceConnection,
-                autioLocalDataSourceImpl,
-//                applicationRepository
-            ) as T
-        }
-    }
 }

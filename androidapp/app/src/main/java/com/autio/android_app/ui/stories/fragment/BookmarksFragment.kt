@@ -20,33 +20,41 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
+import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
-import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
-import com.autio.android_app.ui.view.usecases.home.fragment.stories.models.Story
 import com.autio.android_app.util.*
 import dagger.hilt.EntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @EntryPoint
 class BookmarksFragment : Fragment() {
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
-    private val prefRepository by lazy { PrefRepository(requireContext()) }
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
+
+    @Inject
+    lateinit var prefRepository: PrefRepository
+
+    //TODO(Move service calls)
+    @Inject
+    lateinit var apiClient: ApiClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -116,10 +124,11 @@ class BookmarksFragment : Fragment() {
                 }
                 val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
-                    ApiService.getStoriesByIds(prefRepository.userId,
+                    lifecycleScope.launch{
+                   val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
                         prefRepository.userApiToken,
-                        storiesWithoutRecords.map { it.originalId }) { storiesFromAPI ->
-                        if (storiesFromAPI != null) {
+                        storiesWithoutRecords.map { it.originalId })
+                 if(storiesFromAPI.isSuccessful) {
                             for (story in storiesFromAPI) {
                                 storyViewModel.cacheRecordOfStory(
                                     story.id, story.recordUrl
@@ -177,14 +186,10 @@ class BookmarksFragment : Fragment() {
                             storyViewModel.removeBookmarkFromStory(
                                 story.id
                             )
-                            showFeedbackSnackBar(
-                                "Removed From Bookmarks"
-                            )
+                            showFeedbackSnackBar("Removed From Bookmarks")
                         },
                         onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
+                            showFeedbackSnackBar("Connection Failure")
                         })
 //                    ApiService.removeBookmarkFromStory(
 //                        prefRepository.userId,
@@ -245,7 +250,7 @@ class BookmarksFragment : Fragment() {
                 }
                 com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
-                        val downloadedStory = DownloadedStory.fromStory(
+                        val downloadedStory = DownloadedStoryEntity.fromStory(
                             requireContext(), story
                         )
                         storyViewModel.downloadStory(downloadedStory!!)

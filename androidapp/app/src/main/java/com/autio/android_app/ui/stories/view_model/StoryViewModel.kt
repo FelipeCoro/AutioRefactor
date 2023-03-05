@@ -7,7 +7,7 @@ import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.util.coroutines.IoDispatcher
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch

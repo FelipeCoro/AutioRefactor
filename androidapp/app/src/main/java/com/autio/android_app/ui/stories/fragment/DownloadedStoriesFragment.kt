@@ -15,7 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
@@ -52,7 +52,7 @@ class DownloadedStoriesFragment : Fragment() {
         )
 
         snackBarView = layoutInflater.inflate(
-            R.layout.feedback_snackbar, binding.root, false
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
         )
 
         binding.tvToolbarTitle.text = resources.getString(
@@ -100,7 +100,7 @@ class DownloadedStoriesFragment : Fragment() {
             binding.pbLoadingStories.visibility = View.GONE
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
-                    requireContext(), binding.root, view, listOf(
+                    requireContext(), binding.root as ViewGroup, view, listOf(
                         com.autio.android_app.data.api.model.PlaylistOption.REMOVE
                     ).map {
                         it.also { option ->
@@ -129,7 +129,7 @@ class DownloadedStoriesFragment : Fragment() {
     }
 
     private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption, story: DownloadedStory
+        option: com.autio.android_app.data.api.model.StoryOption, story: DownloadedStoryEntity
     ) {
         when (option) {
             com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
@@ -208,9 +208,7 @@ class DownloadedStoriesFragment : Fragment() {
                 FirebaseStoryRepository.giveLikeToStory(story.id,
                     prefRepository.firebaseKey,
                     onSuccessListener = {
-                        storyViewModel.setLikeToStory(
-                            story.id
-                        )
+                        storyViewModel.setLikeToStory(story.id)
                         showFeedbackSnackBar(
                             "Added To Favorites"
                         )
@@ -243,9 +241,7 @@ class DownloadedStoriesFragment : Fragment() {
                 FirebaseStoryRepository.removeLikeFromStory(prefRepository.firebaseKey,
                     story.id,
                     onSuccessListener = {
-                        storyViewModel.removeLikeFromStory(
-                            story.id
-                        )
+                        storyViewModel.removeLikeFromStory(story.id)
                         showFeedbackSnackBar(
                             "Removed From Favorites"
                         )

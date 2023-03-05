@@ -37,11 +37,7 @@ class SubscribeActivity : AppCompatActivity() {
     @Inject
     lateinit var prefRepository: PrefRepository
 
-    private val purchaseViewModel by viewModels<PurchaseViewModel> {
-        InjectorUtils.providePurchaseViewModel(
-            this
-        )
-    }
+    private val purchaseViewModel:PurchaseViewModel by viewModels()
 
     private lateinit var binding: ActivitySubscribeBinding
 

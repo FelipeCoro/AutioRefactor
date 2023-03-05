@@ -1,12 +1,10 @@
 package com.autio.android_app.ui.stories.view_model
 
-import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.autio.android_app.R
 import com.autio.android_app.extensions.currentPlayBackPosition
 import com.autio.android_app.extensions.isPlaying

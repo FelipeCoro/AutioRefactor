@@ -9,48 +9,44 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.Category
-import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
 import com.autio.android_app.extensions.makeLinks
-import com.autio.android_app.ui.view.usecases.home.adapter.CategoryAdapter
-import com.autio.android_app.ui.view.usecases.login.LoginActivity
-import com.autio.android_app.ui.view.usecases.login.SignInActivity
-import com.autio.android_app.ui.view.usecases.login.SignUpActivity
+import com.autio.android_app.ui.login.LoginActivity
+import com.autio.android_app.ui.login.SignInActivity
+import com.autio.android_app.ui.login.SignUpActivity
+import com.autio.android_app.ui.stories.adapter.CategoryAdapter
+import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.bumptech.glide.Glide
 import com.revenuecat.purchases.CustomerInfo
+import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
-class AccountFragment :
-    Fragment() {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
+class AccountFragment : Fragment() {
 
-    private val accountFragmentViewModel by viewModels<AccountFragmentViewModel> {
-        InjectorUtils.provideAccountFragmentViewModel(
-            requireContext()
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
+
+    //TODO(Move service calls)
+    @Inject
+    lateinit var apiClient:ApiClient
+
+    private val accountFragmentViewModel: AccountFragmentViewModel by viewModels()
     private val storyViewModel: StoryViewModel by viewModels()
-    private val purchaseViewModel by viewModels<PurchaseViewModel> {
-        InjectorUtils.providePurchaseViewModel(
-            requireContext()
-        )
-    }
+    private val purchaseViewModel: PurchaseViewModel by viewModels()
 
     private lateinit var binding: FragmentAccountBinding
 
@@ -454,12 +450,13 @@ class AccountFragment :
                     confirmPassword
                 )
             if (newPassword == confirmPassword) {
-                ApiService.changePassword(
+                lifecycleScope.launch{
+                val result = apiClient.changePassword(
                     prefRepository.userId,
                     prefRepository.userApiToken,
                     passwordInfo
-                ) {
-                    if (it != null) {
+                )
+                    if (result.isSuccessful) {
                         binding.llChangePasswordForm.visibility =
                             GONE
                         binding.llChangePasswordButtons.visibility =

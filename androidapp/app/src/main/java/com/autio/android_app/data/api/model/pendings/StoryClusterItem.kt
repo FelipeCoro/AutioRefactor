@@ -1,13 +1,14 @@
 package com.autio.android_app.data.api.model.pendings
 
 import android.graphics.Bitmap
-import com.autio.android_app.data.api.model.story.StoryDto
+import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterItem
 
 class StoryClusterItem(
-    mStoryDto: StoryDto
+    mStoryDto: MapPoint
 ) : ClusterItem {
 
     private val position: LatLng =
@@ -29,7 +30,7 @@ class StoryClusterItem(
         null
 
     fun updateStory(
-        storyDto: StoryDto
+        storyDto: Story
     ) {
         if (storyDto.id != this.story.id) {
             throw Exception(
