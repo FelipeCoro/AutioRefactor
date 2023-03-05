@@ -12,7 +12,6 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSourceImpl
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
@@ -23,6 +22,7 @@ import com.autio.android_app.extensions.isPrepared
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -221,19 +221,15 @@ class BottomNavigationViewModel @Inject constructor(
                     viewModelScope.launch(
                         Dispatchers.IO
                     ) {
-                        autioLocalDataSourceImpl.addStoryToHistory(
-                            History(
-                                mediaItem.mediaId, timestamp
-                            )
+                        autioRepository.addStoryToHistory(
+                            History(mediaItem.mediaId, timestamp)
                         )
                     }
                 })
         }
     }
 
-    fun playMediaId(
-        mediaId: String
-    ) {
+    fun playMediaId(mediaId: String) {
         val nowPlaying = playerServiceConnection.nowPlaying.value
         val transportControls = playerServiceConnection.transportControls
 
@@ -256,19 +252,15 @@ class BottomNavigationViewModel @Inject constructor(
             transportControls.playFromMediaId(
                 mediaId, null
             )
-            FirebaseStoryRepository.addStoryToUserHistory(prefRepository.firebaseKey,
-                mediaId,
-                onSuccessListener = { timestamp ->
-                    viewModelScope.launch(
-                        Dispatchers.IO
-                    ) {
-                        autioLocalDataSourceImpl.addStoryToHistory(
-                            History(
-                                mediaId, timestamp
-                            )
-                        )
-                    }
-                })
+            FirebaseStoryRepository
+                .addStoryToUserHistory(
+                    prefRepository.firebaseKey,
+                    mediaId,
+                    onSuccessListener = { timestamp ->
+                        viewModelScope.launch(coroutineDispatcher) {
+                            autioRepository.addStoryToHistory(History(mediaId, timestamp))
+                        }
+                    })
         }
     }
 
@@ -288,13 +280,9 @@ class BottomNavigationViewModel @Inject constructor(
         transportControls.skipToNext()
     }
 
-    fun setPlaybackPosition(
-        progress: Int
-    ) {
+    fun setPlaybackPosition(progress: Int) {
         val transportControls = playerServiceConnection.transportControls
-        transportControls.seekTo(
-            progress * 1000L
-        )
+        transportControls.seekTo(progress * 1000L)
     }
 
     // TODO: Add items to queue
@@ -336,16 +324,12 @@ class BottomNavigationViewModel @Inject constructor(
     private suspend fun getRemoteStories() {
         val lastFetchedStory = autioLocalDataSourceImpl.getLastModifiedStory()
         val date = lastFetchedStory?.modifiedDate ?: 63808881662
-        withContext(
-            Dispatchers.IO
-        ) {
+        withContext(coroutineDispatcher) {
             // TODO: change Firebase code with commented code once endpoint is stable
             val stories = FirebaseStoryRepository.getStoriesAfterModifiedDate(
                 date.toInt()
             )
-            autioLocalDataSourceImpl.addStories(
-                stories
-            )
+            autioRepository.addStories(stories)
 //            val dateFormat =
 //                SimpleDateFormat(
 //                    "yyyy/MM/dd'T'HH:mm:ss",
@@ -372,14 +356,12 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     private suspend fun setBookmarksToStories() {
-        withContext(
-            Dispatchers.IO
-        ) {
+        withContext(coroutineDispatcher) {
             // TODO: change Firebase code with commented code once stable
             val userBookmarkedStories = FirebaseStoryRepository.getUserBookmarks(
                 prefRepository.firebaseKey
             )
-            autioLocalDataSourceImpl.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.storyId })
+            autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.storyId })
 //            apiService.getStoriesFromUserBookmarks(
 //                prefRepository.userId,
 //                prefRepository.userApiToken
@@ -394,9 +376,7 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     private suspend fun setLikesToStories() {
-        withContext(
-            Dispatchers.IO
-        ) {
+        withContext(coroutineDispatcher) {
             val userFavoriteStories = FirebaseStoryRepository.getUserFavoriteStories(
                 prefRepository.firebaseKey
             )
@@ -416,9 +396,7 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     private suspend fun setListenedAtToStories() {
-        withContext(
-            Dispatchers.IO
-        ) {
+        withContext(coroutineDispatcher) {
             val userHistory = FirebaseStoryRepository.getUserStoriesHistory(
                 prefRepository.firebaseKey
             )
@@ -427,9 +405,7 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     fun clearRoomCache() {
-        viewModelScope.launch(
-            Dispatchers.IO
-        ) {
+        viewModelScope.launch(coroutineDispatcher) {
             autioRepository.deleteCachedData()
         }
     }
@@ -443,4 +419,5 @@ class BottomNavigationViewModel @Inject constructor(
 
 //    val billingLifecycleObserver: LifecycleObserver
 //        get() = applicationRepository.billingLifecycleObserver
+
 }

@@ -22,6 +22,7 @@ import androidx.transition.TransitionManager
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
+import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -173,14 +174,15 @@ class BookmarksFragment : Fragment() {
     }
 
     private fun onStoryOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption, story: Story
+        option: StoryOption, story: Story
     ) {
         showPaywallOrProceedWithNormalProcess(
             requireActivity(), isActionExclusiveForSignedInUser = true
         ) {
             when (option) {
-                com.autio.android_app.data.api.model.StoryOption.DELETE, com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
-                    FirebaseStoryRepository.removeBookmarkFromStory(prefRepository.firebaseKey,
+                StoryOption.DELETE, StoryOption.REMOVE_BOOKMARK -> {
+                    FirebaseStoryRepository.removeBookmarkFromStory(
+                        prefRepository.firebaseKey,
                         story.id,
                         onSuccessListener = {
                             storyViewModel.removeBookmarkFromStory(
@@ -210,7 +212,7 @@ class BookmarksFragment : Fragment() {
 //                        }
 //                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
+                StoryOption.LIKE -> {
                     FirebaseStoryRepository.giveLikeToStory(story.id,
                         prefRepository.firebaseKey,
                         onSuccessListener = {
@@ -239,7 +241,7 @@ class BookmarksFragment : Fragment() {
 //                        }
 //                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
+                StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(story.id,
                         prefRepository.firebaseKey,
                         onSuccessListener = {
@@ -248,7 +250,7 @@ class BookmarksFragment : Fragment() {
                         },
                         onFailureListener = { showFeedbackSnackBar("Connection Failure") })
                 }
-                com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
+                StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory = DownloadedStoryEntity.fromStory(
                             requireContext(), story
@@ -260,16 +262,14 @@ class BookmarksFragment : Fragment() {
                         showFeedbackSnackBar("Failed Downloading Story")
                     }
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
+                StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(story.id)
                     showFeedbackSnackBar("Story Removed From My Device")
                 }
-                com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(),
-                    story.lat,
-                    story.lon
+                StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                    requireActivity(), story.lat, story.lon
                 )
-                com.autio.android_app.data.api.model.StoryOption.SHARE -> {
+                StoryOption.SHARE -> {
                     shareStory(requireContext(), story.id)
                 }
                 else -> Log.d("BookmarksFragment", "no action defined for this option")

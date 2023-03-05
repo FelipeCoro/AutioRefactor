@@ -1,8 +1,10 @@
 package com.autio.android_app.domain.mappers
 
 import com.autio.android_app.data.database.entities.CategoryEntity
+import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 
 fun CategoryEntity.toModel(): Category {
@@ -18,5 +20,11 @@ fun MapPoint.toModel(): Story {
         publishedDate = publishedAt,
         state = state,
         countryCode = countryCode
+    )
+}
+
+fun History.toEntity(): HistoryEntity {
+    return HistoryEntity(
+        storyId, playedAt
     )
 }

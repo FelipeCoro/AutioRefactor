@@ -27,7 +27,7 @@ interface StoryDao {
     fun readStoriesWithIds(ids: List<Int>): Flow<List<MapPoint>>
 
     @Query("SELECT * FROM stories WHERE id = (:id)")
-    suspend fun getStoryById(id: String): MapPoint?
+    suspend fun getMapPointById(id: String): MapPoint?
 
     @Query("SELECT * FROM stories WHERE modifiedDate = (SELECT MAX(modifiedDate) FROM stories)")
     suspend fun readLastModifiedStory(): MapPoint?
