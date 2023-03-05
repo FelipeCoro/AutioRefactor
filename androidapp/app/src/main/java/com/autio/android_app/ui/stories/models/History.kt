@@ -1,4 +1,4 @@
-package com.autio.android_app.data.api.model.history
+package com.autio.android_app.ui.stories.models
 
 data class History(
     val storyId: String,

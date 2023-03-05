@@ -14,34 +14,35 @@ interface AutioLocalDataSource {
     val bookmarkedStories: Flow<List<MapPoint>>
     val favoriteStories: Flow<List<MapPoint>>
     val history: Flow<List<MapPoint>>
-    fun addUserCategories(categories: List<CategoryEntity>)
+    suspend fun addUserCategories(categories: List<CategoryEntity>)
     suspend fun updateCategories(categories: List<CategoryEntity>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPoint>
+
     suspend fun getAllStories(): List<MapPoint>
-    suspend fun getStoryById(id: String): MapPoint?
-    fun getStoriesByIds(ids: List<Int>): Flow<List<MapPoint>>
+    suspend fun getMapPointById(id: String): Result<MapPoint?>
+    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>>
     suspend fun getLastModifiedStory(): MapPoint?
-    fun addStories(stories: List<MapPoint>)
-    fun setBookmarksDataToLocalStories(storiesIds: List<String>)
-    fun setLikesDataToLocalStories(storiesIds: List<String>)
+    suspend fun addStories(stories: List<MapPoint>)
+    suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
+    suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
     suspend fun addStoryToHistory(history: HistoryEntity)
     suspend fun markStoryAsListenedAtLeast30Secs(storyId: String)
     suspend fun removeStoryFromHistory(id: String)
-    fun clearStoryHistory()
+    suspend fun clearStoryHistory()
     suspend fun bookmarkStory(id: String)
     suspend fun removeBookmarkFromStory(id: String)
-    fun removeAllBookmarks()
+    suspend fun removeAllBookmarks()
     suspend fun giveLikeToStory(id: String)
     suspend fun removeLikeFromStory(id: String)
-    fun downloadStory(story: DownloadedStoryEntity)
-    fun removeDownloadedStory(id: String)
-    fun removeAllDownloads()
+    suspend fun downloadStory(story: DownloadedStoryEntity)
+    suspend fun removeDownloadedStory(id: String)
+    suspend fun removeAllDownloads()
     suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity?
-    fun cacheRecordOfStory(storyId: String, recordUrl: String)
-    fun cacheRecordOfStory(storyId: Int, recordUrl: String)
-    fun clearUserData()
-    fun deleteCachedData()
+    suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
+    suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
+    suspend fun clearUserData()
+    suspend fun deleteCachedData()
 }

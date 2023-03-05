@@ -1,12 +1,14 @@
 package com.autio.android_app.ui.stories.view_model
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.HistoryEntity
-
-import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.domain.repository.AutioRepository
-import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.History
+import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,8 +18,12 @@ import javax.inject.Inject
 @HiltViewModel
 class StoryViewModel @Inject constructor(
     private val autioRepository: AutioRepository,
-    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
+    @IoDispatcher
+    private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+
+    private val _state = MutableLiveData<StoryViewState>()
+    val viewState: LiveData<StoryViewState> = _state
 
     val userCategories = autioRepository.userCategories.asLiveData()
     val allStories = autioRepository.allStories.asLiveData()
@@ -26,15 +32,16 @@ class StoryViewModel @Inject constructor(
     val storiesHistory = autioRepository.history.asLiveData()
     val favoriteStories = autioRepository.favoriteStories.asLiveData()
 
-
-    fun getAllStories(): List<MapPoint> {
+    fun getAllStories() {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.getAllStories()
         }
     }
 
-    fun getStoriesByIds(ids: List<Int>): LiveData<List<Story>> {
-        autioRepository.getStoriesByIds(ids)
+    fun getStoriesByIds(ids: List<Int>) {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.getMapPointsByIds(ids)
+        }
     }
 
     fun downloadStory(story: DownloadedStoryEntity) {
@@ -58,44 +65,51 @@ class StoryViewModel @Inject constructor(
 
     fun bookmarkStory(id: String) {
         viewModelScope.launch(coroutineDispatcher) {
-                autioRepository.bookmarkStory(id)
-    }
+            autioRepository.bookmarkStory(id)
+        }
 
-    fun removeBookmarkFromStory(id: String) {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeBookmarkFromStory(id) }
-    }
+        fun removeBookmarkFromStory(id: String) {
+            viewModelScope.launch(coroutineDispatcher) {
+                autioRepository.removeBookmarkFromStory(id)
+            }
+        }
 
-    fun removeAllBookmarks() {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeAllBookmarks() }
-    }
+        fun removeAllBookmarks() {
+            viewModelScope.launch(coroutineDispatcher) {
+                autioRepository.removeAllBookmarks()
+            }
+        }
 
 
-    fun setLikeToStory(id: String) {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.giveLikeToStory(id)
-        } }
+        fun setLikeToStory(id: String) {
+            viewModelScope.launch(coroutineDispatcher) {
+                autioRepository.giveLikeToStory(id)
+            }
+        }
     }
 
     fun removeLikeFromStory(id: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeLikeFromStory(id) }
+            autioRepository.removeLikeFromStory(id)
+        }
     }
 
-    fun addStoryToHistory(history: HistoryEntity) {
+    fun addStoryToHistory(history: History) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.addStoryToHistory(history) }
+            autioRepository.addStoryToHistory(history)
+        }
     }
 
     fun removeStoryFromHistory(id: String) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeStoryFromHistory(id) }
+            autioRepository.removeStoryFromHistory(id)
+        }
     }
 
     fun clearStoryHistory() =
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.clearStoryHistory() }
+            autioRepository.clearStoryHistory()
+        }
 
     fun cacheRecordOfStory(storyId: String, recordUrl: String) {
         viewModelScope.launch(coroutineDispatcher) {

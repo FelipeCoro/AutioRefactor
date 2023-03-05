@@ -15,7 +15,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.api.model.StoryOption
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
@@ -52,7 +53,7 @@ class DownloadedStoriesFragment : Fragment() {
         )
 
         snackBarView = layoutInflater.inflate(
-            R.layout.feedback_snackbar, binding.root, false
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
         )
 
         binding.tvToolbarTitle.text = resources.getString(
@@ -100,7 +101,7 @@ class DownloadedStoriesFragment : Fragment() {
             binding.pbLoadingStories.visibility = View.GONE
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
-                    requireContext(), binding.root, view, listOf(
+                    requireContext(), binding.root as ViewGroup, view, listOf(
                         com.autio.android_app.data.api.model.PlaylistOption.REMOVE
                     ).map {
                         it.also { option ->
@@ -110,18 +111,14 @@ class DownloadedStoriesFragment : Fragment() {
                 )
             }
             if (stories.isEmpty()) {
-                binding.ivNoContentIcon.setImageResource(
-                    R.drawable.ic_download
-                )
+                binding.ivNoContentIcon.setImageResource(R.drawable.ic_download)
                 binding.tvNoContentMessage.text = resources.getText(
                     R.string.empty_downloads_message
                 )
                 binding.rlStories.visibility = View.GONE
                 binding.llNoContent.visibility = View.VISIBLE
             } else {
-                storyAdapter.submitList(
-                    stories
-                )
+                storyAdapter.submitList(stories)
                 binding.llNoContent.visibility = View.GONE
                 binding.rlStories.visibility = View.VISIBLE
             }
@@ -129,26 +126,21 @@ class DownloadedStoriesFragment : Fragment() {
     }
 
     private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption, story: DownloadedStory
+        option: StoryOption, story: DownloadedStoryEntity
     ) {
         when (option) {
-            com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
+            StoryOption.BOOKMARK -> {
                 // TODO: change Firebase code with commented code once stable
-                FirebaseStoryRepository.bookmarkStory(prefRepository.firebaseKey,
+                FirebaseStoryRepository.bookmarkStory(
+                    prefRepository.firebaseKey,
                     story.id,
                     story.title,
                     onSuccessListener = {
-                        storyViewModel.bookmarkStory(
-                            story.id
-                        )
-                        showFeedbackSnackBar(
-                            "Added To Bookmarks"
-                        )
+                        storyViewModel.bookmarkStory(story.id)
+                        showFeedbackSnackBar("Added To Bookmarks")
                     },
                     onFailureListener = {
-                        showFeedbackSnackBar(
-                            "Connection Failure"
-                        )
+                        showFeedbackSnackBar("Connection Failure")
                     })
 //                ApiService.bookmarkStory(
 //                    prefRepository.userId,
@@ -169,21 +161,15 @@ class DownloadedStoriesFragment : Fragment() {
 //                    }
 //                }
             }
-            com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
+            StoryOption.REMOVE_BOOKMARK -> {
                 FirebaseStoryRepository.removeBookmarkFromStory(prefRepository.firebaseKey,
                     story.id,
                     onSuccessListener = {
-                        storyViewModel.removeBookmarkFromStory(
-                            story.id
-                        )
-                        showFeedbackSnackBar(
-                            "Removed From Bookmarks"
-                        )
+                        storyViewModel.removeBookmarkFromStory(story.id)
+                        showFeedbackSnackBar("Removed From Bookmarks")
                     },
                     onFailureListener = {
-                        showFeedbackSnackBar(
-                            "Connection Failure"
-                        )
+                        showFeedbackSnackBar("Connection Failure")
                     })
 //                ApiService.removeBookmarkFromStory(
 //                    prefRepository.userId,
@@ -204,21 +190,15 @@ class DownloadedStoriesFragment : Fragment() {
 //                    }
 //                }
             }
-            com.autio.android_app.data.api.model.StoryOption.LIKE -> {
+            StoryOption.LIKE -> {
                 FirebaseStoryRepository.giveLikeToStory(story.id,
                     prefRepository.firebaseKey,
                     onSuccessListener = {
-                        storyViewModel.setLikeToStory(
-                            story.id
-                        )
-                        showFeedbackSnackBar(
-                            "Added To Favorites"
-                        )
+                        storyViewModel.setLikeToStory(story.id)
+                        showFeedbackSnackBar("Added To Favorites")
                     },
                     onFailureListener = {
-                        showFeedbackSnackBar(
-                            "Connection Failure"
-                        )
+                        showFeedbackSnackBar("Connection Failure")
                     })
 //                ApiService.likeStory(
 //                    prefRepository.userId,
@@ -239,38 +219,28 @@ class DownloadedStoriesFragment : Fragment() {
 //                    }
 //                }
             }
-            com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
+            StoryOption.REMOVE_LIKE -> {
                 FirebaseStoryRepository.removeLikeFromStory(prefRepository.firebaseKey,
                     story.id,
                     onSuccessListener = {
-                        storyViewModel.removeLikeFromStory(
-                            story.id
-                        )
-                        showFeedbackSnackBar(
-                            "Removed From Favorites"
-                        )
+                        storyViewModel.removeLikeFromStory(story.id)
+                        showFeedbackSnackBar("Removed From Favorites")
                     },
                     onFailureListener = {
-                        showFeedbackSnackBar(
-                            "Connection Failure"
-                        )
+                        showFeedbackSnackBar("Connection Failure")
                     })
             }
-            com.autio.android_app.data.api.model.StoryOption.DELETE, com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
+            StoryOption.DELETE, StoryOption.REMOVE_DOWNLOAD -> {
                 storyViewModel.removeDownloadedStory(
                     story.id
                 )
-                showFeedbackSnackBar(
-                    "Story Removed From My Device"
-                )
+                showFeedbackSnackBar("Story Removed From My Device")
             }
-            com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
+            StoryOption.DIRECTIONS -> openLocationInMapsApp(
                 requireActivity(), story.lat, story.lon
             )
-            com.autio.android_app.data.api.model.StoryOption.SHARE -> {
-                shareStory(
-                    requireContext(), story.id
-                )
+            StoryOption.SHARE -> {
+                shareStory(requireContext(), story.id)
             }
             else -> Log.d(
                 "HistoryFragment", "no action defined for this option"
@@ -289,9 +259,7 @@ class DownloadedStoriesFragment : Fragment() {
                 com.autio.android_app.data.api.model.PlaylistOption.REMOVE -> {
                     storyViewModel.removeAllDownloads()
                     binding.pbLoadingProcess.visibility = View.GONE
-                    showFeedbackSnackBar(
-                        "Removed Downloads"
-                    )
+                    showFeedbackSnackBar("Removed Downloads")
                 }
                 else -> Log.d(
                     "DownloadedStoriesFragment", "option not available for this playlist"
@@ -300,39 +268,22 @@ class DownloadedStoriesFragment : Fragment() {
         }
     }
 
-    private fun showFeedbackSnackBar(
-        feedback: String
-    ) {
+    private fun showFeedbackSnackBar(feedback: String) {
         cancelJob()
         snackBarView.alpha = 1F
-        snackBarView.findViewById<TextView>(
-            R.id.tvFeedback
-        ).text = feedback
-        activityLayout.addView(
-            snackBarView
-        )
+        snackBarView.findViewById<TextView>(R.id.tvFeedback).text = feedback
+        activityLayout.addView(snackBarView)
         feedbackJob = lifecycleScope.launch {
-            delay(
-                2000
-            )
-            snackBarView.animate().alpha(
-                0F
-            ).withEndAction {
-                activityLayout.removeView(
-                    snackBarView
-                )
+            delay(2000)
+            snackBarView.animate().alpha(0F).withEndAction {
+                activityLayout.removeView(snackBarView)
             }
         }
     }
 
     private fun cancelJob() {
-        if (activityLayout.contains(
-                snackBarView
-            )
-        ) {
-            activityLayout.removeView(
-                snackBarView
-            )
+        if (activityLayout.contains(snackBarView)) {
+            activityLayout.removeView(snackBarView)
         }
         feedbackJob?.cancel()
     }

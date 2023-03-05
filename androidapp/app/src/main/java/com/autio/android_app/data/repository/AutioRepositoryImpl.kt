@@ -5,14 +5,15 @@ import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
@@ -111,6 +112,12 @@ class AutioRepositoryImpl @Inject constructor(
         }.onFailure { onFailure.invoke() }
     }
 
+    override suspend fun getMapPointById(id: String): Result<MapPoint?> =
+        autioLocalDataSource.getMapPointById(id)
+
+    override suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>> =
+        autioLocalDataSource.getMapPointsByIds(ids)
+
     override suspend fun getStoriesByIds(
         userId: Int,
         apiToken: String,
@@ -196,8 +203,8 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.removeLikeFromStory(id)
     }
 
-    override suspend fun addStoryToHistory(historyEntity: HistoryEntity) {
-        autioLocalDataSource.addStoryToHistory(historyEntity)
+    override suspend fun addStoryToHistory(history: History) {
+        autioLocalDataSource.addStoryToHistory(history.toEntity())
     }
 
     override suspend fun removeStoryFromHistory(id: String) {
@@ -209,7 +216,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
-        autioLocalDataSource.cacheRecordOfStory(storyId,recordUrl)
+        autioLocalDataSource.cacheRecordOfStory(storyId, recordUrl)
     }
 
     override suspend fun clearUserData() {

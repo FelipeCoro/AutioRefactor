@@ -5,9 +5,9 @@ import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPoint
 import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,8 @@ interface AutioRepository {
         infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     )
 
-    suspend fun getStoryById(id: String): MapPoint?
+    suspend fun getMapPointById(id: String): Result<MapPoint?>
+    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>>
     suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
@@ -56,10 +57,8 @@ interface AutioRepository {
 
     suspend fun removeLikeFromStory(id: String)
 
-    suspend fun addStoryToHistory(historyEntity: HistoryEntity)
-
+    suspend fun addStoryToHistory(history: History)
     suspend fun removeStoryFromHistory(id: String)
-
     suspend fun clearStoryHistory()
 
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
