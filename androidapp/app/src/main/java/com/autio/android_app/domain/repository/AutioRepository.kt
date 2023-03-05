@@ -58,7 +58,9 @@ interface AutioRepository {
     suspend fun removeLikeFromStory(id: String)
 
     suspend fun addStoryToHistory(history: History)
+
     suspend fun removeStoryFromHistory(id: String)
+
     suspend fun clearStoryHistory()
 
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)

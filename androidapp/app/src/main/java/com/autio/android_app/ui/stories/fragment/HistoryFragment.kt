@@ -16,29 +16,33 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
-import com.autio.android_app.data.entities.story.Story
-import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
-import com.autio.android_app.ui.view.usecases.home.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HistoryFragment :
-    Fragment() {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
+@EntryPoint
+class HistoryFragment : Fragment() {
 
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
+    @Inject
+    lateinit var prefRepository: PrefRepository
+
+    //TODO(Move service calls)
+    @Inject
+    lateinit var apiClient: ApiClient
+
+    private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
 
     private lateinit var binding: FragmentPlaylistBinding
@@ -67,7 +71,7 @@ class HistoryFragment :
         snackBarView =
             layoutInflater.inflate(
                 R.layout.feedback_snackbar,
-                binding.root,
+                binding.root as ViewGroup,
                 false
             )
 
@@ -127,7 +131,7 @@ class HistoryFragment :
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
                     requireContext(),
-                    binding.root,
+                    binding.root as ViewGroup,
                     view,
                     listOf(
                         com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
@@ -157,13 +161,13 @@ class HistoryFragment :
                 val storiesWithoutRecords =
                     stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
-                    ApiService.getStoriesByIds(
+                    lifecycleScope.launch{
+                    val storiesFromAPI = apiClient.getStoriesByIds(
                         prefRepository.userId,
                         prefRepository.userApiToken,
                         storiesWithoutRecords.map { it.originalId }
-                    ) { storiesFromAPI ->
-                        if (storiesFromAPI != null) {
-
+                    )
+                        if (storiesFromAPI.isSuccessful) {
                             for (story in storiesFromAPI) {
                                 storyViewModel.cacheRecordOfStory(
                                     story.id,
@@ -360,7 +364,7 @@ class HistoryFragment :
                 com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
-                            DownloadedStory.fromStory(
+                            DownloadedStoryEntity.fromStory(
                                 requireContext(),
                                 story
                             )

@@ -7,7 +7,7 @@ import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPoint
-import com.autio.android_app.util.coroutines.IoDispatcher
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

@@ -44,21 +44,22 @@ import javax.inject.Inject
 
 @EntryPoint
 class BookmarksFragment : Fragment() {
+
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
-
-    @Inject
-    private lateinit var prefRepository: PrefRepository
-
-    @Inject
-    private lateinit var apiService: ApiClient
-
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
+
+    @Inject
+    lateinit var prefRepository: PrefRepository
+
+    //TODO(Move service calls)
+    @Inject
+    lateinit var apiClient: ApiClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -129,10 +130,9 @@ class BookmarksFragment : Fragment() {
                 val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
                     lifecycleScope.launch {
-
                         val ids =
                             storiesWithoutRecords.map { it.firebaseId } //it.originalId changed to firebaseId
-                        val result = apiService.getStoriesByIds(
+                        val result = apiClient.getStoriesByIds(
                             prefRepository.userId,
                             prefRepository.userApiToken,
                             ids
@@ -197,14 +197,10 @@ class BookmarksFragment : Fragment() {
                             storyViewModel.removeBookmarkFromStory(
                                 story.id
                             )
-                            showFeedbackSnackBar(
-                                "Removed From Bookmarks"
-                            )
+                            showFeedbackSnackBar("Removed From Bookmarks")
                         },
                         onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
+                            showFeedbackSnackBar("Connection Failure")
                         })
 //                    ApiService.removeBookmarkFromStory(
 //                        prefRepository.userId,

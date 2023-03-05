@@ -24,7 +24,7 @@ import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.util.coroutines.IoDispatcher
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject

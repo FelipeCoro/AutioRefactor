@@ -24,9 +24,9 @@ import com.autio.android_app.ui.login.SignInActivity
 import com.autio.android_app.ui.login.SignUpActivity
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
+import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.bumptech.glide.Glide
@@ -39,12 +39,12 @@ import javax.inject.Inject
 @EntryPoint
 class AccountFragment : Fragment() {
 
-    //TODO (remove when refactor to VM -> Repo)
     @Inject
-    private lateinit var apiClient: ApiClient
+    lateinit var prefRepository: PrefRepository
 
+    //TODO(Move service calls)
     @Inject
-    private lateinit var prefRepository: PrefRepository
+    lateinit var apiClient:ApiClient
 
     private val accountFragmentViewModel: AccountFragmentViewModel by viewModels()
     private val storyViewModel: StoryViewModel by viewModels()

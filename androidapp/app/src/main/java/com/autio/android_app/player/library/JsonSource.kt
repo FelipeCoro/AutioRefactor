@@ -8,7 +8,7 @@ import com.autio.android_app.extensions.albumArtUri
 import com.autio.android_app.extensions.displayIconUri
 import com.autio.android_app.extensions.from
 import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.util.coroutines.IoDispatcher
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.google.gson.Gson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher

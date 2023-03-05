@@ -10,17 +10,16 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
-import com.autio.android_app.ui.view.usecases.login.SignInActivity
-import com.autio.android_app.ui.view.usecases.login.SignUpActivity
+import com.autio.android_app.ui.login.SignInActivity
+import com.autio.android_app.ui.login.SignUpActivity
+import dagger.hilt.EntryPoint
+import javax.inject.Inject
 
+@EntryPoint
+class MyStoriesFragment : Fragment() {
 
-class MyStoriesFragment :
-    Fragment() {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
 
     private var _binding: FragmentMyStoriesBinding? =
         null

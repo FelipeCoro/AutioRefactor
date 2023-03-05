@@ -21,17 +21,17 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
-import com.autio.android_app.data.entities.story.NowPlayingMetadata
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.data.api.model.modelLegacy.NowPlayingMetadata
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
 import com.autio.android_app.extensions.getAddress
 import com.autio.android_app.extensions.timestampToMSS
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
-import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
 import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -42,26 +42,22 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.regex.Pattern
+import javax.inject.Inject
 
-class PlayerFragment :
-    Fragment(),
+@EntryPoint
+class PlayerFragment : Fragment(),
     OnMapReadyCallback,
     FragmentManager.OnBackStackChangedListener {
-    private val prefRepository by lazy {
-        PrefRepository(
-            requireContext()
-        )
-    }
 
-    private val bottomNavigationViewModel by activityViewModels<BottomNavigationViewModel>()
-    private val playerFragmentViewModel by viewModels<PlayerFragmentViewModel> {
-        InjectorUtils.providePlayerFragmentViewModel(
-            requireContext()
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
+
+    private val bottomNavigationViewModel:BottomNavigationViewModel by activityViewModels()
+    private val playerFragmentViewModel: PlayerFragmentViewModel by viewModels()
     private val storyViewModel: StoryViewModel by viewModels()
 
     private lateinit var binding: FragmentPlayerBinding
@@ -111,7 +107,7 @@ class PlayerFragment :
         snackBarView =
             layoutInflater.inflate(
                 R.layout.feedback_snackbar,
-                binding.root,
+                binding.root as ViewGroup,
                 false
             )
 
@@ -730,7 +726,7 @@ class PlayerFragment :
                     lifecycleScope.launch {
                         try {
                             val downloadedStory =
-                                DownloadedStory.fromStory(
+                                DownloadedStoryEntity.fromStory(
                                     requireContext(),
                                     story
                                 )

@@ -1,4 +1,4 @@
-package com.autio.android_app.util.coroutines
+package com.autio.android_app.ui.di.coroutines
 
 import javax.inject.Qualifier
 import kotlin.annotation.AnnotationRetention.RUNTIME

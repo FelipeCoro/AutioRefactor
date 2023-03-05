@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.autio.android_app.databinding.FragmentSearchBinding
+import dagger.hilt.EntryPoint
 
-
-class SearchFragment :
-    Fragment() {
+@EntryPoint
+class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? =
         null

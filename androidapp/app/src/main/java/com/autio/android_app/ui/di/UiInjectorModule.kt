@@ -5,7 +5,7 @@ import android.content.Context
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.player.PlayerService
 import com.autio.android_app.player.PlayerServiceConnection
-import com.autio.android_app.util.coroutines.MainDispatcher
+import com.autio.android_app.ui.di.coroutines.MainDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

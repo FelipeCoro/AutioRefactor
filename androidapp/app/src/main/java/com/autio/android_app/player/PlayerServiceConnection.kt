@@ -17,7 +17,7 @@ import com.autio.android_app.extensions.id
 import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
 import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnectionCallback
 import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.util.coroutines.MainDispatcher
+import com.autio.android_app.ui.di.coroutines.MainDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
