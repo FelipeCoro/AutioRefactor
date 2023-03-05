@@ -1,12 +1,11 @@
 package com.autio.android_app.ui.stories.view_model
 
-import android.app.Application
 import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.autio.android_app.R
 import com.autio.android_app.extensions.currentPlayBackPosition
 import com.autio.android_app.extensions.isPlaying
@@ -23,6 +22,26 @@ class StoryDetailFragmentViewModel @Inject constructor(
     private val playerServiceConnection: PlayerServiceConnection
 ) : ViewModel() {
 
+    init {
+
+        /**
+         * There's three things that are observed that cause the [LiveData] exposed from this
+         * class to be updated
+         *
+         * [PlayerServiceConnection.playbackState] changes state based on playback state of the
+         * player, which can change the [MediaItemData.playbackRes] in the list
+         *
+         * [PlayerServiceConnection.nowPlaying] changes based on what is being played, which
+         * can algo change the [MediaItemData.playbackRes] in map's marker
+         */
+        playerServiceConnection.apply {
+            playbackState.observeForever(playbackStateObserver)
+            nowPlaying.observeForever(storyObserver)
+            checkPlaybackPosition()
+        }
+
+    }
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
     private val currentStory = MutableLiveData<Story?>()
     private val mediaPosition = MutableLiveData<Long>().apply {
@@ -33,9 +52,7 @@ class StoryDetailFragmentViewModel @Inject constructor(
     }
 
     private var updatePosition = true
-    private val handler = Handler(
-        Looper.getMainLooper()
-    )
+    private val handler = Handler(Looper.getMainLooper())
 
     /**
      * When the session's [PlaybackStateCompat] changes, [mediaItems] need to be updated
@@ -44,9 +61,7 @@ class StoryDetailFragmentViewModel @Inject constructor(
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it ?: EMPTY_PLAYBACK_STATE
         val metadata = playerServiceConnection.nowPlaying.value
-        updateState(
-            playbackState, metadata
-        )
+        updateState(playbackState, metadata)
     }
 
     /**
@@ -56,29 +71,7 @@ class StoryDetailFragmentViewModel @Inject constructor(
      * changed
      */
     private val storyObserver = Observer<Story?> {
-        updateState(
-            playbackState, it
-        )
-    }
-
-    /**
-     * There's three things that are observed that cause the [LiveData] exposed from this
-     * class to be updated
-     *
-     * [PlayerServiceConnection.playbackState] changes state based on playback state of the
-     * player, which can change the [MediaItemData.playbackRes] in the list
-     *
-     * [PlayerServiceConnection.nowPlaying] changes based on what is being played, which
-     * can algo change the [MediaItemData.playbackRes] in map's marker
-     */
-    private val playerServiceConnection = playerServiceConnection.also {
-        it.playbackState.observeForever(
-            playbackStateObserver
-        )
-        it.nowPlaying.observeForever(
-            storyObserver
-        )
-        checkPlaybackPosition()
+        updateState(playbackState, it)
     }
 
     /**

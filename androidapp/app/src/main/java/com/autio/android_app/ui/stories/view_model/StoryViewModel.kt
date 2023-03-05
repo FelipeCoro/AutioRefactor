@@ -12,16 +12,15 @@ import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StoryViewModel @Inject constructor(
     private val autioRepository: AutioRepository,
-    @IoDispatcher
-    private val coroutineDispatcher: CoroutineDispatcher
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
     private val _state = MutableLiveData<StoryViewState>()
     val viewState: LiveData<StoryViewState> = _state
 
@@ -32,15 +31,30 @@ class StoryViewModel @Inject constructor(
     val storiesHistory = autioRepository.history.asLiveData()
     val favoriteStories = autioRepository.favoriteStories.asLiveData()
 
+    private fun setViewState(newState: StoryViewState) {
+        _state.postValue(newState)
+    }
+
     fun getAllStories() {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.getAllStories()
+            kotlin.runCatching {
+                autioRepository.getAllStories()
+            }.onSuccess { result ->
+                val stories = result.getOrNull() ?: listOf()
+                setViewState(StoryViewState.FetchedAllStories(stories))
+            }.onFailure {
+                setViewState(StoryViewState.FetchedAllStoriesFailed)
+            }
         }
     }
 
     fun getStoriesByIds(ids: List<Int>) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.getMapPointsByIds(ids)
+            autioRepository.getMapPointsByIds(ids).catch {
+                setViewState(StoryViewState.FetchedStoriesByIdsFailed)
+            }.collect {
+                setViewState(StoryViewState.FetchedStoriesByIds(it))
+            }
         }
     }
 
@@ -67,24 +81,23 @@ class StoryViewModel @Inject constructor(
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.bookmarkStory(id)
         }
+    }
 
-        fun removeBookmarkFromStory(id: String) {
-            viewModelScope.launch(coroutineDispatcher) {
-                autioRepository.removeBookmarkFromStory(id)
-            }
+    fun removeBookmarkFromStory(id: String) {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.removeBookmarkFromStory(id)
         }
+    }
 
-        fun removeAllBookmarks() {
-            viewModelScope.launch(coroutineDispatcher) {
-                autioRepository.removeAllBookmarks()
-            }
+    fun removeAllBookmarks() {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.removeAllBookmarks()
         }
+    }
 
-
-        fun setLikeToStory(id: String) {
-            viewModelScope.launch(coroutineDispatcher) {
-                autioRepository.giveLikeToStory(id)
-            }
+    fun setLikeToStory(id: String) {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.giveLikeToStory(id)
         }
     }
 
@@ -106,10 +119,9 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun clearStoryHistory() =
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.clearStoryHistory()
-        }
+    fun clearStoryHistory() = viewModelScope.launch(coroutineDispatcher) {
+        autioRepository.clearStoryHistory()
+    }
 
     fun cacheRecordOfStory(storyId: String, recordUrl: String) {
         viewModelScope.launch(coroutineDispatcher) {

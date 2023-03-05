@@ -212,18 +212,12 @@ class BottomNavigationViewModel @Inject constructor(
             }
         } else {
             postedPlay = false
-            transportControls.playFromMediaId(
-                mediaItem.mediaId, null
-            )
-            FirebaseStoryRepository.addStoryToUserHistory(prefRepository.firebaseKey,
-                mediaItem.mediaId,
+            transportControls.playFromMediaId(mediaItem.mediaId, null)
+            FirebaseStoryRepository.addStoryToUserHistory(
+                prefRepository.firebaseKey, mediaItem.mediaId,
                 onSuccessListener = { timestamp ->
-                    viewModelScope.launch(
-                        Dispatchers.IO
-                    ) {
-                        autioRepository.addStoryToHistory(
-                            History(mediaItem.mediaId, timestamp)
-                        )
+                    viewModelScope.launch(Dispatchers.IO) {
+                        autioRepository.addStoryToHistory(History(mediaItem.mediaId, timestamp))
                     }
                 })
         }
@@ -322,36 +316,19 @@ class BottomNavigationViewModel @Inject constructor(
      * after it
      */
     private suspend fun getRemoteStories() {
-        val lastFetchedStory = autioLocalDataSourceImpl.getLastModifiedStory()
-        val date = lastFetchedStory?.modifiedDate ?: 63808881662
-        withContext(coroutineDispatcher) {
-            // TODO: change Firebase code with commented code once endpoint is stable
-            val stories = FirebaseStoryRepository.getStoriesAfterModifiedDate(
-                date.toInt()
-            )
-            autioRepository.addStories(stories)
-//            val dateFormat =
-//                SimpleDateFormat(
-//                    "yyyy/MM/dd'T'HH:mm:ss",
-//                    Locale.getDefault()
-//                )
-//            val formattedDate =
-//                dateFormat.format(
-//                    Date(
-//                        (date.toLong() * 1000)
-//                    )
-//                )
-//            apiService.getStoriesAfterDate(
-//                prefRepository.userId,
-//                prefRepository.userApiToken,
-//                formattedDate
-//            ) {
-//                if (it != null) {
-//                    storyRepository.addStories(
-//                        it.toTypedArray()
-//                    )
-//                }
-//            }
+        viewModelScope.launch(coroutineDispatcher) {
+            kotlin.runCatching {
+                autioRepository.getLastModifiedStory()
+            }.onSuccess {
+                val result = it.getOrNull()
+                result?.let {
+                    val date = result.modifiedDate ?: 63808881662
+                    //TODO (Move to Repository)
+                    // TODO: change Firebase code with commented code once endpoint is stable
+                    val stories = FirebaseStoryRepository.getStoriesAfterModifiedDate(date.toInt())
+                    autioRepository.addStories(stories)
+                }
+            }.onFailure { }
         }
     }
 
@@ -362,16 +339,6 @@ class BottomNavigationViewModel @Inject constructor(
                 prefRepository.firebaseKey
             )
             autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.storyId })
-//            apiService.getStoriesFromUserBookmarks(
-//                prefRepository.userId,
-//                prefRepository.userApiToken
-//            ) { stories ->
-//                if (stories != null) {
-//                    storyRepository.setBookmarksDataToLocalStories(
-//                        stories.map { it.id }
-//                    )
-//                }
-//            }
         }
     }
 
@@ -380,18 +347,10 @@ class BottomNavigationViewModel @Inject constructor(
             val userFavoriteStories = FirebaseStoryRepository.getUserFavoriteStories(
                 prefRepository.firebaseKey
             )
-            autioRepository.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
-                .map { it.storyId })
-//            ApiService.likedStoriesByUser(
-//                prefRepository.userId,
-//                prefRepository.userApiToken
-//            ) { stories ->
-//                if (stories != null) {
-//                    storyRepository.setLikesDataToLocalStories(
-//                        stories.map { it.id }
-//                    )
-//                }
-//            }
+            autioRepository.setLikesDataToLocalStories(userFavoriteStories
+                .filter { it.isGiven == true }
+                .map { it.storyId }
+            )
         }
     }
 

@@ -56,8 +56,7 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun fetchUserData() {
         kotlin.runCatching {
             autioRemoteDataSource.getProfileDataV2(
-                prefRepository.userId,
-                prefRepository.userApiToken
+                prefRepository.userId, prefRepository.userApiToken
             )
         }.onSuccess {
             val profile = it.body()
@@ -70,15 +69,11 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateProfile(
-        infoUser: ProfileDto,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     ) {
         runCatching {
             autioRemoteDataSource.updateProfileV2(
-                prefRepository.userId,
-                prefRepository.userApiToken,
-                infoUser
+                prefRepository.userId, prefRepository.userApiToken, infoUser
             )
         }.onSuccess {
             val profile = it.body()
@@ -91,15 +86,11 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateCategoriesOrder(
-        infoUser: ProfileDto,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
+        infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     ) {
         runCatching {
             autioRemoteDataSource.updateProfileV2(
-                prefRepository.userId,
-                prefRepository.userApiToken,
-                infoUser
+                prefRepository.userId, prefRepository.userApiToken, infoUser
             )
         }.onSuccess {
             val profile = it.body()
@@ -119,9 +110,7 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.getMapPointsByIds(ids)
 
     override suspend fun getStoriesByIds(
-        userId: Int,
-        apiToken: String,
-        storiesWithoutRecords: List<Story>
+        userId: Int, apiToken: String, storiesWithoutRecords: List<Story>
     ) {
         runCatching {
             autioRemoteDataSource.getStoriesByIds(userId,
@@ -140,8 +129,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getStoriesInLatLngBoundaries(
-        swCoordinates: LatLng,
-        neCoordinates: LatLng
+        swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPoint> {
         return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
@@ -154,20 +142,31 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.downloadStory(TODO("Map back from DownloadedStoryEntity to a DownloadedHistory Domain Model"))
     }
 
-    override suspend fun getAllStories(): List<MapPoint> {
-        return autioLocalDataSource.getAllStories()
+    override suspend fun getAllStories(): Result<List<Story>?> {
+        val result = autioLocalDataSource.getAllStories()
+
+        return if (result.isSuccess) {
+            val stories = result.getOrNull()?.let { mapPoints ->
+                mapPoints.map { it.toModel() }
+            } ?: listOf()
+            Result.success(stories)
+        } else {
+            val throwable = result.exceptionOrNull() ?: java.lang.Error()
+            Result.failure(throwable)
+        }
     }
+
 
     override suspend fun removeDownloadedStory(id: String) {
         return autioLocalDataSource.removeDownloadedStory(id)
     }
 
-    override suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto) {
+    override suspend fun postStoryPlayed(
+        xUserId: Int, userApiToken: String, playsDto: PlaysDto
+    ) {
         runCatching {
             autioRemoteDataSource.postStoryPlayed(
-                prefRepository.userId,
-                prefRepository.userApiToken,
-                playsDto
+                prefRepository.userId, prefRepository.userApiToken, playsDto
             )
         }.onSuccess { response ->
             if (response.isSuccessful) {
@@ -221,6 +220,11 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun clearUserData() {
         autioLocalDataSource.clearUserData()
+    }
+
+    override suspend fun getLastModifiedStory(): Result<Story?> {
+        val mapPoint = autioLocalDataSource.getLastModifiedStory()
+        return mapPoint.toModel()
     }
 }
 

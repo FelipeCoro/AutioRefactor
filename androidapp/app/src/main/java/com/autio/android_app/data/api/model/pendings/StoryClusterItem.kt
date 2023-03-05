@@ -6,48 +6,29 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterItem
 
-class StoryClusterItem(
-    mStoryDto: StoryDto
-) : ClusterItem {
+class StoryClusterItem(mStoryDto: StoryDto) : ClusterItem {
 
-    private val position: LatLng =
-        LatLng(
-            mStoryDto.lat,
-            mStoryDto.lon
-        )
-    private val title: String =
-        mStoryDto.title
-    private val snippet: String =
-        ""
+    private val position: LatLng = LatLng(mStoryDto.lat, mStoryDto.lon)
+    private val title: String = mStoryDto.title
+    private val snippet: String = ""
 
-    var story =
-        mStoryDto
+    var story = mStoryDto
         private set
-    var marker: Marker? =
-        null
-    var bitmap: Bitmap? =
-        null
+    var marker: Marker? = null
+    var bitmap: Bitmap? = null
 
-    fun updateStory(
-        storyDto: StoryDto
-    ) {
+    fun updateStory(storyDto: StoryDto) {
         if (storyDto.id != this.story.id) {
-            throw Exception(
-                "Story is not the same!"
-            )
+            throw Exception("Story is not the same!")
         }
-        this.story =
-            storyDto
+        this.story = storyDto
     }
 
-    override fun getPosition() =
-        position
+    override fun getPosition() = position
 
-    override fun getTitle(): String? =
-        null
+    override fun getTitle(): String? = null
 
-    override fun getSnippet(): String? =
-        null
+    override fun getSnippet(): String? = null
 
     override fun toString(): String {
         return """

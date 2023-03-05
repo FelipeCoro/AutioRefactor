@@ -20,15 +20,22 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
+import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
+import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
-import com.autio.android_app.util.*
+import com.autio.android_app.util.openLocationInMapsApp
+import com.autio.android_app.util.shareStory
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.EntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,6 +49,10 @@ class BookmarksFragment : Fragment() {
 
     @Inject
     private lateinit var prefRepository: PrefRepository
+
+    @Inject
+    private lateinit var apiService: ApiClient
+
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
     private lateinit var storyAdapter: StoryAdapter
@@ -117,22 +128,29 @@ class BookmarksFragment : Fragment() {
                 }
                 val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
-                    ApiService.getStoriesByIds(prefRepository.userId,
-                        prefRepository.userApiToken,
-                        storiesWithoutRecords.map { it.originalId }) { storiesFromAPI ->
-                        if (storiesFromAPI != null) {
-                            for (story in storiesFromAPI) {
-                                storyViewModel.cacheRecordOfStory(
-                                    story.id, story.recordUrl
-                                )
+                    lifecycleScope.launch {
+
+                        val ids =
+                            storiesWithoutRecords.map { it.firebaseId } //it.originalId changed to firebaseId
+                        val result = apiService.getStoriesByIds(
+                            prefRepository.userId,
+                            prefRepository.userApiToken,
+                            ids
+                        )
+                        if (result.isSuccessful) {
+                            var storiesFromAPI = result.body()
+                            if (storiesFromAPI != null) {
+                                for (story in storiesFromAPI) {
+                                    storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
+                                }
                             }
                         }
                     }
                 }
-                storyAdapter.submitList(stories)
-                binding.llNoContent.visibility = View.GONE
-                binding.rlStories.visibility = View.VISIBLE
             }
+            storyAdapter.submitList(stories)
+            binding.llNoContent.visibility = View.GONE
+            binding.rlStories.visibility = View.VISIBLE
         }
     }
 
@@ -247,9 +265,8 @@ class BookmarksFragment : Fragment() {
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
-                        val downloadedStory = DownloadedStory.fromStory(
-                            requireContext(), story
-                        )
+                        val downloadedStory =
+                            DownloadedStoryEntity.fromStory(requireContext(), story.toDto())
                         storyViewModel.downloadStory(downloadedStory!!)
                         showFeedbackSnackBar("Story Saved To My Device")
                     } catch (e: Exception) {

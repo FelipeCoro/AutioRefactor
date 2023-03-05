@@ -3,59 +3,38 @@ package com.autio.android_app.ui.stories.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.databinding.ItemListPopupWindowBinding
 
 class PlaylistOptionsAdapter(
-    private var options: List<com.autio.android_app.data.api.model.PlaylistOption>,
-    private val onOptionClickListener: (() -> Unit?)
+    private var options: List<PlaylistOption>,
+    private val onOptionClickListener: ((PlaylistOption) -> Unit?)
 ) : RecyclerView.Adapter<PlaylistOptionsAdapter.OptionViewHolder>() {
 
     inner class OptionViewHolder(
         val binding: ItemListPopupWindowBinding
-    ) : RecyclerView.ViewHolder(
-        binding.root
-    ) {
-        fun render(
-            model: com.autio.android_app.data.api.model.PlaylistOption
-        ) {
+    ) : RecyclerView.ViewHolder(binding.root) {
+        fun render(model: PlaylistOption) {
             binding.root.setOnClickListener {
-                onOptionClickListener?.onOptionClick(
-                    model
-                )
+                onOptionClickListener?.invoke(model)
             }
-            binding.ivOptionIcon.setImageResource(
-                model.option.resourceId
-            )
-            binding.tvOptionTitle.text =
-                model.option.title
+            binding.ivOptionIcon.setImageResource(model.option.resourceId)
+            binding.tvOptionTitle.text = model.option.title
         }
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ) =
-        OptionViewHolder(
-            ItemListPopupWindowBinding.inflate(
-                LayoutInflater.from(
-                    parent.context
-                ),
-                parent,
-                false
-            )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = OptionViewHolder(
+        ItemListPopupWindowBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
         )
+    )
 
     override fun onBindViewHolder(
-        holder: PlaylistOptionsAdapter.OptionViewHolder,
-        position: Int
+        holder: PlaylistOptionsAdapter.OptionViewHolder, position: Int
     ) {
-        val option =
-            options[position]
-        holder.render(
-            option
-        )
+        val option = options[position]
+        holder.render(option)
     }
 
-    override fun getItemCount() =
-        options.size
+    override fun getItemCount() = options.size
 }

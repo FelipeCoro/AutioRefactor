@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.DownloadedStory
+import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -19,15 +19,15 @@ import java.io.File
 
 class DownloadedStoryAdapter(
     private var onStoryPlay: ((String) -> Unit)?,
-    private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)?
-) : ListAdapter<DownloadedStory, DownloadedStoryAdapter.DownloadedStoryViewHolder>(
+    private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
+) : ListAdapter<DownloadedStoryEntity, DownloadedStoryAdapter.DownloadedStoryViewHolder>(
     DownloadedStoryComparator()
 ) {
 
     class DownloadedStoryViewHolder(
         itemView: View,
         private var onStoryPlay: ((String) -> Unit)?,
-        private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)?
+        private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
     ) : RecyclerView.ViewHolder(
         itemView
     ) {
@@ -56,45 +56,24 @@ class DownloadedStoryAdapter(
                 R.id.ivStoryItemOptions
             )
 
-        fun bind(
-            model: DownloadedStory
-        ) {
-            Glide.with(
-                itemView
-            )
-                .load(
-                    model.image?.let { path ->
-                        Uri.parse(
-                            path
-                        ).path?.let {
-                            File(
-                                it
-                            )
-                        }
-                    })
+        fun bind(model: DownloadedStoryEntity) {
+            Glide.with(itemView)
+                .load(model.image?.let { path ->
+                    Uri.parse(path).path?.let {
+                        File(it)
+                    }
+                })
                 .apply(
-                    RequestOptions().placeholder(
-                        R.drawable.maps_placeholder
-                    )
-                        .error(
-                            R.drawable.maps_placeholder
-                        )
+                    RequestOptions().placeholder(R.drawable.maps_placeholder)
+                        .error(R.drawable.maps_placeholder)
                 )
-                .into(
-                    ivStoryImage
-                )
+                .into(ivStoryImage)
             ivStoryCard.setOnClickListener {
-                onStoryPlay?.invoke(
-                    model.id
-                )
+                onStoryPlay?.invoke(model.id)
             }
-            storyTitle.text =
-                model.title
-            storyAuthor.text =
-                model.author
-            storyPin.setImageResource(
-                R.drawable.ic_non_listened_pin
-            )
+            storyTitle.text = model.title
+            storyAuthor.text = model.author
+            storyPin.setImageResource(R.drawable.ic_non_listened_pin)
             ivStoryItemOptions.setOnClickListener {
                 showStoryOptions(
                     itemView.context,
@@ -118,7 +97,7 @@ class DownloadedStoryAdapter(
             fun create(
                 parent: ViewGroup,
                 onStoryPlay: ((String) -> Unit)?,
-                onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStory) -> Unit)?
+                onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
             ): DownloadedStoryViewHolder {
                 val view =
                     LayoutInflater.from(
@@ -139,17 +118,17 @@ class DownloadedStoryAdapter(
     }
 
     class DownloadedStoryComparator :
-        DiffUtil.ItemCallback<DownloadedStory>() {
+        DiffUtil.ItemCallback<DownloadedStoryEntity>() {
         override fun areItemsTheSame(
-            oldItem: DownloadedStory,
-            newItem: DownloadedStory
+            oldItem: DownloadedStoryEntity,
+            newItem: DownloadedStoryEntity
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: DownloadedStory,
-            newItem: DownloadedStory
+            oldItem: DownloadedStoryEntity,
+            newItem: DownloadedStoryEntity
         ): Boolean {
             return oldItem.recordPath == newItem.recordPath
                     || oldItem.isLiked == newItem.isLiked
@@ -172,12 +151,7 @@ class DownloadedStoryAdapter(
         holder: DownloadedStoryViewHolder,
         position: Int
     ) {
-        val story =
-            getItem(
-                position
-            )
-        holder.bind(
-            story
-        )
+        val story = getItem(position)
+        holder.bind(story)
     }
 }

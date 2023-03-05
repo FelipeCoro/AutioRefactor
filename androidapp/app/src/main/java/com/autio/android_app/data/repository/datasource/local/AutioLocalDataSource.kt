@@ -20,10 +20,10 @@ interface AutioLocalDataSource {
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPoint>
 
-    suspend fun getAllStories(): List<MapPoint>
+    suspend fun getAllStories(): Result<List<MapPoint>?>
     suspend fun getMapPointById(id: String): Result<MapPoint?>
     suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>>
-    suspend fun getLastModifiedStory(): MapPoint?
+    suspend fun getLastModifiedStory(): Result<MapPoint?>
     suspend fun addStories(stories: List<MapPoint>)
     suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     suspend fun setLikesDataToLocalStories(storiesIds: List<String>)

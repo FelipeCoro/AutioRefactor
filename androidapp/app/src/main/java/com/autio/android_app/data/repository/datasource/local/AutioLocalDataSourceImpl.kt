@@ -48,8 +48,13 @@ class AutioLocalDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun getAllStories(): List<MapPoint> {
-        return storyDao.allStories()
+    override suspend fun getAllStories(): Result<List<MapPoint>?> {
+        return kotlin.runCatching { storyDao.allStories() }
+            .onSuccess {
+                Result.success(it)
+            }.onFailure {
+                Result.failure<List<MapPoint>?>(it)
+            }
     }
 
     override suspend fun getMapPointById(id: String): Result<MapPoint?> {

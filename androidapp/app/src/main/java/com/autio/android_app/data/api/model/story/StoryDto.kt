@@ -1,7 +1,7 @@
 package com.autio.android_app.data.api.model.story
 
 import androidx.room.*
-import com.autio.android_app.data.api.model.pendings.Category
+import com.autio.android_app.ui.stories.models.Category
 import com.google.firebase.database.PropertyName
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
@@ -52,116 +52,29 @@ import java.io.Serializable
  * Another database table was created for downloaded stories in
  * device
  */
-@Entity(
-    tableName = "stories",
-    indices = [Index(
-        value = ["id"],
-        unique = true
-    )]
-)
+@Entity(tableName = "stories", indices = [Index(value = ["id"], unique = true)])
 data class StoryDto(
     // Firebase ID
-    @PrimaryKey
-    var id: String = "",
+    @PrimaryKey var id: String = "",
     // Story ID
-    @get:PropertyName(
-        "hhId"
-    )
-    @set:PropertyName(
-        "hhId"
-    )
-    @SerializedName(
-        "hhId"
-    )
-    var originalId: Int = 0,
+    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerializedName("hhId") var originalId: Int = 0,
     val title: String = "",
     val description: String = "",
-    @get:PropertyName(
-        "latitude"
-    )
-    @set:PropertyName(
-        "latitude"
-    )
-    @SerializedName(
-        "latitude"
-    )
-    var lat: Double = 0.0,
-    @get:PropertyName(
-        "longitude"
-    )
-    @set:PropertyName(
-        "longitude"
-    )
-    @SerializedName(
-        "longitude"
-    )
-    var lon: Double = 0.0,
-    @get:PropertyName(
-        "rangeInMeters"
-    )
-    @set:PropertyName(
-        "rangeInMeters"
-    )
-    var range: Int = 0,
-    @PropertyName(
-        "imageURL"
-    )
-    @SerializedName(
-        "imageURL"
-    )
-    val imageUrl: String = "",
-    @PropertyName(
-        "recordURL"
-    )
-    @SerializedName(
-        "recordURL"
-    )
-    val recordUrl: String = "",
-    @get:PropertyName(
-        "durationInSeconds"
-    )
-    @set:PropertyName(
-        "durationInSeconds"
-    )
-    var duration: Int = 0,
-    @SerializedName(
-        "dateAdded"
-    )
-    var publishedDate: Int = 0,
-    @get:PropertyName(
-        "dateModifiedTimestamp"
-    ) @set:PropertyName(
-        "dateModifiedTimestamp"
-    )
-    @SerializedName(
+    @get:PropertyName("latitude") @set:PropertyName("latitude") @SerializedName("latitude") var lat: Double = 0.0,
+    @get:PropertyName("longitude") @set:PropertyName("longitude") @SerializedName("longitude") var lon: Double = 0.0,
+    @get:PropertyName("rangeInMeters") @set:PropertyName("rangeInMeters") var range: Int = 0,
+    @PropertyName("imageURL") @SerializedName("imageURL") val imageUrl: String = "",
+    @PropertyName("recordURL") @SerializedName("recordURL") val recordUrl: String = "",
+    @get:PropertyName("durationInSeconds") @set:PropertyName("durationInSeconds") var duration: Int = 0,
+    @SerializedName("dateAdded") var publishedDate: Int = 0,
+    @get:PropertyName("dateModifiedTimestamp") @set:PropertyName("dateModifiedTimestamp") @SerializedName(
         "dateModified"
-    )
-    var modifiedDate: Int = 0,
-    @get:PropertyName(
-        "narratorName"
-    ) @set:PropertyName(
-        "narratorName"
-    )
-    @SerializedName(
-        "narratorName"
-    ) var narrator: String = "",
-    @get:PropertyName(
-        "authorName"
-    ) @set:PropertyName(
-        "authorName"
-    )
-    @SerializedName(
-        "authorName"
-    ) var author: String = "",
+    ) var modifiedDate: Int = 0,
+    @get:PropertyName("narratorName") @set:PropertyName("narratorName") @SerializedName("narratorName") var narrator: String = "",
+    @get:PropertyName("authorName") @set:PropertyName("authorName") @SerializedName("authorName") var author: String = "",
     val state: String = "",
-    @SerializedName(
-        "country_code"
-    )
-    val countryCode: String = "",
-    @Embedded(
-        prefix = "category_"
-    )
-    var category: Category? = null,
+    @SerializedName("country_code") val countryCode: String = "",
+    @Embedded(prefix = "category_") var category: Category? = null,
     val isLiked: Boolean? = null,
     val isBookmarked: Boolean? = null,
     val isDownloaded: Boolean? = null,

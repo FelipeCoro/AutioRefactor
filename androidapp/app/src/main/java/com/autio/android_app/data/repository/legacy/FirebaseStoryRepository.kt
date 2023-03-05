@@ -2,10 +2,10 @@ package com.autio.android_app.data.repository.legacy
 
 import android.util.Log
 import com.autio.android_app.data.api.model.bookmarks.BookmarkDto
-import com.autio.android_app.data.entities.history.History
-import com.autio.android_app.data.entities.likes.Like
-import com.autio.android_app.data.entities.story.Category
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.data.api.model.pendings.Like
+import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.History
+import com.autio.android_app.ui.stories.models.Story
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -19,165 +19,75 @@ import java.time.format.DateTimeFormatter
 // TODO: Delete repository once endpoints from staging are in production
 class FirebaseStoryRepository {
     companion object {
-        private val rootRef =
-            FirebaseDatabase.getInstance().reference
-        private val categoryRef =
-            rootRef.child(
-                "categories"
-            )
-        private val bookmarksRef =
-            rootRef.child(
-                "library"
-            )
-        private val likesRef =
-            rootRef.child(
-                "likes"
-            )
-        private val playedHistoryRef =
-            rootRef.child(
-                "playedHistory"
-            )
-        private val storiesRef =
-            rootRef.child(
-                "stories"
-            )
+        private val rootRef = FirebaseDatabase.getInstance().reference
+        private val categoryRef = rootRef.child("categories")
+        private val bookmarksRef = rootRef.child("library")
+        private val likesRef = rootRef.child("likes")
+        private val playedHistoryRef = rootRef.child("playedHistory")
+        private val storiesRef = rootRef.child("stories")
 
-        suspend fun getStoriesAfterModifiedDate(
-            modifiedDate: Int
-        ): Array<Story> {
+        suspend fun getStoriesAfterModifiedDate(modifiedDate: Int): List<Story> {
             val storiesQuery =
-                storiesRef.orderByChild(
-                    "dateModifiedTimestamp"
-                )
-                    .startAfter(
-                        modifiedDate.toDouble()
-                    )
+                storiesRef.orderByChild("dateModifiedTimestamp").startAfter(modifiedDate.toDouble())
                     .get()
 
-            return storiesQuery
-                .await().children.mapNotNull {
-                    val story =
-                        it.getValue(
-                            Story::class.java
-                        )
-                    story?.id =
-                        it.key!!
-                    story?.category =
-                        Category(
-                            firebaseId = it.child(
-                                "categoryId"
-                            ).value as? String
-                                ?: "",
-                        )
-                    story
-                }
-                .toTypedArray()
+            return storiesQuery.await().children.mapNotNull {
+                val story = it.getValue(Story::class.java)
+                story?.id = it.key!!
+                story?.category =
+                    Category(firebaseId = it.child("categoryId").value as? String ?: "")
+                story
+            }.toList()
         }
 
         suspend fun getUserBookmarks(
             userId: String
-        ): Array<BookmarkDto> {
-            return bookmarksRef.child(
-                userId
-            )
-                .get()
-                .await().children.map {
-                    BookmarkDto(
-                        storyId = it.key!!,
-                        isOwn = it.child(
-                            "isOwn"
-                        ).value as? String
-                            ?: "true",
-                        title = it.child(
-                            "title"
-                        ).value as? String
-                            ?: ""
-                    )
-                }
-                .toTypedArray()
+        ): List<BookmarkDto> {
+            return bookmarksRef.child(userId).get().await().children.map {
+                BookmarkDto(
+                    storyId = it.key!!,
+                    isOwn = it.child("isOwn").value as? String ?: "true",
+                    title = it.child("title").value as? String ?: ""
+                )
+            }.toList()
         }
 
         suspend fun getCategory(
-            categoryId: String?,
-            onSuccessListener: ((Category) -> Unit)? = null,
+            categoryId: String?, onSuccessListener: ((Category) -> Unit)? = null,
         ) {
             try {
                 if (categoryId == null) return
-                val category =
-                    categoryRef.child(
-                        categoryId
-                    )
-                        .get()
-                        .await()
+                val category = categoryRef.child(categoryId).get().await()
                 if (category.exists()) onSuccessListener?.invoke(
                     Category(
-                        title = category.child(
-                            "title"
-                        ).value as? String
-                            ?: "",
-                        order = category.child(
-                            "order"
-                        ).value as? Int
-                            ?: 0
+                        title = category.child("title").value as? String ?: "",
+                        order = category.child("order").value as? Int ?: 0
                     )
                 )
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
             }
         }
 
-        suspend fun isStoryBookmarkedByUser(
-            userId: String,
-            storyId: String
-        ) =
-            callbackFlow {
-                val valueListener =
-                    object :
-                        ValueEventListener {
-                        override fun onCancelled(
-                            error: DatabaseError
-                        ) {
-                            close()
-                        }
+        suspend fun isStoryBookmarkedByUser(userId: String, storyId: String) = callbackFlow {
+            val valueListener = object : ValueEventListener {
+                override fun onCancelled(error: DatabaseError) {
+                    close()
+                }
 
-                        override fun onDataChange(
-                            snapshot: DataSnapshot
-                        ) {
-                            trySend(
-                                SnapshotResult(
-                                    snapshot,
-                                    null
-                                )
-                            )
-                        }
-                    }
-
-                bookmarksRef.child(
-                    userId
-                )
-                    .child(
-                        storyId
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    trySend(
+                        SnapshotResult(snapshot, null)
                     )
-                    .addValueEventListener(
-                        valueListener
-                    )
-
-                awaitClose {
-                    bookmarksRef.child(
-                        userId
-                    )
-                        .child(
-                            storyId
-                        )
-                        .removeEventListener(
-                            valueListener
-                        )
                 }
             }
+
+            bookmarksRef.child(userId).child(storyId).addValueEventListener(valueListener)
+
+            awaitClose {
+                bookmarksRef.child(userId).child(storyId).removeEventListener(valueListener)
+            }
+        }
 
         fun bookmarkStory(
             userId: String,
@@ -186,33 +96,15 @@ class FirebaseStoryRepository {
             onSuccessListener: (() -> Unit)? = null,
             onFailureListener: (() -> Unit)? = null
         ) {
-            val map =
-                hashMapOf(
-                    "isOwn" to "true",
-                    "title" to storyTitle
-                )
+            val map = hashMapOf("isOwn" to "true", "title" to storyTitle)
             try {
-                bookmarksRef.child(
-                    userId
-                )
-                    .child(
-                        storyId
-                    )
-                    .setValue(
-                        map
-                    )
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                bookmarksRef.child(userId).child(storyId).setValue(map).addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
                 onFailureListener?.invoke()
             }
         }
@@ -224,25 +116,13 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                bookmarksRef.child(
-                    userId
-                )
-                    .child(
-                        storyId
-                    )
-                    .removeValue()
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                bookmarksRef.child(userId).child(storyId).removeValue().addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
                 onFailureListener?.invoke()
             }
         }
@@ -253,91 +133,60 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                bookmarksRef.child(
-                    userId
-                )
-                    .removeValue()
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                bookmarksRef.child(userId).removeValue().addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
                 onFailureListener?.invoke()
             }
         }
 
-        suspend fun getUserFavoriteStories(
-            userId: String
-        ): Array<Like> {
-            return likesRef.get()
-                .await().children.filter {
-                    it.hasChild(
-                        userId
-                    )
-                }
-                .associate {
-                    it.key!! to (it.child(
-                        userId
-                    ).value as Boolean?)
-                }
-                .map {
-                    Like(
-                        storyId = it.key,
-                        userId = userId,
-                        isGiven = it.value
-                    )
-                }
-                .toTypedArray()
+        suspend fun getUserFavoriteStories(userId: String): List<Like> {
+            return likesRef.get().await().children.filter { it.hasChild(userId) }.associate {
+                it.key!! to (it.child(userId).value as Boolean?)
+            }.map {
+                Like(storyId = it.key, userId = userId, isGiven = it.value)
+            }.toList()
         }
 
         suspend fun getLikesByStoryId(
             storyId: String
-        ) =
-            callbackFlow {
-                val valueListener =
-                    object :
-                        ValueEventListener {
-                        override fun onCancelled(
-                            error: DatabaseError
-                        ) {
-                            close()
-                        }
+        ) = callbackFlow {
+            val valueListener = object : ValueEventListener {
+                override fun onCancelled(
+                    error: DatabaseError
+                ) {
+                    close()
+                }
 
-                        override fun onDataChange(
-                            snapshot: DataSnapshot
-                        ) {
-                            trySend(
-                                SnapshotResult(
-                                    snapshot,
-                                    null
-                                )
-                            )
-                        }
-                    }
-
-                likesRef.child(
-                    storyId
-                )
-                    .addValueEventListener(
-                        valueListener
-                    )
-
-                awaitClose {
-                    likesRef.child(
-                        storyId
-                    )
-                        .removeEventListener(
-                            valueListener
+                override fun onDataChange(
+                    snapshot: DataSnapshot
+                ) {
+                    trySend(
+                        SnapshotResult(
+                            snapshot, null
                         )
+                    )
                 }
             }
+
+            likesRef.child(
+                storyId
+            ).addValueEventListener(
+                valueListener
+            )
+
+            awaitClose {
+                likesRef.child(
+                    storyId
+                ).removeEventListener(
+                    valueListener
+                )
+            }
+        }
 
         fun giveLikeToStory(
             storyId: String,
@@ -348,25 +197,18 @@ class FirebaseStoryRepository {
             try {
                 likesRef.child(
                     storyId
-                )
-                    .child(
-                        userId
-                    )
-                    .setValue(
-                        true
-                    )
-                    .addOnCompleteListener { }
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                ).child(
+                    userId
+                ).setValue(
+                    true
+                ).addOnCompleteListener { }.addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
                 Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
+                    "FirebaseStoryRepository", "exception: ", e
                 )
                 onFailureListener?.invoke()
             }
@@ -381,19 +223,15 @@ class FirebaseStoryRepository {
             try {
                 likesRef.child(
                     storyId
-                )
-                    .child(
-                        userId
-                    )
-                    .setValue(
-                        false
-                    )
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                ).child(
+                    userId
+                ).setValue(
+                    false
+                ).addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
                 onFailureListener?.invoke()
             }
@@ -406,47 +244,28 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                val userLikedStories =
-                    storyIds.associate {
-                        "$it/$userId" to null
-                    }
-                likesRef
-                    .updateChildren(
-                        userLikedStories
-                    )
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                val userLikedStories = storyIds.associate {
+                    "$it/$userId" to null
+                }
+                likesRef.updateChildren(
+                    userLikedStories
+                ).addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
                 Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
+                    "FirebaseStoryRepository", "exception: ", e
                 )
                 onFailureListener?.invoke()
             }
         }
 
-        suspend fun getUserStoriesHistory(
-            userId: String
-        ): Array<History> {
-            return playedHistoryRef.child(
-                userId
-            )
-                .get()
-                .await().children.map {
-                    History(
-                        it.key!!,
-                        it.child(
-                            "played_at"
-                        ).value as? String
-                            ?: ""
-                    )
-                }
-                .toTypedArray()
+        suspend fun getUserStoriesHistory(userId: String): List<History> {
+            return playedHistoryRef.child(userId).get().await().children.map {
+                History(it.key!!, it.child("played_at").value as? String ?: "")
+            }.toList()
         }
 
         fun addStoryToUserHistory(
@@ -456,38 +275,16 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                val listenedAt =
-                    DateTimeFormatter.ISO_INSTANT.format(
-                        Instant.now()
-                    )
-                playedHistoryRef.child(
-                    userId
-                )
-                    .child(
-                        storyId
-                    )
-                    .child(
-                        "played_at"
-                    )
-                    .setValue(
-                        DateTimeFormatter.ISO_INSTANT.format(
-                            Instant.now()
-                        )
-                    )
+                val listenedAt = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
+                playedHistoryRef.child(userId).child(storyId).child("played_at")
+                    .setValue(DateTimeFormatter.ISO_INSTANT.format(Instant.now()))
                     .addOnSuccessListener {
-                        onSuccessListener?.invoke(
-                            listenedAt
-                        )
-                    }
-                    .addOnFailureListener {
+                        onSuccessListener?.invoke(listenedAt)
+                    }.addOnFailureListener {
                         onFailureListener?.invoke()
                     }
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
             }
         }
 
@@ -498,25 +295,11 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                playedHistoryRef.child(
-                    userId
-                )
-                    .child(
-                        storyId
-                    )
-                    .removeValue()
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                playedHistoryRef.child(userId).child(storyId).removeValue()
+                    .addOnSuccessListener { onSuccessListener?.invoke() }
+                    .addOnFailureListener { onFailureListener?.invoke() }
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
                 onFailureListener?.invoke()
             }
         }
@@ -527,29 +310,17 @@ class FirebaseStoryRepository {
             onFailureListener: (() -> Unit)? = null
         ) {
             try {
-                playedHistoryRef.child(
-                    userId
-                )
-                    .removeValue()
-                    .addOnSuccessListener {
-                        onSuccessListener?.invoke()
-                    }
-                    .addOnFailureListener {
-                        onFailureListener?.invoke()
-                    }
+                playedHistoryRef.child(userId).removeValue().addOnSuccessListener {
+                    onSuccessListener?.invoke()
+                }.addOnFailureListener {
+                    onFailureListener?.invoke()
+                }
             } catch (e: Exception) {
-                Log.e(
-                    "FirebaseStoryRepository",
-                    "exception: ",
-                    e
-                )
+                Log.e("FirebaseStoryRepository", "exception: ", e)
                 onFailureListener?.invoke()
             }
         }
     }
 
-    data class SnapshotResult(
-        val snapshot: DataSnapshot? = null,
-        val error: Throwable? = null
-    )
+    data class SnapshotResult(val snapshot: DataSnapshot? = null, val error: Throwable? = null)
 }

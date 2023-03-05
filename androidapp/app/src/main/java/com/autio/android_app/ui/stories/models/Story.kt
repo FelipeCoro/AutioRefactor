@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class Story(
-    val id: String = "",
+    var id: String = "",
     val originalId: Int = 0,
     val title: String = "",
     val description: String = "",
@@ -15,6 +15,7 @@ data class Story(
     val imageUrl: String = "",
     val recordUrl: String = "",
     var duration: Int = 0,
+    //TODO (Dates should be Long not Int)
     var publishedDate: Int = 0,
     var modifiedDate: Int = 0,
     var narrator: String = "",

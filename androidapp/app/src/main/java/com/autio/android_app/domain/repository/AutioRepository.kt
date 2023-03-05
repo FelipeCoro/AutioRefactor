@@ -28,8 +28,8 @@ interface AutioRepository {
         infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     )
 
-    suspend fun getMapPointById(id: String): Result<MapPoint?>
-    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>>
+    suspend fun getMapPointById(id: String): Result<Story?>
+    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<Story>>
     suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
@@ -41,7 +41,7 @@ interface AutioRepository {
 
     suspend fun downloadStory(story: DownloadedStoryEntity)
 
-    suspend fun getAllStories(): List<MapPoint>
+    suspend fun getAllStories(): Result<List<Story>?>
 
     suspend fun removeDownloadedStory(id: String)
 
@@ -64,4 +64,8 @@ interface AutioRepository {
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
 
     suspend fun clearUserData()
+    suspend fun getLastModifiedStory(): Result<Story?>
+    fun addStories(stories: List<Story>) {
+
+    }
 }

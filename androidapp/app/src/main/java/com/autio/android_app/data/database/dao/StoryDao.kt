@@ -10,7 +10,7 @@ interface StoryDao {
     fun addStories(story: List<MapPoint>): List<Long>
 
     @Query("SELECT * FROM stories")
-    suspend fun allStories(): List<MapPoint>
+    suspend fun allStories(): List<MapPoint>?
 
     @Query("SELECT * FROM stories ORDER BY id ASC")
     fun readLiveStories(): Flow<List<MapPoint>>
