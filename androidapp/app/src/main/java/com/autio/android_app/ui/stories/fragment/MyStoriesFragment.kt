@@ -12,9 +12,10 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
 import com.autio.android_app.ui.login.SignInActivity
 import com.autio.android_app.ui.login.SignUpActivity
+import dagger.hilt.EntryPoint
 import javax.inject.Inject
 
-
+@EntryPoint
 class MyStoriesFragment : Fragment() {
 
     @Inject

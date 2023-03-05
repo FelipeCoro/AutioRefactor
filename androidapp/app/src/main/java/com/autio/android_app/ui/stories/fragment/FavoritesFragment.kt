@@ -1,3 +1,4 @@
+
 package com.autio.android_app.ui.stories.fragment
 
 import android.os.Bundle
@@ -19,7 +20,6 @@ import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.MapPoint
-import com.autio.android_app.data.entities.story.DownloadedStory
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
@@ -28,11 +28,13 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@EntryPoint
 class FavoritesFragment : Fragment() {
 
     @Inject

@@ -50,9 +50,11 @@ import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.maps.android.clustering.ClusterManager
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+@EntryPoint
 class MapFragment : Fragment(),
     OnMapReadyCallback {
 

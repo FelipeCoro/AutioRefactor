@@ -42,11 +42,13 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.regex.Pattern
 import javax.inject.Inject
 
+@EntryPoint
 class PlayerFragment : Fragment(),
     OnMapReadyCallback,
     FragmentManager.OnBackStackChangedListener {

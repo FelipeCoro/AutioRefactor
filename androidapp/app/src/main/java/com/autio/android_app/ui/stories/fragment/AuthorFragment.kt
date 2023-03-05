@@ -31,11 +31,13 @@ import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import dagger.hilt.EntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@EntryPoint
 class AuthorFragment : Fragment() {
     @Inject
     lateinit var prefRepository: PrefRepository
