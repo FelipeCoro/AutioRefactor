@@ -1,13 +1,16 @@
 package com.autio.android_app.domain.mappers
 
+import com.autio.android_app.data.api.model.account.CreateAccountDto
+import com.autio.android_app.data.api.model.account.GuestResponse
+import com.autio.android_app.data.api.model.account.LoginDto
+import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.story.StoryDto
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
-import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.models.History
-import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.*
 
+//TODO(need to break this up for readability)
 fun CategoryEntity.toModel(): Category {
     return Category(id, firebaseId, title, order)
 }
@@ -113,5 +116,45 @@ fun Story.toDto(): StoryDto {
         isDownloaded,
         listenedAt,
         listenedAtLeast30Secs
+    )
+}
+
+fun GuestResponse.toModel(): User {
+    return User(
+        id,
+        name = "",
+        email = "",
+        apiToken,
+        isGuest,
+        firebaseKey
+    )
+}
+
+fun LoginResponse.toModel(): User {
+    return User(
+        id,
+        name = "",
+        email = "",
+        apiToken,
+        isGuest,
+        firebaseKey
+    )
+}
+
+fun LoginRequest.toDTO(): LoginDto {
+    return LoginDto(
+        email,
+        password
+    )
+
+}
+
+fun AccountRequest.toDTO(): CreateAccountDto {
+    return CreateAccountDto(
+        email,
+        emailConfirmation,
+        password,
+        passwordConfirmation,
+        name
     )
 }

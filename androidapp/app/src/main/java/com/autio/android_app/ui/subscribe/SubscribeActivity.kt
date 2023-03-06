@@ -16,19 +16,17 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivitySubscribeBinding
 import com.autio.android_app.databinding.MothPopupBinding
 import com.autio.android_app.extensions.makeLinks
-import com.autio.android_app.ui.login.LoginActivity
+import com.autio.android_app.ui.login.fragments.LoginFragment
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.util.Constants.ADVENTURER_TRIP_PRODUCT
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.autio.android_app.util.Constants.SINGLE_TRIP_PRODUCT
 import com.autio.android_app.util.Constants.TRAVELER_TRIP_SUBSCRIPTION
-import com.autio.android_app.util.InjectorUtils
 import com.autio.android_app.util.openUrl
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Package
 import com.smarteist.autoimageslider.SliderView
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -200,7 +198,7 @@ class SubscribeActivity : AppCompatActivity() {
     }
 
     private fun goToLoginActivity() {
-        startActivity(Intent(this, LoginActivity::class.java))
+        startActivity(Intent(this, LoginFragment::class.java))
         finish()
     }
 }

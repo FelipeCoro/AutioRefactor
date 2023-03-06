@@ -629,64 +629,57 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         clusterManager.renderer = clusterRenderer
 
         //TODO(untangle and remove this thread changes madness)
-        lifecycleScope.launch(Dispatchers.IO) {
-            val stories = storyViewModel.getAllStories()
+        val stories = storyViewModel.getAllStories()
 
-            // markers.putAll(stories.associate { it.id to StoryClusterItem(it) })
+        // markers.putAll(stories.associate { it.id to StoryClusterItem(it) })
 
-            withContext(Dispatchers.Main) {
-                clusterManager.addItems(markers.values)
-                clusterManager.cluster()
+        clusterManager.addItems(markers.values)
+        clusterManager.cluster()
+        clusterManager.setOnClusterItemClickListener { storyItem ->
+            tapClusterItem(storyItem)
+            false
+        }
+        clusterManager.setOnClusterClickListener {
+            moveCamera(it.position, map.cameraPosition.zoom + 1)
+            true
+        }
 
-                clusterManager.setOnClusterItemClickListener { storyItem ->
-                    tapClusterItem(storyItem)
-                    false
-                }
-                clusterManager.setOnClusterClickListener {
-                    moveCamera(it.position, map.cameraPosition.zoom + 1)
-                    true
-                }
-
-                map.setOnCameraMoveStartedListener {
-                    cameraIdleTimer?.cancelTimer()
-                }
-                map.setOnCameraIdleListener {
-                    cameraPosition = map.cameraPosition
-                    // Call clusterManager.onCameraIdle() when the camera stops moving so that re-clustering
-                    // can be performed when the camera stops moving
-                    clusterManager.onCameraIdle()
-                    updateMapBounds(map)
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        mapFragmentViewModel.fetchRecordsOfStories(
-                            prefRepository.userId, prefRepository.userApiToken
-                        )
-                    }
-                    cameraIdleTimer = Timer(15000)
-                    cameraIdleTimer?.startTimer()
-                    cameraIdleTimer?.isActive?.observe(this@MapFragment) {
-                        if (it == false) {
-                            val center = map.cameraPosition.target
-                            val nearestStory =
-                                mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(
-                                    center
-                                )
-                            if (nearestStory != null) {
-                                moveCamera(
-                                    latitude = nearestStory.lat,
-                                    longitude = nearestStory.lon,
-                                    zoom = map.cameraPosition.zoom
-                                )
-                                if (clusterRenderer.getMarker(markers[nearestStory.id]!!) != null) {
-                                    highlightClusterItem(markers[nearestStory.id]!!)
-                                }
-                            }
-                        }
+        map.setOnCameraMoveStartedListener {
+            cameraIdleTimer?.cancelTimer()
+        }
+        map.setOnCameraIdleListener {
+            cameraPosition = map.cameraPosition
+            // Call clusterManager.onCameraIdle() when the camera stops moving so that re-clustering
+            // can be performed when the camera stops moving
+            clusterManager.onCameraIdle()
+            updateMapBounds(map)
+            mapFragmentViewModel.fetchRecordsOfStories(
+                prefRepository.userId, prefRepository.userApiToken
+            )
+        }
+        cameraIdleTimer = Timer(15000)
+        cameraIdleTimer?.startTimer()
+        cameraIdleTimer?.isActive?.observe(this@MapFragment) {
+            if (it == false) {
+                val center = map.cameraPosition.target
+                val nearestStory =
+                    mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(
+                        center
+                    )
+                if (nearestStory != null) {
+                    moveCamera(
+                        latitude = nearestStory.lat,
+                        longitude = nearestStory.lon,
+                        zoom = map.cameraPosition.zoom
+                    )
+                    if (clusterRenderer.getMarker(markers[nearestStory.id]!!) != null) {
+                        highlightClusterItem(markers[nearestStory.id]!!)
                     }
                 }
             }
-
         }
     }
+
 
     private fun updateMarker(story: Story, item: StoryClusterItem) {
         item.updateStory(story.toDto())

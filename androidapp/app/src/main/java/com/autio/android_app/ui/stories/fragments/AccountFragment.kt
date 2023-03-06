@@ -19,9 +19,9 @@ import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
 import com.autio.android_app.extensions.makeLinks
-import com.autio.android_app.ui.login.LoginActivity
-import com.autio.android_app.ui.login.SignInActivity
-import com.autio.android_app.ui.login.SignUpActivity
+import com.autio.android_app.ui.login.fragments.LoginFragment
+import com.autio.android_app.ui.login.fragments.SignInFragment
+import com.autio.android_app.ui.login.fragments.SignUpFragment
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
@@ -420,17 +420,17 @@ class AccountFragment : Fragment() {
 
         // Clears shared preferences user's data
         prefRepository.clearData()
-        startActivity(Intent(activity, LoginActivity::class.java))
+        startActivity(Intent(activity, LoginFragment::class.java))
         activity?.finish()
     }
 
     private fun goToSignIn() {
-        val signInIntent = Intent(activity, SignInActivity::class.java)
+        val signInIntent = Intent(activity, SignInFragment::class.java)
         startActivity(signInIntent)
     }
 
     private fun goToSignUp() {
-        val signUpIntent = Intent(activity, SignUpActivity::class.java)
+        val signUpIntent = Intent(activity, SignUpFragment::class.java)
         startActivity(signUpIntent)
     }
 }

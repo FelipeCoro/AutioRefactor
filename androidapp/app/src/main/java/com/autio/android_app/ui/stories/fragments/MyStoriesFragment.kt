@@ -10,8 +10,8 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
-import com.autio.android_app.ui.login.SignInActivity
-import com.autio.android_app.ui.login.SignUpActivity
+import com.autio.android_app.ui.login.fragments.SignInFragment
+import com.autio.android_app.ui.login.fragments.SignUpFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -90,7 +90,7 @@ class MyStoriesFragment : Fragment() {
         val signInIntent =
             Intent(
                 activity,
-                SignInActivity::class.java
+                SignInFragment::class.java
             )
         startActivity(
             signInIntent
@@ -101,7 +101,7 @@ class MyStoriesFragment : Fragment() {
         val signUpIntent =
             Intent(
                 activity,
-                SignUpActivity::class.java
+                SignUpFragment::class.java
             )
         startActivity(
             signUpIntent

@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.ui.login.LoginActivity
+import com.autio.android_app.ui.login.fragments.LoginFragment
 import com.autio.android_app.ui.onboarding.OnBoardingActivity
 import com.autio.android_app.ui.stories.BottomNavigation
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,7 +63,7 @@ class SplashActivity : AppCompatActivity() {
      * - The user has opened the app for the first time, which then it'll
      *   be redirected to [OnBoardingActivity]
      * - The user is signed in, which will navigate the user to the [BottomNavigation]
-     *   if user is logged, [LoginActivity] if false
+     *   if user is logged, [LoginFragment] if false
      */
     private fun whereToGo() {
         if (onBoardingFinished()) {
@@ -76,7 +76,7 @@ class SplashActivity : AppCompatActivity() {
                 startActivity(
                     Intent(
                         this,
-                        LoginActivity::class.java
+                        LoginFragment::class.java
                     )
                 )
                 finish()

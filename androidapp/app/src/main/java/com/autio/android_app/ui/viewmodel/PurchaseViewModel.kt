@@ -2,33 +2,88 @@ package com.autio.android_app.ui.viewmodel
 
 import android.app.Activity
 import androidx.lifecycle.*
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.data.repository.revenue.RevenueCatRepository
+import com.autio.android_app.domain.repository.AutioRepository
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
+import com.autio.android_app.ui.stories.models.AccountRequest
+import com.autio.android_app.ui.stories.models.LoginRequest
+import com.autio.android_app.ui.stories.models.User
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
 import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.models.StoreTransaction
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PurchaseViewModel @Inject constructor(
-    private val revenueCatRepository: RevenueCatRepository
+    private val autioRepository: AutioRepository,
+    private val revenueCatRepository: RevenueCatRepository,
+    private val prefRepository: PrefRepository,
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
-    val customerInfo =
-        revenueCatRepository.customerInfo
+    private val _viewState = MutableLiveData<PurchaseViewState>()
+    val viewState: LiveData<PurchaseViewState> = _viewState
+    val customerInfo = revenueCatRepository.customerInfo
 
     fun getUserInfo() {
         revenueCatRepository.getUserInfo()
     }
 
-    fun login(
-        userId: String
-    ) {
-        revenueCatRepository.login(
-            userId
-        )
+    fun login(loginRequest: LoginRequest) {
+        viewModelScope.launch(coroutineDispatcher) {
+            val result = autioRepository.login(loginRequest)
+
+            if (result.isSuccess) { //TODO(Double check this)
+                result.getOrNull()?.let { saveUserInfo(it) }
+                result.getOrNull()?.let { handleSuccessViewState(it) }
+                revenueCatRepository.login(result.getOrNull()?.id.toString())
+            } else
+                handleFailureViewState(result.exceptionOrNull() as Exception)
+        }
+    }
+
+    fun createAccount(accountRequest: AccountRequest){
+            viewModelScope.launch(coroutineDispatcher) {
+                val result = autioRepository.createAccount(accountRequest)
+                if (result.isSuccess) { //TODO(Double check this)
+                    result.getOrNull()?.let { saveUserInfo(it) }
+                    result.getOrNull()?.let { handleSuccessViewState(it) }
+                    revenueCatRepository.login(result.getOrNull()?.id.toString())
+                } else
+                    handleFailureViewState(result.exceptionOrNull() as Exception)
+            }
+    }
+
+    private fun handleSuccessViewState(data: User) {
+        setViewState(PurchaseViewState.SuccessViewState(data))
+
+    }
+
+    private fun handleFailureViewState(exception: Exception) {
+        setViewState(PurchaseViewState.ErrorViewState(exception))
+    }
+
+    private fun setViewState(purchaseViewState: PurchaseViewState) {
+        _viewState.postValue(purchaseViewState)
+    }
+
+    /**
+     * Saves user's data in the shared preferences
+     */
+    private fun saveUserInfo(loginResponse: User) {
+        prefRepository.isUserGuest = false
+        prefRepository.userId = loginResponse.id
+        prefRepository.userApiToken = loginResponse.apiToken
+        prefRepository.userName = loginResponse.name
+        prefRepository.userEmail = loginResponse.email
+        prefRepository.firebaseKey = loginResponse.firebaseKey
+        prefRepository.remainingStories = -1
     }
 
     fun logOut() {
@@ -68,6 +123,11 @@ class PurchaseViewModel @Inject constructor(
             onSuccess
         )
     }
+}
+
+sealed interface PurchaseViewState {
+    data class ErrorViewState(val exception: Exception) : PurchaseViewState
+    data class SuccessViewState(val data: User) : PurchaseViewState
 }
 
 //    class ProductDetails internal constructor(
@@ -264,3 +324,6 @@ class PurchaseViewModel @Inject constructor(
 
 private val TAG =
     PurchaseViewModel::class.java.simpleName*/
+
+
+

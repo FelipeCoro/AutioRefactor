@@ -1,5 +1,6 @@
 package com.autio.android_app.domain.repository
 
+import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
@@ -7,9 +8,7 @@ import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
-import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.models.History
-import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -22,7 +21,9 @@ interface AutioRepository {
     val favoriteStories: Flow<List<MapPointEntity>>
     val history: Flow<List<MapPointEntity>>
 
-    suspend fun login(loginDto: LoginDto): Response<LoginResponse>
+    suspend fun createAccount(accountRequest: AccountRequest): Result<User>
+    suspend fun login(loginRequest: LoginRequest): Result<User>
+    suspend fun loginAsGuest(): Result<User>
     suspend fun fetchUserData()
     suspend fun updateProfile(infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit)
     suspend fun updateCategoriesOrder(

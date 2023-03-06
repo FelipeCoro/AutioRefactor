@@ -1,5 +1,6 @@
 package com.autio.android_app.data.repository
 
+import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
@@ -10,13 +11,12 @@ import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.mappers.toDTO
 import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
-import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.models.History
-import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.*
 import kotlinx.serialization.descriptors.StructureKind
@@ -51,9 +51,58 @@ class AutioRepositoryImpl @Inject constructor(
     override val history: Flow<List<MapPointEntity>>
         get() = TODO("Not yet implemented")
 
-    override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
-        return autioRemoteDataSource.login(loginDto)
+    override suspend fun createAccount(accountRequest: AccountRequest): Result<User> {
+        val accountDto = accountRequest.toDTO()
+        val result = autioRemoteDataSource.createAccount(accountDto)
+
+        return if (result.isSuccessful) {
+            val user = result.let { accountCreateResponse ->
+                accountCreateResponse.body()!!.toModel()
+            }
+            Result.success(user)
+
+        } else {
+            //TODO(Handle Error)
+            Result.failure(Throwable())
+        }
     }
+
+    override suspend fun login(loginRequest: LoginRequest): Result<User> {
+
+        val loginDto = loginRequest.toDTO()
+        val result = autioRemoteDataSource.login(loginDto)
+
+        return if (result.isSuccessful) {
+            val user = result.let { loginResponse ->
+                loginResponse.body()!!.toModel()
+            }
+            Result.success(user)
+
+        } else {
+            //TODO(Handle Error)
+            Result.failure(Throwable())
+        }
+
+
+    }
+
+    override suspend fun loginAsGuest(): Result<User> {
+
+        val result = autioRemoteDataSource.createGuestAccount()
+
+        if (result.isSuccessful) {
+            val user = result.let { guestResponse ->
+                guestResponse.body()!!.toModel()
+            }
+            return Result.success(user)
+
+        } else {
+            //TODO(Handle Error)
+            return Result.failure(Throwable())
+        }
+
+    }
+
 
     override suspend fun fetchUserData() {
         kotlin.runCatching {
@@ -143,19 +192,21 @@ class AutioRepositoryImpl @Inject constructor(
         TODO("RETUR FLOW CORRECTLY")
     }
 
-    override suspend fun getStoryById(xUserId: String, apiToken: String, id: String):Story {
+    override suspend fun getStoryById(xUserId: String, apiToken: String, id: String): Story {
         runCatching {
-            autioRemoteDataSource.getStoryById(xUserId,
+            autioRemoteDataSource.getStoryById(
+                xUserId,
                 apiToken,
-                id)
+                id
+            )
         }.onSuccess {
             val story = it.body()
             if (story != null) {
-                    autioLocalDataSource.cacheRecordOfStory(
-                        story.id, story.recordUrl
-                    )
-                }
-            }.onFailure { }
+                autioLocalDataSource.cacheRecordOfStory(
+                    story.id, story.recordUrl
+                )
+            }
+        }.onFailure { }
 
         return Story() //TODO(TEMP FIX)
     }
@@ -291,11 +342,11 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun setLikesDataToLocalStories(storiesIds: List<String>) {
-       autioLocalDataSource.setLikesDataToLocalStories(storiesIds)
+        autioLocalDataSource.setLikesDataToLocalStories(storiesIds)
     }
 
     override suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>) {
-       autioLocalDataSource.setLikesDataToLocalStories(storiesHistory.map { it.toString() }) //TODO(Check this mapping)
+        autioLocalDataSource.setLikesDataToLocalStories(storiesHistory.map { it.toString() }) //TODO(Check this mapping)
     }
 
     override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
@@ -307,7 +358,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addStories(stories: List<Story>) {
-       autioLocalDataSource.addStories(stories.map { it.toEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
+        autioLocalDataSource.addStories(stories.map { it.toEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
     }
 }
 

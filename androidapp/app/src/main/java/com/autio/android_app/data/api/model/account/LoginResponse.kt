@@ -6,20 +6,20 @@ import com.google.gson.annotations.SerializedName
 data class LoginResponse(
     @SerializedName(
         "id"
-    ) val id: Int?,
+    ) val id: Int,
     @SerializedName(
         "name"
-    ) val name: String?,
+    ) val name: String,
     @SerializedName(
         "email"
-    ) val email: String?,
+    ) val email: String,
     @SerializedName(
         "api_token"
-    ) val apiToken: String?,
+    ) val apiToken: String,
     @SerializedName(
         "is_guest"
-    ) val isGuest: Boolean?,
+    ) val isGuest: Boolean,
     @SerializedName(
         "firebase_key"
-    ) val firebaseKey: String?
+    ) val firebaseKey: String
 )

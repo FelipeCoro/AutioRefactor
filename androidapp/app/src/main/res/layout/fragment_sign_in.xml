@@ -6,9 +6,10 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.login.SignUpActivity">
+        tools:context=".ui.login.fragments.SignInFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/view_root"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/background_sign_in">
@@ -31,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="61dp"
                 android:fontFamily="@font/lora_bold"
-                android:text="@string/create_your_account"
+                android:text="@string/sign_in"
                 android:textColor="@color/white"
                 android:textSize="28sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -48,46 +49,26 @@
                 app:layout_constraintTop_toBottomOf="@+id/textViewSignIn">
 
                 <TextView
-                    android:id="@+id/label_name"
+                    android:id="@+id/mail_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:text="@string/name"
-                    android:textColor="@color/gray_letter" />
-
-                <EditText
-                    android:id="@+id/tv_name"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:autofillHints="emailAddress"
-                    android:backgroundTint="@color/gray_letter"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:inputType="text"
-                    android:labelFor="@id/label_name"
-                    android:textColor="@color/white" />
-
-                <TextView
-                    android:id="@+id/label_email"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:fontFamily="@font/sf_pro_text_regular"
                     android:text="@string/email"
                     android:textColor="@color/gray_letter" />
 
                 <EditText
-                    android:id="@+id/tv_email"
+                    android:id="@+id/edit_text_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="emailAddress"
                     android:backgroundTint="@color/gray_letter"
                     android:fontFamily="@font/sf_pro_text_regular"
                     android:inputType="textEmailAddress"
-                    android:labelFor="@id/label_email"
+                    android:labelFor="@id/mail_label"
                     android:textColor="@color/white" />
 
                 <TextView
-                    android:id="@+id/label_password"
+                    android:id="@+id/password_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
@@ -96,14 +77,14 @@
                     android:textColor="@color/gray_letter" />
 
                 <EditText
-                    android:id="@+id/tv_password"
+                    android:id="@+id/edit_text_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="password"
                     android:backgroundTint="@color/gray_letter"
                     android:fontFamily="@font/sf_pro_text_regular"
                     android:inputType="textPassword"
-                    android:labelFor="@id/label_password"
+                    android:labelFor="@id/password_label"
                     android:textColor="@color/white" />
             </LinearLayout>
 
@@ -118,12 +99,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/linearLayoutSignInFields">
 
                 <Button
-                    android:id="@+id/btn_signup"
+                    android:id="@+id/btn_sign_in"
                     style="@style/Button.White"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/sign_up"
-                    android:textAllCaps="false" />
+                    android:text="@string/sign_in" />
 
                 <Button
                     android:id="@+id/btn_cancel"
@@ -132,7 +112,27 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="23dp"
                     android:text="@string/cancel" />
+
+                <Button
+                    android:id="@+id/btn_forgot_password"
+                    style="@style/Button.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="34dp"
+                    android:text="@string/forgot_password" />
+
             </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_guest_mode"
+                style="@style/Button.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:text="@string/continue_as_guest"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
