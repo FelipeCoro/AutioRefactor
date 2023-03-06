@@ -1,7 +1,10 @@
 package com.autio.android_app.ui.stories.models
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class AccountRequest(
     val email: String,
 
@@ -13,4 +16,4 @@ data class AccountRequest(
 
     val name: String
 
-)
+):Parcelable

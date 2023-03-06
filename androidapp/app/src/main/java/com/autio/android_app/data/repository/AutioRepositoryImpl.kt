@@ -4,6 +4,7 @@ import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
+import com.autio.android_app.data.api.model.story.AuthorDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
@@ -62,8 +63,8 @@ class AutioRepositoryImpl @Inject constructor(
             Result.success(user)
 
         } else {
-            //TODO(Handle Error)
-            Result.failure(Throwable())
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
         }
     }
 
@@ -79,8 +80,8 @@ class AutioRepositoryImpl @Inject constructor(
             Result.success(user)
 
         } else {
-            //TODO(Handle Error)
-            Result.failure(Throwable())
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
         }
 
 
@@ -90,15 +91,15 @@ class AutioRepositoryImpl @Inject constructor(
 
         val result = autioRemoteDataSource.createGuestAccount()
 
-        if (result.isSuccessful) {
+        return if (result.isSuccessful) {
             val user = result.let { guestResponse ->
                 guestResponse.body()!!.toModel()
             }
-            return Result.success(user)
+            Result.success(user)
 
         } else {
-            //TODO(Handle Error)
-            return Result.failure(Throwable())
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
         }
 
     }
@@ -235,6 +236,44 @@ class AutioRepositoryImpl @Inject constructor(
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPointEntity> {
         return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
+    }
+
+    override suspend fun getAuthorOfStory(
+        xUserId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Author> {
+
+        val result = autioRemoteDataSource.getAuthorOfStory(xUserId, apiToken, storyId)
+
+        return if (result.isSuccessful) {
+            val author = result.let { authorResponse ->
+                authorResponse.body()!!.toModel()
+            }
+            Result.success(author)
+        } else {
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
+        }
+    }
+
+    override suspend fun getStoriesByContributor(
+        xUserId: Int,
+        apiToken: String,
+        storyId: Int,
+        page: Int
+    ): Result<Contributor> {
+        val result = autioRemoteDataSource.getStoriesByContributor(xUserId, apiToken, storyId, page)
+
+        return if (result.isSuccessful) {
+            val contributor = result.let {contributorResponse ->
+                contributorResponse.body()!!.toModel()
+            }
+            Result.success(contributor)
+        } else {
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
+        }
     }
 
     override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {

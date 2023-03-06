@@ -41,6 +41,15 @@ interface AutioRepository {
         neCoordinates: LatLng
     ): List<MapPointEntity>
 
+    suspend fun getAuthorOfStory(xUserId: Int, apiToken: String, storyId: Int): Result<Author>
+
+    suspend fun getStoriesByContributor(
+        xUserId: Int,
+        apiToken: String,
+        storyId: Int,
+        page: Int
+    ): Result<Contributor>
+
     suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto)
 
     suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity?
