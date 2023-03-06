@@ -1,6 +1,3 @@
-package com.autio.android_app.ui.login.fragments
-
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentSignInBinding
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
-import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.models.LoginRequest
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewState
@@ -33,21 +29,14 @@ class SignInFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             layoutInflater, R.layout.fragment_sign_in, container, false
         )
-
         setListeners()
-
         purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
-
         return binding.root
     }
 
     private fun setListeners() {
-        binding.btnSignIn.setOnClickListener {
-            loginUser()
-        }
-        binding.btnGuestMode.setOnClickListener {
-            loginViewModel.loginGuest()
-        }
+        binding.btnSignIn.setOnClickListener { loginUser() }
+        binding.btnGuestMode.setOnClickListener { loginViewModel.loginGuest() }
         binding.btnCancel.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -64,19 +53,14 @@ class SignInFragment : Fragment() {
     private fun loginUser() {
         if (checkEmptyField(binding.editTextEmail) || checkEmptyField(binding.editTextPassword)
         ) {
-            context?.let {
-                pleaseFillText(it)
-            }
+            context?.let { pleaseFillText(it) }
         } else {
             showLoadingView()
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
-            val loginRequest = LoginRequest(
-                email, password
-            )
+            val loginRequest = LoginRequest(email, password)
 
             purchaseViewModel.login(loginRequest)
-
         }
     }
 

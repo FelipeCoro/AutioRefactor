@@ -1,7 +1,10 @@
 package com.autio.android_app.ui.viewmodel
 
 import android.app.Activity
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.data.repository.revenue.RevenueCatRepository
 import com.autio.android_app.domain.repository.AutioRepository
@@ -37,8 +40,23 @@ class PurchaseViewModel @Inject constructor(
 
     fun login(loginRequest: LoginRequest) {
         viewModelScope.launch(coroutineDispatcher) {
+
             val result = autioRepository.login(loginRequest)
 
+            if (result.isSuccess) { //TODO(Double check this)
+                result.getOrNull()?.let {
+                    saveUserInfo(it)
+                    handleSuccessViewState(it)
+                    revenueCatRepository.login(result.getOrNull()?.id.toString())
+                } ?: handleFailureViewState(result.exceptionOrNull() as Exception)
+            } else
+                handleFailureViewState(result.exceptionOrNull() as Exception)
+        }
+    }
+
+    fun createAccount(accountRequest: AccountRequest) {
+        viewModelScope.launch(coroutineDispatcher) {
+            val result = autioRepository.createAccount(accountRequest)
             if (result.isSuccess) { //TODO(Double check this)
                 result.getOrNull()?.let { saveUserInfo(it) }
                 result.getOrNull()?.let { handleSuccessViewState(it) }
@@ -46,18 +64,6 @@ class PurchaseViewModel @Inject constructor(
             } else
                 handleFailureViewState(result.exceptionOrNull() as Exception)
         }
-    }
-
-    fun createAccount(accountRequest: AccountRequest){
-            viewModelScope.launch(coroutineDispatcher) {
-                val result = autioRepository.createAccount(accountRequest)
-                if (result.isSuccess) { //TODO(Double check this)
-                    result.getOrNull()?.let { saveUserInfo(it) }
-                    result.getOrNull()?.let { handleSuccessViewState(it) }
-                    revenueCatRepository.login(result.getOrNull()?.id.toString())
-                } else
-                    handleFailureViewState(result.exceptionOrNull() as Exception)
-            }
     }
 
     private fun handleSuccessViewState(data: User) {
