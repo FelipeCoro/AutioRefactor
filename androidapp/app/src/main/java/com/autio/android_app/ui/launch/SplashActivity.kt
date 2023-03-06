@@ -6,6 +6,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.navigation.findNavController
+import com.autio.android_app.R
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.ui.login.fragments.LoginFragment
@@ -21,12 +23,9 @@ class SplashActivity : AppCompatActivity() {
     @Inject
     lateinit var prefRepository: PrefRepository
 
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-        super.onCreate(
-            savedInstanceState
-        )
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_start)
         isNightModeOn()
         FirebaseStoryRepository
         whereToGo()
@@ -73,18 +72,19 @@ class SplashActivity : AppCompatActivity() {
             // but it is found more properly to check for the API token and firebase key
             // since the communication with backend requires any of these two
             if (prefRepository.userApiToken.isEmpty() || prefRepository.firebaseKey.isEmpty()) {
-                startActivity(
-                    Intent(
-                        this,
-                        LoginFragment::class.java
-                    )
-                )
+
+              // val navHostFragment = supportFragmentManager.findFragmentById(R.id.authentication_nav_host) as NavHostFragment
+              //  val navController = navHostFragment.navController
+
+                findNavController.navigate(R.id.loginFragment)
+
                 finish()
+
             } else {
                 startActivity(
                     Intent(
                         this,
-                        com.autio.android_app.ui.stories.BottomNavigation::class.java
+                        BottomNavigation::class.java
                     )
                 )
                 finish()

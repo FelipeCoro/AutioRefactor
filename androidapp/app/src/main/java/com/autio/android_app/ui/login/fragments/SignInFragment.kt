@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentSignInBinding
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
@@ -88,9 +89,7 @@ class SignInFragment : Fragment() {
     }
 
     private fun showSuccess(user: PurchaseViewState?) {
-        startActivity(
-            Intent(context, BottomNavigation::class.java)
-        )
+        findNavController().navigate(R.id.action_signInFragment_to_bottomNavigation)
     }
 
     private fun showError(exception: Exception) {

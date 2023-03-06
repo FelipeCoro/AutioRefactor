@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/authentication_nav"
+    app:startDestination="@id/loginFragment">
+
+    <action
+        android:id="@+id/action_loginFragment_to_signUpFragment"
+        app:destination="@id/signUpFragment" />
+    <action
+        android:id="@+id/action_loginFragment_to_signInFragment"
+        app:destination="@id/signInFragment" />
+    <action
+        android:id="@+id/action_signInFragment_to_bottomNavigation"
+        app:destination="@id/bottomNavigation" />
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.autio.android_app.ui.login.fragments.SignUpFragment"
+        android:label="SignUpFragment">
+        <action
+            android:id="@+id/action_signUpFragment_to_bottomNavigation"
+            app:destination="@id/bottomNavigation" />
+    </fragment>
+    <activity
+        android:id="@+id/bottomNavigation"
+        android:name="com.autio.android_app.ui.stories.BottomNavigation"
+        android:label="BottomNavigation" />
+    <action
+        android:id="@+id/action_loginFragment_to_bottomNavigation"
+        app:destination="@id/bottomNavigation" />
+    <action
+        android:id="@+id/action_signUpFragment_to_bottomNavigation"
+        app:destination="@id/bottomNavigation" />
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.autio.android_app.ui.login.fragments.SignInFragment"
+        android:label="SignInFragment">
+        <action
+            android:id="@+id/action_signInFragment_to_bottomNavigation"
+            app:destination="@id/bottomNavigation" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.autio.android_app.ui.login.fragments.LoginFragment"
+        tools:layout="@layout/fragment_login"
+        android:label="LoginFragment">
+        <action
+            android:id="@+id/action_loginFragment_to_bottomNavigation"
+            app:destination="@id/bottomNavigation" />
+        <action
+            android:id="@+id/action_loginFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+</navigation>

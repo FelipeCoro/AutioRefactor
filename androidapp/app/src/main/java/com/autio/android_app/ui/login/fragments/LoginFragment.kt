@@ -9,6 +9,7 @@ import android.widget.ScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.Datasource
@@ -17,7 +18,6 @@ import com.autio.android_app.extensions.setAutomaticScroll
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
 import com.autio.android_app.ui.login.viewmodels.LoginViewState
 import com.autio.android_app.ui.stories.adapter.ImageAdapter
-import com.autio.android_app.ui.stories.models.User
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -69,10 +69,10 @@ class LoginFragment : Fragment() {
 
     private fun setListeners() {
         binding.btnSignIn.setOnClickListener {
-            startActivity(Intent(context, SignInFragment::class.java))
+            findNavController().navigate(R.id.action_loginFragment_to_signInFragment)
         }
         binding.btnSignup.setOnClickListener {
-            startActivity(Intent(context, SignUpFragment::class.java))
+            findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
         binding.btnLoginAsGuest.setOnClickListener {
             showLoadingView()
@@ -98,9 +98,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun showSuccess(user: LoginViewState?) {
-        startActivity(
-            Intent(context, com.autio.android_app.ui.stories.BottomNavigation::class.java)
-        )
+        findNavController().navigate(R.id.action_loginFragment_to_bottomNavigation)
     }
 
 

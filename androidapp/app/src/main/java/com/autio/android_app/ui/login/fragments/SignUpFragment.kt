@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -66,9 +67,7 @@ class SignUpFragment : Fragment() {
             )
         ) {
             context?.let {
-                pleaseFillText(
-                    it
-                )
+                pleaseFillText(it)
             }
         } else {
             showLoadingView()
@@ -93,7 +92,7 @@ class SignUpFragment : Fragment() {
     }
 
     private fun showSuccess(user: PurchaseViewState?) {
-        startActivity(Intent(context, BottomNavigation::class.java))
+        findNavController().navigate(R.id.action_signUpFragment_to_bottomNavigation)
     }
 
     private fun showError(exception: Exception) {
