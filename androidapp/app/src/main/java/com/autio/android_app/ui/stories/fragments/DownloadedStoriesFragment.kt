@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -24,7 +24,6 @@ import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

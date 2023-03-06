@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_notification_perm"
-    tools:context=".ui.view.usecases.onboarding.screens.NotificationsFragment">
+    tools:context=".ui.onboarding.screens.NotificationsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

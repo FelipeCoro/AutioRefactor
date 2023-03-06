@@ -6,7 +6,7 @@
     android:id="@+id/maps_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.view.usecases.home.fragment.MapFragment">
+    tools:context=".ui.stories.fragments.MapFragment">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/maps"

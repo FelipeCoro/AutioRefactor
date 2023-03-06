@@ -7,7 +7,7 @@
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.view.usecases.subscribe.SubscribeActivity">
+        tools:context=".ui.subscribe.SubscribeActivity">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"

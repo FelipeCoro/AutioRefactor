@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.Manifest.permission.*
 import android.annotation.SuppressLint
@@ -53,7 +53,6 @@ import com.google.android.gms.maps.model.*
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.maps.android.clustering.ClusterManager
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject

@@ -1,8 +1,7 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,24 +15,21 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Slide
-import androidx.transition.TransitionManager
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
+import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.databinding.FragmentAuthorBinding
+import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.domain.mappers.toDto
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -41,31 +37,29 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AuthorFragment : Fragment() {
+class FavoritesFragment : Fragment() {
+
     @Inject
     lateinit var prefRepository: PrefRepository
 
     //TODO(Move service calls)
     @Inject
-    lateinit var apiClient:ApiClient
+    lateinit var apiClient: ApiClient
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
-    private lateinit var binding: FragmentAuthorBinding
-    private lateinit var activityLayout: ConstraintLayout
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var storyAdapter: StoryAdapter
-    private lateinit var snackBarView: View
-    private var feedbackJob: Job? = null
 
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-        super.onCreate(
-            savedInstanceState
-        )
-        (requireActivity() as com.autio.android_app.ui.stories.BottomNavigation).showUpButton()
-    }
+    private lateinit var binding: FragmentPlaylistBinding
+    private lateinit var activityLayout: ConstraintLayout
+
+    private lateinit var storyAdapter: StoryAdapter
+    private lateinit var recyclerView: RecyclerView
+
+    private var stories: List<MapPointEntity>? = null
+
+    private lateinit var snackBarView: View
+    private var feedbackJob: Job? =
+        null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,15 +67,19 @@ class AuthorFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding =
-            FragmentAuthorBinding.inflate(
+            FragmentPlaylistBinding.inflate(
                 inflater,
                 container,
                 false
             )
 
+        binding.tvToolbarTitle.text =
+            resources.getString(
+                R.string.my_stories_favorites
+            )
         binding.btnBack.setOnClickListener {
             findNavController().navigate(
-                R.id.action_author_details_to_player
+                R.id.action_favorites_playlist_to_my_stories
             )
         }
 
@@ -93,7 +91,7 @@ class AuthorFragment : Fragment() {
             )
 
         recyclerView =
-            binding.rvAuthorStories
+            binding.rvStories
         storyAdapter =
             StoryAdapter(
                 bottomNavigationViewModel.playingStory,
@@ -116,101 +114,130 @@ class AuthorFragment : Fragment() {
                 requireContext()
             )
 
-        val storyId =
-            arguments?.getInt(
-                STORY_ID_ARG
-            )
-
         activityLayout =
             requireActivity().findViewById(
                 R.id.activityRoot
             )
 
-        storyId?.let {
-            lifecycleScope.launch {
-                val authorResult = apiClient.getAuthorOfStory(
-                    prefRepository.userId,
-                    "Bearer " + prefRepository.userApiToken,
-                    it
+        storyViewModel.favoriteStories.observe(
+            viewLifecycleOwner
+        ) { stories ->
+            this.stories =
+                stories
+            recyclerView.adapter =
+                storyAdapter
+//            val totalTime =
+//                stories.sumOf { it.duration } / 60
+//            binding.tvToolbarSubtitle.text =
+//                resources.getQuantityString(
+//                    R.plurals.toolbar_stories_with_time_subtitle,
+//                    stories.size,
+//                    stories.size,
+//                    totalTime
+//                )
+            binding.pbLoadingStories.visibility =
+                View.GONE
+            binding.btnPlaylistOptions.setOnClickListener { view ->
+                showPlaylistOptions(
+                    requireContext(),
+                    binding.root as ViewGroup,
+                    view,
+                    listOf(
+                        com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
+                        com.autio.android_app.data.api.model.PlaylistOption.REMOVE
+                    ).map {
+                        it.also { option ->
+                            option.disabled =
+                                stories.isEmpty()
+                        }
+                    },
+                    onOptionClicked = ::onPlaylistOptionClicked
                 )
-                if (authorResult.isSuccessful) {
-                    val author = authorResult.body()!!
-                    if (author.imageUrl != null) {
-                        Glide.with(
-                            this@AuthorFragment
-                        )
-                            .load(
-                                author.imageUrl
-                            )
-                            .transition(
-                                DrawableTransitionOptions.withCrossFade(
-                                    100
-                                )
-                            )
-                            .into(
-                                binding.ivAuthorPic
-                            )
-                    }
-                    binding.tvAuthorName.apply {
-                        visibility =
-                            View.VISIBLE
-                        text =
-                            author.name
-                    }
-                    binding.tvAuthorBio.apply {
-                        visibility =
-                            View.VISIBLE
-                        text =
-                            author.biography
-                    }
-                    if (author.url != null) {
-                        binding.btnVisitAuthorLink.apply {
-                            setOnClickListener {
-                                openUrl(
-                                    requireContext(),
-                                    author.url
-                                )
-                            }
-                            visibility =
-                                View.VISIBLE
-                        }
-                    }
-
-                    val contributorApiResponse = apiClient.getStoriesByContributor(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        author.id,
-                        1
+            }
+            if (stories.isEmpty()) {
+                binding.ivNoContentIcon.setImageResource(
+                    R.drawable.ic_heart
+                )
+                binding.tvNoContentMessage.text =
+                    resources.getText(
+                        R.string.empty_favorites_message
                     )
-                    if (contributorApiResponse.isSuccessful) {
-                        for (story in contributorApiResponse.body()!!.data) {
-                            storyViewModel.cacheRecordOfStory(
-                                story.id,
-                                story.narrationUrl
-                                    ?: ""
-                            )
-                        }
-                        storyViewModel.getStoriesByIds(
-                            contributorApiResponse.body()!!.data.map {
-                                it.id
-                            }
-                        )
-                            //TODO(This should change with livedata???)
-                            /*.observe(viewLifecycleOwner) { stories ->
-                                if (stories.isNotEmpty()) {
-                                    binding.tvPublishedStoriesSubtitle.visibility =
-                                        View.VISIBLE
-                                }
-                                storyAdapter.submitList(
-                                    stories.toList()
+                binding.rlStories.visibility =
+                    View.GONE
+                binding.llNoContent.visibility =
+                    View.VISIBLE
+            } else {
+                val storiesWithoutRecords =
+                    stories.filter { it.recordUrl.isEmpty() }
+                if (storiesWithoutRecords.isNotEmpty()) {
+                    lifecycleScope.launch {
+                        val storiesFromAPI = apiClient.getStoriesByIds(
+                            prefRepository.userId,
+                            prefRepository.userApiToken,
+                            //TODO DTO has a val "original id" we need to see if mapPointEntity might need it
+                            storiesWithoutRecords.map { it.toModel().toDto().originalId})
+                        if (storiesFromAPI.isSuccessful) {
+                            for (story in storiesFromAPI.body()!!) { //TODO(need to extract list from result)
+                                storyViewModel.cacheRecordOfStory(
+                                    story.id,
+                                    story.recordUrl
                                 )
-                            }*/
+                            }
+                        }
                     }
                 }
+                storyAdapter.submitList(
+                    stories.map{it.toModel()}
+                )
+                binding.llNoContent.visibility =
+                    View.GONE
+                binding.rlStories.visibility =
+                    View.VISIBLE
             }
         }
-
         return binding.root
+    }
+
+    private fun onPlaylistOptionClicked(
+        option: com.autio.android_app.data.api.model.PlaylistOption
+    ) {
+        showPaywallOrProceedWithNormalProcess(
+            requireActivity(),
+            isActionExclusiveForSignedInUser = true
+        ) {
+            binding.pbLoadingProcess.visibility =
+                View.VISIBLE
+            when (option) {
+                com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD -> {
+
+                }
+                com.autio.android_app.data.api.model.PlaylistOption.REMOVE -> {
+                    FirebaseStoryRepository.removeAllLikes(
+                        prefRepository.firebaseKey,
+                        stories!!.map { it.id },
+                        onSuccessListener = {
+                            storyViewModel.removeAllBookmarks()
+                            binding.pbLoadingProcess.visibility =
+                                View.GONE
+                            showFeedbackSnackBar(
+                                "Removed All Bookmarks"
+                            )
+                        },
+                        onFailureListener = {
+                            binding.pbLoadingProcess.visibility =
+                                View.GONE
+                            showFeedbackSnackBar(
+                                "Connection Failure"
+                            )
+                        }
+                    )
+                }
+                else -> Log.d(
+                    "FavoritesFragment",
+                    "option not available for this playlist"
+                )
+            }
+        }
     }
 
     private fun onOptionClicked(
@@ -262,12 +289,13 @@ class AuthorFragment : Fragment() {
 //                    }
                 }
                 com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
-                    // TODO: change Firebase code with commented code once stable
                     FirebaseStoryRepository.removeBookmarkFromStory(
                         prefRepository.firebaseKey,
                         story.id,
                         onSuccessListener = {
-                            storyViewModel.removeBookmarkFromStory(story.id)
+                            storyViewModel.removeBookmarkFromStory(
+                                story.id
+                            )
                             showFeedbackSnackBar(
                                 "Removed From Bookmarks"
                             )
@@ -297,38 +325,7 @@ class AuthorFragment : Fragment() {
 //                        }
 //                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
-                    FirebaseStoryRepository.giveLikeToStory(
-                        story.id,
-                        prefRepository.firebaseKey,
-                        onSuccessListener = {
-                            storyViewModel.setLikeToStory(story.id)
-                            showFeedbackSnackBar("Added To Favorites")
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar("Connection Failure")
-                        }
-                    )
-//                    ApiService.likeStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it == true) {
-//                            storyViewModel.setLikeToStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Favorites"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
-                }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
+                com.autio.android_app.data.api.model.StoryOption.DELETE, com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
                     FirebaseStoryRepository.removeLikeFromStory(
                         prefRepository.firebaseKey,
                         story.id,
@@ -348,12 +345,11 @@ class AuthorFragment : Fragment() {
                     )
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
-
                     try {
                         val downloadedStory =
                             DownloadedStoryEntity.fromStory(
                                 requireContext(),
-                                story.toDto() //TODO(Temp fix for runability)
+                                story.toDto() //TODO(temp fix)
                             )
                         storyViewModel.downloadStory(
                             downloadedStory!!
@@ -392,8 +388,8 @@ class AuthorFragment : Fragment() {
                     )
                 }
                 else -> Log.d(
-                    "AuthorFragment",
-                    "no option available"
+                    "FavoritesFragment",
+                    "no action defined for this option"
                 )
             }
         }
@@ -410,12 +406,6 @@ class AuthorFragment : Fragment() {
                 R.id.tvFeedback
             ).text =
                 feedback
-            TransitionManager.beginDelayedTransition(
-                activityLayout,
-                Slide(
-                    Gravity.TOP
-                )
-            )
             activityLayout.addView(
                 snackBarView
             )
@@ -449,6 +439,3 @@ class AuthorFragment : Fragment() {
         feedbackJob?.cancel()
     }
 }
-
-private const val STORY_ID_ARG =
-    "com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"

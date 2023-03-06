@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -12,7 +12,6 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
 import com.autio.android_app.ui.login.SignInActivity
 import com.autio.android_app.ui.login.SignUpActivity
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

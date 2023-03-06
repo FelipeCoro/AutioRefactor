@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
-    tools:context=".ui.view.usecases.home.fragment.AccountFragment">
+    tools:context=".ui.stories.fragments.AccountFragment">
 
     <LinearLayout
         android:id="@+id/linear_layout_sign_in"

@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.content.Intent
 import android.os.Bundle

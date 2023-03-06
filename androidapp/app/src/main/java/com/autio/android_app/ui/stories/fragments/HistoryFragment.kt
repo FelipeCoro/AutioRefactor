@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -19,7 +19,6 @@ import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
@@ -37,7 +36,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class FavoritesFragment : Fragment() {
+class HistoryFragment : Fragment() {
 
     @Inject
     lateinit var prefRepository: PrefRepository
@@ -50,209 +49,157 @@ class FavoritesFragment : Fragment() {
     private val storyViewModel: StoryViewModel by viewModels()
 
     private lateinit var binding: FragmentPlaylistBinding
+
     private lateinit var activityLayout: ConstraintLayout
 
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
 
-    private var stories: List<MapPointEntity>? = null
-
     private lateinit var snackBarView: View
-    private var feedbackJob: Job? =
-        null
+    private var feedbackJob: Job? = null
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding =
-            FragmentPlaylistBinding.inflate(
-                inflater,
-                container,
-                false
-            )
+        binding = FragmentPlaylistBinding.inflate(
+            inflater, container, false
+        )
 
-        binding.tvToolbarTitle.text =
-            resources.getString(
-                R.string.my_stories_favorites
-            )
+        snackBarView = layoutInflater.inflate(
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
+        )
+
+        binding.tvToolbarTitle.text = resources.getString(
+            R.string.my_stories_history
+        )
+
         binding.btnBack.setOnClickListener {
             findNavController().navigate(
-                R.id.action_favorites_playlist_to_my_stories
+                R.id.action_history_playlist_to_my_stories
             )
         }
 
-        snackBarView =
-            layoutInflater.inflate(
-                R.layout.feedback_snackbar,
-                binding.root as ViewGroup,
-                false
-            )
+        recyclerView = binding.rvStories
+        storyAdapter = StoryAdapter(
+            bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
+                showPaywallOrProceedWithNormalProcess(
+                    requireActivity(), isActionExclusiveForSignedInUser = true
+                ) {
+                    bottomNavigationViewModel.playMediaId(
+                        id
+                    )
+                }
+            }, onOptionClick = ::onOptionClicked
+        )
+        recyclerView.adapter = storyAdapter
+        recyclerView.layoutManager = LinearLayoutManager(
+            requireContext()
+        )
 
-        recyclerView =
-            binding.rvStories
-        storyAdapter =
-            StoryAdapter(
-                bottomNavigationViewModel.playingStory,
-                onStoryPlay = { id ->
-                    showPaywallOrProceedWithNormalProcess(
-                        requireActivity(),
-                        isActionExclusiveForSignedInUser = true
-                    ) {
-                        bottomNavigationViewModel.playMediaId(
-                            id
-                        )
-                    }
-                },
-                onOptionClick = ::onOptionClicked
-            )
-        recyclerView.adapter =
-            storyAdapter
-        recyclerView.layoutManager =
-            LinearLayoutManager(
-                requireContext()
-            )
+        activityLayout = requireActivity().findViewById(
+            R.id.activityRoot
+        )
 
-        activityLayout =
-            requireActivity().findViewById(
-                R.id.activityRoot
-            )
-
-        storyViewModel.favoriteStories.observe(
+        storyViewModel.storiesHistory.observe(
             viewLifecycleOwner
         ) { stories ->
-            this.stories =
-                stories
-            recyclerView.adapter =
-                storyAdapter
-//            val totalTime =
-//                stories.sumOf { it.duration } / 60
+            recyclerView.adapter = storyAdapter
 //            binding.tvToolbarSubtitle.text =
 //                resources.getQuantityString(
-//                    R.plurals.toolbar_stories_with_time_subtitle,
+//                    R.plurals.toolbar_stories_subtitle,
 //                    stories.size,
-//                    stories.size,
-//                    totalTime
+//                    stories.size
 //                )
-            binding.pbLoadingStories.visibility =
-                View.GONE
+            binding.pbLoadingStories.visibility = View.GONE
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
-                    requireContext(),
-                    binding.root as ViewGroup,
-                    view,
-                    listOf(
+                    requireContext(), binding.root as ViewGroup, view, listOf(
                         com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
-                        com.autio.android_app.data.api.model.PlaylistOption.REMOVE
+                        com.autio.android_app.data.api.model.PlaylistOption.CLEAR_HISTORY
                     ).map {
                         it.also { option ->
-                            option.disabled =
-                                stories.isEmpty()
+                            option.disabled = stories.isEmpty()
                         }
-                    },
-                    onOptionClicked = ::onPlaylistOptionClicked
+                    }, onOptionClicked = ::onPlaylistOptionClicked
                 )
             }
             if (stories.isEmpty()) {
                 binding.ivNoContentIcon.setImageResource(
-                    R.drawable.ic_heart
+                    R.drawable.ic_history
                 )
-                binding.tvNoContentMessage.text =
-                    resources.getText(
-                        R.string.empty_favorites_message
-                    )
-                binding.rlStories.visibility =
-                    View.GONE
-                binding.llNoContent.visibility =
-                    View.VISIBLE
+                binding.tvNoContentMessage.text = resources.getText(
+                    R.string.empty_history_message
+                )
+                binding.rlStories.visibility = View.GONE
+                binding.llNoContent.visibility = View.VISIBLE
             } else {
-                val storiesWithoutRecords =
-                    stories.filter { it.recordUrl.isEmpty() }
+                val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
                     lifecycleScope.launch {
-                        val storiesFromAPI = apiClient.getStoriesByIds(
-                            prefRepository.userId,
+                        val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
                             prefRepository.userApiToken,
                             //TODO DTO has a val "original id" we need to see if mapPointEntity might need it
-                            storiesWithoutRecords.map { it.toModel().toDto().originalId})
+                            storiesWithoutRecords.map { it.toModel().toDto().originalId })
+
                         if (storiesFromAPI.isSuccessful) {
-                            for (story in storiesFromAPI.body()!!) { //TODO(need to extract list from result)
+                            for (story in storiesFromAPI.body()!!) //TODO(need to extract list from result)
+                            {
                                 storyViewModel.cacheRecordOfStory(
-                                    story.id,
-                                    story.recordUrl
+                                    story.id, story.recordUrl
                                 )
                             }
                         }
                     }
                 }
+//                setOnClickListener {
+//                    FirebaseStoryRepository.removeWholeUserHistory(
+//                        prefRepository.firebaseKey,
+//                        onSuccessListener = {
+//                            storyViewModel.clearStoryHistory()
+//                            showFeedbackSnackBar(
+//                                "Cleared History"
+//                            )
+//                        }
+//                    )
+//                }
                 storyAdapter.submitList(
-                    stories.map{it.toModel()}
+                    stories.map { it.toModel() }
                 )
-                binding.llNoContent.visibility =
-                    View.GONE
-                binding.rlStories.visibility =
-                    View.VISIBLE
+                binding.llNoContent.visibility = View.GONE
+                binding.rlStories.visibility = View.VISIBLE
             }
         }
+
         return binding.root
     }
 
-    private fun onPlaylistOptionClicked(
-        option: com.autio.android_app.data.api.model.PlaylistOption
+    private fun onOptionClicked(
+        option: StoryOption, story: Story
     ) {
         showPaywallOrProceedWithNormalProcess(
-            requireActivity(),
-            isActionExclusiveForSignedInUser = true
+            requireActivity(), isActionExclusiveForSignedInUser = true
         ) {
-            binding.pbLoadingProcess.visibility =
-                View.VISIBLE
             when (option) {
-                com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD -> {
-
-                }
-                com.autio.android_app.data.api.model.PlaylistOption.REMOVE -> {
-                    FirebaseStoryRepository.removeAllLikes(
-                        prefRepository.firebaseKey,
-                        stories!!.map { it.id },
+                StoryOption.DELETE -> {
+                    FirebaseStoryRepository.removeStoryFromUserHistory(prefRepository.firebaseKey,
+                        story.id,
                         onSuccessListener = {
-                            storyViewModel.removeAllBookmarks()
-                            binding.pbLoadingProcess.visibility =
-                                View.GONE
+                            storyViewModel.removeStoryFromHistory(
+                                story.id
+                            )
                             showFeedbackSnackBar(
-                                "Removed All Bookmarks"
+                                "Removed From History"
                             )
                         },
                         onFailureListener = {
-                            binding.pbLoadingProcess.visibility =
-                                View.GONE
                             showFeedbackSnackBar(
                                 "Connection Failure"
                             )
-                        }
-                    )
+                        })
                 }
-                else -> Log.d(
-                    "FavoritesFragment",
-                    "option not available for this playlist"
-                )
-            }
-        }
-    }
-
-    private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption,
-        story: Story
-    ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(),
-            isActionExclusiveForSignedInUser = true
-        ) {
-            when (option) {
-                com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
+                StoryOption.BOOKMARK -> {
                     // TODO: change Firebase code with commented code once stable
-                    FirebaseStoryRepository.bookmarkStory(
-                        prefRepository.firebaseKey,
+                    FirebaseStoryRepository.bookmarkStory(prefRepository.firebaseKey,
                         story.id,
                         story.title,
                         onSuccessListener = {
@@ -267,8 +214,7 @@ class FavoritesFragment : Fragment() {
                             showFeedbackSnackBar(
                                 "Connection Failure"
                             )
-                        }
-                    )
+                        })
 //                    ApiService.bookmarkStory(
 //                        prefRepository.userId,
 //                        prefRepository.userApiToken,
@@ -289,8 +235,7 @@ class FavoritesFragment : Fragment() {
 //                    }
                 }
                 com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
-                    FirebaseStoryRepository.removeBookmarkFromStory(
-                        prefRepository.firebaseKey,
+                    FirebaseStoryRepository.removeBookmarkFromStory(prefRepository.firebaseKey,
                         story.id,
                         onSuccessListener = {
                             storyViewModel.removeBookmarkFromStory(
@@ -304,8 +249,7 @@ class FavoritesFragment : Fragment() {
                             showFeedbackSnackBar(
                                 "Connection Failure"
                             )
-                        }
-                    )
+                        })
 //                    ApiService.removeBookmarkFromStory(
 //                        prefRepository.userId,
 //                        prefRepository.userApiToken,
@@ -325,9 +269,43 @@ class FavoritesFragment : Fragment() {
 //                        }
 //                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.DELETE, com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
-                    FirebaseStoryRepository.removeLikeFromStory(
+                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
+                    FirebaseStoryRepository.giveLikeToStory(story.id,
                         prefRepository.firebaseKey,
+                        onSuccessListener = {
+                            storyViewModel.setLikeToStory(
+                                story.id
+                            )
+                            showFeedbackSnackBar(
+                                "Added To Favorites"
+                            )
+                        },
+                        onFailureListener = {
+                            showFeedbackSnackBar(
+                                "Connection Failure"
+                            )
+                        })
+//                    ApiService.likeStory(
+//                        prefRepository.userId,
+//                        prefRepository.userApiToken,
+//                        story.originalId
+//                    ) {
+//                        if (it == true) {
+//                            storyViewModel.setLikeToStory(
+//                                story.id
+//                            )
+//                            showFeedbackSnackBar(
+//                                "Added To Favorites"
+//                            )
+//                        } else {
+//                            showFeedbackSnackBar(
+//                                "Connection Failure"
+//                            )
+//                        }
+//                    }
+                }
+                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
+                    FirebaseStoryRepository.removeLikeFromStory(prefRepository.firebaseKey,
                         story.id,
                         onSuccessListener = {
                             storyViewModel.removeLikeFromStory(
@@ -341,16 +319,13 @@ class FavoritesFragment : Fragment() {
                             showFeedbackSnackBar(
                                 "Connection Failure"
                             )
-                        }
-                    )
+                        })
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
-                        val downloadedStory =
-                            DownloadedStoryEntity.fromStory(
-                                requireContext(),
-                                story.toDto() //TODO(temp fix)
-                            )
+                        val downloadedStory = DownloadedStoryEntity.fromStory(
+                            requireContext(), story.toDto()//Temp Fix
+                        )
                         storyViewModel.downloadStory(
                             downloadedStory!!
                         )
@@ -359,9 +334,7 @@ class FavoritesFragment : Fragment() {
                         )
                     } catch (e: Exception) {
                         Log.e(
-                            "BookmarksFragment",
-                            "exception: ",
-                            e
+                            "BookmarksFragment", "exception: ", e
                         )
                         showFeedbackSnackBar(
                             "Failed Downloading Story"
@@ -377,19 +350,46 @@ class FavoritesFragment : Fragment() {
                     )
                 }
                 com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(),
-                    story.lat,
-                    story.lon
+                    requireActivity(), story.lat, story.lon
                 )
                 com.autio.android_app.data.api.model.StoryOption.SHARE -> {
                     shareStory(
-                        requireContext(),
-                        story.id
+                        requireContext(), story.id
                     )
                 }
+            }
+        }
+    }
+
+    private fun onPlaylistOptionClicked(
+        option: com.autio.android_app.data.api.model.PlaylistOption
+    ) {
+        showPaywallOrProceedWithNormalProcess(
+            requireActivity(), isActionExclusiveForSignedInUser = true
+        ) {
+            binding.pbLoadingProcess.visibility = View.VISIBLE
+            when (option) {
+                com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD -> {
+
+                }
+                com.autio.android_app.data.api.model.PlaylistOption.CLEAR_HISTORY -> {
+                    FirebaseStoryRepository.removeWholeUserHistory(prefRepository.firebaseKey,
+                        onSuccessListener = {
+                            storyViewModel.clearStoryHistory()
+                            binding.pbLoadingProcess.visibility = View.GONE
+                            showFeedbackSnackBar(
+                                "Cleared History"
+                            )
+                        },
+                        onFailureListener = {
+                            binding.pbLoadingProcess.visibility = View.GONE
+                            showFeedbackSnackBar(
+                                "Connection Failure"
+                            )
+                        })
+                }
                 else -> Log.d(
-                    "FavoritesFragment",
-                    "no action defined for this option"
+                    "HistoryFragment", "option not available for this playlist"
                 )
             }
         }
@@ -398,31 +398,24 @@ class FavoritesFragment : Fragment() {
     private fun showFeedbackSnackBar(
         feedback: String
     ) {
-        if (isAdded && activity != null) {
-            cancelJob()
-            snackBarView.alpha =
-                1F
-            snackBarView.findViewById<TextView>(
-                R.id.tvFeedback
-            ).text =
-                feedback
-            activityLayout.addView(
-                snackBarView
+        cancelJob()
+        snackBarView.alpha = 1F
+        snackBarView.findViewById<TextView>(
+            R.id.tvFeedback
+        ).text = feedback
+        activityLayout.addView(
+            snackBarView
+        )
+        feedbackJob = lifecycleScope.launch {
+            delay(
+                2000
             )
-            feedbackJob =
-                lifecycleScope.launch {
-                    delay(
-                        2000
+            snackBarView.animate().alpha(
+                    0F
+                ).withEndAction {
+                    activityLayout.removeView(
+                        snackBarView
                     )
-                    snackBarView.animate()
-                        .alpha(
-                            0F
-                        )
-                        .withEndAction {
-                            activityLayout.removeView(
-                                snackBarView
-                            )
-                        }
                 }
         }
     }

@@ -21,7 +21,7 @@ import com.autio.android_app.databinding.ActivityBottomNavigationBinding
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.subscribe.SubscribeActivity
-import com.autio.android_app.ui.stories.fragment.MapFragment
+import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.viewmodel.MyState
 import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel

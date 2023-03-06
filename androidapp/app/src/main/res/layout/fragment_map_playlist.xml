@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:elevation="10dp"
-    tools:context=".ui.view.usecases.home.fragment.MapFragment">
+    tools:context=".ui.stories.fragments.MapFragment">
 
     <RelativeLayout
         android:id="@+id/rlTab"

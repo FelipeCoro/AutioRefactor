@@ -6,22 +6,22 @@
     app:startDestination="@id/map_fragment">
     <fragment
         android:id="@+id/map_fragment"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MapFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map">
         <argument
-            android:name="com.autio.android_app.ui.view.usecases.home.fragment.MediaItemFragment.MEDIA_ID"
+            android:name="com.autio.android_app.ui.stories.fragment.MediaItemFragment.MEDIA_ID"
             android:defaultValue="/__ALL__"
             app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/account"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.AccountFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.AccountFragment"
         android:label="fragment_account"
         tools:layout="@layout/fragment_account" />
     <fragment
         android:id="@+id/my_stories"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MyStoriesFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.MyStoriesFragment"
         android:label="fragment_my_stories"
         tools:layout="@layout/fragment_my_stories">
         <action
@@ -39,7 +39,7 @@
     </fragment>
     <fragment
         android:id="@+id/player"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.PlayerFragment"
         android:label="fragment_player"
         tools:layout="@layout/fragment_player">
         <argument
@@ -60,11 +60,11 @@
     </fragment>
     <fragment
         android:id="@+id/author_details"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.AuthorFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.AuthorFragment"
         android:label="fragment_author"
         tools:layout="@layout/fragment_author">
         <argument
-            android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"
+            android:name="com.autio.android_app.ui.stories.fragment.PlayerFragment.STORY_ID"
             android:defaultValue="0"
             app:argType="integer" />
         <action
@@ -73,11 +73,11 @@
     </fragment>
     <fragment
         android:id="@+id/narrator_details"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.NarratorFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.NarratorFragment"
         android:label="fragment_narrator"
         tools:layout="@layout/fragment_author">
         <argument
-            android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"
+            android:name="com.autio.android_app.ui.stories.fragment.PlayerFragment.STORY_ID"
             android:defaultValue="0"
             app:argType="integer" />
         <action
@@ -86,7 +86,7 @@
     </fragment>
     <fragment
         android:id="@+id/bookmarks_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.BookmarksFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.BookmarksFragment"
         android:label="fragment_bookmarks"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -95,7 +95,7 @@
     </fragment>
     <fragment
         android:id="@+id/favorites_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.FavoritesFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.FavoritesFragment"
         android:label="fragment_favorites"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -104,7 +104,7 @@
     </fragment>
     <fragment
         android:id="@+id/history_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.HistoryFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -113,7 +113,7 @@
     </fragment>
     <fragment
         android:id="@+id/downloaded_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.fragments.DownloadedStoriesFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.DownloadedStoriesFragment"
         android:label="fragment_downloaded_stories"
         tools:layout="@layout/fragment_playlist">
 

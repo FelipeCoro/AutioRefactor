@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ApiModule {
+class ApiModule { //TODO(Had to change this to class from object in order to inject Interceptor)
     @Inject
     lateinit var loggingInterceptor: RequestInterceptor
 

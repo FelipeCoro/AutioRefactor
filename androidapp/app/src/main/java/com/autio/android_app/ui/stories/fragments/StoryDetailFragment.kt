@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,8 +10,6 @@ import androidx.fragment.app.viewModels
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryDetailFragmentViewModel
-import com.autio.android_app.util.showError
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragment
+package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
 import android.util.Log
@@ -37,7 +37,6 @@ import com.autio.android_app.util.openLocationInMapsApp
 import com.autio.android_app.util.shareStory
 import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
 import com.autio.android_app.util.showPlaylistOptions
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
