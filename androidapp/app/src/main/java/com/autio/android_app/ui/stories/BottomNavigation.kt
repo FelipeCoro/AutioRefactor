@@ -18,10 +18,10 @@ import androidx.navigation.get
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
+import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.subscribe.SubscribeActivity
-import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.viewmodel.MyState
 import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
@@ -31,11 +31,11 @@ import com.google.android.gms.cast.framework.CastContext
 
 class BottomNavigation : AppCompatActivity() {
 
-    private val bottomNavigationViewModel:BottomNavigationViewModel by viewModels()
+    private val bottomNavigationViewModel: BottomNavigationViewModel by viewModels()
 
-    private val purchaseViewModel:PurchaseViewModel by viewModels()
+    private val purchaseViewModel: PurchaseViewModel by viewModels()
 
-    private val networkViewModel:NetworkStatusViewModel by viewModels()
+    private val networkViewModel: NetworkStatusViewModel by viewModels()
 
     private var castContext: CastContext? = null
 
@@ -54,9 +54,7 @@ class BottomNavigation : AppCompatActivity() {
 
         bindObservables()
 
-        castContext = CastContext.getSharedInstance(
-            this
-        )
+        castContext = CastContext.getSharedInstance(this)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_bottom_navigation)
 
@@ -73,7 +71,8 @@ class BottomNavigation : AppCompatActivity() {
 
         bottomNavigationViewModel.mediaButtonRes.observe(
             this
-        ) { res -> binding.btnFloatingPlayerPlay.setImageResource(res)
+        ) { res ->
+            binding.btnFloatingPlayerPlay.setImageResource(res)
         }
     }
 
@@ -160,9 +159,7 @@ class BottomNavigation : AppCompatActivity() {
         }
         binding.btnFloatingPlayerPlay.setOnClickListener {
             bottomNavigationViewModel.playingStory.value?.let {
-                bottomNavigationViewModel.playMediaId(
-                    it.id
-                )
+                bottomNavigationViewModel.playMediaId(it.id)
             }
         }
     }
@@ -170,8 +167,7 @@ class BottomNavigation : AppCompatActivity() {
     fun showPayWall() {
         val subscribeIntent = Intent(this, SubscribeActivity::class.java)
         subscribeIntent.putExtra(
-            "ACTIVITY_NAME",
-            com.autio.android_app.ui.stories.BottomNavigation::class.simpleName
+            "ACTIVITY_NAME", BottomNavigation::class.simpleName
         )
         startActivity(subscribeIntent)
     }
@@ -250,16 +246,12 @@ class BottomNavigation : AppCompatActivity() {
     private fun updateConnectionUI(
         connectionAvailable: Boolean
     ) {
-        binding.rlNoInternetConnection.visibility = if (!connectionAvailable) VISIBLE
-        else GONE
+        binding.rlNoInternetConnection.visibility =
+            if (!connectionAvailable) VISIBLE else GONE
     }
 
-    private fun updatePlayer(
-        story: Story?
-    ) {
-        with(
-            binding
-        ) {
+    private fun updatePlayer(story: Story?) {
+        with(binding) {
             tvFloatingPlayerTitle.text = story?.title ?: resources.getText(
                 R.string.no_story_loaded
             )
@@ -270,11 +262,9 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun hidePlayerComponent() {
-        binding.persistentPlayer.animate().alpha(
-                0.0f
-            ).translationY(
-                binding.persistentPlayer.height.toFloat()
-            ).withEndAction {
+        binding.persistentPlayer.animate().alpha(0.0f)
+            .translationY(binding.persistentPlayer.height.toFloat())
+            .withEndAction {
                 binding.mainContainer.requestLayout()
                 binding.persistentPlayer.visibility = GONE
             }
@@ -282,11 +272,9 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun showPlayerComponent() {
         binding.persistentPlayer.visibility = VISIBLE
-        binding.persistentPlayer.animate().alpha(
-                1.0f
-            ).translationYBy(
-                -binding.persistentPlayer.height.toFloat()
-            ).withEndAction {
+        binding.persistentPlayer.animate().alpha(1.0f)
+            .translationYBy(-binding.persistentPlayer.height.toFloat())
+            .withEndAction {
                 binding.mainContainer.requestLayout()
             }
     }
@@ -297,10 +285,7 @@ class BottomNavigation : AppCompatActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissionResults ->
-        if (permissionResults.keys.contains(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        ) {
+        if (permissionResults.keys.contains(Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (permissionResults[Manifest.permission.ACCESS_FINE_LOCATION]!!) {
                 binding.rlAllowLocationAccess.visibility = GONE
                 val mapFragment =
@@ -311,10 +296,7 @@ class BottomNavigation : AppCompatActivity() {
                 }
             }
         }
-        if (permissionResults.keys.contains(
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-        ) {
+        if (permissionResults.keys.contains(Manifest.permission.POST_NOTIFICATIONS)) {
             if (permissionResults[Manifest.permission.POST_NOTIFICATIONS]!!) {
                 binding.rlAllowNotifications.visibility = GONE
             }

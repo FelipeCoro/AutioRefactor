@@ -101,9 +101,7 @@ object InjectorUtils {
         )
     }
 
-    fun providePlayerFragmentViewModel(
-        context: Context
-    )
+    fun providePlayerFragmentViewModel(context: Context)
             : PlayerFragmentViewModel.Factory {
         val applicationContext =
             context.applicationContext

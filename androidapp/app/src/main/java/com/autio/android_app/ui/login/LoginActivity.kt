@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.Datasource
 import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivityLoginBinding
 import com.autio.android_app.extensions.setAutomaticScroll
 import com.autio.android_app.ui.stories.adapter.ImageAdapter
-import com.autio.android_app.util.showError
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -32,81 +32,42 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var secondRecyclerView: RecyclerView
     private lateinit var thirdRecyclerView: RecyclerView
 
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-        super.onCreate(
-            savedInstanceState
-        )
-        binding = ActivityLoginBinding.inflate(
-            layoutInflater
-        )
-        setContentView(
-            binding.root
-        )
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setUpBackgroundAnimation()
         setListeners()
     }
 
     private fun setUpBackgroundAnimation() {
         val imageDataset = Datasource().loadLocationViews()
-        firstRecyclerView = findViewById(
-            R.id.rvFirstColumn
-        )
-        secondRecyclerView = findViewById(
-            R.id.rvSecondColumn
-        )
-        thirdRecyclerView = findViewById(
-            R.id.rvThirdColumn
-        )
+        firstRecyclerView = findViewById(R.id.rvFirstColumn)
+        secondRecyclerView = findViewById(R.id.rvSecondColumn)
+        thirdRecyclerView = findViewById(R.id.rvThirdColumn)
 
-        firstRecyclerView.adapter = ImageAdapter(
-            imageDataset.shuffled()
-        )
-        firstRecyclerView.layoutManager!!.scrollToPosition(
-            Integer.MAX_VALUE / 2
-        )
+        firstRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
+        firstRecyclerView.layoutManager!!.scrollToPosition(Integer.MAX_VALUE / 2)
 
-        secondRecyclerView.adapter = ImageAdapter(
-            imageDataset.shuffled()
-        )
-        secondRecyclerView.layoutManager!!.scrollToPosition(
-            Integer.MAX_VALUE / 2
-        )
+        secondRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
+        secondRecyclerView.layoutManager!!.scrollToPosition(Integer.MAX_VALUE / 2)
 
-        thirdRecyclerView.adapter = ImageAdapter(
-            imageDataset.shuffled()
-        )
-        thirdRecyclerView.layoutManager!!.scrollToPosition(
-            Integer.MAX_VALUE / 2
-        )
+        thirdRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
+        thirdRecyclerView.layoutManager!!.scrollToPosition(Integer.MAX_VALUE / 2)
 
         firstRecyclerView.setAutomaticScroll()
-        secondRecyclerView.setAutomaticScroll(
-            ScrollView.FOCUS_UP
-        )
+        secondRecyclerView.setAutomaticScroll(ScrollView.FOCUS_UP)
         thirdRecyclerView.setAutomaticScroll()
     }
 
     private fun setListeners() {
         binding.btnSignIn.setOnClickListener {
-            startActivity(
-                Intent(
-                    this, SignInActivity::class.java
-                )
-            )
+            startActivity(Intent(this, SignInActivity::class.java))
         }
         binding.btnSignup.setOnClickListener {
-            startActivity(
-                Intent(
-                    this, SignUpActivity::class.java
-                )
-            )
+            startActivity(Intent(this, SignUpActivity::class.java))
         }
-        binding.btnLoginAsGuest.setOnClickListener {
-            loginGuest()
-        }
+        binding.btnLoginAsGuest.setOnClickListener { loginGuest() }
     }
 
     private fun showLoadingView() {
@@ -135,13 +96,13 @@ class LoginActivity : AppCompatActivity() {
             }*/
     }
 
-    private fun saveGuestInfo(
-        guestResponse: com.autio.android_app.data.api.model.account.GuestResponse
-    ) {
-        prefRepository.isUserGuest = true
-        prefRepository.userId = guestResponse.id
-        prefRepository.firebaseKey = guestResponse.firebaseKey
-        prefRepository.userApiToken = guestResponse.apiToken
-        prefRepository.remainingStories = 5
+    private fun saveGuestInfo(guestResponse: GuestResponse) {
+        with(prefRepository) {
+            isUserGuest = true
+            userId = guestResponse.id
+            firebaseKey = guestResponse.firebaseKey
+            userApiToken = guestResponse.apiToken
+            remainingStories = 5
+        }
     }
 }

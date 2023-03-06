@@ -1,38 +1,48 @@
 package com.autio.android_app.core.di
 
+import com.autio.android_app.BuildConfig
+import com.autio.android_app.data.api.ApiClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import com.autio.android_app.BuildConfig
-import com.autio.android_app.core.RequestInterceptor
-import com.autio.android_app.data.api.ApiClient
-import com.autio.android_app.data.repository.prefs.PrefRepository
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Inject
 
 @Module
 @InstallIn(SingletonComponent::class)
-class ApiModule { //TODO(Had to change this to class from object in order to inject Interceptor)
-    @Inject
-    lateinit var loggingInterceptor: RequestInterceptor
+class ApiModule {
 
     @Provides
-    fun provideBaseUrl(): String = BuildConfig.base_url
-
-    @Provides
-    fun provideRetrofit(baseUrl: String): ApiClient {
-
-        val client = OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
-
-        val retrofit =
-            Retrofit.Builder().baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(client).build()
-
+    fun providesAutioService(
+        retrofitBuilder: Retrofit.Builder,
+    ): ApiClient {
+        val retrofit = retrofitBuilder
+            .baseUrl(BuildConfig.base_url).build()
         return retrofit.create(ApiClient::class.java)
+    }
+
+    @Provides
+    fun providesRetrofitClient(
+        okHttpclient: OkHttpClient//, converterFactory: Converter.Factory
+    ): Retrofit.Builder {
+        return Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            //.addConverterFactory(converterFactory)
+            .client(okHttpclient)
+    }
+
+    @Provides
+    fun provideOkHttpClient(interceptor: Interceptor): OkHttpClient {
+        val builder = OkHttpClient.Builder()
+        builder.addInterceptor(interceptor)
+        return builder.build()
+    }
+
+    @Provides
+    fun provideInterceptor(): Interceptor {
+        return LoggingInterceptor()
     }
 }

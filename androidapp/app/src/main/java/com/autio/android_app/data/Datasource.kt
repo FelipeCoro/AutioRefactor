@@ -7,21 +7,11 @@ import com.autio.android_app.data.api.model.modelLegacy.LocationView
 class Datasource {
     fun loadLocationViews(): List<LocationView> {
         return listOf(
-            LocationView(
-                R.drawable.golden_gate_bridge
-            ),
-            LocationView(
-                R.drawable.pyramid_lake
-            ),
-            LocationView(
-                R.drawable.sand_harbor
-            ),
-            LocationView(
-                R.drawable.valle_of_fire
-            ),
-            LocationView(
-                R.drawable.viviana_rishe
-            ),
+            LocationView(R.drawable.golden_gate_bridge),
+            LocationView(R.drawable.pyramid_lake),
+            LocationView(R.drawable.sand_harbor),
+            LocationView(R.drawable.valle_of_fire),
+            LocationView(R.drawable.viviana_rishe),
         )
     }
 }

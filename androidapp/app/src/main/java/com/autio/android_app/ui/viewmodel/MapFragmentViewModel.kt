@@ -17,17 +17,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapFragmentViewModel @Inject constructor(
-    private val mediaId: String,
     playerServiceConnection: PlayerServiceConnection,
     private val autioRepository: AutioRepository,
 ) : ViewModel() {
 
+    //TODO (media ID - should be a safeArgs parameter and pass as a parameter )
+    private val mediaId: String = "true"
     private val _storiesInScreen = MutableLiveData<List<Story>>()
     val storiesInScreen: LiveData<List<Story>> = _storiesInScreen
 
-    private val _isListDisplaying = MutableLiveData(
-        false
-    )
+    private val _isListDisplaying = MutableLiveData(false)
     val isListDisplaying: LiveData<Boolean> = _isListDisplaying
 
     private val subscriptionCallback = object : SubscriptionCallback() {
@@ -72,13 +71,9 @@ class MapFragmentViewModel @Inject constructor(
      * which can also change the [MediaItemData.playbackRes] in the list
      */
     private val playerServiceConnection = playerServiceConnection.also {
-        it.subscribe(
-            mediaId, subscriptionCallback
-        )
+        it.subscribe(mediaId, subscriptionCallback)
 
-        it.playbackState.observeForever(
-            playbackStateObserver
-        )
+        it.playbackState.observeForever(playbackStateObserver)
 //        it.nowPlaying.observeForever(mediaMetadataObserver)
     }
 
@@ -90,47 +85,32 @@ class MapFragmentViewModel @Inject constructor(
         super.onCleared()
 
         // Remove permanent observers from the PlayerServiceConnection
-        playerServiceConnection.playbackState.removeObserver(
-            playbackStateObserver
-        )
+        playerServiceConnection.playbackState.removeObserver(playbackStateObserver)
 //        playerServiceConnection.nowPlaying.removeObserver(mediaMetadataObserver)
-
         // Unsubscribe media ID being watched
-        playerServiceConnection.unsubscribe(
-            mediaId, subscriptionCallback
-        )
+        playerServiceConnection.unsubscribe(mediaId, subscriptionCallback)
     }
 
     fun displayListForStoriesInScreen() {
-        _isListDisplaying.postValue(
-            !(_isListDisplaying.value ?: false)
-        )
+        _isListDisplaying.postValue(!(_isListDisplaying.value ?: false))
     }
 
-    suspend fun changeLatLngBounds(
-        latLngBounds: LatLngBounds
-    ) {
+    suspend fun changeLatLngBounds(latLngBounds: LatLngBounds) {
         viewModelScope.launch {
             val storiesInBounds = autioRepository.getStoriesInLatLngBoundaries(
                 latLngBounds.southwest, latLngBounds.northeast
             )
-            _storiesInScreen.postValue(
-                storiesInBounds.map { it.toModel() }
-            )
+            _storiesInScreen.postValue(storiesInBounds.map { it.toModel() })
         }
     }
 
-    fun fetchRecordsOfStories(
-        userId: Int, apiToken: String
-    ) {
+    fun fetchRecordsOfStories(userId: Int, apiToken: String) {
         viewModelScope.launch {
             _storiesInScreen.value?.let { stories ->
                 if (stories.isEmpty()) return@launch
                 val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
-
                     autioRepository.getStoriesByIds(userId, apiToken, storiesWithoutRecords)
-
                 }
             }
         }
