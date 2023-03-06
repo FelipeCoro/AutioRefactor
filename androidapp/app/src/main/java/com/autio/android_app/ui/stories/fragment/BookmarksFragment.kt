@@ -28,6 +28,7 @@ import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.domain.mappers.toDto
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
@@ -37,12 +38,13 @@ import com.autio.android_app.util.shareStory
 import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
 import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class BookmarksFragment : Fragment() {
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
@@ -148,7 +150,7 @@ class BookmarksFragment : Fragment() {
                     }
                 }
             }
-            storyAdapter.submitList(stories)
+            storyAdapter.submitList(stories.map { it.toModel() })
             binding.llNoContent.visibility = View.GONE
             binding.rlStories.visibility = View.VISIBLE
         }

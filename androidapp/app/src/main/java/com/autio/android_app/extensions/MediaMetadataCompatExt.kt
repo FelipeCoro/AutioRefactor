@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.autio.android_app.data.entities.story.Story
 import com.autio.android_app.player.library.JsonSource
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.util.MimeTypes

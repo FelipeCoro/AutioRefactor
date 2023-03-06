@@ -1,6 +1,6 @@
 package com.autio.android_app.extensions
 
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
 import kotlin.math.abs
 import kotlin.math.pow

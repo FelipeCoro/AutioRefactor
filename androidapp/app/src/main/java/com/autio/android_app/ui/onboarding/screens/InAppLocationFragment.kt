@@ -14,11 +14,10 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentInAppLocationBinding
-import com.autio.android_app.ui.view.usecases.subscribe.SubscribeActivity
+import com.autio.android_app.ui.subscribe.SubscribeActivity
 import com.autio.android_app.util.TrackingUtility
 
-class InAppLocationFragment :
-    Fragment() {
+class InAppLocationFragment : Fragment() {
 
     private var _binding: FragmentInAppLocationBinding? =
         null

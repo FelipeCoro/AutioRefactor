@@ -77,6 +77,12 @@ interface AutioRemoteDataSource {
         ids: List<Int>
     ): Response<List<StoryDto>>
 
+    suspend fun getStoryById(
+        xUserId: String,
+        apiToken: String,
+        id: String
+    ): Response<StoryDto>
+
     suspend fun getStoriesSinceDate(
         xUserId: Int,
         apiToken: String,

@@ -19,10 +19,7 @@ import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnecti
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.MainDispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 /**
@@ -103,7 +100,7 @@ class PlayerServiceConnection(
                 context, mediaBrowser.sessionToken
             )
             mediaController.registerCallback(
-                MediaControllerCallback(coroutineDispatcher)
+                MediaControllerCallback()
             )
             isConnected.postValue(true)
         }
@@ -123,9 +120,8 @@ class PlayerServiceConnection(
         }
     }
 
-    private inner class MediaControllerCallback @Inject constructor(
-        @MainDispatcher private val coroutineDispatcher: CoroutineDispatcher,
-    ) : MediaControllerCompat.Callback() {
+    //TODO(Cannot inject to inner classes, invetigate fix later for coroutine which was injected at MediaControllerCallback())
+    private  inner  class MediaControllerCallback () : MediaControllerCompat.Callback() {
 
         override fun onPlaybackStateChanged(
             state: PlaybackStateCompat?
@@ -144,9 +140,9 @@ class PlayerServiceConnection(
                 nowPlaying.postValue(null)
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
-                    val currentStory = autioRepository.getStoryById(metadata.id!!)
-                    currentStory?.let {
-                        nowPlaying.value = it.toModel()
+                    val currentStory = autioRepository.getStoryById(metadata.id!!,"","") //TODO Check this
+                    currentStory.let {
+                        nowPlaying.value = it
                     }
                 }
             }

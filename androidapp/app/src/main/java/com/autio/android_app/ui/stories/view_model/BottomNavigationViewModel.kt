@@ -14,6 +14,7 @@ import com.autio.android_app.R
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.currentPlayBackPosition
 import com.autio.android_app.extensions.isPlayEnabled
@@ -324,7 +325,7 @@ class BottomNavigationViewModel @Inject constructor(
                 result?.let {
                     val date = result.modifiedDate ?: 63808881662
                     //TODO (Move to Repository)
-                    // TODO: change Firebase code with commented code once endpoint is stable
+                    //TODO: change Firebase code with commented code once endpoint is stable
                     val stories = FirebaseStoryRepository.getStoriesAfterModifiedDate(date.toInt())
                     autioRepository.addStories(stories)
                 }
@@ -359,7 +360,7 @@ class BottomNavigationViewModel @Inject constructor(
             val userHistory = FirebaseStoryRepository.getUserStoriesHistory(
                 prefRepository.firebaseKey
             )
-            autioRepository.setListenedAtToLocalStories(userHistory)
+            autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
         }
     }
 

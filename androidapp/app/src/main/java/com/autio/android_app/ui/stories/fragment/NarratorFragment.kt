@@ -20,10 +20,12 @@ import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentNarratorBinding
+import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
@@ -32,12 +34,13 @@ import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class NarratorFragment : Fragment() {
 
     @Inject
@@ -193,8 +196,8 @@ class NarratorFragment : Fragment() {
                             contributorApiResponse.body()!!.data.map {
                                 it.id
                             }
-                        )
-                            .observe(
+                        )  //TODO(This should change with livedata??)
+                           /* .observe(
                                 viewLifecycleOwner
                             ) { stories ->
                                 if (stories.isNotEmpty()) {
@@ -204,7 +207,7 @@ class NarratorFragment : Fragment() {
                                 storyAdapter.submitList(
                                     stories.toList()
                                 )
-                            }
+                            }*/
                     }
                 }
             }
@@ -353,12 +356,12 @@ class NarratorFragment : Fragment() {
                         }
                     )
                 }
-                com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
+                StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
                             DownloadedStoryEntity.fromStory(
                                 requireContext(),
-                                story
+                                story.toDto() //TODO(Temp fix)
                             )!!
                         storyViewModel.downloadStory(
                             downloadedStory

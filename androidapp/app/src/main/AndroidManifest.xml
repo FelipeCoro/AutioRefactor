@@ -51,24 +51,24 @@
             android:value="com.autio.android_app.cast.CastOptionsProvider" />
 
         <activity
-            android:name=".ui.view.usecases.login.LoginActivity"
+            android:name=".ui.login.LoginActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".ui.view.usecases.onboarding.OnBoardingActivity"
+            android:name=".ui.onboarding.OnBoardingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.view.usecases.login.SignUpActivity"
+            android:name=".ui.login.SignUpActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.view.usecases.login.SignInActivity"
+            android:name=".ui.login.SignInActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.view.usecases.subscribe.SubscribeActivity"
+            android:name=".ui.subscribe.SubscribeActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
@@ -90,7 +90,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.view.usecases.launch.SplashActivity"
+            android:name=".ui.launch.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">

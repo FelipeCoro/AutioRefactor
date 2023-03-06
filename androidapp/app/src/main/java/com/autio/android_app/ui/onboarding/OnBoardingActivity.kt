@@ -7,9 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.autio.android_app.R
 import com.autio.android_app.databinding.ActivityOnBoardingBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-class OnBoardingActivity :
-    AppCompatActivity() {
+@AndroidEntryPoint
+class OnBoardingActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOnBoardingBinding
 
@@ -19,10 +20,9 @@ class OnBoardingActivity :
         super.onCreate(
             savedInstanceState
         )
-        binding =
-            ActivityOnBoardingBinding.inflate(
-                layoutInflater
-            )
+        binding = ActivityOnBoardingBinding.inflate(
+            layoutInflater
+        )
         setContentView(
             binding.root
         )
@@ -44,11 +44,8 @@ class OnBoardingActivity :
                 android.view.WindowInsets.Type.statusBars()
             )
         }
-        window.navigationBarColor =
-            ResourcesCompat.getColor(
-                resources,
-                R.color.autio_blue,
-                null
-            )
+        window.navigationBarColor = ResourcesCompat.getColor(
+            resources, R.color.autio_blue, null
+        )
     }
 }

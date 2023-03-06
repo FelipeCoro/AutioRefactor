@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.entities.story.Story
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -22,10 +22,9 @@ class StoryAdapter(
     private var onStoryPlay: ((String) -> Unit)?,
     private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
     private var shouldPinLocationBeShown: Boolean = false
-) :
-    ListAdapter<Story, StoryAdapter.StoryViewHolder>(
-        StoryComparator()
-    ) {
+) : ListAdapter<Story, StoryAdapter.StoryViewHolder>(
+    StoryComparator()
+) {
 
     class StoryViewHolder(
         itemView: View,
@@ -36,55 +35,43 @@ class StoryAdapter(
     ) : RecyclerView.ViewHolder(
         itemView
     ) {
-        private val ivStoryImage =
-            itemView.findViewById<ImageView>(
-                R.id.story_image
-            )
-        private val ivStoryCard =
-            itemView.findViewById<CardView>(
-                R.id.ivStoryCard
-            )
-        private val storyTitle =
-            itemView.findViewById<TextView>(
-                R.id.story_title
-            )
-        private val storyAuthor =
-            itemView.findViewById<TextView>(
-                R.id.story_author
-            )
-        private val storyPin =
-            itemView.findViewById<ImageView>(
-                R.id.story_pin
-            )
-        private val ivStoryItemOptions =
-            itemView.findViewById<ImageView>(
-                R.id.ivStoryItemOptions
-            )
-        private val ivPlayIcon =
-            itemView.findViewById<ImageView>(
-                R.id.ivPlayIcon
-            )
+        private val ivStoryImage = itemView.findViewById<ImageView>(
+            R.id.story_image
+        )
+        private val ivStoryCard = itemView.findViewById<CardView>(
+            R.id.ivStoryCard
+        )
+        private val storyTitle = itemView.findViewById<TextView>(
+            R.id.story_title
+        )
+        private val storyAuthor = itemView.findViewById<TextView>(
+            R.id.story_author
+        )
+        private val storyPin = itemView.findViewById<ImageView>(
+            R.id.story_pin
+        )
+        private val ivStoryItemOptions = itemView.findViewById<ImageView>(
+            R.id.ivStoryItemOptions
+        )
+        private val ivPlayIcon = itemView.findViewById<ImageView>(
+            R.id.ivPlayIcon
+        )
 
         fun bind(
             model: Story
         ) {
-            val wasStoryListenedAtLeast30Seconds =
-                model.listenedAtLeast30Secs == true
+            val wasStoryListenedAtLeast30Seconds = model.listenedAtLeast30Secs == true
             Glide.with(
                 itemView
-            )
-                .load(
+            ).load(
                     model.imageUrl
-                )
-                .apply(
+                ).apply(
                     RequestOptions().placeholder(
                         R.color.autio_blue_20
-                    )
-                        .error(
+                    ).error(
                             R.color.autio_blue_20
                         )
-                )
-                .into(
+                ).into(
                     ivStoryImage
                 )
             ivStoryCard.setOnClickListener {
@@ -93,37 +80,28 @@ class StoryAdapter(
                 )
             }
             storyTitle.apply {
-                text =
-                    model.title
+                text = model.title
                 if (wasStoryListenedAtLeast30Seconds) {
                     setTextColor(
                         resources.getColor(
-                            R.color.autio_blue_60,
-                            null
+                            R.color.autio_blue_60, null
                         )
                     )
                 }
             }
-            storyAuthor.text =
-                model.author
+            storyAuthor.text = model.author
             if (shouldPinLocationBeShown) {
-                storyPin.visibility =
-                    View.VISIBLE
+                storyPin.visibility = View.VISIBLE
             }
             ivStoryItemOptions.setOnClickListener {
                 showStoryOptions(
-                    itemView.context,
-                    itemView.parent as ViewGroup,
-                    it,
-                    model,
-                    arrayListOf(
+                    itemView.context, itemView.parent as ViewGroup, it, model, arrayListOf(
                         if (model.isBookmarked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
                         if (model.isLiked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
                         com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
                         com.autio.android_app.data.api.model.StoryOption.DIRECTIONS,
                         com.autio.android_app.data.api.model.StoryOption.SHARE
-                    ),
-                    onOptionClick = onOptionClick
+                    ), onOptionClick = onOptionClick
                 )
             }
             playingStory.observe(
@@ -156,67 +134,46 @@ class StoryAdapter(
                 onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
                 shouldPinLocationBeShown: Boolean
             ): StoryViewHolder {
-                val view =
-                    LayoutInflater.from(
-                        parent.context
+                val view = LayoutInflater.from(
+                    parent.context
+                ).inflate(
+                        R.layout.story_item, parent, false
                     )
-                        .inflate(
-                            R.layout.story_item,
-                            parent,
-                            false
-                        )
                 return StoryViewHolder(
-                    view,
-                    playingStory,
-                    onStoryPlay,
-                    onOptionClick,
-                    shouldPinLocationBeShown
+                    view, playingStory, onStoryPlay, onOptionClick, shouldPinLocationBeShown
                 )
             }
         }
     }
 
-    class StoryComparator :
-        DiffUtil.ItemCallback<Story>() {
+    class StoryComparator : DiffUtil.ItemCallback<Story>() {
         override fun areItemsTheSame(
-            oldItem: Story,
-            newItem: Story
+            oldItem: Story, newItem: Story
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: Story,
-            newItem: Story
+            oldItem: Story, newItem: Story
         ): Boolean {
-            return oldItem.recordUrl == newItem.recordUrl
-                    || oldItem.isLiked == newItem.isLiked
-                    || oldItem.isBookmarked == newItem.isBookmarked
-                    || oldItem.isDownloaded == newItem.isDownloaded
+            return oldItem.recordUrl == newItem.recordUrl || oldItem.isLiked == newItem.isLiked || oldItem.isBookmarked == newItem.isBookmarked || oldItem.isDownloaded == newItem.isDownloaded
         }
     }
 
     override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
+        parent: ViewGroup, viewType: Int
     ): StoryViewHolder {
         return StoryViewHolder.create(
-            parent,
-            playingStory,
-            onStoryPlay,
-            onOptionClick,
-            shouldPinLocationBeShown
+            parent, playingStory, onStoryPlay, onOptionClick, shouldPinLocationBeShown
         )
     }
 
     override fun onBindViewHolder(
-        holder: StoryViewHolder,
-        position: Int
+        holder: StoryViewHolder, position: Int
     ) {
-        val story =
-            getItem(
-                position
-            )
+        val story = getItem(
+            position
+        )
         holder.bind(
             story
         )

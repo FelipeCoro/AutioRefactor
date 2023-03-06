@@ -20,8 +20,15 @@ interface ApiClient {
      * profile data
      * @param loginDto object including the email and password
      */
+
+    //TODO(make suspended)
     @POST("/api/v1/login")
-    suspend fun login(@Body loginDto: LoginDto): Response<LoginResponse>
+    fun login(@Body loginDto: LoginDto) :Response<LoginResponse>
+
+
+    //TODO(annotate method, check endpoint and make suspended)
+    @POST("/api/v1/login")
+     fun loginAsGuest(@Body loginDto: LoginDto)
 
     /**
      * Authenticates user as guest and returns the guest's
@@ -122,6 +129,13 @@ interface ApiClient {
         @Header("Authorization") apiToken: String,
         @Query("ids[]") ids: List<Int>
     ): Response<List<StoryDto>>
+
+    @GET("/api/v1/stories/by-ids-v2")//TODO(Check endpoint with BO, this is just a copy paste from above)
+    suspend fun getStoryById(
+        @Header("X-User-Id") xUserId: String,
+        @Header("Authorization") apiToken: String,
+        @Query("id") id: String ="" //TODO(Should this is apparently a String in the PlayerServiceConnection method)
+    ): Response<StoryDto>
 
     @Deprecated(
         "Captures stories and its content after a certain datetime", ReplaceWith("getStoriesDiff")

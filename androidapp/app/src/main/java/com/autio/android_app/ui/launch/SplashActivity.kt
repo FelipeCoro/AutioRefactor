@@ -8,19 +8,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.ui.login.LoginActivity
+import com.autio.android_app.ui.onboarding.OnBoardingActivity
 import com.autio.android_app.ui.stories.BottomNavigation
-import com.autio.android_app.ui.view.usecases.login.LoginActivity
-import com.autio.android_app.ui.view.usecases.onboarding.OnBoardingActivity
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
-class SplashActivity :
-    AppCompatActivity() {
+@AndroidEntryPoint
+class SplashActivity : AppCompatActivity() {
 
-    private val prefRepository by lazy {
-        PrefRepository(
-            this
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
 
     override fun onCreate(
         savedInstanceState: Bundle?

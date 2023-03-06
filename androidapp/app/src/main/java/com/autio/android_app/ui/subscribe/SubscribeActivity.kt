@@ -29,9 +29,10 @@ import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Package
 import com.smarteist.autoimageslider.SliderView
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class SubscribeActivity : AppCompatActivity() {
 
     @Inject

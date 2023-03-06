@@ -7,9 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.DownloadedStoryDao
-import com.autio.android_app.data.database.dao.StoryDao
-import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.data.repository.prefs.PrefRepositoryImpl
+import com.autio.android_app.data.database.dao.MapPointDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,7 +51,7 @@ object PersistenceModule {
 
     @Singleton
     @Provides
-    fun providesStoryDao(database: DataBase): StoryDao = database.storyDao()
+    fun providesStoryDao(database: DataBase): MapPointDao = database.mapPointDao()
 
     @Singleton
     @Provides

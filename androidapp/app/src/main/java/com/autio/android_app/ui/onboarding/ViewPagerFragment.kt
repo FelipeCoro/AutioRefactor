@@ -6,12 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.autio.android_app.databinding.FragmentViewPagerBinding
-import com.autio.android_app.ui.view.usecases.onboarding.screens.BackgroundLocationFragment
-import com.autio.android_app.ui.view.usecases.onboarding.screens.InAppLocationFragment
-import com.autio.android_app.ui.view.usecases.onboarding.screens.NotificationsFragment
+import com.autio.android_app.ui.onboarding.screens.BackgroundLocationFragment
+import com.autio.android_app.ui.onboarding.screens.InAppLocationFragment
+import com.autio.android_app.ui.onboarding.screens.NotificationsFragment
 
-class ViewPagerFragment :
-    Fragment() {
+class ViewPagerFragment : Fragment() {
 
     private var _binding: FragmentViewPagerBinding? =
         null

@@ -4,11 +4,12 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaBrowserCompat.SubscriptionCallback
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.*
-import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,8 +22,8 @@ class MapFragmentViewModel @Inject constructor(
     private val autioRepository: AutioRepository,
 ) : ViewModel() {
 
-    private val _storiesInScreen = MutableLiveData<List<MapPoint>>()
-    val storiesInScreen: LiveData<List<MapPoint>> = _storiesInScreen
+    private val _storiesInScreen = MutableLiveData<List<Story>>()
+    val storiesInScreen: LiveData<List<Story>> = _storiesInScreen
 
     private val _isListDisplaying = MutableLiveData(
         false
@@ -114,7 +115,7 @@ class MapFragmentViewModel @Inject constructor(
                 latLngBounds.southwest, latLngBounds.northeast
             )
             _storiesInScreen.postValue(
-                storiesInBounds
+                storiesInBounds.map { it.toModel() }
             )
         }
     }

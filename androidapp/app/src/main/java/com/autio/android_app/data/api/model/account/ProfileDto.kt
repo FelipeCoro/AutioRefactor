@@ -1,6 +1,6 @@
 package com.autio.android_app.data.api.model.account
 
-import com.autio.android_app.data.entities.story.Category
+import com.autio.android_app.data.database.entities.CategoryEntity
 import com.google.gson.annotations.SerializedName
 
 data class ProfileDto(
@@ -12,5 +12,5 @@ data class ProfileDto(
     ) val name: String,
     @SerializedName(
         "category_order"
-    ) val categories: List<Category>
+    ) val categories: List<CategoryEntity> //TODO(Not sure about this Type, quick fix from Category to CategoryEntity for runnability)
 )

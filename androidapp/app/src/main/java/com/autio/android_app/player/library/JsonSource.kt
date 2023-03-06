@@ -84,7 +84,7 @@ class JsonSource @Inject constructor(
      * @return The catalog downloaded, or an empty catalog if an error occurred.
      */
     private suspend fun downloadJson(): JsonCatalog {
-        val stories = database.storyDao().readStories()
+        val stories = database.mapPointDao().readStories()
         val jsonArray = JSONArray(
             Gson().toJson(stories)
         )

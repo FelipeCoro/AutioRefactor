@@ -2,21 +2,21 @@ package com.autio.android_app.data.repository.revenue
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.revenuecat.purchases.*
 import com.revenuecat.purchases.models.StoreTransaction
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class RevenueCatRepositoryImpl private constructor(
-    application: Application
+class RevenueCatRepositoryImpl  @Inject constructor(
+    @ApplicationContext private val context: Context
 ) : RevenueCatRepository {
-    private val _customerInfo =
-        MutableLiveData<CustomerInfo>().apply {
-            value =
-                null
-        }
-    override val customerInfo: LiveData<CustomerInfo> =
-        _customerInfo
+    private val _customerInfo = MutableLiveData<CustomerInfo>().apply {
+        value = null
+    }
+    override val customerInfo: LiveData<CustomerInfo> = _customerInfo
 
     /**
      * Identifies the user inside the RevenueCat local code so the requests
@@ -33,16 +33,14 @@ class RevenueCatRepositoryImpl private constructor(
         onSuccess: ((CustomerInfo, Boolean) -> Unit)?
     ) {
         with(Purchases.sharedInstance) {
-            logInWith(
-                userId,
-                { error ->
-                    onError?.invoke(
-                        error
-                    )
-                    displayError(
-                        error
-                    )
-                }) { customerInfo, created ->
+            logInWith(userId, { error ->
+                onError?.invoke(
+                    error
+                )
+                displayError(
+                    error
+                )
+            }) { customerInfo, created ->
 
                 // Set user's data in RevenueCat
                 setDisplayName(name)
@@ -55,8 +53,7 @@ class RevenueCatRepositoryImpl private constructor(
 
                 // created variable checks whether the user is new to RC
                 onSuccess?.invoke(
-                    customerInfo,
-                    created
+                    customerInfo, created
                 )
             }
         }
@@ -73,12 +70,10 @@ class RevenueCatRepositoryImpl private constructor(
     }
 
     override fun getOfferings(
-        onError: ((PurchasesError) -> Unit),
-        onSuccess: (Offerings) -> Unit
+        onError: ((PurchasesError) -> Unit), onSuccess: (Offerings) -> Unit
     ) {
         Purchases.sharedInstance.getOfferingsWith(
-            onError = onError,
-            onSuccess = onSuccess
+            onError = onError, onSuccess = onSuccess
         )
     }
 
@@ -88,8 +83,7 @@ class RevenueCatRepositoryImpl private constructor(
         onError: ((PurchasesError, Boolean) -> Unit),
         onSuccess: ((StoreTransaction, CustomerInfo) -> Unit)
     ) {
-        Purchases.sharedInstance.purchasePackageWith(
-            activity,
+        Purchases.sharedInstance.purchasePackageWith(activity,
             packageToPurchase,
             onError = onError,
             onSuccess = { transaction, customerInfo ->
@@ -97,16 +91,13 @@ class RevenueCatRepositoryImpl private constructor(
                     customerInfo
                 )
                 onSuccess.invoke(
-                    transaction,
-                    customerInfo
+                    transaction, customerInfo
                 )
-            }
-        )
+            })
     }
 
     override fun restorePurchase(
-        onError: ((PurchasesError) -> Unit),
-        onSuccess: ((CustomerInfo) -> Unit)
+        onError: ((PurchasesError) -> Unit), onSuccess: ((CustomerInfo) -> Unit)
     ) {
         Purchases.sharedInstance.restorePurchasesWith(
             onError
@@ -180,42 +171,14 @@ class RevenueCatRepositoryImpl private constructor(
         }
     }
 
-    companion object {
-        @Volatile
-        override var sInstance: RevenueCatRepository? =
-            null
-
-        @JvmStatic
-        override fun getInstance(
-            application: Application
-        ) =
-            sInstance
-                ?: synchronized(
-                    this
-                ) {
-                    sInstance
-                        ?: RevenueCatRepository(
-                            application
-                        )
-                            .also {
-                                sInstance =
-                                    it
-                            }
-                }
-    }
-
     init {
-        Purchases.debugLogsEnabled =
-            true
+        Purchases.debugLogsEnabled = true
         Purchases.configure(
             PurchasesConfiguration.Builder(
-                application,
-                "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS"
-            )
-                .observerMode(
+                context, "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS"
+            ).observerMode(
                     false
-                )
-                .build()
+                ).build()
         )
     }
 }

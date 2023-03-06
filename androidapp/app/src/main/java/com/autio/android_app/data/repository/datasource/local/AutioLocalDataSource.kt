@@ -3,28 +3,28 @@ package com.autio.android_app.data.repository.datasource.local
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.data.database.entities.MapPointEntity
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
 interface AutioLocalDataSource {
     val userCategories: Flow<List<CategoryEntity>>
-    val allLiveStories: Flow<List<MapPoint>>
+    val allLiveStories: Flow<List<MapPointEntity>>
     val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
-    val bookmarkedStories: Flow<List<MapPoint>>
-    val favoriteStories: Flow<List<MapPoint>>
-    val history: Flow<List<MapPoint>>
+    val bookmarkedStories: Flow<List<MapPointEntity>>
+    val favoriteStories: Flow<List<MapPointEntity>>
+    val history: Flow<List<MapPointEntity>>
     suspend fun addUserCategories(categories: List<CategoryEntity>)
     suspend fun updateCategories(categories: List<CategoryEntity>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<MapPoint>
+    ): List<MapPointEntity>
 
-    suspend fun getAllStories(): Result<List<MapPoint>?>
-    suspend fun getMapPointById(id: String): Result<MapPoint?>
-    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>>
-    suspend fun getLastModifiedStory(): Result<MapPoint?>
-    suspend fun addStories(stories: List<MapPoint>)
+    suspend fun getAllStories(): Result<List<MapPointEntity>?>
+    suspend fun getMapPointById(id: String): Result<MapPointEntity?>
+    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPointEntity>>
+    suspend fun getLastModifiedStory(): Result<MapPointEntity?>
+    suspend fun addStories(stories: List<MapPointEntity>)
     suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)

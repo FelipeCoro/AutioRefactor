@@ -25,16 +25,17 @@ import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class DownloadedStoriesFragment : Fragment() {
 
     @Inject
-    private lateinit var prefRepository: PrefRepository
+    lateinit var prefRepository: PrefRepository
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()

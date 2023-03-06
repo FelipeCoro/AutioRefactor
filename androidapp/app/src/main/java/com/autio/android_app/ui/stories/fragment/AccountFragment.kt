@@ -24,19 +24,20 @@ import com.autio.android_app.ui.login.SignInActivity
 import com.autio.android_app.ui.login.SignUpActivity
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.bumptech.glide.Glide
 import com.revenuecat.purchases.CustomerInfo
-import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
 
-@EntryPoint
+
+@AndroidEntryPoint
 class AccountFragment : Fragment() {
 
     @Inject

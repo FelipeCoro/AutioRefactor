@@ -54,10 +54,11 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.maps.android.clustering.ClusterManager
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
@@ -65,7 +66,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val storyViewModel: StoryViewModel by viewModels()
 
     @Inject
-    private lateinit var prefRepository: PrefRepository
+    lateinit var prefRepository: PrefRepository
 
     private lateinit var mediaId: String
     private lateinit var binding: FragmentMapBinding
@@ -380,7 +381,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun updateLocationUI() {
+    fun updateLocationUI() {
         try {
             if (locationPermissionGranted) {
                 map.isMyLocationEnabled = true

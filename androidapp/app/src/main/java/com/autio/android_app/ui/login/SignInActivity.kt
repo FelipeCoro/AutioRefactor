@@ -1,33 +1,30 @@
 package com.autio.android_app.ui.login
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.autio.android_app.data.repository.ApiService
+import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivitySignInBinding
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
-import com.autio.android_app.util.InjectorUtils
 import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.pleaseFillText
-import com.autio.android_app.util.showError
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-class SignInActivity :
-    AppCompatActivity() {
-    private val prefRepository by lazy {
-        PrefRepository(
-            this
-        )
-    }
+@AndroidEntryPoint
+class SignInActivity : AppCompatActivity() {
 
-    private val purchaseViewModel by viewModels<PurchaseViewModel> {
-        InjectorUtils.providePurchaseViewModel(
-            this
-        )
-    }
+    @Inject
+    lateinit var prefRepository: PrefRepository
 
+    //TODO(Move service calls)
+    @Inject
+    lateinit var apiClient: ApiClient
+
+
+    private val purchaseViewModel: PurchaseViewModel by viewModels()
     private lateinit var binding: ActivitySignInBinding
 
     override fun onCreate(
@@ -36,10 +33,9 @@ class SignInActivity :
         super.onCreate(
             savedInstanceState
         )
-        binding =
-            ActivitySignInBinding.inflate(
-                layoutInflater
-            )
+        binding = ActivitySignInBinding.inflate(
+            layoutInflater
+        )
         setContentView(
             binding.root
         )
@@ -59,13 +55,11 @@ class SignInActivity :
     }
 
     private fun showLoadingView() {
-        binding.flLoading.root.visibility =
-            View.VISIBLE
+        binding.flLoading.root.visibility = View.VISIBLE
     }
 
     private fun hideLoadingView() {
-        binding.flLoading.root.visibility =
-            View.GONE
+        binding.flLoading.root.visibility = View.GONE
     }
 
     private fun loginUser() {
@@ -80,18 +74,14 @@ class SignInActivity :
             )
         } else {
             showLoadingView()
-            val email =
-                binding.editTextEmail.text.toString()
-            val password =
-                binding.editTextPassword.text.toString()
-            val loginRequest =
-                com.autio.android_app.data.api.model.account.LoginDto(
-                    email,
-                    password
-                )
-            ApiService.login(
-                loginRequest
-            ) {
+            val email = binding.editTextEmail.text.toString()
+            val password = binding.editTextPassword.text.toString()
+            val loginRequest = com.autio.android_app.data.api.model.account.LoginDto(
+                email, password
+            )
+
+            //TODO(Had to comment out to run)
+            /*apiClient.login(loginRequest) {
                 if (it != null) {
                     saveUserInfo(
                         it
@@ -113,34 +103,35 @@ class SignInActivity :
                         "The user and/or password are incorrect"
                     )
                 }
-            }
+            }*/
         }
     }
 
     private fun loginGuest() {
         showLoadingView()
-        ApiService.loginAsGuest {
-            if (it != null) {
-                saveGuestInfo(
-                    it
-                )
-                purchaseViewModel.login(
-                    "${it.id}"
-                )
-                startActivity(
-                    Intent(
-                        this,
-                        com.autio.android_app.ui.stories.BottomNavigation::class.java
-                    )
-                )
-                finish()
-            } else {
-                hideLoadingView()
-                showError(
-                    this
-                )
-            }
-        }
+        //TODO(Had to comment out to run)
+        /* apiClient.loginAsGuest {
+             if (it != null) {
+                 saveGuestInfo(
+                     it
+                 )
+                 purchaseViewModel.login(
+                     "${it.id}"
+                 )
+                 startActivity(
+                     Intent(
+                         this,
+                         com.autio.android_app.ui.stories.BottomNavigation::class.java
+                     )
+                 )
+                 finish()
+             } else {
+                 hideLoadingView()
+                 showError(
+                     this
+                 )
+             }
+         }*/
     }
 
     /**
@@ -149,16 +140,11 @@ class SignInActivity :
     private fun saveGuestInfo(
         guestResponse: com.autio.android_app.data.api.model.account.GuestResponse
     ) {
-        prefRepository.isUserGuest =
-            true
-        prefRepository.userId =
-            guestResponse.id
-        prefRepository.firebaseKey =
-            guestResponse.firebaseKey
-        prefRepository.userApiToken =
-            guestResponse.apiToken
-        prefRepository.remainingStories =
-            5
+        prefRepository.isUserGuest = true
+        prefRepository.userId = guestResponse.id
+        prefRepository.firebaseKey = guestResponse.firebaseKey
+        prefRepository.userApiToken = guestResponse.apiToken
+        prefRepository.remainingStories = 5
     }
 
     /**
@@ -167,19 +153,12 @@ class SignInActivity :
     private fun saveUserInfo(
         loginResponse: com.autio.android_app.data.api.model.account.LoginResponse
     ) {
-        prefRepository.isUserGuest =
-            false
-        prefRepository.userId =
-            loginResponse.id!!
-        prefRepository.userApiToken =
-            loginResponse.apiToken!!
-        prefRepository.userName =
-            loginResponse.name!!
-        prefRepository.userEmail =
-            loginResponse.email!!
-        prefRepository.firebaseKey =
-            loginResponse.firebaseKey!!
-        prefRepository.remainingStories =
-            -1
+        prefRepository.isUserGuest = false
+        prefRepository.userId = loginResponse.id!!
+        prefRepository.userApiToken = loginResponse.apiToken!!
+        prefRepository.userName = loginResponse.name!!
+        prefRepository.userEmail = loginResponse.email!!
+        prefRepository.firebaseKey = loginResponse.firebaseKey!!
+        prefRepository.remainingStories = -1
     }
 }

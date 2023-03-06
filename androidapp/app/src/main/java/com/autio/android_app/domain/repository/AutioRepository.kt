@@ -5,7 +5,8 @@ import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.data.database.entities.HistoryEntity
+import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
@@ -17,23 +18,27 @@ interface AutioRepository {
     val userCategories: Flow<List<Category>>
     val allStories: Flow<List<Story>>
     val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
-    val bookmarkedStories: Flow<List<MapPoint>>
-    val favoriteStories: Flow<List<MapPoint>>
-    val history: Flow<List<MapPoint>>
+    val bookmarkedStories: Flow<List<MapPointEntity>>
+    val favoriteStories: Flow<List<MapPointEntity>>
+    val history: Flow<List<MapPointEntity>>
 
     suspend fun login(loginDto: LoginDto): Response<LoginResponse>
     suspend fun fetchUserData()
     suspend fun updateProfile(infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit)
     suspend fun updateCategoriesOrder(
-        infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
+        infoUser: ProfileDto,
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit
     )
 
     suspend fun getMapPointById(id: String): Result<Story?>
     suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<Story>>
+    suspend fun getStoryById(xUserId: String, apiToken: String, id: String): Story
     suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
     suspend fun getStoriesInLatLngBoundaries(
-        swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<MapPoint>
+        swCoordinates: LatLng,
+        neCoordinates: LatLng
+    ): List<MapPointEntity>
 
     suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto)
 
@@ -67,7 +72,14 @@ interface AutioRepository {
 
     suspend fun clearUserData()
     suspend fun getLastModifiedStory(): Result<Story?>
-    fun addStories(stories: List<Story>) {
 
-    }
+    suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
+
+    suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
+
+    suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
+    suspend fun deleteCachedData()
+    suspend fun addStories(stories: List<Story>)
+
+
 }

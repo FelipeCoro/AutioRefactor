@@ -2,11 +2,11 @@ package com.autio.android_app.data.repository.datasource.local
 
 import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.DownloadedStoryDao
-import com.autio.android_app.data.database.dao.StoryDao
+import com.autio.android_app.data.database.dao.MapPointDao
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,18 +16,18 @@ import java.util.concurrent.Executors
 import javax.inject.Inject
 
 class AutioLocalDataSourceImpl @Inject constructor(
-    private val storyDao: StoryDao,
+    private val mapPointDao: MapPointDao,
     private val downloadedStoryDao: DownloadedStoryDao,
     private val categoryDao: CategoryDao,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
-    override val allLiveStories = storyDao.readLiveStories()
+    override val allLiveStories = mapPointDao.readLiveStories()
     override val getDownloadedStories = downloadedStoryDao.readLiveStories()
-    override val bookmarkedStories = storyDao.getBookmarkedStories()
-    override val favoriteStories = storyDao.getFavoriteStories()
-    override val history = storyDao.getHistory()
+    override val bookmarkedStories = mapPointDao.getBookmarkedStories()
+    override val favoriteStories = mapPointDao.getFavoriteStories()
+    override val history = mapPointDao.getHistory()
 
     override suspend fun addUserCategories(categories: List<CategoryEntity>) {
         executor.execute { categoryDao.addCategories(categories) }
@@ -39,8 +39,8 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<MapPoint> {
-        return storyDao.getStoriesInLatLngBoundaries(
+    ): List<MapPointEntity> {
+        return mapPointDao.getStoriesInLatLngBoundaries(
             swCoordinates.latitude,
             swCoordinates.longitude,
             neCoordinates.latitude,
@@ -48,56 +48,57 @@ class AutioLocalDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun getAllStories(): Result<List<MapPoint>?> {
-        return kotlin.runCatching { storyDao.allStories() }
+    override suspend fun getAllStories(): Result<List<MapPointEntity>?> {
+        return kotlin.runCatching { mapPointDao.allStories() }
             .onSuccess {
                 Result.success(it)
             }.onFailure {
-                Result.failure<List<MapPoint>?>(it)
+                Result.failure<List<MapPointEntity>?>(it)
             }
     }
 
-    override suspend fun getMapPointById(id: String): Result<MapPoint?> {
+    override suspend fun getMapPointById(id: String): Result<MapPointEntity?> {
         return kotlin.runCatching {
-            storyDao.getMapPointById(id)
-        }.onSuccess { Result.success(it) }.onFailure { Result.failure<MapPoint>(it) }
+            mapPointDao.getMapPointById(id)
+        }.onSuccess { Result.success(it) }.onFailure { Result.failure<MapPointEntity>(it) }
     }
 
-    override suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>> {
-        val listMapPoints = mutableListOf<MapPoint>()
+    override suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPointEntity>> {
+        val listMapPointEntities = mutableListOf<MapPointEntity>()
         ids.forEach { id ->
-            storyDao.getMapPointById(id.toString())?.let {
-                listMapPoints.add(it)
+            mapPointDao.getMapPointById(id.toString())?.let {
+                listMapPointEntities.add(it)
             }
         }
-        return flowOf(listMapPoints)
+        return flowOf(listMapPointEntities)
     }
 
-    override suspend fun getLastModifiedStory(): MapPoint? {
-        return storyDao.readLastModifiedStory()
+    override suspend fun getLastModifiedStory(): Result<MapPointEntity?> {
+
+        return kotlin.runCatching {
+            mapPointDao.readLastModifiedStory()
+        }.onSuccess { Result.success(it) }.onFailure { Result.failure<MapPointEntity>(it) }
     }
 
-    override suspend fun addStories(stories: List<MapPoint>) {
-        executor.execute { storyDao.addStories(stories) }
+    override suspend fun addStories(stories: List<MapPointEntity>) {
+        executor.execute { mapPointDao.addStories(stories) }
     }
 
     override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
         executor.execute {
-            storyDao.setBookmarksData(storiesIds)
+            mapPointDao.setBookmarksData(storiesIds)
         }
     }
 
     override suspend fun setLikesDataToLocalStories(storiesIds: List<String>) {
         executor.execute {
-            storyDao.setLikesData(storiesIds)
+            mapPointDao.setLikesData(storiesIds)
         }
     }
 
-    override suspend fun setListenedAtToLocalStories(
-        storiesHistory: List<HistoryEntity>
-    ) {
+    override suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>) {
         for (history in storiesHistory) {
-            storyDao.setListenedAtData(history.storyId, history.playedAt)
+            mapPointDao.setListenedAtData(history.storyId, history.playedAt)
 
             if (getDownloadedStoryById(history.storyId) != null) {
                 downloadedStoryDao.setListenedAtData(
@@ -109,7 +110,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
 
     override suspend fun addStoryToHistory(history: HistoryEntity) {
-        storyDao.setListenedAtData(
+        mapPointDao.setListenedAtData(
             history.storyId, history.playedAt
         )
 
@@ -121,7 +122,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun markStoryAsListenedAtLeast30Secs(storyId: String) {
-        storyDao.markStoryAsListenedAtLeast30Secs(storyId)
+        mapPointDao.markStoryAsListenedAtLeast30Secs(storyId)
 
         if (getDownloadedStoryById(storyId) != null) {
             downloadedStoryDao.markStoryAsListenedAtLeast30Secs(storyId)
@@ -129,7 +130,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun removeStoryFromHistory(id: String) {
-        storyDao.removeListenedAtData(id)
+        mapPointDao.removeListenedAtData(id)
 
         if (getDownloadedStoryById(id) != null) {
             downloadedStoryDao.removeListenedAtData(id)
@@ -137,19 +138,19 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun clearStoryHistory() {
-        storyDao.clearStoryHistory()
+        mapPointDao.clearStoryHistory()
         downloadedStoryDao.clearStoryHistory()
     }
 
     override suspend fun bookmarkStory(id: String) {
-        storyDao.setBookmarkToStory(id)
+        mapPointDao.setBookmarkToStory(id)
         if (getDownloadedStoryById(id) != null) {
             downloadedStoryDao.setBookmarkToStory(id)
         }
     }
 
     override suspend fun removeBookmarkFromStory(id: String) {
-        storyDao.removeBookmarkFromStory(id)
+        mapPointDao.removeBookmarkFromStory(id)
 
         if (getDownloadedStoryById(id) != null) {
             downloadedStoryDao.removeBookmarkFromStory(id)
@@ -157,12 +158,12 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun removeAllBookmarks() {
-        storyDao.removeAllBookmarks()
+        mapPointDao.removeAllBookmarks()
         downloadedStoryDao.removeAllBookmarks()
     }
 
     override suspend fun giveLikeToStory(id: String) {
-        storyDao.setLikeToStory(id)
+        mapPointDao.setLikeToStory(id)
 
         if (getDownloadedStoryById(id) != null) {
             downloadedStoryDao.setLikeToStory(id)
@@ -170,14 +171,14 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun removeLikeFromStory(id: String) {
-        storyDao.removeLikeFromStory(id)
+        mapPointDao.removeLikeFromStory(id)
 
         if (getDownloadedStoryById(id) != null) {
             downloadedStoryDao.removeLikeFromStory(id)
         }
     }
 
-    // Downloaded stories
+// Downloaded stories
 
     override suspend fun downloadStory(story: DownloadedStoryEntity) {
         executor.execute {
@@ -203,26 +204,26 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
         executor.execute {
-            storyDao.addRecordOfStory(storyId, recordUrl)
+            mapPointDao.addRecordOfStory(storyId, recordUrl)
         }
     }
 
     override suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
         executor.execute {
-            storyDao.addRecordOfStory(storyId, recordUrl)
+            mapPointDao.addRecordOfStory(storyId, recordUrl)
         }
     }
 
     override suspend fun clearUserData() {
         executor.execute {
-            storyDao.clearUserData()
+            mapPointDao.clearUserData()
             downloadedStoryDao.clearTable()
         }
     }
 
     override suspend fun deleteCachedData() {
         executor.execute {
-            storyDao.deleteRecordUrls()
+            mapPointDao.deleteRecordUrls()
         }
     }
 }

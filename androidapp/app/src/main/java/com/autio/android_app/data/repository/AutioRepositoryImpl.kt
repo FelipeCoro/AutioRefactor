@@ -5,10 +5,12 @@ import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.data.database.entities.HistoryEntity
+import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
@@ -16,8 +18,8 @@ import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.flow.*
+import kotlinx.serialization.descriptors.StructureKind
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -42,11 +44,11 @@ class AutioRepositoryImpl @Inject constructor(
 
             entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
         }
-    override val bookmarkedStories: Flow<List<MapPoint>>
+    override val bookmarkedStories: Flow<List<MapPointEntity>>
         get() = TODO("Not yet implemented")
-    override val favoriteStories: Flow<List<MapPoint>>
+    override val favoriteStories: Flow<List<MapPointEntity>>
         get() = TODO("Not yet implemented")
-    override val history: Flow<List<MapPoint>>
+    override val history: Flow<List<MapPointEntity>>
         get() = TODO("Not yet implemented")
 
     override suspend fun login(loginDto: LoginDto): Response<LoginResponse> {
@@ -103,11 +105,61 @@ class AutioRepositoryImpl @Inject constructor(
         }.onFailure { onFailure.invoke() }
     }
 
-    override suspend fun getMapPointById(id: String): Result<MapPoint?> =
-        autioLocalDataSource.getMapPointById(id)
+    override suspend fun getMapPointById(id: String): Result<Story?> {
 
-    override suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPoint>> =
-        autioLocalDataSource.getMapPointsByIds(ids)
+        val result = autioLocalDataSource.getMapPointById(id)
+
+        return if (result.isSuccess) {
+            val story = result.let { mapPoint ->
+                mapPoint.map { it?.toModel() }
+            }
+            story
+
+        } else {
+            val throwable = result.exceptionOrNull() ?: java.lang.Error()
+            Result.failure(throwable)
+        }
+    }
+
+    override suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<Story>> {
+
+        val result = autioLocalDataSource.getMapPointsByIds(ids)
+
+        result.map { entities ->
+            entities.onEach { it.toModel() }
+        }
+
+        val tempFlow: Flow<List<Story>> = emptyFlow()
+        return tempFlow
+
+        /* return if (result.isSuccess) {
+             result.transform { entities ->
+                 entities.onEach { it.toModel() }
+             }
+         } else {
+             val throwable = result.exceptionOrNull() ?: java.lang.Error()
+             Result.failure(throwable)
+         }*/
+        TODO("RETUR FLOW CORRECTLY")
+    }
+
+    override suspend fun getStoryById(xUserId: String, apiToken: String, id: String):Story {
+        runCatching {
+            autioRemoteDataSource.getStoryById(xUserId,
+                apiToken,
+                id)
+        }.onSuccess {
+            val story = it.body()
+            if (story != null) {
+                    autioLocalDataSource.cacheRecordOfStory(
+                        story.id, story.recordUrl
+                    )
+                }
+            }.onFailure { }
+
+        return Story() //TODO(TEMP FIX)
+    }
+
 
     override suspend fun getStoriesByIds(
         userId: Int, apiToken: String, storiesWithoutRecords: List<Story>
@@ -130,7 +182,7 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<MapPoint> {
+    ): List<MapPointEntity> {
         return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
 
@@ -223,8 +275,39 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getLastModifiedStory(): Result<Story?> {
-        val mapPoint = autioLocalDataSource.getLastModifiedStory()
-        return mapPoint.toModel()
+
+        val result = autioLocalDataSource.getLastModifiedStory()
+
+        return if (result.isSuccess) {
+            val story = result.let { mapPoint ->
+                mapPoint.map { it?.toModel() }
+            }
+            story
+
+        } else {
+            val throwable = result.exceptionOrNull() ?: java.lang.Error()
+            Result.failure(throwable)
+        }
+    }
+
+    override suspend fun setLikesDataToLocalStories(storiesIds: List<String>) {
+       autioLocalDataSource.setLikesDataToLocalStories(storiesIds)
+    }
+
+    override suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>) {
+       autioLocalDataSource.setLikesDataToLocalStories(storiesHistory.map { it.toString() }) //TODO(Check this mapping)
+    }
+
+    override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
+        autioLocalDataSource.setBookmarksDataToLocalStories(storiesIds)
+    }
+
+    override suspend fun deleteCachedData() {
+        autioLocalDataSource.deleteCachedData()
+    }
+
+    override suspend fun addStories(stories: List<Story>) {
+       autioLocalDataSource.addStories(stories.map { it.toEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
     }
 }
 

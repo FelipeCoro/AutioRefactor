@@ -26,6 +26,7 @@ import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
+import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.extensions.getAddress
 import com.autio.android_app.extensions.timestampToMSS
 import com.autio.android_app.ui.stories.models.Story
@@ -43,12 +44,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import java.util.*
 import java.util.regex.Pattern
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class PlayerFragment : Fragment(),
     OnMapReadyCallback,
     FragmentManager.OnBackStackChangedListener {
@@ -565,7 +567,7 @@ class PlayerFragment : Fragment(),
                 btnOptions.setOnClickListener {
                     showStoryOptions(
                         requireContext(),
-                        binding.root,
+                        binding.root as ViewGroup,
                         it,
                         story,
                         arrayListOf(
@@ -728,7 +730,7 @@ class PlayerFragment : Fragment(),
                             val downloadedStory =
                                 DownloadedStoryEntity.fromStory(
                                     requireContext(),
-                                    story
+                                    story.toDto() //TODO(Temp fix)
                                 )
                             lifecycleScope.launch {
                                 storyViewModel.downloadStory(

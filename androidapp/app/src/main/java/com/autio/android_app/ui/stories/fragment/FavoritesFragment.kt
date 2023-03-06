@@ -1,4 +1,3 @@
-
 package com.autio.android_app.ui.stories.fragment
 
 import android.os.Bundle
@@ -18,23 +17,26 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.MapPoint
+import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
+import com.autio.android_app.domain.mappers.toDto
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.util.*
-import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@EntryPoint
+@AndroidEntryPoint
 class FavoritesFragment : Fragment() {
 
     @Inject
@@ -53,7 +55,7 @@ class FavoritesFragment : Fragment() {
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
 
-    private var stories: List<MapPoint>? = null
+    private var stories: List<MapPointEntity>? = null
 
     private lateinit var snackBarView: View
     private var feedbackJob: Job? =
@@ -168,14 +170,14 @@ class FavoritesFragment : Fragment() {
                 val storiesWithoutRecords =
                     stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
-                    lifecycleScope.launch{
-                   val storiesFromAPI = apiClient.getStoriesByIds(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        storiesWithoutRecords.map { it.originalId }
-                    )
+                    lifecycleScope.launch {
+                        val storiesFromAPI = apiClient.getStoriesByIds(
+                            prefRepository.userId,
+                            prefRepository.userApiToken,
+                            //TODO DTO has a val "original id" we need to see if mapPointEntity might need it
+                            storiesWithoutRecords.map { it.toModel().toDto().originalId})
                         if (storiesFromAPI.isSuccessful) {
-                            for (story in storiesFromAPI) {
+                            for (story in storiesFromAPI.body()!!) { //TODO(need to extract list from result)
                                 storyViewModel.cacheRecordOfStory(
                                     story.id,
                                     story.recordUrl
@@ -185,7 +187,7 @@ class FavoritesFragment : Fragment() {
                     }
                 }
                 storyAdapter.submitList(
-                    stories
+                    stories.map{it.toModel()}
                 )
                 binding.llNoContent.visibility =
                     View.GONE
@@ -342,12 +344,12 @@ class FavoritesFragment : Fragment() {
                         }
                     )
                 }
-                com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> lifecycleScope.launch {
+                StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
                         val downloadedStory =
                             DownloadedStoryEntity.fromStory(
                                 requireContext(),
-                                story
+                                story.toDto() //TODO(temp fix)
                             )
                         storyViewModel.downloadStory(
                             downloadedStory!!

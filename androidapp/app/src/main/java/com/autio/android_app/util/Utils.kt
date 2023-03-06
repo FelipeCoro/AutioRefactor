@@ -229,10 +229,7 @@ fun showPaywallOrProceedWithNormalProcess(
             normalProcess.invoke()
         } else {
             try {
-                val prefRepository =
-                    PrefRepository(
-                        activity
-                    )
+                lateinit var prefRepository: PrefRepository //TODO(check this later, cant inject)
                 val isUserGuest =
                     prefRepository.isUserGuest
                 val remainingStories =

@@ -12,8 +12,9 @@ import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryDetailFragmentViewModel
 import com.autio.android_app.util.showError
 import dagger.hilt.EntryPoint
+import dagger.hilt.android.AndroidEntryPoint
 
-@EntryPoint
+@AndroidEntryPoint
 class StoryDetailFragment : Fragment() {
 
     private val viewmodel: StoryDetailFragmentViewModel by viewModels()

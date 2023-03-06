@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.autio.android_app.R
 import com.autio.android_app.data.database.DataBase
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.extensions.album
 import com.autio.android_app.extensions.flag
 import com.autio.android_app.extensions.from
@@ -539,12 +540,12 @@ open class PlayerService @Inject constructor(
             mediaId: String, playWhenReady: Boolean, extras: Bundle?
         ) {
             serviceScope.launch {
-                val itemToPlay = database.storyDao().getStoryById(mediaId)
+                val itemToPlay = database.mapPointDao().getMapPointById(mediaId)
                 if (itemToPlay == null) {
                     Log.w(TAG, "Content not found: MediaID=$mediaId")
                 } else {
                     val itemMetadata = MediaMetadataCompat.Builder().from(
-                        itemToPlay
+                        itemToPlay.toModel()
                     ).build()
                     val playbackStartPositionMs = extras?.getLong(
                         MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS, C.TIME_UNSET
