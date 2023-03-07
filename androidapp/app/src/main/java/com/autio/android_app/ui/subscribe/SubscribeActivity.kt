@@ -11,6 +11,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.NavHostFragment
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.ActivitySubscribeBinding
@@ -198,7 +199,11 @@ class SubscribeActivity : AppCompatActivity() {
     }
 
     private fun goToLoginActivity() {
-        startActivity(Intent(this, LoginFragment::class.java))
-        finish()
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.subscribe_nav_host) as NavHostFragment
+        val nav = navHostFragment.navController
+        nav.navigate(R.id.loginFragment)
+
+
     }
 }

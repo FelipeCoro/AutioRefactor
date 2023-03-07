@@ -6,6 +6,7 @@ import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.player.PlayerService
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.di.coroutines.MainDispatcher
+import com.autio.android_app.ui.network_monitor.NetworkManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,5 +34,11 @@ object UiInjectorModule {
             autioRepository,
             coroutineDispatcher
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideNetworkManager(@ApplicationContext context: Context): NetworkManager {
+        return NetworkManager(context)
     }
 }

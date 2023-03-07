@@ -125,8 +125,7 @@ fun GuestResponse.toModel(): User {
         name = "",
         email = "",
         apiToken,
-        isGuest,
-        firebaseKey
+        isGuest
     )
 }
 
@@ -136,8 +135,7 @@ fun LoginResponse.toModel(): User {
         name = "",
         email = "",
         apiToken,
-        isGuest,
-        firebaseKey
+        isGuest
     )
 }
 

@@ -14,31 +14,23 @@ import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentNotificationsBinding
 import com.autio.android_app.util.TrackingUtility
 
-class NotificationsFragment :
-    Fragment() {
+class NotificationsFragment : Fragment() {
 
-    private var _binding: FragmentNotificationsBinding? =
-        null
+    private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding =
-            FragmentNotificationsBinding.inflate(
-                inflater,
-                container,
-                false
-            )
+        _binding = FragmentNotificationsBinding.inflate(
+            inflater, container, false
+        )
 
-        viewPager =
-            requireActivity().findViewById(
-                R.id.viewPager
-            )
+        viewPager = requireActivity().findViewById(
+            R.id.viewPager
+        )
 
         binding.buttonNotificationPermission.setOnClickListener {
             requestPermission()
@@ -47,8 +39,7 @@ class NotificationsFragment :
     }
 
     private fun goToLocationPermission() {
-        viewPager.currentItem =
-            1
+        viewPager.currentItem = 1
     }
 
     private fun requestPermission() {
@@ -64,34 +55,26 @@ class NotificationsFragment :
         }
     }
 
-    private val requestPermissionLauncher =
-        registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { permissionResult ->
-            if (permissionResult) {
-                goToLocationPermission()
-            } else {
-                showWarningDialog()
-            }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { permissionResult ->
+        if (permissionResult) {
+            goToLocationPermission()
+        } else {
+            showWarningDialog()
         }
+    }
 
     private fun showWarningDialog(
     ) {
         AlertDialog.Builder(
             requireActivity()
-        )
-            .setMessage(
-                "For a full experience of the app, accepting the " +
-                        "requested permissions are necessary. Are you sure want to continue?" +
-                        " You can change this later in your Settings."
-            )
-            .setPositiveButton(
+        ).setMessage(
+                "For a full experience of the app, accepting the " + "requested permissions are necessary. Are you sure want to continue?" + " You can change this later in your Settings."
+            ).setPositiveButton(
                 "Continue"
-            ) { _, _ -> goToLocationPermission() }
-            .setNegativeButton(
+            ) { _, _ -> goToLocationPermission() }.setNegativeButton(
                 "Request again"
-            ) { _, _ -> requestPermission() }
-            .create()
-            .show()
+            ) { _, _ -> requestPermission() }.create().show()
     }
 }

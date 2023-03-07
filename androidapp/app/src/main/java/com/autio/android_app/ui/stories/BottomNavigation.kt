@@ -12,39 +12,40 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.get
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
+import com.autio.android_app.ui.network_monitor.NetworkManager
 import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.subscribe.SubscribeActivity
-import com.autio.android_app.ui.viewmodel.MyState
-import com.autio.android_app.ui.viewmodel.NetworkStatusViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class BottomNavigation : AppCompatActivity() {
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by viewModels()
 
     private val purchaseViewModel: PurchaseViewModel by viewModels()
 
-    private val networkViewModel: NetworkStatusViewModel by viewModels()
-
     private var castContext: CastContext? = null
 
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
+    private lateinit var networkManager:NetworkManager
 
     private lateinit var navHostFragment: NavHostFragment
 
-    private var connected = false
+    private var isNetworkAvailable = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,17 +78,15 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun bindObservables() {
-        networkViewModel.state.observe(
-            this
-        ) { state ->
-            connected = when (state) {
-                MyState.Fetched -> true
-                MyState.Error -> false
+            lifecycleScope.launchWhenResumed {
+                networkManager.networkStatus.collect {
+                    isNetworkAvailable = it.isConnected
+
+                     updateConnectionUI(
+                    isNetworkAvailable
+                )
+                }
             }
-            updateConnectionUI(
-                connected
-            )
-        }
 
         bottomNavigationViewModel.playingStory.observe(this) { mediaItem ->
             updatePlayer(mediaItem)
@@ -113,7 +112,7 @@ class BottomNavigation : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         updateConnectionUI(
-            connected
+            isNetworkAvailable
         )
     }
 
