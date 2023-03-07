@@ -138,11 +138,14 @@ class AuthorFragment : Fragment() {
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
             is StoryViewState.FetchedStoriesByIds -> storiesByIdsSuccess(viewState.stories)
-            is StoryViewState.FetchedStoriesByIdsFailed -> storiesByIdsFailed()
             is StoryViewState.FetchedAllStories -> allStoriesSuccess(viewState.stories)
-            is StoryViewState.FetchedAllStoriesFailed -> allStoriesFailed()
             is StoryViewState.FetchedAuthor -> authorSuccess(viewState.author)
-            else -> authorFailed()
+            is StoryViewState.AddedBookmark -> addedBookmark()
+            is StoryViewState.RemovedBookmark -> removeBookmark()
+            is StoryViewState.StoryLiked -> storyLiked()
+            is StoryViewState.LikedRemoved -> likedRemoved()
+            is StoryViewState.StoryRemoved -> removedFromDownload()
+            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
         }
     }
 
@@ -192,18 +195,30 @@ class AuthorFragment : Fragment() {
 
     private fun allStoriesSuccess(stories: List<Story>) {}
 
-    private fun authorFailed() {
-        //TODO (Handle Error)
+    private fun addedBookmark() {
+        showFeedbackSnackBar("Added To Bookmarks")
     }
 
-    private fun storiesByIdsFailed() {
-        //TODO (Handle Error)
+    private fun removeBookmark() {
+        showFeedbackSnackBar("Removed From Bookmarks")
     }
 
-    private fun allStoriesFailed() {
-        //TODO (Handle Error)
+    private fun storyLiked() {
+        showFeedbackSnackBar("Added To Favorites")
     }
 
+    private fun likedRemoved() {
+        showFeedbackSnackBar("Removed From Favorites")
+    }
+
+    private fun removedFromDownload() {
+        showFeedbackSnackBar("Story Removed From My Device")
+    }
+
+    private fun viewStateError() {
+        //TODO(Macro error handling for viewstate error)
+        showFeedbackSnackBar("Connection Failure")
+    }
 
     private fun onOptionClicked(
         option: StoryOption, story: Story
@@ -213,127 +228,41 @@ class AuthorFragment : Fragment() {
         ) {
             when (option) {
                 StoryOption.BOOKMARK -> {
-                    // TODO: change Firebase code with commented code once stable
-                    FirebaseStoryRepository.bookmarkStory(prefRepository.firebaseKey,
-                        story.id,
-                        story.title,
-                        onSuccessListener = {
-                            storyViewModel.bookmarkStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Added To Bookmarks"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
-//                    ApiService.bookmarkStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it != null) {
-//                            storyViewModel.bookmarkStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Bookmarks"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
+
+                    storyViewModel.bookmarkStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
+                    )
                 }
                 StoryOption.REMOVE_BOOKMARK -> {
-                    // TODO: change Firebase code with commented code once stable
-                    FirebaseStoryRepository.removeBookmarkFromStory(prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeBookmarkFromStory(story.id)
-                            showFeedbackSnackBar(
-                                "Removed From Bookmarks"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
-//                    ApiService.removeBookmarkFromStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it?.removed == true) {
-//                            storyViewModel.removeBookmarkFromStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Removed From Bookmarks"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
+
+                    storyViewModel.removeBookmarkFromStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
+                    )
                 }
                 StoryOption.LIKE -> {
-                    FirebaseStoryRepository.giveLikeToStory(story.id,
-                        prefRepository.firebaseKey,
-                        onSuccessListener = {
-                            storyViewModel.setLikeToStory(story.id)
-                            showFeedbackSnackBar("Added To Favorites")
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar("Connection Failure")
-                        })
-//                    ApiService.likeStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it == true) {
-//                            storyViewModel.setLikeToStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Favorites"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
+
+                    storyViewModel.giveLikeToStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
+                    )
                 }
                 StoryOption.REMOVE_LIKE -> {
-                    FirebaseStoryRepository.removeLikeFromStory(prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeLikeFromStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Removed From Favorites"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
+                    storyViewModel.removeLikeFromStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
+                    )
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
 
-                    try {
+                    try { //TODO(Temp fix for runability)
                         val downloadedStory = DownloadedStoryEntity.fromStory(
-                            requireContext(), story.toDto() //TODO(Temp fix for runability)
+                            requireContext(), story.toDto()
                         )
                         storyViewModel.downloadStory(
                             downloadedStory!!
@@ -352,10 +281,7 @@ class AuthorFragment : Fragment() {
                 }
                 StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
-                        story.id
-                    )
-                    showFeedbackSnackBar(
-                        "Story Removed From My Device"
+                        story.originalId
                     )
                 }
                 StoryOption.DIRECTIONS -> openLocationInMapsApp(

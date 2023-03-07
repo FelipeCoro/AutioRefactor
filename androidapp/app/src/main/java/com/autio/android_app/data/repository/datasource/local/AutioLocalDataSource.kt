@@ -29,18 +29,18 @@ interface AutioLocalDataSource {
     suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
     suspend fun addStoryToHistory(history: HistoryEntity)
-    suspend fun markStoryAsListenedAtLeast30Secs(storyId: String)
-    suspend fun removeStoryFromHistory(id: String)
+    suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int)
+    suspend fun removeStoryFromHistory(id: Int)
     suspend fun clearStoryHistory()
-    suspend fun bookmarkStory(id: String)
-    suspend fun removeBookmarkFromStory(id: String)
+    suspend fun bookmarkStory(id: Int): DownloadedStoryEntity?
+    suspend fun removeBookmarkFromStory(id: Int): DownloadedStoryEntity?
     suspend fun removeAllBookmarks()
-    suspend fun giveLikeToStory(id: String)
-    suspend fun removeLikeFromStory(id: String)
+    suspend fun giveLikeToStory(id: Int)
+    suspend fun removeLikeFromStory(id: Int)
     suspend fun downloadStory(story: DownloadedStoryEntity)
-    suspend fun removeDownloadedStory(id: String)
+    suspend fun removeDownloadedStory(id: Int)
     suspend fun removeAllDownloads()
-    suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity?
+    suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity?
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
     suspend fun clearUserData()

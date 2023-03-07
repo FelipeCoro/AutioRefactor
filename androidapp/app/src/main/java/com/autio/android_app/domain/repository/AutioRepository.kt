@@ -50,31 +50,38 @@ interface AutioRepository {
         page: Int
     ): Result<Contributor>
 
+    suspend fun giveLikeToStory(xUserId: Int, apiToken: String, storyId: Int): Result<Boolean>
+
     suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto)
 
-    suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity?
+    suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity?
 
     suspend fun downloadStory(story: DownloadedStoryEntity)
 
     suspend fun getAllStories(): Result<List<Story>?>
 
-    suspend fun removeDownloadedStory(id: String)
+    suspend fun removeDownloadedStory(id: Int)
 
     suspend fun removeAllDownloads()
 
-    suspend fun removeBookmarkFromStory(id: String)
+    suspend fun removeBookmarkFromStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Boolean>
 
+    suspend fun bookmarkStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
+
+    //TODO(Same as with storyViewModel we need to have parallel methods to avoid contradictions)
     suspend fun removeAllBookmarks()
 
-    suspend fun bookmarkStory(id: String)
+    suspend fun giveLikeToStory(id: Int)
 
-    suspend fun giveLikeToStory(id: String)
-
-    suspend fun removeLikeFromStory(id: String)
+    suspend fun removeLikeFromStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
     suspend fun addStoryToHistory(history: History)
 
-    suspend fun removeStoryFromHistory(id: String)
+    suspend fun removeStoryFromHistory(id: Int)
 
     suspend fun clearStoryHistory()
 

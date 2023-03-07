@@ -6,7 +6,7 @@ data class PlaysDto(
     @SerializedName(
         "firebase_story_identifier"
     )
-    val firebaseId: String? = null,
+    val firebaseId: Int? = null, //TODO(Check how this changes)
     @SerializedName(
         "was_present"
     )

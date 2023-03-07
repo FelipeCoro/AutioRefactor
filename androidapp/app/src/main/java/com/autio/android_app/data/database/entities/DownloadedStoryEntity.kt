@@ -18,7 +18,7 @@ import java.net.URL
 @Entity(tableName = "downloaded_stories")
 data class DownloadedStoryEntity(
     @PrimaryKey
-    val id: String,
+    val id: Int,
     val title: String,
     val description: String,
     val lat: Double,
@@ -106,7 +106,7 @@ data class DownloadedStoryEntity(
                 }
 
             return DownloadedStoryEntity(
-                id = storyDto.id,
+                id = storyDto.originalId,
                 title = storyDto.title,
                 description = storyDto.description,
                 lat = storyDto.lat,

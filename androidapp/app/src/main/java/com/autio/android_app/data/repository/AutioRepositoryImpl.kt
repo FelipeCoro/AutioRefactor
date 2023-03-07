@@ -1,10 +1,6 @@
 package com.autio.android_app.data.repository
 
-import com.autio.android_app.data.api.model.account.GuestResponse
-import com.autio.android_app.data.api.model.account.LoginDto
-import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
-import com.autio.android_app.data.api.model.story.AuthorDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
@@ -13,15 +9,12 @@ import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSour
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.mappers.toDTO
-import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.*
-import kotlinx.serialization.descriptors.StructureKind
-import retrofit2.Response
 import javax.inject.Inject
 
 class AutioRepositoryImpl @Inject constructor(
@@ -266,7 +259,7 @@ class AutioRepositoryImpl @Inject constructor(
         val result = autioRemoteDataSource.getStoriesByContributor(xUserId, apiToken, storyId, page)
 
         return if (result.isSuccessful) {
-            val contributor = result.let {contributorResponse ->
+            val contributor = result.let { contributorResponse ->
                 contributorResponse.body()!!.toModel()
             }
             Result.success(contributor)
@@ -276,7 +269,7 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {
+    override suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity? {
         return autioLocalDataSource.getDownloadedStoryById(id)
     }
 
@@ -299,7 +292,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun removeDownloadedStory(id: String) {
+    override suspend fun removeDownloadedStory(id: Int) {
         return autioLocalDataSource.removeDownloadedStory(id)
     }
 
@@ -320,35 +313,94 @@ class AutioRepositoryImpl @Inject constructor(
         }.onFailure { }
     }
 
+    override suspend fun giveLikeToStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Boolean> {
+        val likedStory = autioLocalDataSource.giveLikeToStory(storyId)
+        return likedStory.let {
+            val remoteLike = autioRemoteDataSource.giveLikeToStory(userId, apiToken, storyId)
+            if (remoteLike.isSuccessful) {
+                Result.success(remoteLike.body().toString().toBoolean())
+            } else {
+                val throwable = Error(remoteLike.errorBody().toString())
+                Result.failure(throwable)
+            }
+        }
+    }
+
     override suspend fun removeAllDownloads() {
         autioLocalDataSource.removeAllDownloads()
     }
 
-    override suspend fun removeBookmarkFromStory(id: String) {
-        autioLocalDataSource.removeBookmarkFromStory(id)
+    override suspend fun removeBookmarkFromStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Boolean> {
+        val bookedMarkedStory = autioLocalDataSource.removeBookmarkFromStory(storyId)
+        return bookedMarkedStory?.let {
+            val remoteBookmark =
+                autioRemoteDataSource.removeBookmarkFromStory(userId, apiToken, storyId)
+            if (remoteBookmark.isSuccessful) {
+                Result.success(remoteBookmark.body().toString().toBoolean())
+            } else {
+                val throwable = Error(remoteBookmark.errorBody().toString())
+                Result.failure(throwable)
+            }
+        } ?: Result.failure(Error())
     }
+
+    override suspend fun bookmarkStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Boolean> {
+        val bookedMarkedStory = autioLocalDataSource.bookmarkStory(storyId)
+        return bookedMarkedStory?.let {
+            val remoteBookmark = autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId)
+            if (remoteBookmark.isSuccessful) {
+                Result.success(remoteBookmark.body().toString().toBoolean())
+            } else {
+                val throwable = Error(remoteBookmark.errorBody().toString())
+                Result.failure(throwable)
+            }
+        } ?: Result.failure(Error())
+    }
+
 
     override suspend fun removeAllBookmarks() {
         autioLocalDataSource.removeAllBookmarks()
+
     }
 
-    override suspend fun bookmarkStory(id: String) {
-        autioLocalDataSource.bookmarkStory(id)
-    }
-
-    override suspend fun giveLikeToStory(id: String) {
+    override suspend fun giveLikeToStory(id: Int) {
         autioLocalDataSource.giveLikeToStory(id)
     }
 
-    override suspend fun removeLikeFromStory(id: String) {
-        autioLocalDataSource.removeLikeFromStory(id)
+    override suspend fun removeLikeFromStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Boolean> {
+        val removedLike = autioLocalDataSource.removeLikeFromStory(storyId)
+        return removedLike.let {
+            val remoteRemovedLike = autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
+            if (remoteRemovedLike.isSuccessful) {
+                Result.success(remoteRemovedLike.body().toString().toBoolean())
+            } else {
+                val throwable = Error(remoteRemovedLike.errorBody().toString())
+                Result.failure(throwable)
+            }
+        }
     }
 
     override suspend fun addStoryToHistory(history: History) {
         autioLocalDataSource.addStoryToHistory(history.toEntity())
     }
 
-    override suspend fun removeStoryFromHistory(id: String) {
+    override suspend fun removeStoryFromHistory(id: Int) {
         autioLocalDataSource.removeStoryFromHistory(id)
     }
 

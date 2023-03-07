@@ -48,13 +48,13 @@ interface MapPointDao {
     fun setBookmarksToStories(ids: List<String>)
 
     @Query("UPDATE stories SET isBookmarked = 1 WHERE id = :id")
-    fun setBookmarkToStory(id: String)
+    fun setBookmarkToStory(id: Int)
 
     @Query("UPDATE stories SET isBookmarked = 0 WHERE id NOT IN (:ids)")
     fun removeBookmarksFromStories(ids: List<String>)
 
     @Query("UPDATE stories SET isBookmarked = 0 WHERE id = :id")
-    fun removeBookmarkFromStory(id: String)
+    fun removeBookmarkFromStory(id: Int)
 
     @Query("UPDATE stories SET isBookmarked = 0")
     fun removeAllBookmarks()
@@ -72,13 +72,13 @@ interface MapPointDao {
     fun getHistory(): Flow<List<MapPointEntity>>
 
     @Query("UPDATE stories SET listenedAt = :listenedAt WHERE id = :storyId")
-    fun setListenedAtData(storyId: String, listenedAt: String)
+    fun setListenedAtData(storyId: Int, listenedAt: String)
 
     @Query("UPDATE stories SET listenedAtLeast30Secs = true WHERE id = :storyId")
-    fun markStoryAsListenedAtLeast30Secs(storyId: String)
+    fun markStoryAsListenedAtLeast30Secs(storyId: Int)
 
     @Query("UPDATE stories SET listenedAt = '' WHERE id = :storyId")
-    fun removeListenedAtData(storyId: String)
+    fun removeListenedAtData(storyId: Int)
 
     @Query("UPDATE stories SET listenedAt = ''")
     fun clearStoryHistory()
@@ -87,13 +87,13 @@ interface MapPointDao {
     fun setLikesToStories(ids: List<String>)
 
     @Query("UPDATE stories SET isLiked = 1 WHERE id = :id")
-    fun setLikeToStory(id: String): Int
+    fun setLikeToStory(id: Int): Int
 
     @Query("UPDATE stories SET isLiked = 0 WHERE id NOT IN (:ids)")
     fun removeLikesFromStories(ids: List<String>): Int
 
     @Query("UPDATE stories SET isLiked = 0 WHERE id = :id")
-    fun removeLikeFromStory(id: String)
+    fun removeLikeFromStory(id: Int)
 
     @Query("UPDATE stories SET recordUrl = :recordUrl WHERE id = :id")
     fun addRecordOfStory(id: String, recordUrl: String)

@@ -16,39 +16,37 @@ interface DownloadedStoryDao {
     fun readLiveStories(): Flow<List<DownloadedStoryEntity>>
 
     @Query("SELECT * FROM downloaded_stories WHERE id = :id")
-    suspend fun getStoryById(id: String): DownloadedStoryEntity?
+    suspend fun getStoryById(id: Int): DownloadedStoryEntity?
 
     @Query("UPDATE downloaded_stories SET isBookmarked = 1 WHERE id = :id")
-    fun setBookmarkToStory(id: String)
+    fun setBookmarkToStory(id: Int)
 
     @Query("UPDATE downloaded_stories SET isBookmarked = 0 WHERE id = :id")
-    fun removeBookmarkFromStory(id: String)
+    fun removeBookmarkFromStory(id: Int)
 
     @Query("UPDATE downloaded_stories SET isBookmarked = 0")
     fun removeAllBookmarks()
 
     @Query("UPDATE downloaded_stories SET isLiked = 1 WHERE id = :id")
-    fun setLikeToStory(id: String)
+    fun setLikeToStory(id: Int)
 
     @Query("UPDATE downloaded_stories SET isLiked = 0 WHERE id = :id")
-    fun removeLikeFromStory(
-        id: String
-    )
+    fun removeLikeFromStory(id: Int)
 
     @Query("UPDATE downloaded_stories SET listenedAt = :listenedAt WHERE id = :storyId")
-    fun setListenedAtData(storyId: String, listenedAt: String)
+    fun setListenedAtData(storyId: Int, listenedAt: String)
 
     @Query("UPDATE downloaded_stories SET listenedAtLeast30Secs = true WHERE id = :storyId")
-    fun markStoryAsListenedAtLeast30Secs(storyId: String)
+    fun markStoryAsListenedAtLeast30Secs(storyId: Int)
 
     @Query("UPDATE downloaded_stories SET listenedAt = '' WHERE id = :storyId")
-    fun removeListenedAtData(storyId: String)
+    fun removeListenedAtData(storyId: Int)
 
     @Query("UPDATE downloaded_stories SET listenedAt = ''")
     fun clearStoryHistory()
 
     @Query("DELETE FROM downloaded_stories WHERE id = :id")
-    fun removeStory(id: String)
+    fun removeStory(id: Int)
 
     @Query("DELETE FROM downloaded_stories")
     fun clearTable()
