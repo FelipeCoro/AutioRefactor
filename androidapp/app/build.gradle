@@ -59,6 +59,12 @@ android {
     buildFeatures {
         dataBinding true
     }
+
+    kapt {
+        correctErrorTypes true
+    }
+
+
     namespace 'com.autio.android_app'
 
     flavorDimensions 'env'

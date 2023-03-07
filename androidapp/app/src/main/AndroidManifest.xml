@@ -49,22 +49,8 @@
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="com.autio.android_app.cast.CastOptionsProvider" />
-
-        <activity
-            android:name=".ui.login.fragments.LoginFragment"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-
         <activity
             android:name=".ui.onboarding.OnBoardingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.login.fragments.SignUpFragment"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.login.fragments.SignInFragment"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
