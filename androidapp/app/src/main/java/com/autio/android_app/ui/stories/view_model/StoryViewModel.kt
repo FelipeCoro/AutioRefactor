@@ -1,13 +1,11 @@
 package com.autio.android_app.ui.stories.view_model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
+import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,10 +17,12 @@ import javax.inject.Inject
 @HiltViewModel
 class StoryViewModel @Inject constructor(
     private val autioRepository: AutioRepository,
+    private val prefRepository: PrefRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-    private val _state = MutableLiveData<StoryViewState>()
-    val viewState: LiveData<StoryViewState> = _state
+    private val _storyViewState = MutableLiveData<StoryViewState>()
+    val storyViewState: LiveData<StoryViewState> = _storyViewState
+
 
     val userCategories = autioRepository.userCategories.asLiveData()
     val allStories = autioRepository.allStories.asLiveData()
@@ -32,7 +32,7 @@ class StoryViewModel @Inject constructor(
     val favoriteStories = autioRepository.favoriteStories.asLiveData()
 
     private fun setViewState(newState: StoryViewState) {
-        _state.postValue(newState)
+        _storyViewState.postValue(newState)
     }
 
     fun getAllStories() {
@@ -64,9 +64,53 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun removeDownloadedStory(id: String) {
+    fun getAuthorOfStory(xUserId: Int, apiToken: String, storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeDownloadedStory(id)
+            runCatching {
+                autioRepository.getAuthorOfStory(xUserId, apiToken, storyId)
+            }.onSuccess { result ->
+                val author = result.getOrNull()
+                if (author != null) {
+                    setViewState(StoryViewState.FetchedAuthor(author))
+                    callContributor(author)
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FetchedAuthorFailed)
+            }
+
+        }
+    }
+
+    private fun callContributor(author: Author) {
+        viewModelScope.launch(coroutineDispatcher) {
+            val contributorApiResponse = autioRepository.getStoriesByContributor(
+                prefRepository.userId, prefRepository.userApiToken, author.id, 1
+            )
+            contributorApiResponse.let { response ->
+                val contributor = response.getOrNull()
+                if (contributor != null) {
+                    for (story in contributor.data) {
+                        cacheRecordOfStory(
+                            story.id, story.narrationUrl ?: ""
+                        )
+                    }
+                    getStoriesByIds(contributor.data.map {
+                        it.id
+                    })
+                }
+            }
+        }
+    }
+
+    fun removeDownloadedStory(storyId: Int) {
+        viewModelScope.launch(coroutineDispatcher) {
+            runCatching {
+                autioRepository.removeDownloadedStory(storyId)
+            }.onSuccess {
+                setViewState(StoryViewState.StoryRemoved)
+            }.onFailure {
+                setViewState(StoryViewState.FailedStoryRemoved)
+            }
         }
     }
 
@@ -77,33 +121,78 @@ class StoryViewModel @Inject constructor(
     }
 
 
-    fun bookmarkStory(id: String) {
+    fun bookmarkStory(userId: Int, apiToken: String, storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.bookmarkStory(id)
+            runCatching {
+                autioRepository.bookmarkStory(userId, apiToken, storyId)
+            }.onSuccess { result ->
+                val bookmarked = result.getOrNull()
+                bookmarked.let {
+                    if (it == true) {
+                        setViewState(StoryViewState.AddedBookmark)
+                    } else setViewState(StoryViewState.FailedBookmark)
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FailedBookmark)
+            }
         }
     }
 
-    fun removeBookmarkFromStory(id: String) {
+    fun removeBookmarkFromStory(userId: Int, apiToken: String, storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeBookmarkFromStory(id)
+            runCatching {
+                autioRepository.removeBookmarkFromStory(userId, apiToken, storyId)
+            }.onSuccess { result ->
+                val bookmarked = result.getOrNull()
+                bookmarked.let {
+                    if (it == true) {
+                        setViewState(StoryViewState.RemovedBookmark)
+                    } else setViewState(StoryViewState.FailedBookmark)
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FailedBookmark)
+            }
         }
     }
 
-    fun removeAllBookmarks() {
+//TODO(Check with BackEnd for erase allBookmarks method)
+// fun removeAllBookmarks() {
+//     viewModelScope.launch(coroutineDispatcher) {
+//         autioRepository.removeAllBookmarks()
+//     }
+// }
+
+    fun giveLikeToStory(userId: Int, apiToken: String, storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeAllBookmarks()
+            runCatching {
+                autioRepository.giveLikeToStory(userId, apiToken, storyId)
+            }.onSuccess { result ->
+                val likedStory = result.getOrNull()
+                likedStory.let {
+                    if (it == true) {
+                        setViewState(StoryViewState.StoryLiked)
+                    } else setViewState(StoryViewState.FailedLikedStory)
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FailedLikedStory)
+            }
         }
     }
 
-    fun setLikeToStory(id: String) {
+    fun removeLikeFromStory(userId: Int, apiToken: String, storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.giveLikeToStory(id)
-        }
-    }
-
-    fun removeLikeFromStory(id: String) {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeLikeFromStory(id)
+            runCatching {
+                autioRepository.removeLikeFromStory(userId, apiToken, storyId)
+            }.onSuccess { result ->
+                val removedLike = result.getOrNull()
+                removedLike.let {
+                    if (it == true) {
+                        setViewState(StoryViewState.LikedRemoved)
+                    } else setViewState(StoryViewState.FailedLikedRemoved)
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FailedLikedRemoved)
+            }
         }
     }
 
@@ -113,7 +202,7 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun removeStoryFromHistory(id: String) {
+    fun removeStoryFromHistory(id: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.removeStoryFromHistory(id)
         }
@@ -144,4 +233,7 @@ class StoryViewModel @Inject constructor(
             autioRepository.clearUserData()
         }
     }
+
 }
+
+

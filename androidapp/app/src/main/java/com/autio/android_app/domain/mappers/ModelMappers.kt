@@ -4,11 +4,15 @@ import com.autio.android_app.data.api.model.account.CreateAccountDto
 import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
+import com.autio.android_app.data.api.model.story.AuthorDto
+import com.autio.android_app.data.api.model.story.ContributorResponse
+import com.autio.android_app.data.api.model.story.ContributorStoryData
 import com.autio.android_app.data.api.model.story.StoryDto
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.ui.stories.models.*
+import kotlinx.parcelize.Parcelize
 
 //TODO(need to break this up for readability)
 fun CategoryEntity.toModel(): Category {
@@ -156,5 +160,36 @@ fun AccountRequest.toDTO(): CreateAccountDto {
         password,
         passwordConfirmation,
         name
+    )
+}
+
+fun Author.toDto(): AuthorDto {
+    return AuthorDto(
+        id,
+        name,
+        biography,
+        url,
+        imageUrl
+    )
+}
+
+fun AuthorDto.toModel(): Author {
+    return Author(
+        id,
+        name,
+        biography,
+        url,
+        imageUrl
+    )
+
+
+}
+
+
+fun ContributorResponse.toModel(): Contributor {
+    return Contributor(
+        currentPage,
+        data,
+        totalPages
     )
 }

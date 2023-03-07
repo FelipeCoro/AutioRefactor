@@ -121,7 +121,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun markStoryAsListenedAtLeast30Secs(storyId: String) {
+    override suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int) {
         mapPointDao.markStoryAsListenedAtLeast30Secs(storyId)
 
         if (getDownloadedStoryById(storyId) != null) {
@@ -129,7 +129,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeStoryFromHistory(id: String) {
+    override suspend fun removeStoryFromHistory(id: Int) {
         mapPointDao.removeListenedAtData(id)
 
         if (getDownloadedStoryById(id) != null) {
@@ -142,18 +142,22 @@ class AutioLocalDataSourceImpl @Inject constructor(
         downloadedStoryDao.clearStoryHistory()
     }
 
-    override suspend fun bookmarkStory(id: String) {
+    override suspend fun bookmarkStory(id: Int): DownloadedStoryEntity? {
         mapPointDao.setBookmarkToStory(id)
-        if (getDownloadedStoryById(id) != null) {
+        val checkForStory = getDownloadedStoryById(id)
+        return checkForStory?.let {
             downloadedStoryDao.setBookmarkToStory(id)
+            checkForStory
         }
+
     }
 
-    override suspend fun removeBookmarkFromStory(id: String) {
+    override suspend fun removeBookmarkFromStory(id: Int): DownloadedStoryEntity? {
         mapPointDao.removeBookmarkFromStory(id)
-
-        if (getDownloadedStoryById(id) != null) {
+        val checkForStory = getDownloadedStoryById(id)
+        return checkForStory?.let {
             downloadedStoryDao.removeBookmarkFromStory(id)
+            checkForStory
         }
     }
 
@@ -162,7 +166,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         downloadedStoryDao.removeAllBookmarks()
     }
 
-    override suspend fun giveLikeToStory(id: String) {
+    override suspend fun giveLikeToStory(id: Int) {
         mapPointDao.setLikeToStory(id)
 
         if (getDownloadedStoryById(id) != null) {
@@ -170,7 +174,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeLikeFromStory(id: String) {
+    override suspend fun removeLikeFromStory(id: Int) {
         mapPointDao.removeLikeFromStory(id)
 
         if (getDownloadedStoryById(id) != null) {
@@ -186,7 +190,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun removeDownloadedStory(id: String) {
+    override suspend fun removeDownloadedStory(id: Int) {
         executor.execute {
             downloadedStoryDao.removeStory(id)
         }
@@ -198,7 +202,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDownloadedStoryById(id: String): DownloadedStoryEntity? {
+    override suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity? {
         return downloadedStoryDao.getStoryById(id)
     }
 

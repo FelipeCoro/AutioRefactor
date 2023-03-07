@@ -4,7 +4,10 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class LoginRequest(
-    val email: String,
-    val password: String
+data class Author(
+    val id: Int,
+    val name: String,
+    val biography: String,
+    val url: String?,
+    val imageUrl: String?
 ):Parcelable

@@ -27,9 +27,11 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAuthorBinding
 import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
@@ -46,7 +48,7 @@ class AuthorFragment : Fragment() {
 
     //TODO(Move service calls)
     @Inject
-    lateinit var apiClient:ApiClient
+    lateinit var apiClient: ApiClient
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
@@ -67,16 +69,19 @@ class AuthorFragment : Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding =
-            FragmentAuthorBinding.inflate(
-                inflater,
-                container,
-                false
-            )
+        binding = FragmentAuthorBinding.inflate(
+            inflater, container, false
+        )
+        return binding.root
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        bindObservers()
 
         binding.btnBack.setOnClickListener {
             findNavController().navigate(
@@ -84,276 +89,181 @@ class AuthorFragment : Fragment() {
             )
         }
 
-        snackBarView =
-            layoutInflater.inflate(
-                R.layout.feedback_snackbar,
-                binding.root as ViewGroup,
-                false
-            )
+        snackBarView = layoutInflater.inflate(
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
+        )
 
-        recyclerView =
-            binding.rvAuthorStories
-        storyAdapter =
-            StoryAdapter(
-                bottomNavigationViewModel.playingStory,
-                onStoryPlay = { id ->
-                    showPaywallOrProceedWithNormalProcess(
-                        requireActivity(),
-                        isActionExclusiveForSignedInUser = true
-                    ) {
-                        bottomNavigationViewModel.playMediaId(
-                            id
-                        )
-                    }
-                },
-                onOptionClick = ::onOptionClicked
-            )
-        recyclerView.adapter =
-            storyAdapter
-        recyclerView.layoutManager =
-            LinearLayoutManager(
-                requireContext()
-            )
+        recyclerView = binding.rvAuthorStories
+        storyAdapter = StoryAdapter(
+            bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
+                showPaywallOrProceedWithNormalProcess(
+                    requireActivity(), isActionExclusiveForSignedInUser = true
+                ) {
+                    bottomNavigationViewModel.playMediaId(
+                        id
+                    )
+                }
+            }, onOptionClick = ::onOptionClicked
+        )
+        recyclerView.adapter = storyAdapter
+        recyclerView.layoutManager = LinearLayoutManager(
+            requireContext()
+        )
 
-        val storyId =
-            arguments?.getInt(
-                STORY_ID_ARG
-            )
+        val storyId = arguments?.getInt(
+            STORY_ID_ARG
+        )
 
-        activityLayout =
-            requireActivity().findViewById(
-                R.id.activityRoot
-            )
+        activityLayout = requireActivity().findViewById(
+            R.id.activityRoot
+        )
 
         storyId?.let {
-            lifecycleScope.launch {
-                val authorResult = apiClient.getAuthorOfStory(
-                    prefRepository.userId,
-                    "Bearer " + prefRepository.userApiToken,
-                    it
-                )
-                if (authorResult.isSuccessful) {
-                    val author = authorResult.body()!!
-                    if (author.imageUrl != null) {
-                        Glide.with(
-                            this@AuthorFragment
-                        )
-                            .load(
-                                author.imageUrl
-                            )
-                            .transition(
-                                DrawableTransitionOptions.withCrossFade(
-                                    100
-                                )
-                            )
-                            .into(
-                                binding.ivAuthorPic
-                            )
-                    }
-                    binding.tvAuthorName.apply {
-                        visibility =
-                            View.VISIBLE
-                        text =
-                            author.name
-                    }
-                    binding.tvAuthorBio.apply {
-                        visibility =
-                            View.VISIBLE
-                        text =
-                            author.biography
-                    }
-                    if (author.url != null) {
-                        binding.btnVisitAuthorLink.apply {
-                            setOnClickListener {
-                                openUrl(
-                                    requireContext(),
-                                    author.url
-                                )
-                            }
-                            visibility =
-                                View.VISIBLE
-                        }
-                    }
+            storyViewModel.getAuthorOfStory(
+                prefRepository.userId,
+                "Bearer " + prefRepository.userApiToken,
+                it
+            )
 
-                    val contributorApiResponse = apiClient.getStoriesByContributor(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        author.id,
-                        1
-                    )
-                    if (contributorApiResponse.isSuccessful) {
-                        for (story in contributorApiResponse.body()!!.data) {
-                            storyViewModel.cacheRecordOfStory(
-                                story.id,
-                                story.narrationUrl
-                                    ?: ""
-                            )
-                        }
-                        storyViewModel.getStoriesByIds(
-                            contributorApiResponse.body()!!.data.map {
-                                it.id
-                            }
-                        )
-                            //TODO(This should change with livedata???)
-                            /*.observe(viewLifecycleOwner) { stories ->
-                                if (stories.isNotEmpty()) {
-                                    binding.tvPublishedStoriesSubtitle.visibility =
-                                        View.VISIBLE
-                                }
-                                storyAdapter.submitList(
-                                    stories.toList()
-                                )
-                            }*/
-                    }
-                }
-            }
+
         }
 
-        return binding.root
+
+    }
+
+    fun bindObservers() {
+        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
+    }
+
+    private fun handleViewState(viewState: StoryViewState?) {
+        when (viewState) {
+            is StoryViewState.FetchedStoriesByIds -> storiesByIdsSuccess(viewState.stories)
+            is StoryViewState.FetchedAllStories -> allStoriesSuccess(viewState.stories)
+            is StoryViewState.FetchedAuthor -> authorSuccess(viewState.author)
+            is StoryViewState.AddedBookmark -> addedBookmark()
+            is StoryViewState.RemovedBookmark -> removeBookmark()
+            is StoryViewState.StoryLiked -> storyLiked()
+            is StoryViewState.LikedRemoved -> likedRemoved()
+            is StoryViewState.StoryRemoved -> removedFromDownload()
+            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+        }
+    }
+
+    private fun authorSuccess(author: Author?) {
+
+        author?.let {
+            if (author.imageUrl != null) {
+                Glide.with(this@AuthorFragment).load(author.imageUrl)
+                    .transition(
+                        DrawableTransitionOptions.withCrossFade(
+                            100
+                        )
+                    ).into(
+                        binding.ivAuthorPic
+                    )
+            }
+            binding.tvAuthorName.apply {
+                visibility = View.VISIBLE
+                text = author.name
+            }
+            binding.tvAuthorBio.apply {
+                visibility = View.VISIBLE
+                text = author.biography
+            }
+            if (author.url != null) {
+                binding.btnVisitAuthorLink.apply {
+                    setOnClickListener {
+                        openUrl(
+                            requireContext(), author.url
+                        )
+                    }
+                    visibility = View.VISIBLE
+                }
+            }
+
+        }
+
+    }
+
+    private fun storiesByIdsSuccess(stories: List<Story>) {
+        binding.tvPublishedStoriesSubtitle.visibility =
+            View.VISIBLE
+        storyAdapter.submitList(
+            stories
+        )
+    }
+
+    private fun allStoriesSuccess(stories: List<Story>) {}
+
+    private fun addedBookmark() {
+        showFeedbackSnackBar("Added To Bookmarks")
+    }
+
+    private fun removeBookmark() {
+        showFeedbackSnackBar("Removed From Bookmarks")
+    }
+
+    private fun storyLiked() {
+        showFeedbackSnackBar("Added To Favorites")
+    }
+
+    private fun likedRemoved() {
+        showFeedbackSnackBar("Removed From Favorites")
+    }
+
+    private fun removedFromDownload() {
+        showFeedbackSnackBar("Story Removed From My Device")
+    }
+
+    private fun viewStateError() {
+        //TODO(Macro error handling for viewstate error)
+        showFeedbackSnackBar("Connection Failure")
     }
 
     private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption,
-        story: Story
+        option: StoryOption, story: Story
     ) {
         showPaywallOrProceedWithNormalProcess(
-            requireActivity(),
-            isActionExclusiveForSignedInUser = true
+            requireActivity(), isActionExclusiveForSignedInUser = true
         ) {
             when (option) {
-                com.autio.android_app.data.api.model.StoryOption.BOOKMARK -> {
-                    // TODO: change Firebase code with commented code once stable
-                    FirebaseStoryRepository.bookmarkStory(
-                        prefRepository.firebaseKey,
-                        story.id,
-                        story.title,
-                        onSuccessListener = {
-                            storyViewModel.bookmarkStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Added To Bookmarks"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        }
+                StoryOption.BOOKMARK -> {
+
+                    storyViewModel.bookmarkStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
                     )
-//                    ApiService.bookmarkStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it != null) {
-//                            storyViewModel.bookmarkStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Bookmarks"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
-                    // TODO: change Firebase code with commented code once stable
-                    FirebaseStoryRepository.removeBookmarkFromStory(
-                        prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeBookmarkFromStory(story.id)
-                            showFeedbackSnackBar(
-                                "Removed From Bookmarks"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        }
+                StoryOption.REMOVE_BOOKMARK -> {
+
+                    storyViewModel.removeBookmarkFromStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
                     )
-//                    ApiService.removeBookmarkFromStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it?.removed == true) {
-//                            storyViewModel.removeBookmarkFromStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Removed From Bookmarks"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
-                    FirebaseStoryRepository.giveLikeToStory(
-                        story.id,
-                        prefRepository.firebaseKey,
-                        onSuccessListener = {
-                            storyViewModel.setLikeToStory(story.id)
-                            showFeedbackSnackBar("Added To Favorites")
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar("Connection Failure")
-                        }
+                StoryOption.LIKE -> {
+
+                    storyViewModel.giveLikeToStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
                     )
-//                    ApiService.likeStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it == true) {
-//                            storyViewModel.setLikeToStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Favorites"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
-                    FirebaseStoryRepository.removeLikeFromStory(
-                        prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeLikeFromStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Removed From Favorites"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        }
+                StoryOption.REMOVE_LIKE -> {
+                    storyViewModel.removeLikeFromStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.originalId
                     )
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
 
-                    try {
-                        val downloadedStory =
-                            DownloadedStoryEntity.fromStory(
-                                requireContext(),
-                                story.toDto() //TODO(Temp fix for runability)
-                            )
+                    try { //TODO(Temp fix for runability)
+                        val downloadedStory = DownloadedStoryEntity.fromStory(
+                            requireContext(), story.toDto()
+                        )
                         storyViewModel.downloadStory(
                             downloadedStory!!
                         )
@@ -362,37 +272,28 @@ class AuthorFragment : Fragment() {
                         )
                     } catch (e: Exception) {
                         Log.e(
-                            "BookmarksFragment",
-                            "exception: ",
-                            e
+                            "BookmarksFragment", "exception: ", e
                         )
                         showFeedbackSnackBar(
                             "Failed Downloading Story"
                         )
                     }
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
+                StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
-                        story.id
-                    )
-                    showFeedbackSnackBar(
-                        "Story Removed From My Device"
+                        story.originalId
                     )
                 }
-                com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(),
-                    story.lat,
-                    story.lon
+                StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                    requireActivity(), story.lat, story.lon
                 )
-                com.autio.android_app.data.api.model.StoryOption.SHARE -> {
+                StoryOption.SHARE -> {
                     shareStory(
-                        requireContext(),
-                        story.id
+                        requireContext(), story.id
                     )
                 }
                 else -> Log.d(
-                    "AuthorFragment",
-                    "no option available"
+                    "AuthorFragment", "no option available"
                 )
             }
         }
@@ -403,36 +304,30 @@ class AuthorFragment : Fragment() {
     ) {
         if (isAdded && activity != null) {
             cancelJob()
-            snackBarView.alpha =
-                1F
+            snackBarView.alpha = 1F
             snackBarView.findViewById<TextView>(
                 R.id.tvFeedback
-            ).text =
-                feedback
+            ).text = feedback
             TransitionManager.beginDelayedTransition(
-                activityLayout,
-                Slide(
+                activityLayout, Slide(
                     Gravity.TOP
                 )
             )
             activityLayout.addView(
                 snackBarView
             )
-            feedbackJob =
-                lifecycleScope.launch {
-                    delay(
-                        2000
+            feedbackJob = lifecycleScope.launch {
+                delay(
+                    2000
+                )
+                snackBarView.animate().alpha(
+                    0F
+                ).withEndAction {
+                    activityLayout.removeView(
+                        snackBarView
                     )
-                    snackBarView.animate()
-                        .alpha(
-                            0F
-                        )
-                        .withEndAction {
-                            activityLayout.removeView(
-                                snackBarView
-                            )
-                        }
                 }
+            }
         }
     }
 

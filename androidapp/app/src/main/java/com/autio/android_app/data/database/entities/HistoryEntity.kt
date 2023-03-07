@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 data class HistoryEntity(
     @PrimaryKey
-    val storyId: String,
+    val storyId: Int,
     val playedAt: String,
     val isBookmarked: Boolean = false //TODO(Check initialization)
 )
