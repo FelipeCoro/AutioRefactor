@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/maps_root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.stories.fragments.MapFragment">
+    android:layout_height="match_parent">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/maps"

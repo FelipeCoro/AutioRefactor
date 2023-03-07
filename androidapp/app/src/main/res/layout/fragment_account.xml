@@ -5,8 +5,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/fragment_background"
-        tools:context=".ui.stories.fragments.AccountFragment">
+        android:background="@color/fragment_background">
 
         <LinearLayout
             android:id="@+id/linear_layout_sign_in"
