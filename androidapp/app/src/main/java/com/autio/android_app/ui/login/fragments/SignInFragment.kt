@@ -1,3 +1,5 @@
+package com.autio.android_app.ui.login.fragments
+
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

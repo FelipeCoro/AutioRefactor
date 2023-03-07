@@ -56,6 +56,11 @@ class SplashActivity : AppCompatActivity() {
      *   if user is logged, [LoginFragment] if false
      */
     private fun navigate() {
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.authentication_nav_host) as NavHostFragment
+        val nav = navHostFragment.navController
+
         if (!isBoardingFinished()) {
             startActivity(Intent(this, OnBoardingActivity::class.java))
             finish()
@@ -66,9 +71,6 @@ class SplashActivity : AppCompatActivity() {
         // but it is found more properly to check for the API token and firebase key
         // since the communication with backend requires any of these two
         if (isUserLoggedIn()) {
-            val navHostFragment =
-                supportFragmentManager.findFragmentById(R.id.authentication_nav_host) as NavHostFragment
-            val nav = navHostFragment.navController
             nav.navigate(R.id.loginFragment)
         } else {
             startActivity(Intent(this, BottomNavigation::class.java))

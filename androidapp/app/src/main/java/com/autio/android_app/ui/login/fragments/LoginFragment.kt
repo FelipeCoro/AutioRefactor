@@ -1,6 +1,5 @@
 package com.autio.android_app.ui.login.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,8 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
 
-    private val loginViewModel: LoginViewModel by viewModels()
     private lateinit var binding: FragmentLoginBinding
+
+    private val loginViewModel: LoginViewModel by viewModels()
     private lateinit var firstRecyclerView: RecyclerView
     private lateinit var secondRecyclerView: RecyclerView
     private lateinit var thirdRecyclerView: RecyclerView
@@ -39,12 +39,17 @@ class LoginFragment : Fragment() {
             container,
             false
         )
-        setUpBackgroundAnimation()
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setListeners()
         bindObservables()
+        initView()
+    }
 
-
-        return binding.root
+    private fun initView() {
+        setUpBackgroundAnimation()
     }
 
     private fun bindObservables() {
