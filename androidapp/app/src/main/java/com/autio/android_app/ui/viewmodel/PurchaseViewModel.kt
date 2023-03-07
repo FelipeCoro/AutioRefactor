@@ -89,7 +89,6 @@ class PurchaseViewModel @Inject constructor(
         prefRepository.userApiToken = loginResponse.apiToken
         prefRepository.userName = loginResponse.name
         prefRepository.userEmail = loginResponse.email
-        prefRepository.firebaseKey = loginResponse.firebaseKey
         prefRepository.remainingStories = -1
     }
 

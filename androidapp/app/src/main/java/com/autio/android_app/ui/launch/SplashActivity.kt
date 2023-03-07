@@ -6,10 +6,8 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.ui.login.fragments.LoginFragment
 import com.autio.android_app.ui.onboarding.OnBoardingActivity
@@ -28,7 +26,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
         isNightModeOn()
-        FirebaseStoryRepository
+        //FirebaseStoryRepository
         //navigate()
     }
 
@@ -79,6 +77,6 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun isUserLoggedIn() =
-        prefRepository.userApiToken.isEmpty() || prefRepository.firebaseKey.isEmpty()
+        prefRepository.userApiToken.isEmpty() //TODO(Shouldn't this be if its NOT empty?)
 
 }

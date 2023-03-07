@@ -132,9 +132,9 @@ interface ApiClient {
 
     @GET("/api/v1/stories/by-ids-v2")//TODO(Check endpoint with BO, this is just a copy paste from above)
     suspend fun getStoryById(
-        @Header("X-User-Id") xUserId: String,
+        @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,
-        @Query("id") id: String ="" //TODO(Should this is apparently a String in the PlayerServiceConnection method)
+        @Query("id") id: Int
     ): Response<StoryDto>
 
     @Deprecated(

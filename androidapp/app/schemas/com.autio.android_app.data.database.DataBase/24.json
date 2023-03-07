@@ -2,21 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 24,
-    "identityHash": "5e3e4e8532089be21d280cfe8ac316f4",
+    "identityHash": "88fb87f17690e78ecf0073d8ee598d88",
     "entities": [
       {
         "tableName": "stories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `firebaseId` INTEGER NOT NULL, `publishedAt` INTEGER NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `range` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `recordUrl` TEXT NOT NULL, `duration` INTEGER NOT NULL, `state` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `originalId` INTEGER NOT NULL, `isLiked` INTEGER NOT NULL, `listenedAt` TEXT NOT NULL, `modifiedDate` INTEGER NOT NULL, `isBookmarked` INTEGER, `listenedAtLeast30Secs` INTEGER, `isDownloaded` INTEGER, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `publishedAt` INTEGER NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `range` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `recordUrl` TEXT NOT NULL, `duration` INTEGER NOT NULL, `state` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `isLiked` INTEGER NOT NULL, `listenedAt` TEXT NOT NULL, `modifiedDate` INTEGER NOT NULL, `isBookmarked` INTEGER, `listenedAtLeast30Secs` INTEGER, `isDownloaded` INTEGER, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "firebaseId",
-            "columnName": "firebaseId",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -87,12 +81,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "originalId",
-            "columnName": "originalId",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "isLiked",
             "columnName": "isLiked",
             "affinity": "INTEGER",
@@ -140,12 +128,12 @@
       },
       {
         "tableName": "downloaded_stories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `range` INTEGER NOT NULL, `image` TEXT, `recordPath` TEXT NOT NULL, `duration` INTEGER NOT NULL, `publishedDate` INTEGER NOT NULL, `modifiedDate` INTEGER NOT NULL, `narrator` TEXT NOT NULL, `author` TEXT NOT NULL, `state` TEXT, `isLiked` INTEGER, `isBookmarked` INTEGER, `listenedAt` TEXT, `listenedAtLeast30Secs` INTEGER, `category_id` INTEGER NOT NULL, `category_title` TEXT NOT NULL, `category_order` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `range` INTEGER NOT NULL, `image` TEXT, `recordPath` TEXT NOT NULL, `duration` INTEGER NOT NULL, `publishedDate` INTEGER NOT NULL, `modifiedDate` INTEGER NOT NULL, `narrator` TEXT NOT NULL, `author` TEXT NOT NULL, `state` TEXT, `isLiked` INTEGER, `isBookmarked` INTEGER, `listenedAt` TEXT, `listenedAtLeast30Secs` INTEGER, `category_id` INTEGER NOT NULL, `category_title` TEXT NOT NULL, `category_order` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -312,12 +300,12 @@
       },
       {
         "tableName": "HistoryEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storyId` TEXT NOT NULL, `playedAt` TEXT NOT NULL, `isBookmarked` INTEGER NOT NULL, PRIMARY KEY(`storyId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storyId` INTEGER NOT NULL, `playedAt` TEXT NOT NULL, `isBookmarked` INTEGER NOT NULL, PRIMARY KEY(`storyId`))",
         "fields": [
           {
             "fieldPath": "storyId",
             "columnName": "storyId",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -346,7 +334,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e3e4e8532089be21d280cfe8ac316f4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '88fb87f17690e78ecf0073d8ee598d88')"
     ]
   }
 }

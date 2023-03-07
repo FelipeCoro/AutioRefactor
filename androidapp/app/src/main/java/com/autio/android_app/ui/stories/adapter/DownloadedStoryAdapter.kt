@@ -18,7 +18,7 @@ import com.bumptech.glide.request.RequestOptions
 import java.io.File
 
 class DownloadedStoryAdapter(
-    private var onStoryPlay: ((String) -> Unit)?,
+    private var onStoryPlay: ((Int) -> Unit)?,
     private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
 ) : ListAdapter<DownloadedStoryEntity, DownloadedStoryAdapter.DownloadedStoryViewHolder>(
     DownloadedStoryComparator()
@@ -26,7 +26,7 @@ class DownloadedStoryAdapter(
 
     class DownloadedStoryViewHolder(
         itemView: View,
-        private var onStoryPlay: ((String) -> Unit)?,
+        private var onStoryPlay: ((Int) -> Unit)?,
         private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
     ) : RecyclerView.ViewHolder(
         itemView
@@ -96,7 +96,7 @@ class DownloadedStoryAdapter(
         companion object {
             fun create(
                 parent: ViewGroup,
-                onStoryPlay: ((String) -> Unit)?,
+                onStoryPlay: ((Int) -> Unit)?,
                 onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
             ): DownloadedStoryViewHolder {
                 val view =

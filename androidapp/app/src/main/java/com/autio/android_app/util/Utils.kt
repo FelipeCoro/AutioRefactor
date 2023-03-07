@@ -83,7 +83,7 @@ fun String.capitalize(): String {
     }
 }
 
-fun shareStory(context: Context, storyId: String) {
+fun shareStory(context: Context, storyId: Int) {
     val intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(

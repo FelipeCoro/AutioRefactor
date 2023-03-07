@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class History(
-    val storyId: String,
+    val storyId: Int,
     val playedAt: String
 ): Parcelable
 

@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestOptions
 
 class StoryAdapter(
     private var playingStory: MutableLiveData<Story?>,
-    private var onStoryPlay: ((String) -> Unit)?,
+    private var onStoryPlay: ((Int) -> Unit)?,
     private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
     private var shouldPinLocationBeShown: Boolean = false
 ) : ListAdapter<Story, StoryAdapter.StoryViewHolder>(
@@ -29,7 +29,7 @@ class StoryAdapter(
     class StoryViewHolder(
         itemView: View,
         private val playingStory: MutableLiveData<Story?>,
-        private val onStoryPlay: ((String) -> Unit)?,
+        private val onStoryPlay: ((Int) -> Unit)?,
         private val onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
         private val shouldPinLocationBeShown: Boolean
     ) : RecyclerView.ViewHolder(
@@ -130,7 +130,7 @@ class StoryAdapter(
             fun create(
                 parent: ViewGroup,
                 playingStory: MutableLiveData<Story?>,
-                onStoryPlay: ((String) -> Unit)?,
+                onStoryPlay: ((Int) -> Unit)?,
                 onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, Story) -> Unit)?,
                 shouldPinLocationBeShown: Boolean
             ): StoryViewHolder {

@@ -19,10 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
-import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAuthorBinding
 import com.autio.android_app.domain.mappers.toDto
@@ -43,12 +41,11 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class AuthorFragment : Fragment() {
+
+    //TODO(Remove rep calls)
     @Inject
     lateinit var prefRepository: PrefRepository
 
-    //TODO(Move service calls)
-    @Inject
-    lateinit var apiClient: ApiClient
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
@@ -232,7 +229,7 @@ class AuthorFragment : Fragment() {
                     storyViewModel.bookmarkStory(
                         prefRepository.userId,
                         prefRepository.userApiToken,
-                        story.originalId
+                        story.id
                     )
                 }
                 StoryOption.REMOVE_BOOKMARK -> {
@@ -240,7 +237,7 @@ class AuthorFragment : Fragment() {
                     storyViewModel.removeBookmarkFromStory(
                         prefRepository.userId,
                         prefRepository.userApiToken,
-                        story.originalId
+                        story.id
                     )
                 }
                 StoryOption.LIKE -> {
@@ -248,14 +245,14 @@ class AuthorFragment : Fragment() {
                     storyViewModel.giveLikeToStory(
                         prefRepository.userId,
                         prefRepository.userApiToken,
-                        story.originalId
+                        story.id
                     )
                 }
                 StoryOption.REMOVE_LIKE -> {
                     storyViewModel.removeLikeFromStory(
                         prefRepository.userId,
                         prefRepository.userApiToken,
-                        story.originalId
+                        story.id
                     )
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
@@ -281,7 +278,7 @@ class AuthorFragment : Fragment() {
                 }
                 StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
-                        story.originalId
+                        story.id
                     )
                 }
                 StoryOption.DIRECTIONS -> openLocationInMapsApp(

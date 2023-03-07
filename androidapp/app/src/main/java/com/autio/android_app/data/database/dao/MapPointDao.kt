@@ -23,7 +23,7 @@ interface MapPointDao {
     @Query("SELECT * FROM stories")
     suspend fun readStories(): List<MapPointEntity>
 
-    @Query("SELECT * FROM stories WHERE originalId IN (:ids)")
+    @Query("SELECT * FROM stories WHERE id IN (:ids)")
     fun readStoriesWithIds(ids: List<Int>): Flow<List<MapPointEntity>>
 
     @Query("SELECT * FROM stories WHERE id = (:id)")
@@ -98,7 +98,7 @@ interface MapPointDao {
     @Query("UPDATE stories SET recordUrl = :recordUrl WHERE id = :id")
     fun addRecordOfStory(id: String, recordUrl: String)
 
-    @Query("UPDATE stories SET recordUrl = :recordUrl WHERE originalId = :id")
+    @Query("UPDATE stories SET recordUrl = :recordUrl WHERE id = :id")
     fun addRecordOfStory(id: Int, recordUrl: String)
 
     @Query("UPDATE stories SET isLiked = 0, isBookmarked = 0, isDownloaded = 0, listenedAt = '', listenedAtLeast30Secs = false")

@@ -186,7 +186,7 @@ class AutioRepositoryImpl @Inject constructor(
         TODO("RETUR FLOW CORRECTLY")
     }
 
-    override suspend fun getStoryById(xUserId: String, apiToken: String, id: String): Story {
+    override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Story {
         runCatching {
             autioRemoteDataSource.getStoryById(
                 xUserId,
@@ -212,7 +212,7 @@ class AutioRepositoryImpl @Inject constructor(
         runCatching {
             autioRemoteDataSource.getStoriesByIds(userId,
                 apiToken,
-                storiesWithoutRecords.map { it.originalId })
+                storiesWithoutRecords.map { it.id })
         }.onSuccess {
             val storiesFromService = it.body()
             if (storiesFromService != null) {
@@ -289,6 +289,10 @@ class AutioRepositoryImpl @Inject constructor(
             val throwable = result.exceptionOrNull() ?: java.lang.Error()
             Result.failure(throwable)
         }
+    }
+
+    override suspend fun getStoriesAfterModifiedDate(date: Int): List<Story> {
+        TODO("Not yet implemented")
     }
 
 
@@ -369,10 +373,36 @@ class AutioRepositoryImpl @Inject constructor(
         } ?: Result.failure(Error())
     }
 
+    override suspend fun getUserBookmarks(firebaseId: Int): List<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getStoriesFromUserBookmarks(
+        userId: Int,
+        apiToken: String
+    ): Result<List<Story>> {
+
+        val result = autioRemoteDataSource.getStoriesFromUserBookmarks(userId,apiToken)
+
+        return if (result.isSuccessful) {
+            val stories = result.body()?.let { storiesResponse ->
+                storiesResponse.map { it.toModel() }
+            } ?: listOf()
+            Result.success(stories)
+        } else {
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
+        }
+    }
+
 
     override suspend fun removeAllBookmarks() {
         autioLocalDataSource.removeAllBookmarks()
 
+    }
+
+    override suspend fun getUserFavoriteStories(firebaseId: Int) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun giveLikeToStory(id: Int) {
@@ -386,7 +416,8 @@ class AutioRepositoryImpl @Inject constructor(
     ): Result<Boolean> {
         val removedLike = autioLocalDataSource.removeLikeFromStory(storyId)
         return removedLike.let {
-            val remoteRemovedLike = autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
+            val remoteRemovedLike =
+                autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
             if (remoteRemovedLike.isSuccessful) {
                 Result.success(remoteRemovedLike.body().toString().toBoolean())
             } else {
@@ -396,8 +427,24 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun likesByStory(userId: Int, apiToken: String, storyId: Int): Result<Int> {
+
+        val likesByStory = autioRemoteDataSource.likesByStory(userId, apiToken, storyId)
+        return if (likesByStory.isSuccessful) {
+            Result.success(likesByStory.body().toString().toInt())
+        } else {
+            val throwable = Error(likesByStory.errorBody().toString())
+            Result.failure(throwable)
+        }
+    }
+
+
     override suspend fun addStoryToHistory(history: History) {
         autioLocalDataSource.addStoryToHistory(history.toEntity())
+    }
+
+    override suspend fun getUserStoriesHistory(firebaseId: Int) {
+        TODO("Not yet implemented")
     }
 
     override suspend fun removeStoryFromHistory(id: Int) {
@@ -408,7 +455,7 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.clearStoryHistory()
     }
 
-    override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
+    override suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
         autioLocalDataSource.cacheRecordOfStory(storyId, recordUrl)
     }
 

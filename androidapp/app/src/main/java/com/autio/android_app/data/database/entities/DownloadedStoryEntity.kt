@@ -106,7 +106,7 @@ data class DownloadedStoryEntity(
                 }
 
             return DownloadedStoryEntity(
-                id = storyDto.originalId,
+                id = storyDto.id,
                 title = storyDto.title,
                 description = storyDto.description,
                 lat = storyDto.lat,

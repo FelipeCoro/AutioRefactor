@@ -12,6 +12,7 @@ import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
+import java.util.IdentityHashMap
 
 interface AutioRepository {
     val userCategories: Flow<List<Category>>
@@ -34,7 +35,7 @@ interface AutioRepository {
 
     suspend fun getMapPointById(id: String): Result<Story?>
     suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<Story>>
-    suspend fun getStoryById(xUserId: String, apiToken: String, id: String): Story
+    suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Story
     suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng,
@@ -60,6 +61,8 @@ interface AutioRepository {
 
     suspend fun getAllStories(): Result<List<Story>?>
 
+    suspend fun getStoriesAfterModifiedDate(date:Int):List<Story>
+
     suspend fun removeDownloadedStory(id: Int)
 
     suspend fun removeAllDownloads()
@@ -72,20 +75,29 @@ interface AutioRepository {
 
     suspend fun bookmarkStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
+    suspend fun getUserBookmarks(firebaseId:Int):List<String>
+
+    suspend fun getStoriesFromUserBookmarks(userId: Int, apiToken: String) :Result<List<Story>>
+
     //TODO(Same as with storyViewModel we need to have parallel methods to avoid contradictions)
     suspend fun removeAllBookmarks()
 
     suspend fun giveLikeToStory(id: Int)
 
+    suspend fun getUserFavoriteStories(firebaseId: Int)
+
     suspend fun removeLikeFromStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
+    suspend fun likesByStory(userId: Int, apiToken: String, storyId: Int): Result<Int>
     suspend fun addStoryToHistory(history: History)
+
+    suspend fun getUserStoriesHistory(firebaseId: Int)
 
     suspend fun removeStoryFromHistory(id: Int)
 
     suspend fun clearStoryHistory()
 
-    suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
+    suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
 
     suspend fun clearUserData()
     suspend fun getLastModifiedStory(): Result<Story?>

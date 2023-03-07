@@ -23,7 +23,6 @@ import androidx.navigation.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.modelLegacy.NowPlayingMetadata
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
 import com.autio.android_app.domain.mappers.toDto
@@ -32,6 +31,7 @@ import com.autio.android_app.extensions.timestampToMSS
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
 import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
@@ -50,14 +50,12 @@ import java.util.regex.Pattern
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class PlayerFragment : Fragment(),
-    OnMapReadyCallback,
-    FragmentManager.OnBackStackChangedListener {
+class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackStackChangedListener {
 
     @Inject
     lateinit var prefRepository: PrefRepository
 
-    private val bottomNavigationViewModel:BottomNavigationViewModel by activityViewModels()
+    private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val playerFragmentViewModel: PlayerFragmentViewModel by viewModels()
     private val storyViewModel: StoryViewModel by viewModels()
 
@@ -65,12 +63,10 @@ class PlayerFragment : Fragment(),
 
     private lateinit var activityLayout: ConstraintLayout
 
-    private var map: GoogleMap? =
-        null
+    private var map: GoogleMap? = null
 
     private lateinit var snackBarView: View
-    private var feedbackJob: Job? =
-        null
+    private var feedbackJob: Job? = null
 
     override fun onCreate(
         savedInstanceState: Bundle?
@@ -94,29 +90,20 @@ class PlayerFragment : Fragment(),
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding =
-            FragmentPlayerBinding.inflate(
-                inflater,
-                container,
-                false
-            )
+        binding = FragmentPlayerBinding.inflate(
+            inflater, container, false
+        )
 
-        snackBarView =
-            layoutInflater.inflate(
-                R.layout.feedback_snackbar,
-                binding.root as ViewGroup,
-                false
-            )
+        snackBarView = layoutInflater.inflate(
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
+        )
 
         lifecycleScope.launch {
-            val mapFragment =
-                childFragmentManager.findFragmentById(
-                    R.id.player_map
-                ) as SupportMapFragment?
+            val mapFragment = childFragmentManager.findFragmentById(
+                R.id.player_map
+            ) as SupportMapFragment?
             mapFragment?.getMapAsync(
                 this@PlayerFragment
             )
@@ -126,27 +113,24 @@ class PlayerFragment : Fragment(),
     }
 
     override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
+        view: View, savedInstanceState: Bundle?
     ) {
         super.onViewCreated(
-            view,
-            savedInstanceState
+            view, savedInstanceState
         )
 
-        val context =
-            activity
-                ?: return
+        val context = activity ?: return
 
-        activityLayout =
-            requireActivity().findViewById(
-                R.id.activityRoot
-            )
+        bindObservers()
+
+        activityLayout = requireActivity().findViewById(
+            R.id.activityRoot
+        )
 
         playerFragmentViewModel.storyLikes.observe(
             viewLifecycleOwner
         ) { likes ->
-            if (likes[prefRepository.firebaseKey] == true) {
+            if (likes[prefRepository.userId] == true) {
                 binding.btnHeart.setImageResource(
                     R.drawable.ic_heart_filled
                 )
@@ -155,67 +139,21 @@ class PlayerFragment : Fragment(),
                     R.drawable.ic_heart
                 )
             }
-            binding.tvNumberOfLikes.text =
-                likes.filter { it.value }.size.toString()
+            binding.tvNumberOfLikes.text = likes.filter { it.value }.size.toString()
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnHeart.setOnClickListener {
                     showPaywallOrProceedWithNormalProcess(
                         requireActivity()
                     ) {
-                        if (likes[prefRepository.firebaseKey] == true) {
-                            FirebaseStoryRepository.removeLikeFromStory(
-                                story.id,
-                                prefRepository.firebaseKey,
-                                onSuccessListener = {
-                                    storyViewModel.removeLikeFromStory(
-                                        story.id
-                                    )
-                                    showFeedbackSnackBar(
-                                        "Removed From Favorites"
-                                    )
-                                },
-                                onFailureListener = {
-                                    showFeedbackSnackBar(
-                                        "Connection Failure"
-                                    )
-                                }
+                        if (likes[prefRepository.userId] == true) {
+                            storyViewModel.removeLikeFromStory(
+                                prefRepository.userId, prefRepository.userApiToken, story.id
                             )
                         } else {
-                            FirebaseStoryRepository.giveLikeToStory(
-                                story.id,
-                                prefRepository.firebaseKey,
-                                onSuccessListener = {
-                                    storyViewModel.setLikeToStory(
-                                        story.id
-                                    )
-                                    showFeedbackSnackBar(
-                                        "Added To Favorites"
-                                    )
-                                },
-                                onFailureListener = {
-                                    showFeedbackSnackBar(
-                                        "Connection Failure"
-                                    )
-                                }
+
+                            storyViewModel.giveLikeToStory(
+                                prefRepository.userId, prefRepository.userApiToken, story.id
                             )
-//                            ApiService.likeStory(
-//                                prefRepository.userId,
-//                                prefRepository.userApiToken,
-//                                story.originalId
-//                            ) {
-//                                if (it == true) {
-//                                    storyViewModel.setLikeToStory(
-//                                        story.id
-//                                    )
-//                                    showFeedbackSnackBar(
-//                                        "Added To Favorites"
-//                                    )
-//                                } else {
-//                                    showFeedbackSnackBar(
-//                                        "Connection Failure"
-//                                    )
-//                                }
-//                            }
                         }
                     }
                 }
@@ -239,79 +177,13 @@ class PlayerFragment : Fragment(),
                         requireActivity()
                     ) {
                         if (isBookmarked) {
-                            FirebaseStoryRepository.removeBookmarkFromStory(
-                                prefRepository.firebaseKey,
-                                story.id,
-                                onSuccessListener = {
-                                    storyViewModel.removeBookmarkFromStory(
-                                        story.id
-                                    )
-                                    showFeedbackSnackBar(
-                                        "Removed From Bookmarks"
-                                    )
-                                },
-                                onFailureListener = {
-                                    showFeedbackSnackBar(
-                                        "Connection Failure"
-                                    )
-                                }
+                            storyViewModel.removeBookmarkFromStory(
+                                prefRepository.userId, prefRepository.userApiToken, story.id
                             )
-//                            ApiService.removeBookmarkFromStory(
-//                                prefRepository.userId,
-//                                prefRepository.userApiToken,
-//                                story.originalId
-//                            ) {
-//                                if (it?.removed == true) {
-//                                    storyViewModel.removeBookmarkFromStory(
-//                                        story.id
-//                                    )
-//                                    showFeedbackSnackBar(
-//                                        "Removed From Bookmarks"
-//                                    )
-//                                } else {
-//                                    showFeedbackSnackBar(
-//                                        "Connection Failure"
-//                                    )
-//                                }
-//                            }
                         } else {
-                            // TODO: change Firebase code with commented code once stable
-                            FirebaseStoryRepository.bookmarkStory(
-                                prefRepository.firebaseKey,
-                                story.id,
-                                story.title,
-                                onSuccessListener = {
-                                    storyViewModel.bookmarkStory(
-                                        story.id
-                                    )
-                                    showFeedbackSnackBar(
-                                        "Added To Bookmarks"
-                                    )
-                                },
-                                onFailureListener = {
-                                    showFeedbackSnackBar(
-                                        "Connection Failure"
-                                    )
-                                }
+                            storyViewModel.bookmarkStory(
+                                prefRepository.userId, prefRepository.userApiToken, story.id
                             )
-//                            ApiService.bookmarkStory(
-//                                prefRepository.userId,
-//                                prefRepository.userApiToken,
-//                                story.originalId
-//                            ) {
-//                                if (it != null) {
-//                                    storyViewModel.bookmarkStory(
-//                                        story.id
-//                                    )
-//                                    showFeedbackSnackBar(
-//                                        "Added To Bookmarks"
-//                                    )
-//                                } else {
-//                                    showFeedbackSnackBar(
-//                                        "Connection Failure"
-//                                    )
-//                                }
-//                            }
                         }
                     }
                 }
@@ -321,8 +193,7 @@ class PlayerFragment : Fragment(),
             viewLifecycleOwner
         ) { mediaItem ->
             updateUI(
-                view,
-                mediaItem
+                view, mediaItem
             )
         }
         playerFragmentViewModel.speedButtonRes.observe(
@@ -342,14 +213,10 @@ class PlayerFragment : Fragment(),
         playerFragmentViewModel.mediaPosition.observe(
             viewLifecycleOwner
         ) { pos ->
-            binding.tvNowPlayingSeek.text =
-                NowPlayingMetadata.timestampToMSS(
-                    context,
-                    pos
-                )
-            binding.sBTrack.progress =
-                (pos / 1000)
-                    .toInt()
+            binding.tvNowPlayingSeek.text = NowPlayingMetadata.timestampToMSS(
+                context, pos
+            )
+            binding.sBTrack.progress = (pos / 1000).toInt()
         }
 
         binding.btnChangeSpeed.setOnClickListener {
@@ -380,237 +247,218 @@ class PlayerFragment : Fragment(),
             }
         }
 
-        binding.tvNowPlayingDuration.text =
-            NowPlayingMetadata.timestampToMSS(
-                context,
-                0L
-            )
-        binding.tvNowPlayingSeek.text =
-            NowPlayingMetadata.timestampToMSS(
-                context,
-                0L
-            )
+        binding.tvNowPlayingDuration.text = NowPlayingMetadata.timestampToMSS(
+            context, 0L
+        )
+        binding.tvNowPlayingSeek.text = NowPlayingMetadata.timestampToMSS(
+            context, 0L
+        )
+    }
+
+    fun bindObservers() {
+        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
+    }
+
+    private fun handleViewState(viewState: StoryViewState?) {
+        when (viewState) {
+            is StoryViewState.AddedBookmark -> addedBookmark()
+            is StoryViewState.RemovedBookmark -> removeBookmark()
+            is StoryViewState.StoryLiked -> storyLiked()
+            is StoryViewState.LikedRemoved -> likedRemoved()
+            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+        }
+    }
+
+    private fun addedBookmark() {
+        showFeedbackSnackBar("Added To Bookmarks")
+    }
+
+    private fun removeBookmark() {
+        showFeedbackSnackBar("Removed From Bookmarks")
+    }
+
+    private fun storyLiked() {
+        showFeedbackSnackBar("Added To Favorites")
+    }
+
+    private fun likedRemoved() {
+        showFeedbackSnackBar("Removed From Favorites")
+    }
+
+    private fun viewStateError() {
+        //TODO(Macro error handling for viewstate error)
+        showFeedbackSnackBar("Connection Failure")
     }
 
     private fun updateUI(
-        view: View,
-        story: Story?
-    ) =
-        with(
-            binding
-        ) {
-            if (story != null) {
-                val bundle =
-                    Bundle()
-                bundle.putInt(
-                    STORY_ID_ARG,
-                    story.originalId
+        view: View, story: Story?
+    ) = with(
+        binding
+    ) {
+        if (story != null) {
+            val bundle = Bundle()
+            bundle.putInt(
+                STORY_ID_ARG, story.id
+            )
+            if (story.imageUrl.isNotEmpty()) {
+                val uri = Uri.parse(
+                    story.imageUrl
                 )
-                if (story.imageUrl.isNotEmpty()) {
-                    val uri =
-                        Uri.parse(
-                            story.imageUrl
-                        )
-                    Glide.with(
-                        view
-                    )
-                        .load(
-                            uri
-                        )
-                        .into(
-                            ivStoryImage
-                        )
-                }
-                sBTrack.isEnabled =
-                    true
-                sBTrack.max =
-                    story.duration
-                sBTrack.setOnSeekBarChangeListener(
-                    object :
-                        SeekBar.OnSeekBarChangeListener {
-                        override fun onStartTrackingTouch(
-                            p0: SeekBar?
-                        ) {
-                        }
-
-                        override fun onStopTrackingTouch(
-                            p0: SeekBar?
-                        ) {
-                        }
-
-                        override fun onProgressChanged(
-                            seekBar: SeekBar?,
-                            progress: Int,
-                            fromUser: Boolean
-                        ) {
-                            if (fromUser) {
-                                showPaywallOrProceedWithNormalProcess(
-                                    requireActivity()
-                                ) {
-                                    bottomNavigationViewModel.setPlaybackPosition(
-                                        progress
-                                    )
-                                }
-                            }
-                        }
-                    })
-                tvStoryTitle.text =
-                    story.title
-                tvStoryAuthor.apply {
-                    text =
-                        story.author
-                    paintFlags =
-                        Paint.UNDERLINE_TEXT_FLAG
-                    visibility =
-                        View.VISIBLE
-                    setOnClickListener {
-                        findNavController().navigate(
-                            R.id.action_player_to_author_details,
-                            bundle
-                        )
-                    }
-                }
-                tvStoryNarrator.apply {
-                    text =
-                        story.narrator
-                    paintFlags =
-                        Paint.UNDERLINE_TEXT_FLAG
-                    visibility =
-                        View.VISIBLE
-                    setOnClickListener {
-                        findNavController().navigate(
-                            R.id.action_player_to_narrator_details,
-                            bundle
-                        )
-                    }
-                }
-                lifecycleScope.launch {
-                    withContext(
-                        Dispatchers.IO
-                    ) {
-                        Geocoder(
-                            requireContext(),
-                            Locale.US
-                        ).getAddress(
-                            story.lat,
-                            story.lon
-                        ) { address ->
-                            lifecycleScope.launch {
-                                withContext(
-                                    Dispatchers.Main
-                                ) {
-                                    if (address != null) {
-                                        val stateCode =
-                                            getUSStateCode(
-                                                address
-                                            )
-                                        binding.tvStoryLocation.text =
-                                            resources.getString(
-                                                R.string.address,
-                                                address.subAdminArea,
-                                                stateCode
-                                            )
-                                        binding.tvStoryLocation.visibility =
-                                            View.VISIBLE
-                                    }
-                                }
-                            }
-                        }
-                        FirebaseStoryRepository.getCategory(
-                            "${story.category?.id}"
-                        ) { category ->
-                            lifecycleScope.launch {
-                                withContext(
-                                    Dispatchers.Main
-                                ) {
-                                    Constants.categoryIcons[category.title.uppercase()]?.let {
-                                        ivCategoryIcon.setImageResource(
-                                            it
-                                        )
-                                    }
-                                    tvStoryCategory.text =
-                                        category.title
-                                }
-                            }
-                        }
-                    }
-                }
-                llCategory.visibility =
-                    View.VISIBLE
-                tvNowPlayingDuration.text =
-                    (story.duration * 1000L)
-                        .timestampToMSS(
-                            requireContext()
-                        )
-                tvStoryDescription.apply {
-                    visibility =
-                        View.VISIBLE
-                    text =
-                        story.description
-                }
-                btnShare.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess(
-                        requireActivity()
-                    ) {
-                        shareStory(
-                            requireContext(),
-                            story.id
-                        )
-                    }
-                }
-                btnFeedback.setOnClickListener {
-                    writeEmailToCustomerSupport(
-                        requireContext()
-                    )
-                }
-                btnOptions.setOnClickListener {
-                    showStoryOptions(
-                        requireContext(),
-                        binding.root as ViewGroup,
-                        it,
-                        story,
-                        arrayListOf(
-                            if (story.isDownloaded == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD else com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
-                            com.autio.android_app.data.api.model.StoryOption.DIRECTIONS
-                        ),
-                        onOptionClick = ::onOptionClicked
-                    )
-                }
-                mapCard.visibility =
-                    View.VISIBLE
-            } else {
-                sBTrack.setOnSeekBarChangeListener(null)
-                ivStoryImage.setImageResource(
-                    0
+                Glide.with(
+                    view
+                ).load(
+                    uri
+                ).into(
+                    ivStoryImage
                 )
-                tvStoryTitle.text =
-                    requireContext().resources.getResourceName(
-                        R.string.no_story_loaded
-                    )
-                tvStoryAuthor.visibility =
-                    View.GONE
-                tvStoryNarrator.visibility =
-                    View.GONE
-                llCategory.visibility =
-                    View.GONE
-                tvNowPlayingDuration.text =
-                    requireContext().resources.getResourceName(
-                        R.string.duration_unknown
-                    )
-                tvStoryDescription.visibility =
-                    View.GONE
-                mapCard.visibility =
-                    View.GONE
             }
+            sBTrack.isEnabled = true
+            sBTrack.max = story.duration
+            sBTrack.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onStartTrackingTouch(
+                    p0: SeekBar?
+                ) {
+                }
+
+                override fun onStopTrackingTouch(
+                    p0: SeekBar?
+                ) {
+                }
+
+                override fun onProgressChanged(
+                    seekBar: SeekBar?, progress: Int, fromUser: Boolean
+                ) {
+                    if (fromUser) {
+                        showPaywallOrProceedWithNormalProcess(
+                            requireActivity()
+                        ) {
+                            bottomNavigationViewModel.setPlaybackPosition(
+                                progress
+                            )
+                        }
+                    }
+                }
+            })
+            tvStoryTitle.text = story.title
+            tvStoryAuthor.apply {
+                text = story.author
+                paintFlags = Paint.UNDERLINE_TEXT_FLAG
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_player_to_author_details, bundle
+                    )
+                }
+            }
+            tvStoryNarrator.apply {
+                text = story.narrator
+                paintFlags = Paint.UNDERLINE_TEXT_FLAG
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    findNavController().navigate(
+                        R.id.action_player_to_narrator_details, bundle
+                    )
+                }
+            }
+            lifecycleScope.launch {
+                withContext(
+                    Dispatchers.IO
+                ) {
+                    Geocoder(
+                        requireContext(), Locale.US
+                    ).getAddress(
+                        story.lat, story.lon
+                    ) { address ->
+                        lifecycleScope.launch {
+                            withContext(
+                                Dispatchers.Main
+                            ) {
+                                if (address != null) {
+                                    val stateCode = getUSStateCode(
+                                        address
+                                    )
+                                    binding.tvStoryLocation.text = resources.getString(
+                                        R.string.address, address.subAdminArea, stateCode
+                                    )
+                                    binding.tvStoryLocation.visibility = View.VISIBLE
+                                }
+                            }
+                        }
+                    }
+                    //TODO(Add our repo)
+                    // FirebaseStoryRepository.getCategory(
+                    //     "${story.category?.id}"
+                    // ) { category ->
+                    //     lifecycleScope.launch {
+                    //         withContext(
+                    //             Dispatchers.Main
+                    //         ) {
+                    //             Constants.categoryIcons[category.title.uppercase()]?.let {
+                    //                 ivCategoryIcon.setImageResource(
+                    //                     it
+                    //                 )
+                    //             }
+                    //             tvStoryCategory.text = category.title
+                    //         }
+                    //     }
+                    // }
+                }
+            }
+            llCategory.visibility = View.VISIBLE
+            tvNowPlayingDuration.text = (story.duration * 1000L).timestampToMSS(
+                requireContext()
+            )
+            tvStoryDescription.apply {
+                visibility = View.VISIBLE
+                text = story.description
+            }
+            btnShare.setOnClickListener {
+                showPaywallOrProceedWithNormalProcess(
+                    requireActivity()
+                ) {
+                    shareStory(
+                        requireContext(), story.id
+                    )
+                }
+            }
+            btnFeedback.setOnClickListener {
+                writeEmailToCustomerSupport(
+                    requireContext()
+                )
+            }
+            btnOptions.setOnClickListener {
+                showStoryOptions(
+                    requireContext(), binding.root as ViewGroup, it, story, arrayListOf(
+                        if (story.isDownloaded == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD else com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
+                        com.autio.android_app.data.api.model.StoryOption.DIRECTIONS
+                    ), onOptionClick = ::onOptionClicked
+                )
+            }
+            mapCard.visibility = View.VISIBLE
+        } else {
+            sBTrack.setOnSeekBarChangeListener(null)
+            ivStoryImage.setImageResource(
+                0
+            )
+            tvStoryTitle.text = requireContext().resources.getResourceName(
+                R.string.no_story_loaded
+            )
+            tvStoryAuthor.visibility = View.GONE
+            tvStoryNarrator.visibility = View.GONE
+            llCategory.visibility = View.GONE
+            tvNowPlayingDuration.text = requireContext().resources.getResourceName(
+                R.string.duration_unknown
+            )
+            tvStoryDescription.visibility = View.GONE
+            mapCard.visibility = View.GONE
         }
+    }
 
     override fun onMapReady(
         map: GoogleMap
     ) {
-        map.uiSettings.isScrollGesturesEnabled =
-            false
-        this.map =
-            map
+        map.uiSettings.isScrollGesturesEnabled = false
+        this.map = map
 
         setMapLayout()
 
@@ -625,8 +473,7 @@ class PlayerFragment : Fragment(),
         try {
             map?.setMapStyle(
                 MapStyleOptions.loadRawResourceStyle(
-                    requireContext(),
-                    R.raw.map_style
+                    requireContext(), R.raw.map_style
                 )
             )
         } catch (e: Resources.NotFoundException) {
@@ -635,28 +482,24 @@ class PlayerFragment : Fragment(),
     }
 
     private fun addStoryMarker(
-        story: Story,
-        customIcon: BitmapDescriptor? = null
+        story: Story, customIcon: BitmapDescriptor? = null
     ) {
-        val latLng =
-            LatLng(
-                story.lat,
-                story.lon
+        val latLng = LatLng(
+            story.lat, story.lon
+        )
+        val marker = MarkerOptions().apply {
+            position(
+                latLng
             )
-        val marker =
-            MarkerOptions().apply {
-                position(
-                    latLng
+            title(
+                story.title
+            )
+            if (customIcon != null) {
+                icon(
+                    customIcon
                 )
-                title(
-                    story.title
-                )
-                if (customIcon != null) {
-                    icon(
-                        customIcon
-                    )
-                }
             }
+        }
         this.map?.apply {
             addMarker(
                 marker
@@ -664,10 +507,8 @@ class PlayerFragment : Fragment(),
             moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(
-                        story.lat,
-                        story.lon
-                    ),
-                    15f
+                        story.lat, story.lon
+                    ), 15f
                 )
             )
         }
@@ -676,61 +517,45 @@ class PlayerFragment : Fragment(),
     private fun getUSStateCode(
         address: Address
     ): String {
-        var fullAddress =
-            ""
+        var fullAddress = ""
         for (i in 0..address.maxAddressLineIndex) if (address.getAddressLine(
                 i
             ) != null
-        ) fullAddress =
-            "$fullAddress " + address.getAddressLine(
-                i
-            )
+        ) fullAddress = "$fullAddress " + address.getAddressLine(
+            i
+        )
 
-        var stateCode: String? =
-            null
-        val pattern =
-            Pattern.compile(
-                " [A-Z]{2} "
+        var stateCode: String? = null
+        val pattern = Pattern.compile(
+            " [A-Z]{2} "
+        )
+        val helper = fullAddress.uppercase().substring(
+            0, fullAddress.uppercase().indexOf(
+                "USA"
             )
-        val helper =
-            fullAddress.uppercase()
-                .substring(
-                    0,
-                    fullAddress.uppercase()
-                        .indexOf(
-                            "USA"
-                        )
-                )
-        val matcher =
-            pattern.matcher(
-                helper
-            )
+        )
+        val matcher = pattern.matcher(
+            helper
+        )
         while (matcher.find()) {
-            stateCode =
-                matcher.group()
-                    .trim()
+            stateCode = matcher.group().trim()
         }
-        return stateCode
-            ?: ""
+        return stateCode ?: ""
     }
 
     private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption,
-        story: Story
+        option: com.autio.android_app.data.api.model.StoryOption, story: Story
     ) {
         when (option) {
             com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> {
                 showPaywallOrProceedWithNormalProcess(
-                    requireActivity(),
-                    isActionExclusiveForSignedInUser = true
+                    requireActivity(), isActionExclusiveForSignedInUser = true
                 ) {
                     lifecycleScope.launch {
                         try {
-                            val downloadedStory =
-                                DownloadedStoryEntity.fromStory(
-                                    requireContext(),
-                                    story.toDto() //TODO(Temp fix)
-                                )
+                            val downloadedStory = DownloadedStoryEntity.fromStory(
+                                requireContext(), story.toDto() //TODO(Temp fix)
+                            )
                             lifecycleScope.launch {
                                 storyViewModel.downloadStory(
                                     downloadedStory!!
@@ -741,9 +566,7 @@ class PlayerFragment : Fragment(),
                             }
                         } catch (e: Exception) {
                             Log.e(
-                                "PlayerFragment",
-                                "exception: ",
-                                e
+                                "PlayerFragment", "exception: ", e
                             )
                             showFeedbackSnackBar(
                                 "Failed Downloading Story"
@@ -761,13 +584,10 @@ class PlayerFragment : Fragment(),
                 )
             }
             com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                requireActivity(),
-                story.lat,
-                story.lon
+                requireActivity(), story.lat, story.lon
             )
             else -> Log.d(
-                "PlayerFragment",
-                "optionSelectedNotAdded"
+                "PlayerFragment", "optionSelectedNotAdded"
             )
         }
     }
@@ -777,30 +597,25 @@ class PlayerFragment : Fragment(),
     ) {
         if (isAdded && activity != null) {
             cancelJob()
-            snackBarView.alpha =
-                1F
+            snackBarView.alpha = 1F
             snackBarView.findViewById<TextView>(
                 R.id.tvFeedback
-            ).text =
-                feedback
+            ).text = feedback
             activityLayout.addView(
                 snackBarView
             )
-            feedbackJob =
-                lifecycleScope.launch {
-                    delay(
-                        2000
+            feedbackJob = lifecycleScope.launch {
+                delay(
+                    2000
+                )
+                snackBarView.animate().alpha(
+                    0F
+                ).withEndAction {
+                    activityLayout.removeView(
+                        snackBarView
                     )
-                    snackBarView.animate()
-                        .alpha(
-                            0F
-                        )
-                        .withEndAction {
-                            activityLayout.removeView(
-                                snackBarView
-                            )
-                        }
                 }
+            }
         }
     }
 

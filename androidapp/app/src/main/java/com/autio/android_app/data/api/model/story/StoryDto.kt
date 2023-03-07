@@ -54,10 +54,8 @@ import java.io.Serializable
  */
 @Entity(tableName = "stories", indices = [Index(value = ["id"], unique = true)])
 data class StoryDto(
-    // Firebase ID
-    @PrimaryKey var id: String = "",
     // Story ID
-    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerializedName("hhId") var originalId: Int = 0,
+    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerializedName("hhId") var id: Int = 0,
     val title: String = "",
     val description: String = "",
     @get:PropertyName("latitude") @set:PropertyName("latitude") @SerializedName("latitude") var lat: Double = 0.0,

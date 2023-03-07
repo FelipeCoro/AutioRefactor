@@ -79,9 +79,9 @@ class AutioRemoteDataSourceImpl @Inject constructor(private val apiClient: ApiCl
     }
 
     override suspend fun getStoryById(
-        xUserId: String,
+        xUserId: Int,
         apiToken: String,
-        id: String
+        id: Int
     ): Response<StoryDto> {
         return apiClient.getStoryById(xUserId, apiToken, id)
     }

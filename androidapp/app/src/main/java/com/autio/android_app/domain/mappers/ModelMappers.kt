@@ -47,7 +47,6 @@ fun Category.toEntity(): CategoryEntity {
 fun StoryDto.toModel(): Story {
     return Story(
         id,
-        originalId,
         title,
         description,
         lat,
@@ -74,7 +73,6 @@ fun StoryDto.toModel(): Story {
 fun Story.toEntity(): MapPointEntity {
     return MapPointEntity(
         id,
-        firebaseId = 0,
         publishedAt = 0,
         lat,
         lon,
@@ -86,7 +84,6 @@ fun Story.toEntity(): MapPointEntity {
         duration,
         state,
         countryCode,
-        originalId,
         isLiked = 0,
         listenedAt = "",
         modifiedDate,
@@ -99,7 +96,6 @@ fun Story.toEntity(): MapPointEntity {
 fun Story.toDto(): StoryDto {
     return StoryDto(
         id,
-        originalId,
         title,
         description,
         lat,

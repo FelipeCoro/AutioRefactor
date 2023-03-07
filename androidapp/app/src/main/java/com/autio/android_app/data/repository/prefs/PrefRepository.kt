@@ -3,7 +3,6 @@ package com.autio.android_app.data.repository.prefs
 import com.autio.android_app.util.SharedPreferenceIntLiveData
 
 interface PrefRepository {
-    var firebaseKey: String
     var userId: Int
     var userName: String
     var userEmail: String

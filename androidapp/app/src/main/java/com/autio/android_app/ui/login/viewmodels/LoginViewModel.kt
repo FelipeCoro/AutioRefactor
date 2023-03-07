@@ -42,7 +42,6 @@ class LoginViewModel @Inject constructor(
         with(prefRepository) {
             isUserGuest = true
             userId = guestResponse.id
-            firebaseKey = guestResponse.firebaseKey
             userApiToken = guestResponse.apiToken
             remainingStories = 5
         }

@@ -133,7 +133,7 @@ class SubscribeActivity : AppCompatActivity() {
 
     private fun updateSubscriptionUI(customerInfo: CustomerInfo?) {
         val isUserLogged =
-            prefRepository.userApiToken.isNotEmpty() && prefRepository.firebaseKey.isNotEmpty()
+            prefRepository.userApiToken.isNotEmpty()
         val isSubscriptionActive =
             customerInfo?.entitlements?.get(REVENUE_CAT_ENTITLEMENT)?.isActive == true
 

@@ -29,19 +29,15 @@ import com.autio.android_app.extensions.*
  *  requesting `browseTree["Story_1"]` would return null (there aren't any children of it).
  */
 class BrowseTree(
-    val context: Context,
-    storiesSource: StorySource,
-    val recentMediaId: String? = null
+    val context: Context, storiesSource: StorySource, val recentMediaId: String? = null
 ) {
-    private val mediaIdToChildren =
-        mutableMapOf<String, MutableList<MediaMetadataCompat>>()
+    private val mediaIdToChildren = mutableMapOf<String, MutableList<MediaMetadataCompat>>()
 
     /**
      * Whether to allow unknown clients (not on allowed list)
      * to search on this [BrowseTree]
      */
-    val searchableByUnknownCaller =
-        true
+    val searchableByUnknownCaller = true
 
     /**
      * The root's children are each category included in the
@@ -49,63 +45,39 @@ class BrowseTree(
      * stories with that category.
      */
     init {
-        val rootList =
-            mediaIdToChildren[BROWSABLE_ROOT]
-                ?: mutableListOf()
+        val rootList = mediaIdToChildren[BROWSABLE_ROOT] ?: mutableListOf()
 
-        val allMetadata =
-            MediaMetadataCompat.Builder()
-                .apply {
-                    id =
-                        ALL_ROOT
-                    title =
-                        "All"
-                    albumArtUri =
-                        RESOURCE_ROOT_URI + context.resources.getResourceEntryName(
-                            R.drawable.ic_notification
-                        )
-                    flag =
-                        MediaItem.FLAG_BROWSABLE
-                }
-                .build()
+        val allMetadata = MediaMetadataCompat.Builder().apply {
+                id = ALL_ROOT
+                title = "All"
+                albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(
+                    R.drawable.ic_notification
+                )
+                flag = MediaItem.FLAG_BROWSABLE
+            }.build()
 
-        val historyMetadata =
-            MediaMetadataCompat.Builder()
-                .apply {
-                    id =
-                        HISTORY_ROOT
-                    title =
-                        "History"
-                    albumArtUri =
-                        RESOURCE_ROOT_URI + context.resources.getResourceEntryName(
-                            R.drawable.ic_bordered_history
-                        )
-                    flag =
-                        MediaItem.FLAG_BROWSABLE
-                }
-                .build()
+        val historyMetadata = MediaMetadataCompat.Builder().apply {
+                id = HISTORY_ROOT
+                title = "History"
+                albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(
+                    R.drawable.ic_bordered_history
+                )
+                flag = MediaItem.FLAG_BROWSABLE
+            }.build()
 
-        val bookmarksMetadata =
-            MediaMetadataCompat.Builder()
-                .apply {
-                    id =
-                        BOOKMARKS_ROOT
-                    title =
-                        "Bookmarks"
-                    albumArtUri =
-                        RESOURCE_ROOT_URI + context.resources.getResourceEntryName(
-                            R.drawable.ic_bordered_bookmarks
-                        )
-                    flag =
-                        MediaItem.FLAG_BROWSABLE
-                }
-                .build()
+        val bookmarksMetadata = MediaMetadataCompat.Builder().apply {
+                id = BOOKMARKS_ROOT
+                title = "Bookmarks"
+                albumArtUri = RESOURCE_ROOT_URI + context.resources.getResourceEntryName(
+                    R.drawable.ic_bordered_bookmarks
+                )
+                flag = MediaItem.FLAG_BROWSABLE
+            }.build()
 
         rootList += allMetadata
         rootList += historyMetadata
         rootList += bookmarksMetadata
-        mediaIdToChildren[BROWSABLE_ROOT] =
-            rootList
+        mediaIdToChildren[BROWSABLE_ROOT] = rootList
 
         storiesSource.forEach { mediaItem ->
 //            val bookmarkMediaId = mediaItem.album.urlEncoded
@@ -122,10 +94,9 @@ class BrowseTree(
 
             // If this was recently played, add it to the recent root.
             if (mediaItem.id == recentMediaId) {
-                mediaIdToChildren[RECENT_ROOT] =
-                    mutableListOf(
-                        mediaItem
-                    )
+                mediaIdToChildren[RECENT_ROOT] = mutableListOf(
+                    mediaItem
+                )
             }
         }
     }
@@ -136,8 +107,7 @@ class BrowseTree(
      */
     operator fun get(
         mediaId: String
-    ) =
-        mediaIdToChildren[mediaId]
+    ) = mediaIdToChildren[mediaId]
 
     /**
      * Builds a node, under the root, that represents a collection, given
@@ -148,57 +118,36 @@ class BrowseTree(
     private fun buildBookmarkRoot(
         mediaItem: MediaMetadataCompat
     ): MutableList<MediaMetadataCompat> {
-        val albumMetadata =
-            MediaMetadataCompat.Builder()
-                .apply {
-                    id =
-                        mediaItem.album.urlEncoded
-                    title =
-                        mediaItem.album
-                    narrator =
-                        mediaItem.artist
-                    albumArt =
-                        mediaItem.albumArt
-                    albumArtUri =
-                        mediaItem.albumArtUri.toString()
-                    flag =
-                        MediaItem.FLAG_BROWSABLE
-                }
-                .build()
+        val albumMetadata = MediaMetadataCompat.Builder().apply {
+                id = mediaItem.album.urlEncoded
+                title = mediaItem.album
+                narrator = mediaItem.artist
+                albumArt = mediaItem.albumArt
+                albumArtUri = mediaItem.albumArtUri.toString()
+                flag = MediaItem.FLAG_BROWSABLE
+            }.build()
 
         // Adds this album to the 'Bookmarks' category.
-        val rootList =
-            mediaIdToChildren[BOOKMARKS_ROOT]
-                ?: mutableListOf()
+        val rootList = mediaIdToChildren[BOOKMARKS_ROOT] ?: mutableListOf()
         rootList += albumMetadata
-        mediaIdToChildren[BOOKMARKS_ROOT] =
-            rootList
+        mediaIdToChildren[BOOKMARKS_ROOT] = rootList
 
         // Insert the album's root with an empty list for its children, and return the list.
         return mutableListOf<MediaMetadataCompat>().also {
-            mediaIdToChildren[albumMetadata.id!!] =
-                it
+            mediaIdToChildren[albumMetadata.id!!] = it
         }
     }
 
     companion object {
-        const val BROWSABLE_ROOT =
-            "/"
-        const val EMPTY_ROOT =
-            "@empty@"
-        const val ALL_ROOT =
-            "__ALL__"
-        const val HISTORY_ROOT =
-            "__RECOMMENDED__"
-        const val BOOKMARKS_ROOT =
-            "__CATEGORIES__"
-        const val RECENT_ROOT =
-            "__RECENT__"
+        const val BROWSABLE_ROOT = "/"
+        const val EMPTY_ROOT = "@empty@"
+        const val ALL_ROOT = "__ALL__"
+        const val HISTORY_ROOT = "__RECOMMENDED__"
+        const val BOOKMARKS_ROOT = "__CATEGORIES__"
+        const val RECENT_ROOT = "__RECENT__"
 
-        const val MEDIA_SEARCH_SUPPORTED =
-            "android.media.browse.SEARCH_SUPPORTED"
+        const val MEDIA_SEARCH_SUPPORTED = "android.media.browse.SEARCH_SUPPORTED"
 
-        const val RESOURCE_ROOT_URI =
-            "android.resource://com.autio.android_app.next/drawable"
+        const val RESOURCE_ROOT_URI = "android.resource://com.autio.android_app.next/drawable"
     }
 }

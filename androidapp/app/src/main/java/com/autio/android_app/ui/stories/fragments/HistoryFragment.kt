@@ -17,9 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
+import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.domain.mappers.toDto
@@ -28,6 +28,7 @@ import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
@@ -64,6 +65,8 @@ class HistoryFragment : Fragment() {
         binding = FragmentPlaylistBinding.inflate(
             inflater, container, false
         )
+
+        bindObservers()
 
         snackBarView = layoutInflater.inflate(
             R.layout.feedback_snackbar, binding.root as ViewGroup, false
@@ -114,8 +117,8 @@ class HistoryFragment : Fragment() {
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
                     requireContext(), binding.root as ViewGroup, view, listOf(
-                        com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
-                        com.autio.android_app.data.api.model.PlaylistOption.CLEAR_HISTORY
+                        PlaylistOption.DOWNLOAD,
+                        PlaylistOption.CLEAR_HISTORY
                     ).map {
                         it.also { option ->
                             option.disabled = stories.isEmpty()
@@ -139,7 +142,7 @@ class HistoryFragment : Fragment() {
                         val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
                             prefRepository.userApiToken,
                             //TODO DTO has a val "original id" we need to see if mapPointEntity might need it
-                            storiesWithoutRecords.map { it.toModel().toDto().originalId })
+                            storiesWithoutRecords.map { it.toModel().toDto().id })
 
                         if (storiesFromAPI.isSuccessful) {
                             for (story in storiesFromAPI.body()!!) //TODO(need to extract list from result)
@@ -173,6 +176,45 @@ class HistoryFragment : Fragment() {
         return binding.root
     }
 
+    fun bindObservers() {
+        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
+    }
+
+    private fun handleViewState(viewState: StoryViewState?) {
+        when (viewState) {
+            is StoryViewState.AddedBookmark -> addedBookmark()
+            is StoryViewState.RemovedBookmark -> removeBookmark()
+            is StoryViewState.StoryLiked -> storyLiked()
+            is StoryViewState.LikedRemoved -> likedRemoved()
+            is StoryViewState.StoryRemoved -> removedFromDownload()
+            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+        }
+    }
+
+    private fun addedBookmark() {
+        showFeedbackSnackBar("Added To Bookmarks")
+    }
+
+    private fun removeBookmark() {
+        showFeedbackSnackBar("Removed From Bookmarks")
+    }
+
+    private fun storyLiked() {
+        showFeedbackSnackBar("Added To Favorites")
+    }
+
+    private fun likedRemoved() {
+        showFeedbackSnackBar("Removed From Favorites")
+    }
+
+    private fun removedFromDownload() {
+        showFeedbackSnackBar("Story Removed From My Device")
+    }
+
+    private fun viewStateError() {
+        //TODO(Macro error handling for viewstate error)
+        showFeedbackSnackBar("Connection Failure")
+    }
     private fun onOptionClicked(
         option: StoryOption, story: Story
     ) {
@@ -181,145 +223,53 @@ class HistoryFragment : Fragment() {
         ) {
             when (option) {
                 StoryOption.DELETE -> {
-                    FirebaseStoryRepository.removeStoryFromUserHistory(prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeStoryFromHistory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Removed From History"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
+          //  FirebaseStoryRepository.removeStoryFromUserHistory(prefRepository.firebaseKey,
+          //      story.id,
+          //      onSuccessListener = {
+          //          storyViewModel.removeStoryFromHistory(
+          //              story.id
+          //          )
+          //          showFeedbackSnackBar(
+          //              "Removed From History"
+          //          )
+          //      },
+          //      onFailureListener = {
+          //          showFeedbackSnackBar(
+          //              "Connection Failure"
+          //          )
+          //      })
                 }
                 StoryOption.BOOKMARK -> {
-                    // TODO: change Firebase code with commented code once stable
-                    FirebaseStoryRepository.bookmarkStory(prefRepository.firebaseKey,
-                        story.id,
-                        story.title,
-                        onSuccessListener = {
-                            storyViewModel.bookmarkStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Added To Bookmarks"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
-//                    ApiService.bookmarkStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it != null) {
-//                            storyViewModel.bookmarkStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Bookmarks"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
+
+                    storyViewModel.bookmarkStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.id
+                    )
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK -> {
-                    FirebaseStoryRepository.removeBookmarkFromStory(prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeBookmarkFromStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Removed From Bookmarks"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
-//                    ApiService.removeBookmarkFromStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it?.removed == true) {
-//                            storyViewModel.removeBookmarkFromStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Removed From Bookmarks"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
+
+                StoryOption.REMOVE_BOOKMARK -> {
+
+                    storyViewModel.removeBookmarkFromStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.id
+                    )
                 }
-                com.autio.android_app.data.api.model.StoryOption.LIKE -> {
-                    FirebaseStoryRepository.giveLikeToStory(story.id,
-                        prefRepository.firebaseKey,
-                        onSuccessListener = {
-                            storyViewModel.setLikeToStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Added To Favorites"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
-//                    ApiService.likeStory(
-//                        prefRepository.userId,
-//                        prefRepository.userApiToken,
-//                        story.originalId
-//                    ) {
-//                        if (it == true) {
-//                            storyViewModel.setLikeToStory(
-//                                story.id
-//                            )
-//                            showFeedbackSnackBar(
-//                                "Added To Favorites"
-//                            )
-//                        } else {
-//                            showFeedbackSnackBar(
-//                                "Connection Failure"
-//                            )
-//                        }
-//                    }
+                StoryOption.LIKE -> {
+
+                    storyViewModel.giveLikeToStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.id
+                    )
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE -> {
-                    FirebaseStoryRepository.removeLikeFromStory(prefRepository.firebaseKey,
-                        story.id,
-                        onSuccessListener = {
-                            storyViewModel.removeLikeFromStory(
-                                story.id
-                            )
-                            showFeedbackSnackBar(
-                                "Removed From Favorites"
-                            )
-                        },
-                        onFailureListener = {
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
+                StoryOption.REMOVE_LIKE -> {
+                    storyViewModel.removeLikeFromStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        story.id
+                    )
                 }
                 StoryOption.DOWNLOAD -> lifecycleScope.launch {
                     try {
@@ -341,7 +291,7 @@ class HistoryFragment : Fragment() {
                         )
                     }
                 }
-                com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
+                StoryOption.REMOVE_DOWNLOAD -> {
                     storyViewModel.removeDownloadedStory(
                         story.id
                     )
@@ -349,10 +299,10 @@ class HistoryFragment : Fragment() {
                         "Story Removed From My Device"
                     )
                 }
-                com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
+                StoryOption.DIRECTIONS -> openLocationInMapsApp(
                     requireActivity(), story.lat, story.lon
                 )
-                com.autio.android_app.data.api.model.StoryOption.SHARE -> {
+                StoryOption.SHARE -> {
                     shareStory(
                         requireContext(), story.id
                     )
@@ -362,31 +312,33 @@ class HistoryFragment : Fragment() {
     }
 
     private fun onPlaylistOptionClicked(
-        option: com.autio.android_app.data.api.model.PlaylistOption
+        option: PlaylistOption
     ) {
         showPaywallOrProceedWithNormalProcess(
             requireActivity(), isActionExclusiveForSignedInUser = true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
-                com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD -> {
+                PlaylistOption.DOWNLOAD -> {
+
+                    //TODO(Add Method)
 
                 }
-                com.autio.android_app.data.api.model.PlaylistOption.CLEAR_HISTORY -> {
-                    FirebaseStoryRepository.removeWholeUserHistory(prefRepository.firebaseKey,
-                        onSuccessListener = {
-                            storyViewModel.clearStoryHistory()
-                            binding.pbLoadingProcess.visibility = View.GONE
-                            showFeedbackSnackBar(
-                                "Cleared History"
-                            )
-                        },
-                        onFailureListener = {
-                            binding.pbLoadingProcess.visibility = View.GONE
-                            showFeedbackSnackBar(
-                                "Connection Failure"
-                            )
-                        })
+                PlaylistOption.CLEAR_HISTORY -> { //TODO(LOCAL METHOD)
+            //      FirebaseStoryRepository.removeWholeUserHistory(prefRepository.firebaseKey,
+            //          onSuccessListener = {
+            //              storyViewModel.clearStoryHistory()
+            //              binding.pbLoadingProcess.visibility = View.GONE
+            //              showFeedbackSnackBar(
+            //                  "Cleared History"
+            //              )
+            //          },
+            //          onFailureListener = {
+            //              binding.pbLoadingProcess.visibility = View.GONE
+            //              showFeedbackSnackBar(
+            //                  "Connection Failure"
+            //              )
+            //          })
                 }
                 else -> Log.d(
                     "HistoryFragment", "option not available for this playlist"
@@ -411,12 +363,12 @@ class HistoryFragment : Fragment() {
                 2000
             )
             snackBarView.animate().alpha(
-                    0F
-                ).withEndAction {
-                    activityLayout.removeView(
-                        snackBarView
-                    )
-                }
+                0F
+            ).withEndAction {
+                activityLayout.removeView(
+                    snackBarView
+                )
+            }
         }
     }
 

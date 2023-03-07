@@ -125,7 +125,7 @@ class AccountFragment : Fragment() {
         setCustomerSupportListeners()
 
         binding.btnDeleteAccount.setOnClickListener {
-//            apiService.deleteAccount()
+//            apiService.deleteAccount() /TODO()
         }
     }
 

@@ -12,7 +12,6 @@ import android.util.Log
 import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.repository.AutioRepository
@@ -213,18 +212,19 @@ class BottomNavigationViewModel @Inject constructor(
             }
         } else {
             postedPlay = false
-            transportControls.playFromMediaId(mediaItem.mediaId, null)
-            FirebaseStoryRepository.addStoryToUserHistory(
-                prefRepository.firebaseKey, mediaItem.mediaId,
-                onSuccessListener = { timestamp ->
-                    viewModelScope.launch(Dispatchers.IO) {
-                        autioRepository.addStoryToHistory(History(mediaItem.mediaId, timestamp))
+            transportControls.playFromMediaId(mediaItem.mediaId.toString(), null)
+            //TODO(Use ourRepo)
+          // FirebaseStoryRepository.addStoryToUserHistory(
+          //     prefRepository.firebaseKey, mediaItem.mediaId,
+          //     onSuccessListener = { timestamp ->
+          //         viewModelScope.launch(Dispatchers.IO) {
+          //             autioRepository.addStoryToHistory(History(mediaItem.mediaId, timestamp))
                     }
-                })
-        }
-    }
+                }
 
-    fun playMediaId(mediaId: String) {
+
+
+    fun playMediaId(mediaId: Int) {
         val nowPlaying = playerServiceConnection.nowPlaying.value
         val transportControls = playerServiceConnection.transportControls
 
@@ -245,17 +245,18 @@ class BottomNavigationViewModel @Inject constructor(
         } else {
             postedPlay = false
             transportControls.playFromMediaId(
-                mediaId, null
+                mediaId.toString(), null
             )
-            FirebaseStoryRepository
-                .addStoryToUserHistory(
-                    prefRepository.firebaseKey,
-                    mediaId,
-                    onSuccessListener = { timestamp ->
-                        viewModelScope.launch(coroutineDispatcher) {
-                            autioRepository.addStoryToHistory(History(mediaId, timestamp))
-                        }
-                    })
+            //TODO(Use ourRepo)
+           //FirebaseStoryRepository
+           //    .addStoryToUserHistory(
+           //        prefRepository.firebaseKey,
+           //        mediaId,
+           //        onSuccessListener = { timestamp ->
+           //            viewModelScope.launch(coroutineDispatcher) {
+           //                autioRepository.addStoryToHistory(History(mediaId, timestamp))
+           //            }
+           //        })
         }
     }
 
@@ -326,7 +327,7 @@ class BottomNavigationViewModel @Inject constructor(
                     val date = result.modifiedDate ?: 63808881662
                     //TODO (Move to Repository)
                     //TODO: change Firebase code with commented code once endpoint is stable
-                    val stories = FirebaseStoryRepository.getStoriesAfterModifiedDate(date.toInt())
+                   val stories = autioRepository.getStoriesAfterModifiedDate(date.toInt())
                     autioRepository.addStories(stories)
                 }
             }.onFailure { }
@@ -336,31 +337,34 @@ class BottomNavigationViewModel @Inject constructor(
     private suspend fun setBookmarksToStories() {
         withContext(coroutineDispatcher) {
             // TODO: change Firebase code with commented code once stable
-            val userBookmarkedStories = FirebaseStoryRepository.getUserBookmarks(
-                prefRepository.firebaseKey
+            val userBookmarkedStories = autioRepository.getUserBookmarks(
+                prefRepository.userId
             )
-            autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.storyId })
+            //TODO(Finish this)
+         //   autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.id .toString })
         }
     }
 
     private suspend fun setLikesToStories() {
         withContext(coroutineDispatcher) {
-            val userFavoriteStories = FirebaseStoryRepository.getUserFavoriteStories(
-                prefRepository.firebaseKey
+            val userFavoriteStories = autioRepository.getUserFavoriteStories(
+                prefRepository.userId
             )
-            autioRepository.setLikesDataToLocalStories(userFavoriteStories
-                .filter { it.isGiven == true }
-                .map { it.storyId }
-            )
+            //TODO(Finish this)
+          //  autioRepository.setLikesDataToLocalStories(userFavoriteStories
+          //      .filter { it.isGiven == true }
+          //      .map { it.storyId }
+           // )
         }
     }
 
     private suspend fun setListenedAtToStories() {
         withContext(coroutineDispatcher) {
-            val userHistory = FirebaseStoryRepository.getUserStoriesHistory(
-                prefRepository.firebaseKey
+            val userHistory = autioRepository.getUserStoriesHistory(
+                prefRepository.userId
             )
-            autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
+            //TODO(Finish this)
+          //  autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
         }
     }
 

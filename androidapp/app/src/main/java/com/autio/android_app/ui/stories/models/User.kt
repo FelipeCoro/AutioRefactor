@@ -12,5 +12,5 @@ data class User(
     val email:String = "",
     val apiToken: String,
     val isGuest: Boolean,
-    val firebaseKey: String
+    val firebaseKey: Int
 ) : Parcelable

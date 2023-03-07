@@ -55,9 +55,6 @@ class PrefRepositoryImpl @Inject constructor(
     override var userApiToken: String = USER_API_TOKEN.getString()
         set(apiToken) = USER_API_TOKEN.put(apiToken)
 
-    override var firebaseKey: String = USER_FIREBASE_KEY.getString()
-        set(firebaseKey) = USER_FIREBASE_KEY.put(firebaseKey)
-
     override var isUserGuest: Boolean = USER_IS_GUEST.getBoolean()
         set(isGuest) = USER_IS_GUEST.put(isGuest)
 

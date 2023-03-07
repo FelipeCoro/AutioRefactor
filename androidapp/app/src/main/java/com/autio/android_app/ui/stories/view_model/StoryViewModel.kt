@@ -212,15 +212,9 @@ class StoryViewModel @Inject constructor(
         autioRepository.clearStoryHistory()
     }
 
-    fun cacheRecordOfStory(storyId: String, recordUrl: String) {
+     fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.cacheRecordOfStory(storyId, recordUrl)
-        }
-    }
-
-    fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.cacheRecordOfStory(storyId.toString(), recordUrl)
         }
     }
 

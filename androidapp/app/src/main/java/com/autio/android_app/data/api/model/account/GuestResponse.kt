@@ -14,5 +14,5 @@ data class GuestResponse(
     ) val isGuest: Boolean,
     @SerializedName(
         "firebase_key"
-    ) val firebaseKey: String
+    ) val firebaseKey: Int
 )

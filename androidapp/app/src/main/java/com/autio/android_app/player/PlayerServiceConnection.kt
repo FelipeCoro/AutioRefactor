@@ -140,7 +140,7 @@ class PlayerServiceConnection(
                 nowPlaying.postValue(null)
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
-                    val currentStory = autioRepository.getStoryById(metadata.id!!,"","") //TODO Check this
+                    val currentStory = autioRepository.getStoryById(metadata.id!!.toInt(),"",0) //TODO Check this
                     currentStory.let {
                         nowPlaying.value = it
                     }
