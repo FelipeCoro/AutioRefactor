@@ -6,7 +6,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.legacy.FirebaseStoryRepository
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -28,10 +28,10 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_start)
         isNightModeOn()
         FirebaseStoryRepository
-        navigate()
+        //navigate()
     }
 
-    private fun onBoardingFinished(): Boolean {
+    private fun isBoardingFinished(): Boolean {
         val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
         return sharedPreferences.getBoolean("Finished", false)
     }
@@ -55,23 +55,23 @@ class SplashActivity : AppCompatActivity() {
      *   if user is logged, [LoginFragment] if false
      */
     private fun navigate() {
-        if (onBoardingFinished()) {
-            // Checks if user is logged in based on the preferences saved
-            // It could be used any of the user's properties since all of them are saved
-            // once the user logs in (either with an account or as a guest),
-            // but it is found more properly to check for the API token and firebase key
-            // since the communication with backend requires any of these two
-            if (isUserLoggedIn()) {
-                val navHostFragment =
-                    supportFragmentManager.findFragmentById(R.id.authentication_nav_host) as NavHostFragment
-                val nav = navHostFragment.navController
-                nav.navigate(R.id.loginFragment)
-            } else {
-                startActivity(Intent(this, BottomNavigation::class.java))
-                finish()
-            }
-        } else {
+        if (!isBoardingFinished()) {
             startActivity(Intent(this, OnBoardingActivity::class.java))
+            finish()
+        }
+        // Checks if user is logged in based on the preferences saved
+        // It could be used any of the user's properties since all of them are saved
+        // once the user logs in (either with an account or as a guest),
+        // but it is found more properly to check for the API token and firebase key
+        // since the communication with backend requires any of these two
+        if (isUserLoggedIn()) {
+//                val navHostFragment =
+//                    supportFragmentManager.findFragmentById(R.id.authentication_nav_host) as NavHostFragment
+//                val nav = navHostFragment.navController
+            val nav = findNavController(R.id.authentication_nav_host)
+            nav.navigate(R.id.loginFragment)
+        } else {
+            startActivity(Intent(this, BottomNavigation::class.java))
             finish()
         }
     }

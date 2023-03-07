@@ -1,17 +1,18 @@
 package com.autio.android_app.ui.stories.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
-import com.autio.android_app.ui.login.fragments.SignInFragment
-import com.autio.android_app.ui.login.fragments.SignUpFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,94 +21,65 @@ class MyStoriesFragment : Fragment() {
 
     @Inject
     lateinit var prefRepository: PrefRepository
-
-    private var _binding: FragmentMyStoriesBinding? =
-        null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentMyStoriesBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-
-        _binding =
-            FragmentMyStoriesBinding.inflate(
-                inflater,
-                container,
-                false
-            )
-
-        createView()
-        intentFunctions()
+        binding = FragmentMyStoriesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    private fun createView() {
-        if (isUserGuest()) {
-            binding.lySignIn.visibility =
-                View.VISIBLE
-            binding.lyStoriesList.visibility =
-                View.GONE
-        } else {
-            binding.lySignIn.visibility =
-                View.GONE
-            binding.lyStoriesList.visibility =
-                View.VISIBLE
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        bindListeners()
+        initView()
+    }
+
+    private fun initView() {
+        val isUser = isUserGuest()
+
+        binding.lySignIn.isVisible = isUser
+        binding.lyStoriesList.isGone = isUser
+
+        if (!isUser) {
+            val navController = findNavController()
             binding.llBookmarksPlaylist.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_my_stories_to_bookmarks_playlist
-                )
+                navController.navigate(R.id.action_my_stories_to_bookmarks_playlist)
             }
             binding.llFavoritesPlaylist.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_my_stories_to_favorites_playlist
-                )
+                navController.navigate(R.id.action_my_stories_to_favorites_playlist)
             }
             binding.llHistoryPlaylist.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_my_stories_to_history_playlist
-                )
+                navController.navigate(R.id.action_my_stories_to_history_playlist)
             }
             binding.llDownloadedPlaylist.setOnClickListener {
-                findNavController().navigate(
-                    R.id.action_my_stories_to_downloaded_playlist
-                )
+                navController.navigate(R.id.action_my_stories_to_downloaded_playlist)
             }
         }
     }
 
-    private fun intentFunctions() {
-        binding.btnSignIn.setOnClickListener {
-            goToSignIn()
-        }
-        binding.btnSignup.setOnClickListener {
-            goToSignUp()
-        }
+    private fun bindListeners() {
+        binding.btnSignIn.setOnClickListener { goToSignIn() }
+        binding.btnSignup.setOnClickListener { goToSignUp() }
     }
 
     private fun goToSignIn() {
-        val signInIntent =
-            Intent(
-                activity,
-                SignInFragment::class.java
-            )
-        startActivity(
-            signInIntent
-        )
+        val request =
+            NavDeepLinkRequest.Builder
+                .fromUri("android-app://navigation.autio.app/sign-in".toUri())
+                .build()
+        val nav = findNavController()
+        nav.navigate(request)
     }
 
     private fun goToSignUp() {
-        val signUpIntent =
-            Intent(
-                activity,
-                SignUpFragment::class.java
-            )
-        startActivity(
-            signUpIntent
-        )
+        val request =
+            NavDeepLinkRequest.Builder
+                .fromUri("android-app://navigation.autio.app/login".toUri())
+                .build()
+        val nav = findNavController()
+        nav.navigate(request)
     }
 
-    private fun isUserGuest(): Boolean =
-        prefRepository.isUserGuest
+    private fun isUserGuest(): Boolean = prefRepository.isUserGuest
 }

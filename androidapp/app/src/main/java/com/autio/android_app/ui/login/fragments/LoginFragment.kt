@@ -41,10 +41,14 @@ class LoginFragment : Fragment() {
         )
         setUpBackgroundAnimation()
         setListeners()
+        bindObservables()
 
-        loginViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
 
         return binding.root
+    }
+
+    private fun bindObservables() {
+        loginViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
     private fun setUpBackgroundAnimation() {

@@ -58,9 +58,11 @@ class PurchaseViewModel @Inject constructor(
         viewModelScope.launch(coroutineDispatcher) {
             val result = autioRepository.createAccount(accountRequest)
             if (result.isSuccess) { //TODO(Double check this)
-                result.getOrNull()?.let { saveUserInfo(it) }
-                result.getOrNull()?.let { handleSuccessViewState(it) }
-                revenueCatRepository.login(result.getOrNull()?.id.toString())
+                result.getOrNull()?.let { user ->
+                    saveUserInfo(user)
+                    handleSuccessViewState(user)
+                    revenueCatRepository.login(user.id.toString())
+                }
             } else
                 handleFailureViewState(result.exceptionOrNull() as Exception)
         }
@@ -68,7 +70,6 @@ class PurchaseViewModel @Inject constructor(
 
     private fun handleSuccessViewState(data: User) {
         setViewState(PurchaseViewState.SuccessViewState(data))
-
     }
 
     private fun handleFailureViewState(exception: Exception) {
@@ -101,8 +102,7 @@ class PurchaseViewModel @Inject constructor(
         onSuccess: (Offerings) -> Unit
     ) {
         revenueCatRepository.getOfferings(
-            onError,
-            onSuccess
+            onError, onSuccess
         )
     }
 
@@ -113,10 +113,7 @@ class PurchaseViewModel @Inject constructor(
         onSuccess: ((StoreTransaction, CustomerInfo) -> Unit) = { _, _ -> }
     ) {
         revenueCatRepository.purchasePackage(
-            activity,
-            packageToPurchase,
-            onError,
-            onSuccess
+            activity, packageToPurchase, onError, onSuccess
         )
     }
 
@@ -125,8 +122,7 @@ class PurchaseViewModel @Inject constructor(
         onSuccess: ((CustomerInfo) -> Unit) = { }
     ) {
         revenueCatRepository.restorePurchase(
-            onError,
-            onSuccess
+            onError, onSuccess
         )
     }
 }

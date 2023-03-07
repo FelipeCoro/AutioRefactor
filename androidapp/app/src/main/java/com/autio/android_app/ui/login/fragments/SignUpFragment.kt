@@ -1,6 +1,5 @@
 package com.autio.android_app.ui.login.fragments
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,18 +9,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
-import com.autio.android_app.data.api.ApiClient
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentSignUpBinding
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
-import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.models.AccountRequest
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewState
 import com.autio.android_app.util.checkEmptyFormFields
 import com.autio.android_app.util.pleaseFillText
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
@@ -36,10 +31,16 @@ class SignUpFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             layoutInflater, R.layout.fragment_sign_up, container, false
         )
-        setListeners()
-        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
-
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setListeners()
+        bindObservables()
+    }
+
+    private fun bindObservables() {
+        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
     private fun setListeners() {
@@ -79,7 +80,6 @@ class SignUpFragment : Fragment() {
             )
 
             purchaseViewModel.createAccount(createAccountRequest)
-
         }
     }
 

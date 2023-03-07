@@ -29,9 +29,16 @@ class SignInFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             layoutInflater, R.layout.fragment_sign_in, container, false
         )
-        setListeners()
-        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setListeners()
+        bindObservables()
+    }
+
+    private fun bindObservables() {
+        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
     private fun setListeners() {
