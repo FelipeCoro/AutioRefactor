@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 
 @Entity(
     tableName = "authors",
@@ -15,13 +16,13 @@ import com.google.gson.annotations.SerializedName
 data class AuthorDto constructor(
     @PrimaryKey val id: Int,
     val name: String,
-    @SerializedName(
+    @SerialName(
         "bio"
     ) val biography: String,
-    @SerializedName(
+    @SerialName(
         "website"
     ) val url: String?,
-    @SerializedName(
+    @SerialName(
         "profile_image_url"
     ) val imageUrl: String?
 )

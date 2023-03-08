@@ -45,7 +45,7 @@ class PlayerServiceConnection(
     @ApplicationContext context: Context,
     serviceComponent: ComponentName,
     private val autioRepository: AutioRepository,
-    @MainDispatcher private val coroutineDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) {
 
     val isConnected = MutableLiveData<Boolean>().apply {
@@ -140,7 +140,7 @@ class PlayerServiceConnection(
                 nowPlaying.postValue(null)
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
-                    val currentStory = autioRepository.getStoryById(metadata.id!!.toInt(),"",0) //TODO Check this
+                    val currentStory = autioRepository.getStoryById(metadata.id.toString().toInt(),"",0) //TODO Check this
                     currentStory.let {
                         nowPlaying.value = it
                     }

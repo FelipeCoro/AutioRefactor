@@ -36,14 +36,14 @@ class AutioRepositoryImpl @Inject constructor(
     override val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
         get() = autioLocalDataSource.getDownloadedStories.transform { entities ->
 
-            entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
+        //    entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
         }
     override val bookmarkedStories: Flow<List<MapPointEntity>>
-        get() = TODO("Not yet implemented")
+        get() = autioLocalDataSource.bookmarkedStories
     override val favoriteStories: Flow<List<MapPointEntity>>
-        get() = TODO("Not yet implemented")
+        get() = autioLocalDataSource.favoriteStories
     override val history: Flow<List<MapPointEntity>>
-        get() = TODO("Not yet implemented")
+        get() = autioLocalDataSource.history
 
     override suspend fun createAccount(accountRequest: AccountRequest): Result<User> {
         val accountDto = accountRequest.toDTO()

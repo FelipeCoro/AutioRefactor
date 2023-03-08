@@ -1,25 +1,18 @@
 package com.autio.android_app.data.api.model.account
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 
-
+@kotlinx.serialization.Serializable
 data class LoginResponse(
-    @SerializedName(
-        "id"
-    ) val id: Int,
-    @SerializedName(
-        "name"
-    ) val name: String,
-    @SerializedName(
-        "email"
-    ) val email: String,
-    @SerializedName(
-        "api_token"
-    ) val apiToken: String,
-    @SerializedName(
-        "is_guest"
-    ) val isGuest: Boolean,
-    @SerializedName(
-        "firebase_key"
-    ) val firebaseKey: Int
+    @SerialName("id")
+    val id: Int,
+    @SerialName("name")
+    val name: String,
+    @SerialName("email")
+    val email: String,
+    @SerialName("api_token")
+    val apiToken: String,
+    @SerialName("is_guest")
+    val isGuest: Boolean
 )

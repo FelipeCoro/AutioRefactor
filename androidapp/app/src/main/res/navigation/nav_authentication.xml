@@ -28,7 +28,7 @@
         tools:layout="@layout/activity_bottom_navigation" />
     <fragment
         android:id="@+id/signInFragment"
-        android:name="SignInFragment"
+        android:name="com.autio.android_app.ui.login.fragments.SignInFragment"
         android:label="SignInFragment"
         tools:layout="@layout/fragment_sign_in">
         <deepLink app:uri="android-app://navigation.autio.app/sign-in" />

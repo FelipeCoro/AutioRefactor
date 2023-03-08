@@ -1,15 +1,17 @@
 package com.autio.android_app.data.api.model
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class State(
     val initials: String,
-    @SerializedName(
+    @SerialName(
         "lat"
     )
     val latitude: Double,
-    @SerializedName(
+    @SerialName(
         "long"
     )
     val longitude: Double

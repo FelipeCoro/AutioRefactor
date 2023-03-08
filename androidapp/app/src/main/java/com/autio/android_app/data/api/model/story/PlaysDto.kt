@@ -1,21 +1,24 @@
 package com.autio.android_app.data.api.model.story
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PlaysDto(
-    @SerializedName(
+    @SerialName(
         "firebase_story_identifier"
     )
     val firebaseId: Int? = null, //TODO(Check how this changes)
-    @SerializedName(
+    @SerialName(
         "was_present"
     )
     val wasPresent: Boolean? = null,
-    @SerializedName(
+    @SerialName(
         "autoplay_enabled"
     )
     val autoPlay: Boolean? = null,
-    @SerializedName(
+    @SerialName(
         "on_disk"
     )
     val isDownloaded: Boolean? = null,

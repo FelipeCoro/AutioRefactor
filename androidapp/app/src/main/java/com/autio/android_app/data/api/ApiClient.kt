@@ -23,12 +23,12 @@ interface ApiClient {
 
     //TODO(make suspended)
     @POST("/api/v1/login")
-    fun login(@Body loginDto: LoginDto) :Response<LoginResponse>
+    suspend fun login(@Body loginDto: LoginDto) : Response<LoginResponse>
 
 
     //TODO(annotate method, check endpoint and make suspended)
     @POST("/api/v1/login")
-     fun loginAsGuest(@Body loginDto: LoginDto)
+     suspend fun loginAsGuest(@Body loginDto: LoginDto)
 
     /**
      * Authenticates user as guest and returns the guest's
@@ -43,7 +43,8 @@ interface ApiClient {
      * @param createAccountDto object including user's data (name, email, password)
      */
     @POST("/api/v1/accounts")
-    suspend fun createAccount(@Body createAccountDto: CreateAccountDto): Response<LoginResponse>
+    suspend fun createAccount(
+        @Body createAccountDto: CreateAccountDto): Response<LoginResponse>
 
     /**
      * Changes password for future authentication

@@ -29,6 +29,7 @@ import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class BottomNavigation : AppCompatActivity() {
@@ -41,7 +42,9 @@ class BottomNavigation : AppCompatActivity() {
 
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
-    private lateinit var networkManager:NetworkManager
+
+    @Inject
+    lateinit var networkManager:NetworkManager
 
     private lateinit var navHostFragment: NavHostFragment
 
@@ -55,7 +58,7 @@ class BottomNavigation : AppCompatActivity() {
 
         bindObservables()
 
-        castContext = CastContext.getSharedInstance(this)
+       // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_bottom_navigation)
 

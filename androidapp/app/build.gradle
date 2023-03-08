@@ -152,14 +152,13 @@ dependencies {
     implementation 'com.google.maps.android:android-maps-utils:2.3.0'
     // HTTP requests
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+
     // API
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10"
-    implementation 'com.google.code.gson:gson:2.10'
-    //Fuel Gson
+
     //Co-routines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"

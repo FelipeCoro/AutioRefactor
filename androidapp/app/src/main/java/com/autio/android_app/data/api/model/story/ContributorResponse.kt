@@ -1,28 +1,30 @@
 package com.autio.android_app.data.api.model.story
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import java.io.Serializable
-
+@kotlinx.serialization.Serializable
 data class ContributorResponse(
-    @SerializedName(
+    @SerialName(
         "current_page"
     )
     val currentPage: Int,
     val data: List<ContributorStoryData>,
-    @SerializedName(
+    @SerialName(
         "total"
     )
     val totalPages: Int
 ) : Serializable
 
+@kotlinx.serialization.Serializable
 data class ContributorStoryData(
     val id: Int,
-    @SerializedName(
+    @SerialName(
         "firebase_identifier"
     )
     val firebaseId: String,
     val title: String,
-    @SerializedName(
+    @SerialName(
         "narration_url"
     )
     val narrationUrl: String?

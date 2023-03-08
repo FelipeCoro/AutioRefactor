@@ -2,15 +2,18 @@ package com.autio.android_app.data.api.model.account
 
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ProfileDto(
-    @SerializedName(
+    @SerialName(
         "email"
     ) val email: String,
-    @SerializedName(
+    @SerialName(
         "name"
     ) val name: String,
-    @SerializedName(
+    @SerialName(
         "category_order"
     ) val categories: List<CategoryEntity> //TODO(Not sure about this Type, quick fix from Category to CategoryEntity for runnability)
 )

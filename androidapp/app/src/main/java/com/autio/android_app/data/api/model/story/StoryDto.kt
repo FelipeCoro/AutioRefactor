@@ -4,6 +4,7 @@ import androidx.room.*
 import com.autio.android_app.ui.stories.models.Category
 import com.google.firebase.database.PropertyName
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 import java.io.Serializable
 
 // TODO: Update class to follow updated structure from API
@@ -55,23 +56,23 @@ import java.io.Serializable
 @Entity(tableName = "stories", indices = [Index(value = ["id"], unique = true)])
 data class StoryDto(
     // Story ID
-    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerializedName("hhId") var id: Int = 0,
+    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerialName("hhId") var id: Int = 0,
     val title: String = "",
     val description: String = "",
-    @get:PropertyName("latitude") @set:PropertyName("latitude") @SerializedName("latitude") var lat: Double = 0.0,
-    @get:PropertyName("longitude") @set:PropertyName("longitude") @SerializedName("longitude") var lon: Double = 0.0,
+    @get:PropertyName("latitude") @set:PropertyName("latitude") @SerialName("latitude") var lat: Double = 0.0,
+    @get:PropertyName("longitude") @set:PropertyName("longitude") @SerialName("longitude") var lon: Double = 0.0,
     @get:PropertyName("rangeInMeters") @set:PropertyName("rangeInMeters") var range: Int = 0,
-    @PropertyName("imageURL") @SerializedName("imageURL") val imageUrl: String = "",
-    @PropertyName("recordURL") @SerializedName("recordURL") val recordUrl: String = "",
+    @PropertyName("imageURL") @SerialName("imageURL") val imageUrl: String = "",
+    @PropertyName("recordURL") @SerialName("recordURL") val recordUrl: String = "",
     @get:PropertyName("durationInSeconds") @set:PropertyName("durationInSeconds") var duration: Int = 0,
-    @SerializedName("dateAdded") var publishedDate: Int = 0,
-    @get:PropertyName("dateModifiedTimestamp") @set:PropertyName("dateModifiedTimestamp") @SerializedName(
+    @SerialName("dateAdded") var publishedDate: Int = 0,
+    @get:PropertyName("dateModifiedTimestamp") @set:PropertyName("dateModifiedTimestamp") @SerialName(
         "dateModified"
     ) var modifiedDate: Int = 0,
-    @get:PropertyName("narratorName") @set:PropertyName("narratorName") @SerializedName("narratorName") var narrator: String = "",
-    @get:PropertyName("authorName") @set:PropertyName("authorName") @SerializedName("authorName") var author: String = "",
+    @get:PropertyName("narratorName") @set:PropertyName("narratorName") @SerialName("narratorName") var narrator: String = "",
+    @get:PropertyName("authorName") @set:PropertyName("authorName") @SerialName("authorName") var author: String = "",
     val state: String = "",
-    @SerializedName("country_code") val countryCode: String = "",
+    @SerialName("country_code") val countryCode: String = "",
     @Embedded(prefix = "category_") var category: Category? = null,
     val isLiked: Boolean? = null,
     val isBookmarked: Boolean? = null,

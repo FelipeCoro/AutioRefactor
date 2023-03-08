@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
+import android.provider.ContactsContract.Data
 import android.service.media.MediaBrowserService.BrowserRoot.EXTRA_RECENT
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -16,6 +17,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
+import androidx.room.Database
 import com.autio.android_app.R
 import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.domain.mappers.toModel
@@ -57,6 +59,9 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.util.Util.constrainValue
 import com.google.android.gms.cast.framework.CastContext
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -70,10 +75,19 @@ import javax.inject.Inject
  * Browsing begins with the method [PlayerService.onGetRoot], and continues in
  * the callback [PlayerService.onLoadChildren]
  */
-open class PlayerService @Inject constructor(
-    private val database: DataBase,
-    private val jsonSource: JsonSource
+
+@AndroidEntryPoint
+class PlayerService(
+    //private val database: DataBase,
+    // private val jsonSource: JsonSource
 ) : MediaBrowserServiceCompat() {
+
+    @Inject
+    lateinit var database: DataBase
+
+    @Inject
+    lateinit var jsonSource: JsonSource
+
 
     private lateinit var notificationManager: MediaNotificationManager
     private lateinit var mediaSource: StorySource

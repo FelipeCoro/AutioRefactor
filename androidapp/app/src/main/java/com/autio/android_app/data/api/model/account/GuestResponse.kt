@@ -1,18 +1,18 @@
 package com.autio.android_app.data.api.model.account
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
 
+
+@kotlinx.serialization.Serializable
 data class GuestResponse(
-    @SerializedName(
-        "id"
-    ) val id: Int,
-    @SerializedName(
-        "api_token"
-    ) val apiToken: String,
-    @SerializedName(
-        "is_guest"
-    ) val isGuest: Boolean,
-    @SerializedName(
-        "firebase_key"
-    ) val firebaseKey: Int
+    @SerialName("id")
+    val id: Int,
+    @SerialName("api_token")
+    val apiToken: String,
+    @SerialName("is_guest")
+    val isGuest: Boolean,
+    @SerialName("firebase_key")
+    val firebaseKey:String,
+    @SerialName("country_code")
+    val countryCode:String
 )
