@@ -14,10 +14,20 @@ import com.autio.android_app.domain.mappers.toMapPointEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
-import com.autio.android_app.ui.stories.models.*
+import com.autio.android_app.ui.stories.models.AccountRequest
+import com.autio.android_app.ui.stories.models.Author
+import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.Contributor
+import com.autio.android_app.ui.stories.models.History
+import com.autio.android_app.ui.stories.models.LoginRequest
+import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
 
 class AutioRepositoryImpl @Inject constructor(
@@ -249,11 +259,11 @@ class AutioRepositoryImpl @Inject constructor(
         return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
 
-    override suspend fun getAllStories(): Flow<List<Story>?> {
-        return autioLocalDataSource.getAllStories().transform { listOfMapPoints ->
-            listOfMapPoints?.map { it.toModel() }
+    override suspend fun getAllStories(): Flow<List<Story>?> =
+        autioLocalDataSource.getAllStories().transform { listOfMapPoints ->
+            val list = listOfMapPoints?.map { it.toModel() } ?: listOf()
+            emit(list)
         }
-    }
 
 
     override suspend fun getStoriesByContributor(

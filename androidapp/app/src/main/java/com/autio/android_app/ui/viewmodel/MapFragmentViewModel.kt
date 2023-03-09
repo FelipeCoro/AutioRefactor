@@ -72,8 +72,7 @@ class MapFragmentViewModel @Inject constructor(
      */
     private val playerServiceConnection = playerServiceConnection.also {
         it.subscribe(mediaId, subscriptionCallback)
-
-        it.playbackState.observeForever(playbackStateObserver)
+        //it.playbackState.observeForever(playbackStateObserver)
 //        it.nowPlaying.observeForever(mediaMetadataObserver)
     }
 
@@ -85,7 +84,7 @@ class MapFragmentViewModel @Inject constructor(
         super.onCleared()
 
         // Remove permanent observers from the PlayerServiceConnection
-        playerServiceConnection.playbackState.removeObserver(playbackStateObserver)
+        // playerServiceConnection.playbackState.removeObserver(playbackStateObserver)
 //        playerServiceConnection.nowPlaying.removeObserver(mediaMetadataObserver)
         // Unsubscribe media ID being watched
         playerServiceConnection.unsubscribe(mediaId, subscriptionCallback)

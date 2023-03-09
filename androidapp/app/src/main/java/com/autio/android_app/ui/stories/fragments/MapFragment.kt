@@ -160,12 +160,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         mediaId = arguments?.getString(MEDIA_ID_ARG) ?: return
 
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
+
         setListeners()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-       // clusterManager.clearItems() //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
+        if (this::clusterManager.isInitialized)
+            clusterManager.clearItems() //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
     }
 
     override fun onSaveInstanceState(
@@ -296,7 +298,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         storyViewModel.getAllStories()
 
-
+/*
         bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) {
             it?.let {
                 updateMarker(it, markers[it.id]!!)
@@ -312,6 +314,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation()
+        */
     }
 
     private fun highlightClusterItem(storyClusterItem: StoryClusterItem) {
@@ -670,7 +673,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * Adds markers to the map with clustering support. As response to the viewModel liveData.
      */
     private fun addClusteredMarkers(stories: List<Story>){
-
+        clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         clusterManager.setAnimation(false)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
         clusterManager.renderer = clusterRenderer
