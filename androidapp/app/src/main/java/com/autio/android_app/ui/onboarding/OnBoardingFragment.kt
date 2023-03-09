@@ -10,7 +10,7 @@ import com.autio.android_app.ui.onboarding.screens.BackgroundLocationFragment
 import com.autio.android_app.ui.onboarding.screens.InAppLocationFragment
 import com.autio.android_app.ui.onboarding.screens.NotificationsFragment
 
-class ViewPagerFragment : Fragment() {
+class OnBoardingFragment : Fragment() {
 
     private var _binding: FragmentViewPagerBinding? =
         null

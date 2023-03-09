@@ -9,15 +9,12 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentWelcomeExplorerBinding
 
-class WelcomeExplorerFragment :
-    Fragment() {
+class WelcomeExplorerFragment : Fragment() {
 
     private lateinit var binding: FragmentWelcomeExplorerBinding
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentWelcomeExplorerBinding.inflate(
             inflater, container, false

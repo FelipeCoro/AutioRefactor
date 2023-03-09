@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/viewPagerFragment"
-        android:name="com.autio.android_app.ui.onboarding.ViewPagerFragment"
+        android:name="com.autio.android_app.ui.onboarding.OnBoardingFragment"
         android:label="fragment_view_pager"
         tools:layout="@layout/fragment_view_pager" />
 </navigation>
