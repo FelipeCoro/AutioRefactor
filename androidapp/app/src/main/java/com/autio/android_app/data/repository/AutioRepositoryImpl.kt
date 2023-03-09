@@ -249,23 +249,11 @@ class AutioRepositoryImpl @Inject constructor(
         return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
 
-    override fun getAllStories() = flow {
-
-        autioLocalDataSource.getAllStories().collect() { result ->
-
-            if (result.isSuccess) {
-                val stories = result.map { listOfMapPoints ->
-                    listOfMapPoints?.map { mapPoints ->
-                        mapPoints.toModel()
-                    } ?: listOf()         //TODO(There's gotta be a better way to do this)
-                }
-                emit(stories)
-            } else {
-                val throwable = result.exceptionOrNull()
-                emit(Result.success(emptyList<Story>()))
-            }
+    override suspend fun getAllStories(): Flow<List<Story>?> {
+        return autioLocalDataSource.getAllStories().transform { listOfMapPoints ->
+            listOfMapPoints?.map { it.toModel() }
         }
-    }.flowOn(coroutineDispatcher)
+    }
 
 
     override suspend fun getStoriesByContributor(

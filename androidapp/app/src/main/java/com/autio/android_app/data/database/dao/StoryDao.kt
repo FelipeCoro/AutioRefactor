@@ -86,6 +86,5 @@ interface StoryDao {
     @Query("UPDATE story SET recordUrl = ''")
     fun deleteRecordUrls()
 
-    @Query("SELECT * FROM story ORDER BY id ASC")
-    fun readLiveStories(): Flow<List<StoryEntity>>
+
 }

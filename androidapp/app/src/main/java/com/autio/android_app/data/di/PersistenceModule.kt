@@ -32,9 +32,9 @@ object PersistenceModule {
     ): DataBase {
         return Room.databaseBuilder(context, DataBase::class.java, CONST_DATABASE_NAME)
             .createFromAsset("database/published_map_points.db")
-        //.fallbackToDestructiveMigration()
-        //   .addCallback(callback)
-        //   .enableMultiInstanceInvalidation()
+           //.fallbackToDestructiveMigration()
+           //.addCallback(callback)
+           //.enableMultiInstanceInvalidation()
             .build()
     }
 
@@ -43,7 +43,7 @@ object PersistenceModule {
     fun provideStoryDatabaseCallBack(
         @ApplicationContext context: Context,
         coroutineScope: CoroutineScope,
-       // mapPointDao:MapPointDao
+        // mapPointDao:MapPointDao
     ): RoomDatabase.Callback {
         return object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {

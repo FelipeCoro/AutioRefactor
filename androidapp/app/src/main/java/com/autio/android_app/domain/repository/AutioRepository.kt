@@ -54,7 +54,7 @@ interface AutioRepository {
 
     suspend fun downloadStory(story: DownloadedStoryEntity)
 
-    fun getAllStories(): Flow<Result<List<Story>?>>
+    suspend fun getAllStories(): Flow<List<Story>?>
 
     suspend fun getStoriesAfterModifiedDate(date:Int):List<Story>
 

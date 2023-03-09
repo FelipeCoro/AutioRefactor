@@ -37,11 +37,10 @@ class StoryViewModel @Inject constructor(
 
     fun getAllStories() {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.getAllStories().collect() { result ->
-                if (result.isSuccess) {
-                    setViewState(StoryViewState.FetchedAllStories(result.getOrNull() ?: emptyList()))
-                } else
-                    setViewState(StoryViewState.FetchedAllStoriesFailed)
+            autioRepository.getAllStories().collect { result ->
+                setViewState(
+                    StoryViewState.FetchedAllStories(result ?: listOf())
+                )
             }
         }
     }

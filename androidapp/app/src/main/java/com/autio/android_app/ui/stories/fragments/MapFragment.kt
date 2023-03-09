@@ -132,6 +132,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.maps) as? SupportMapFragment
 
+
         lifecycleScope.launchWhenCreated {
             mapFragment?.getMapAsync(this@MapFragment)
         }
@@ -157,12 +158,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         // Always true, but lets lint know that as well
         mediaId = arguments?.getString(MEDIA_ID_ARG) ?: return
+
+        clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         setListeners()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        clusterManager.clearItems()
+       // clusterManager.clearItems() //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
     }
 
     override fun onSaveInstanceState(
@@ -190,6 +193,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             is StoryViewState.StoryLiked -> storyLiked()
             is StoryViewState.LikedRemoved -> likedRemoved()
             is StoryViewState.StoryRemoved -> removedFromDownload()
+            is StoryViewState.FetchedAllStories -> addClusteredMarkers(viewState.stories)
             else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
         }
     }
@@ -217,6 +221,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         //TODO(Macro error handling for viewstate error)
         showFeedbackSnackBar("Connection Failure")
     }
+
+
 
     private fun setListeners() {
         with(
@@ -288,7 +294,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         setGoogleLogoNewPosition()
 
-        addClusteredMarkers(map)
+        storyViewModel.getAllStories()
+
 
         bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) {
             it?.let {
@@ -660,19 +667,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     /**
-     * Adds markers to the map with clustering support.
+     * Adds markers to the map with clustering support. As response to the viewModel liveData.
      */
-    private fun addClusteredMarkers(map: GoogleMap) {
-        // Create the ClusterManager class and set the custom renderer
-        clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
+    private fun addClusteredMarkers(stories: List<Story>){
+
         clusterManager.setAnimation(false)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
         clusterManager.renderer = clusterRenderer
-
-        //TODO(untangle and remove this thread changes madness)
-        storyViewModel.getAllStories()
-
-       // markers.putAll(stories.associate { it.id to StoryClusterItem(it) })
+        markers.putAll(stories.associate { it.id to StoryClusterItem(it.toDto()) })
 
         clusterManager.addItems(markers.values)
         clusterManager.cluster()
@@ -719,8 +721,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
-    }
 
+    }
 
     private fun updateMarker(story: Story, item: StoryClusterItem) {
         item.updateStory(story.toDto())
