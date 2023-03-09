@@ -14,7 +14,7 @@ fun List<Story>.findNearestToCoordinates(
             sqrt(
                 (coordinates.latitude - it.lat).pow(
                     2
-                ) + (coordinates.longitude - it.lon).pow(
+                ) + (coordinates.longitude - it.lng).pow(
                     2
                 )
             )

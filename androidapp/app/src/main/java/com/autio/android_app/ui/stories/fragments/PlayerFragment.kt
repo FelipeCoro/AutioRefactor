@@ -367,7 +367,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     Geocoder(
                         requireContext(), Locale.US
                     ).getAddress(
-                        story.lat, story.lon
+                        story.lat, story.lng
                     ) { address ->
                         lifecycleScope.launch {
                             withContext(
@@ -485,7 +485,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         story: Story, customIcon: BitmapDescriptor? = null
     ) {
         val latLng = LatLng(
-            story.lat, story.lon
+            story.lat, story.lng
         )
         val marker = MarkerOptions().apply {
             position(
@@ -507,7 +507,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     LatLng(
-                        story.lat, story.lon
+                        story.lat, story.lng
                     ), 15f
                 )
             )
@@ -584,7 +584,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 )
             }
             com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                requireActivity(), story.lat, story.lon
+                requireActivity(), story.lat, story.lng
             )
             else -> Log.d(
                 "PlayerFragment", "optionSelectedNotAdded"

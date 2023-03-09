@@ -199,10 +199,8 @@ class SubscribeActivity : AppCompatActivity() {
     }
 
     private fun goToLoginActivity() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.subscribe_nav_host) as NavHostFragment
-        val nav = navHostFragment.navController
-        nav.navigate(R.id.loginFragment)
+
+     //TODO(Merge with new commit)
 
 
     }

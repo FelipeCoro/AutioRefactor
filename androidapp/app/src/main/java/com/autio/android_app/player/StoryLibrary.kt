@@ -145,7 +145,7 @@ class StoryLibrary {
             ).putString(
                 MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, story.description
             ).putString(
-                MediaMetadataCompat.METADATA_KEY_GENRE, story.category?.title ?: ""
+                MediaMetadataCompat.METADATA_KEY_GENRE, story.category
             ).putString(
                 MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, getStoryArtUri(
                     story.imageUrl

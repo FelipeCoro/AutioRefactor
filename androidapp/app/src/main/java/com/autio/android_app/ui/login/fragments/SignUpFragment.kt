@@ -85,17 +85,17 @@ class SignUpFragment : Fragment() {
 
     private fun handleViewState(viewState: PurchaseViewState?) {
         when (viewState) {
-            is PurchaseViewState.ErrorViewState -> showError(viewState.exception)
+            is PurchaseViewState.ErrorViewState -> showError()
             else -> showSuccess(viewState)
         }
 
     }
 
-    private fun showSuccess(user: PurchaseViewState?) {
+    private fun showSuccess(state: PurchaseViewState?) {
         findNavController().navigate(R.id.action_signUpFragment_to_bottomNavigation)
     }
 
-    private fun showError(exception: Exception) {
+    private fun showError() {
         //TODO (Handle Error)
         hideLoadingView()
         val savedMessage = "The mail is already associated to another account"

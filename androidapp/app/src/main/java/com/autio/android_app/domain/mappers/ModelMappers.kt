@@ -6,13 +6,12 @@ import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.story.AuthorDto
 import com.autio.android_app.data.api.model.story.ContributorResponse
-import com.autio.android_app.data.api.model.story.ContributorStoryData
 import com.autio.android_app.data.api.model.story.StoryDto
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.ui.stories.models.*
-import kotlinx.parcelize.Parcelize
 
 //TODO(need to break this up for readability)
 fun CategoryEntity.toModel(): Category {
@@ -23,157 +22,185 @@ fun MapPointEntity.toModel(): Story {
     return Story(
         id,
         lat = lat,
-        lon = lon,
-        range = range,
-        publishedDate = publishedAt,
-        state = state,
-        countryCode = countryCode
+        lng = lng,
+        range = range!!,
+        publishedDate = publishedAt!!,
+        state = state!!,
+        countryCode = countryCode!!
     )
 }
 
-fun History.toEntity(): HistoryEntity {
+fun History.toMapPointEntity(): HistoryEntity {
     return HistoryEntity(storyId, playedAt)
 }
 
-fun Category.toEntity(): CategoryEntity {
+fun Category.toMapPointEntity(): CategoryEntity {
     return CategoryEntity(
-        id,
-        firebaseId,
-        title,
-        order
+        id, firebaseId, title, order
     )
 }
 
 fun StoryDto.toModel(): Story {
     return Story(
         id,
-        title,
-        description,
+        fbid,
         lat,
         lon,
         range,
+        state,
+        countryCode,
+        title,
+        description,
+        narrator,
+        author,
+        category?.title.toString(),
         imageUrl,
         recordUrl,
         duration,
-        publishedDate,
-        modifiedDate,
-        narrator,
-        author,
-        state,
-        countryCode,
-        category,
         isLiked,
-        isBookmarked,
-        isDownloaded,
         listenedAt,
-        listenedAtLeast30Secs
-    )
-}
-
-fun Story.toEntity(): MapPointEntity {
-    return MapPointEntity(
-        id,
-        publishedAt = 0,
-        lat,
-        lon,
-        range,
-        title,
-        description,
-        imageUrl = "",
-        recordUrl,
-        duration,
-        state,
-        countryCode,
-        isLiked = 0,
-        listenedAt = "",
         modifiedDate,
         isBookmarked,
         listenedAtLeast30Secs,
-        isDownloaded
+        isDownloaded,
+        publishedDate
     )
 }
+
+fun Story.toMapPointEntity(): MapPointEntity {
+    return MapPointEntity(
+        id,
+        publishedAt = 0,
+        fbid = "",
+        lat,
+        lng,
+        range,
+        state,
+        countryCode,
+        title,
+        description,
+        narrator,
+        author,
+        category.toString()
+    )
+}
+
+fun Story.toStoryEntity(): StoryEntity {
+    return StoryEntity(
+        id,
+        fbid,
+        lat,
+        lng,
+        range,
+        state,
+        countryCode,
+        title,
+        description,
+        narrator,
+        author,
+        category.toString(),
+        imageUrl,
+        recordUrl,
+        duration,
+        isLiked,
+        listenedAt,
+        modifiedDate,
+        isBookmarked,
+        listenedAtLeast30Secs,
+        isDownloaded,
+        publishedDate,
+    )
+}
+
+fun StoryEntity.toModel(): Story {
+    return Story(
+        id,
+        fbid,
+        lat,
+        lon,
+        range,
+        state,
+        countryCode,
+        title,
+        description,
+        narratorName,
+        authorName,
+        category,
+        imageUrl,
+        recordUrl,
+        duration,
+        isLiked,
+        listenedAt,
+        modifiedDate,
+        isBookmarked,
+        listenedAtLeast30Secs,
+        isDownloaded,
+        publishedDate
+    )
+}
+
 
 fun Story.toDto(): StoryDto {
     return StoryDto(
         id,
+        fbid,
         title,
         description,
         lat,
-        lon,
+        lng,
         range,
         imageUrl,
         recordUrl,
         duration,
-        publishedDate,
         modifiedDate,
         narrator,
         author,
         state,
         countryCode,
-        category,
+        category?.let { Category(0,"", it,0) }, //Check this later
         isLiked,
         isBookmarked,
         isDownloaded,
         listenedAt,
-        listenedAtLeast30Secs
+        listenedAtLeast30Secs,
+        publishedDate,
     )
 }
 
 fun GuestResponse.toModel(): User {
     return User(
-        id,
-        name = "",
-        email = "",
-        apiToken,
-        isGuest
+        id, name = "", email = "", apiToken, isGuest
     )
 }
 
 fun LoginResponse.toModel(): User {
     return User(
-        id,
-        name = "",
-        email = "",
-        apiToken,
-        isGuest
+        id, name = "", email = "", apiToken, isGuest
     )
 }
 
 fun LoginRequest.toDTO(): LoginDto {
     return LoginDto(
-        email,
-        password
+        email, password
     )
 
 }
 
 fun AccountRequest.toDTO(): CreateAccountDto {
     return CreateAccountDto(
-        email,
-        emailConfirmation,
-        password,
-        passwordConfirmation,
-        name
+        email, emailConfirmation, password, passwordConfirmation, name
     )
 }
 
 fun Author.toDto(): AuthorDto {
     return AuthorDto(
-        id,
-        name,
-        biography,
-        url,
-        imageUrl
+        id, name, biography, url, imageUrl
     )
 }
 
 fun AuthorDto.toModel(): Author {
     return Author(
-        id,
-        name,
-        biography,
-        url,
-        imageUrl
+        id, name, biography, url, imageUrl
     )
 
 
@@ -182,8 +209,6 @@ fun AuthorDto.toModel(): Author {
 
 fun ContributorResponse.toModel(): Contributor {
     return Contributor(
-        currentPage,
-        data,
-        totalPages
+        currentPage, data, totalPages
     )
 }

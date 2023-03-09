@@ -8,6 +8,7 @@ import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.MapPointDao
+import com.autio.android_app.data.database.dao.StoryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +22,7 @@ import javax.inject.Singleton
 object PersistenceModule {
     private const val CONST_DATABASE_NAME = "STORIES"
 
+
     @Provides
     @Singleton
     fun providesDatabase(
@@ -29,9 +31,10 @@ object PersistenceModule {
         callback: RoomDatabase.Callback
     ): DataBase {
         return Room.databaseBuilder(context, DataBase::class.java, CONST_DATABASE_NAME)
-            .fallbackToDestructiveMigration()
-            .addCallback(callback)
-            .enableMultiInstanceInvalidation()
+            .createFromAsset("database/published_map_points.db")
+        //.fallbackToDestructiveMigration()
+        //   .addCallback(callback)
+        //   .enableMultiInstanceInvalidation()
             .build()
     }
 
@@ -40,18 +43,19 @@ object PersistenceModule {
     fun provideStoryDatabaseCallBack(
         @ApplicationContext context: Context,
         coroutineScope: CoroutineScope,
+       // mapPointDao:MapPointDao
     ): RoomDatabase.Callback {
         return object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-
+                //mapPointDao.deleteAllStories()
             }
         }
     }
 
     @Singleton
     @Provides
-    fun providesStoryDao(database: DataBase): MapPointDao = database.mapPointDao()
+    fun providesMapPointDao(database: DataBase): MapPointDao = database.mapPointDao()
 
     @Singleton
     @Provides
@@ -61,4 +65,9 @@ object PersistenceModule {
     @Provides
     fun providesDownloadedStoryDao(database: DataBase): DownloadedStoryDao =
         database.downloadedStoryDao()
+
+    @Singleton
+    @Provides
+    fun providesStoryDao(database: DataBase): StoryDao =
+        database.storyDao()
 }

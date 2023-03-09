@@ -5,15 +5,18 @@ import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.mappers.toDTO
-import com.autio.android_app.domain.mappers.toEntity
+import com.autio.android_app.domain.mappers.toMapPointEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -21,6 +24,7 @@ class AutioRepositoryImpl @Inject constructor(
     private val autioRemoteDataSource: AutioRemoteDataSource,
     private val autioLocalDataSource: AutioLocalDataSource,
     private val prefRepository: PrefRepository,
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : AutioRepository {
 
     override val userCategories: Flow<List<Category>> =
@@ -28,21 +32,17 @@ class AutioRepositoryImpl @Inject constructor(
             entities.onEach { it.toModel() }
         }
 
-    override val allStories: Flow<List<Story>>
-        get() = autioLocalDataSource.allLiveStories.transform { entities ->
-            entities.onEach { it.toModel() }
-        }
 
     override val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
         get() = autioLocalDataSource.getDownloadedStories.transform { entities ->
 
-        //    entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
+            //    entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
         }
-    override val bookmarkedStories: Flow<List<MapPointEntity>>
+    override val bookmarkedStories: Flow<List<StoryEntity>>
         get() = autioLocalDataSource.bookmarkedStories
-    override val favoriteStories: Flow<List<MapPointEntity>>
+    override val favoriteStories: Flow<List<StoryEntity>>
         get() = autioLocalDataSource.favoriteStories
-    override val history: Flow<List<MapPointEntity>>
+    override val history: Flow<List<StoryEntity>>
         get() = autioLocalDataSource.history
 
     override suspend fun createAccount(accountRequest: AccountRequest): Result<User> {
@@ -189,9 +189,7 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Story {
         runCatching {
             autioRemoteDataSource.getStoryById(
-                xUserId,
-                apiToken,
-                id
+                xUserId, apiToken, id
             )
         }.onSuccess {
             val story = it.body()
@@ -210,7 +208,8 @@ class AutioRepositoryImpl @Inject constructor(
         userId: Int, apiToken: String, storiesWithoutRecords: List<Story>
     ) {
         runCatching {
-            autioRemoteDataSource.getStoriesByIds(userId,
+            autioRemoteDataSource.getStoriesByIds(
+                userId,
                 apiToken,
                 storiesWithoutRecords.map { it.id })
         }.onSuccess {
@@ -223,12 +222,6 @@ class AutioRepositoryImpl @Inject constructor(
                 }
             }
         }.onFailure { }
-    }
-
-    override suspend fun getStoriesInLatLngBoundaries(
-        swCoordinates: LatLng, neCoordinates: LatLng
-    ): List<MapPointEntity> {
-        return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
     }
 
     override suspend fun getAuthorOfStory(
@@ -250,13 +243,36 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getStoriesInLatLngBoundaries(
+        swCoordinates: LatLng, neCoordinates: LatLng
+    ): List<MapPointEntity> {
+        return autioLocalDataSource.getStoriesInLatLngBoundaries(swCoordinates, neCoordinates)
+    }
+
+    override fun getAllStories() = flow {
+
+        autioLocalDataSource.getAllStories().collect() { result ->
+
+            if (result.isSuccess) {
+                val stories = result.map { listOfMapPoints ->
+                    listOfMapPoints?.map { mapPoints ->
+                        mapPoints.toModel()
+                    } ?: listOf()         //TODO(There's gotta be a better way to do this)
+                }
+                emit(stories)
+            } else {
+                val throwable = result.exceptionOrNull()
+                emit(Result.success(emptyList<Story>()))
+            }
+        }
+    }.flowOn(coroutineDispatcher)
+
+
     override suspend fun getStoriesByContributor(
-        xUserId: Int,
-        apiToken: String,
-        storyId: Int,
-        page: Int
+        xUserId: Int, apiToken: String, storyId: Int, page: Int
     ): Result<Contributor> {
-        val result = autioRemoteDataSource.getStoriesByContributor(xUserId, apiToken, storyId, page)
+        val result =
+            autioRemoteDataSource.getStoriesByContributor(xUserId, apiToken, storyId, page)
 
         return if (result.isSuccessful) {
             val contributor = result.let { contributorResponse ->
@@ -275,20 +291,6 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun downloadStory(story: DownloadedStoryEntity) {
         autioLocalDataSource.downloadStory(TODO("Map back from DownloadedStoryEntity to a DownloadedHistory Domain Model"))
-    }
-
-    override suspend fun getAllStories(): Result<List<Story>?> {
-        val result = autioLocalDataSource.getAllStories()
-
-        return if (result.isSuccess) {
-            val stories = result.getOrNull()?.let { mapPoints ->
-                mapPoints.map { it.toModel() }
-            } ?: listOf()
-            Result.success(stories)
-        } else {
-            val throwable = result.exceptionOrNull() ?: java.lang.Error()
-            Result.failure(throwable)
-        }
     }
 
     override suspend fun getStoriesAfterModifiedDate(date: Int): List<Story> {
@@ -318,13 +320,12 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun giveLikeToStory(
-        userId: Int,
-        apiToken: String,
-        storyId: Int
+        userId: Int, apiToken: String, storyId: Int
     ): Result<Boolean> {
         val likedStory = autioLocalDataSource.giveLikeToStory(storyId)
         return likedStory.let {
-            val remoteLike = autioRemoteDataSource.giveLikeToStory(userId, apiToken, storyId)
+            val remoteLike =
+                autioRemoteDataSource.giveLikeToStory(userId, apiToken, storyId)
             if (remoteLike.isSuccessful) {
                 Result.success(remoteLike.body().toString().toBoolean())
             } else {
@@ -339,9 +340,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeBookmarkFromStory(
-        userId: Int,
-        apiToken: String,
-        storyId: Int
+        userId: Int, apiToken: String, storyId: Int
     ): Result<Boolean> {
         val bookedMarkedStory = autioLocalDataSource.removeBookmarkFromStory(storyId)
         return bookedMarkedStory?.let {
@@ -357,13 +356,12 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun bookmarkStory(
-        userId: Int,
-        apiToken: String,
-        storyId: Int
+        userId: Int, apiToken: String, storyId: Int
     ): Result<Boolean> {
         val bookedMarkedStory = autioLocalDataSource.bookmarkStory(storyId)
         return bookedMarkedStory?.let {
-            val remoteBookmark = autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId)
+            val remoteBookmark =
+                autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId)
             if (remoteBookmark.isSuccessful) {
                 Result.success(remoteBookmark.body().toString().toBoolean())
             } else {
@@ -378,11 +376,10 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getStoriesFromUserBookmarks(
-        userId: Int,
-        apiToken: String
+        userId: Int, apiToken: String
     ): Result<List<Story>> {
 
-        val result = autioRemoteDataSource.getStoriesFromUserBookmarks(userId,apiToken)
+        val result = autioRemoteDataSource.getStoriesFromUserBookmarks(userId, apiToken)
 
         return if (result.isSuccessful) {
             val stories = result.body()?.let { storiesResponse ->
@@ -410,9 +407,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeLikeFromStory(
-        userId: Int,
-        apiToken: String,
-        storyId: Int
+        userId: Int, apiToken: String, storyId: Int
     ): Result<Boolean> {
         val removedLike = autioLocalDataSource.removeLikeFromStory(storyId)
         return removedLike.let {
@@ -427,7 +422,11 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun likesByStory(userId: Int, apiToken: String, storyId: Int): Result<Int> {
+    override suspend fun likesByStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Int> {
 
         val likesByStory = autioRemoteDataSource.likesByStory(userId, apiToken, storyId)
         return if (likesByStory.isSuccessful) {
@@ -440,7 +439,7 @@ class AutioRepositoryImpl @Inject constructor(
 
 
     override suspend fun addStoryToHistory(history: History) {
-        autioLocalDataSource.addStoryToHistory(history.toEntity())
+        autioLocalDataSource.addStoryToHistory(history.toMapPointEntity())
     }
 
     override suspend fun getUserStoriesHistory(firebaseId: Int) {
@@ -496,7 +495,7 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addStories(stories: List<Story>) {
-        autioLocalDataSource.addStories(stories.map { it.toEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
+        autioLocalDataSource.addStories(stories.map { it.toMapPointEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
     }
 }
 

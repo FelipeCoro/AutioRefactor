@@ -199,7 +199,7 @@ fun MediaMetadataCompat.Builder.from(
     title = story.title
     narrator = story.narrator
     duration = durationMs
-    category = story.category?.title
+    category = story.category
     mediaUri = story.recordUrl
     albumArtUri = story.imageUrl
     flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE

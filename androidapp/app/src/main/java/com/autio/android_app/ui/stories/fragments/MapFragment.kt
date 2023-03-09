@@ -87,7 +87,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var locationBackgroundPermissionGranted = false
 
     // The geographical location where the device is currently located. That is, the last-known
-// location retrieved by the Fused Location Provider.
+    // location retrieved by the Fused Location Provider.
     private var lastKnownLocation: Location? = null
 
     private lateinit var storyAdapter: StoryAdapter
@@ -670,9 +670,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         clusterManager.renderer = clusterRenderer
 
         //TODO(untangle and remove this thread changes madness)
-        val stories = storyViewModel.getAllStories()
+        storyViewModel.getAllStories()
 
-        // markers.putAll(stories.associate { it.id to StoryClusterItem(it) })
+       // markers.putAll(stories.associate { it.id to StoryClusterItem(it) })
 
         clusterManager.addItems(markers.values)
         clusterManager.cluster()
@@ -710,7 +710,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 if (nearestStory != null) {
                     moveCamera(
                         latitude = nearestStory.lat,
-                        longitude = nearestStory.lon,
+                        longitude = nearestStory.lng,
                         zoom = map.cameraPosition.zoom
                     )
                     if (clusterRenderer.getMarker(markers[nearestStory.id]!!) != null) {
@@ -813,7 +813,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     showFeedbackSnackBar("Story Removed From My Device")
                 }
                 StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lon
+                    requireActivity(), story.lat, story.lng
                 )
                 StoryOption.SHARE -> {
                     shareStory(requireContext(), story.id)
