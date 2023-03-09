@@ -21,6 +21,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.autio.android_app.R
+import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.api.model.modelLegacy.NowPlayingMetadata
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -142,7 +143,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             binding.tvNumberOfLikes.text = likes.filter { it.value }.size.toString()
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnHeart.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess(
+                    UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                         requireActivity()
                     ) {
                         if (likes[prefRepository.userId] == true) {
@@ -173,7 +174,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             }
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnBookmark.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess(
+                    UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                         requireActivity()
                     ) {
                         if (isBookmarked) {
@@ -224,7 +225,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnRewind.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess(
+            UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                 requireActivity()
             ) {
                 bottomNavigationViewModel.rewindFifteenSeconds()
@@ -240,7 +241,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnNext.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess(
+            UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                 requireActivity()
             ) {
                 bottomNavigationViewModel.skipToNextStory()
@@ -329,7 +330,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     seekBar: SeekBar?, progress: Int, fromUser: Boolean
                 ) {
                     if (fromUser) {
-                        showPaywallOrProceedWithNormalProcess(
+                        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                             requireActivity()
                         ) {
                             bottomNavigationViewModel.setPlaybackPosition(
@@ -413,7 +414,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 text = story.description
             }
             btnShare.setOnClickListener {
-                showPaywallOrProceedWithNormalProcess(
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                     requireActivity()
                 ) {
                     shareStory(
@@ -544,12 +545,12 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
     }
 
     private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption, story: Story
+        option: StoryOption, story: Story
     ) {
         when (option) {
-            com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> {
-                showPaywallOrProceedWithNormalProcess(
-                    requireActivity(), isActionExclusiveForSignedInUser = true
+            StoryOption.DOWNLOAD -> {
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+                    requireActivity(),  true
                 ) {
                     lifecycleScope.launch {
                         try {

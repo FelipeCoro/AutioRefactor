@@ -85,7 +85,7 @@ class FavoritesFragment : Fragment() {
         recyclerView = binding.rvStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                     requireActivity(), isActionExclusiveForSignedInUser = true
                 ) {
                     bottomNavigationViewModel.playMediaId(
@@ -205,8 +205,8 @@ class FavoritesFragment : Fragment() {
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+            requireActivity(),  true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
@@ -242,8 +242,8 @@ class FavoritesFragment : Fragment() {
     private fun onOptionClicked(
         option: StoryOption, story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+            requireActivity(), true
         ) { //TODO(No LIKE option?)
             when (option) {
                 StoryOption.BOOKMARK -> {

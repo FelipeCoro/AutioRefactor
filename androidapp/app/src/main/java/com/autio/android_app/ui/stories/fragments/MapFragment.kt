@@ -122,7 +122,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(requireActivity()) {
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
             }, onOptionClick = ::onOptionClicked, shouldPinLocationBeShown = true
@@ -539,7 +539,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
         binding.btnSelectedStoryPlay.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess(requireActivity()) {
+            UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) {
                 bottomNavigationViewModel.playMediaId(storyDto.id)
             }
         }
@@ -765,7 +765,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun onOptionClicked(option: StoryOption, story: Story) {
         storyDisplayTimer?.finishTimer()
-        showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
             when (option) {
                 StoryOption.BOOKMARK -> {
 

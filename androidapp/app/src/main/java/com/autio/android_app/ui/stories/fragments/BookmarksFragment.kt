@@ -33,10 +33,7 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.openLocationInMapsApp
-import com.autio.android_app.util.shareStory
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showPlaylistOptions
+import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -83,7 +80,7 @@ class BookmarksFragment : Fragment() {
 
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
             }, onOptionClick = ::onStoryOptionClicked
@@ -202,7 +199,7 @@ class BookmarksFragment : Fragment() {
     }
 
     private fun onPlaylistOptionClicked(option: PlaylistOption) {
-        showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 PlaylistOption.DOWNLOAD -> {}
@@ -227,8 +224,8 @@ class BookmarksFragment : Fragment() {
     private fun onStoryOptionClicked(
         option: StoryOption, story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+            requireActivity(),  true
         ) {
             //  TODO(I dont see add bookmark option, need to double check if needed latter)
             when (option) {

@@ -85,7 +85,7 @@ class HistoryFragment : Fragment() {
         recyclerView = binding.rvStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
                     requireActivity(), isActionExclusiveForSignedInUser = true
                 ) {
                     bottomNavigationViewModel.playMediaId(
@@ -176,7 +176,7 @@ class HistoryFragment : Fragment() {
         return binding.root
     }
 
-    fun bindObservers() {
+    private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
@@ -218,8 +218,8 @@ class HistoryFragment : Fragment() {
     private fun onOptionClicked(
         option: StoryOption, story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+            requireActivity(),  true
         ) {
             when (option) {
                 StoryOption.DELETE -> {
@@ -314,7 +314,7 @@ class HistoryFragment : Fragment() {
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
     ) {
-        showPaywallOrProceedWithNormalProcess(
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
             requireActivity(), isActionExclusiveForSignedInUser = true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE

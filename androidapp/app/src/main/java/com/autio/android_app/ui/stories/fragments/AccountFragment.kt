@@ -36,14 +36,8 @@ import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
+import com.autio.android_app.util.*
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
-import com.autio.android_app.util.checkEmptyField
-import com.autio.android_app.util.openUrl
-import com.autio.android_app.util.pleaseFillText
-import com.autio.android_app.util.showError
-import com.autio.android_app.util.showPaywall
-import com.autio.android_app.util.showToast
-import com.autio.android_app.util.writeEmailToCustomerSupport
 import com.bumptech.glide.Glide
 import com.revenuecat.purchases.CustomerInfo
 import dagger.hilt.android.AndroidEntryPoint

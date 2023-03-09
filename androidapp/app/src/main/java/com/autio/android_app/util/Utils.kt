@@ -10,10 +10,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepositoryImpl
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
+import javax.inject.Inject
+
 
 fun checkEmptyField(
     etText: EditText
@@ -107,31 +111,8 @@ fun showPaywall(activity: Activity) {
     (activity as BottomNavigation).showPayWall()
 }
 
-fun showPaywallOrProceedWithNormalProcess(
-    activity: Activity,
-    isActionExclusiveForSignedInUser: Boolean = false,
-    normalProcess: () -> Unit
-) {
-    Purchases.sharedInstance.getCustomerInfoWith {
-        if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
-            normalProcess.invoke()
-        } else {
-            try {
-                lateinit var prefRepository: PrefRepository //TODO(check this later, cant inject)
-                val isUserGuest = prefRepository.isUserGuest
-                val remainingStories = prefRepository.remainingStories
-                if ((isActionExclusiveForSignedInUser && isUserGuest) || remainingStories <= 0) {
-                    showPaywall(activity)
-                } else {
-                    normalProcess.invoke()
-                }
-            } catch (exception: java.lang.ClassCastException) {
-                Log.e(
-                    "CastException",
-                    "Activity is not a subtype of BottomNavigation"
-                )
-            }
-        }
-    }
 
-}
+
+
+
+

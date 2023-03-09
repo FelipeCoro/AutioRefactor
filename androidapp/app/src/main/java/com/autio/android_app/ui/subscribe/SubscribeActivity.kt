@@ -182,7 +182,7 @@ class SubscribeActivity : AppCompatActivity() {
     private fun isSessionAlive() {
         val isSessionAlive = prefRepository.userApiToken
 
-        if (isSessionAlive.isEmpty()) {
+        if (isSessionAlive.isEmpty() && false) {
             goToLoginActivity()
         } else {
             getToMainMenu()

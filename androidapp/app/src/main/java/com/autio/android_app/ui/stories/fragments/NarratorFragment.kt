@@ -90,8 +90,8 @@ class NarratorFragment : Fragment() {
         recyclerView = binding.rvNarratorStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(
-                    requireActivity(), isActionExclusiveForSignedInUser = true
+                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+                    requireActivity(),  true
                 ) {
                     bottomNavigationViewModel.playMediaId(
                         id
@@ -222,8 +222,8 @@ class NarratorFragment : Fragment() {
     private fun onOptionClicked(
         option: StoryOption, story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+            requireActivity(),  true
         ) {
             when (option) {
                 StoryOption.BOOKMARK -> {

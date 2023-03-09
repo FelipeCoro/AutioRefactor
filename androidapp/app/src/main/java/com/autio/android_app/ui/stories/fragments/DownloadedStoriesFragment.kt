@@ -210,8 +210,8 @@ class DownloadedStoriesFragment : Fragment() {
     private fun onPlaylistOptionClicked(
         option: com.autio.android_app.data.api.model.PlaylistOption
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
+            requireActivity(), true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
