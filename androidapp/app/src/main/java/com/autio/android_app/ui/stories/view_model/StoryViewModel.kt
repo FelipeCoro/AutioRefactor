@@ -11,6 +11,7 @@ import com.autio.android_app.ui.stories.view_states.StoryViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +26,6 @@ class StoryViewModel @Inject constructor(
 
 
     val userCategories = autioRepository.userCategories.asLiveData()
-    val allStories = autioRepository.allStories.asLiveData()
     val downloadedStories = autioRepository.getDownloadedStories.asLiveData()
     val bookmarkedStories = autioRepository.bookmarkedStories.asLiveData()
     val storiesHistory = autioRepository.history.asLiveData()
@@ -37,13 +37,11 @@ class StoryViewModel @Inject constructor(
 
     fun getAllStories() {
         viewModelScope.launch(coroutineDispatcher) {
-            kotlin.runCatching {
-                autioRepository.getAllStories()
-            }.onSuccess { result ->
-                val stories = result.getOrNull() ?: listOf()
-                setViewState(StoryViewState.FetchedAllStories(stories))
-            }.onFailure {
-                setViewState(StoryViewState.FetchedAllStoriesFailed)
+            autioRepository.getAllStories().collect() { result ->
+                if (result.isSuccess) {
+                    setViewState(StoryViewState.FetchedAllStories(result.getOrNull() ?: emptyList()))
+                } else
+                    setViewState(StoryViewState.FetchedAllStoriesFailed)
             }
         }
     }
@@ -212,7 +210,7 @@ class StoryViewModel @Inject constructor(
         autioRepository.clearStoryHistory()
     }
 
-     fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
+    fun cacheRecordOfStory(storyId: Int, recordUrl: String) {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.cacheRecordOfStory(storyId, recordUrl)
         }

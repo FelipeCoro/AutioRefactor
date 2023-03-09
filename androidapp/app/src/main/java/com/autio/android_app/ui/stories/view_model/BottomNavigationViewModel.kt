@@ -13,7 +13,6 @@ import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.currentPlayBackPosition
 import com.autio.android_app.extensions.isPlayEnabled
@@ -22,7 +21,6 @@ import com.autio.android_app.extensions.isPrepared
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
-import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -117,7 +115,7 @@ class BottomNavigationViewModel @Inject constructor(
                     downloadedStory != null,
                     network,
                     storyToPost.lat,
-                    storyToPost.lon
+                    storyToPost.lng
                 ) else PlaysDto()
 
             autioRepository.postStoryPlayed(

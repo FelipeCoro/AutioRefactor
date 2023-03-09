@@ -75,7 +75,7 @@ class SignInFragment : Fragment() {
 
     private fun handleViewState(viewState: PurchaseViewState?) {
         when (viewState) {
-            is PurchaseViewState.ErrorViewState -> showError(viewState.exception)
+            is PurchaseViewState.ErrorViewState -> showError()
             else -> showSuccess(viewState)
         }
 
@@ -85,7 +85,7 @@ class SignInFragment : Fragment() {
         findNavController().navigate(R.id.action_signInFragment_to_bottomNavigation)
     }
 
-    private fun showError(exception: Exception) {
+    private fun showError() {
         //TODO (Handle Error)
         hideLoadingView()
         val savedMessage = "The user and/or password are incorrect"

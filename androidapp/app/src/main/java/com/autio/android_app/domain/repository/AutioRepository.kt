@@ -1,26 +1,21 @@
 package com.autio.android_app.domain.repository
 
-import com.autio.android_app.data.api.model.account.GuestResponse
-import com.autio.android_app.data.api.model.account.LoginDto
-import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
-import retrofit2.Response
-import java.util.IdentityHashMap
 
 interface AutioRepository {
     val userCategories: Flow<List<Category>>
-    val allStories: Flow<List<Story>>
     val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
-    val bookmarkedStories: Flow<List<MapPointEntity>>
-    val favoriteStories: Flow<List<MapPointEntity>>
-    val history: Flow<List<MapPointEntity>>
+    val bookmarkedStories: Flow<List<StoryEntity>>
+    val favoriteStories: Flow<List<StoryEntity>>
+    val history: Flow<List<StoryEntity>>
 
     suspend fun createAccount(accountRequest: AccountRequest): Result<User>
     suspend fun login(loginRequest: LoginRequest): Result<User>
@@ -59,7 +54,7 @@ interface AutioRepository {
 
     suspend fun downloadStory(story: DownloadedStoryEntity)
 
-    suspend fun getAllStories(): Result<List<Story>?>
+    fun getAllStories(): Flow<Result<List<Story>?>>
 
     suspend fun getStoriesAfterModifiedDate(date:Int):List<Story>
 

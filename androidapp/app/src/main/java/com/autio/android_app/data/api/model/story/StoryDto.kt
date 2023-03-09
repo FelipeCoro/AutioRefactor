@@ -56,27 +56,46 @@ import java.io.Serializable
 @Entity(tableName = "stories", indices = [Index(value = ["id"], unique = true)])
 data class StoryDto(
     // Story ID
-    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerialName("hhId") var id: Int = 0,
+    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerialName("hhId")
+    var id: Int = 0,
+    var fbid: String = "",
     val title: String = "",
     val description: String = "",
-    @get:PropertyName("latitude") @set:PropertyName("latitude") @SerialName("latitude") var lat: Double = 0.0,
-    @get:PropertyName("longitude") @set:PropertyName("longitude") @SerialName("longitude") var lon: Double = 0.0,
-    @get:PropertyName("rangeInMeters") @set:PropertyName("rangeInMeters") var range: Int = 0,
-    @PropertyName("imageURL") @SerialName("imageURL") val imageUrl: String = "",
-    @PropertyName("recordURL") @SerialName("recordURL") val recordUrl: String = "",
-    @get:PropertyName("durationInSeconds") @set:PropertyName("durationInSeconds") var duration: Int = 0,
-    @SerialName("dateAdded") var publishedDate: Int = 0,
-    @get:PropertyName("dateModifiedTimestamp") @set:PropertyName("dateModifiedTimestamp") @SerialName(
-        "dateModified"
-    ) var modifiedDate: Int = 0,
-    @get:PropertyName("narratorName") @set:PropertyName("narratorName") @SerialName("narratorName") var narrator: String = "",
-    @get:PropertyName("authorName") @set:PropertyName("authorName") @SerialName("authorName") var author: String = "",
+    @get:PropertyName("latitude") @set:PropertyName("latitude")
+    @SerialName("latitude")
+    var lat: Double = 0.0,
+    @get:PropertyName("longitude") @set:PropertyName("longitude")
+    @SerialName("longitude")
+    var lon: Double = 0.0,
+    @get:PropertyName("rangeInMeters") @set:PropertyName("rangeInMeters")
+    var range: Int = 0,
+    @PropertyName("imageURL")
+    @SerialName("imageURL")
+    val imageUrl: String = "",
+    @PropertyName("recordURL")
+    @SerialName("recordURL")
+    val recordUrl: String = "",
+    @get:PropertyName("durationInSeconds") @set:PropertyName("durationInSeconds")
+    var duration: Int = 0,
+    @get:PropertyName("dateModifiedTimestamp") @set:PropertyName("dateModifiedTimestamp")
+    @SerialName("dateModified")
+    var modifiedDate: Int = 0,
+    @get:PropertyName("narratorName") @set:PropertyName("narratorName")
+    @SerialName("narratorName")
+    var narrator: String = "",
+    @get:PropertyName("authorName") @set:PropertyName("authorName")
+    @SerialName("authorName")
+    var author: String = "",
     val state: String = "",
-    @SerialName("country_code") val countryCode: String = "",
-    @Embedded(prefix = "category_") var category: Category? = null,
-    val isLiked: Boolean? = null,
-    val isBookmarked: Boolean? = null,
-    val isDownloaded: Boolean? = null,
+    @SerialName("country_code")
+    val countryCode: String = "",
+    @Embedded(prefix = "category_")
+    var category: Category? = null,
+    val isLiked: Boolean? = false,
+    val isBookmarked: Boolean? = false,
+    val isDownloaded: Boolean? = false,
     val listenedAt: String? = null,
-    val listenedAtLeast30Secs: Boolean? = null
+    val listenedAtLeast30Secs: Boolean? = false,
+    @SerialName("dateAdded")
+    var publishedDate: Int = 0
 ) : Serializable

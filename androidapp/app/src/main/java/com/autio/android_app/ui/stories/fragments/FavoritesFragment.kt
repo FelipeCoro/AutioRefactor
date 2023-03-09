@@ -20,7 +20,7 @@ import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.DownloadedStoryEntity
-import com.autio.android_app.data.database.entities.MapPointEntity
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.domain.mappers.toDto
@@ -56,7 +56,7 @@ class FavoritesFragment : Fragment() {
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
 
-    private var stories: List<MapPointEntity>? = null
+    private var stories: List<StoryEntity>? = null
 
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
@@ -106,7 +106,6 @@ class FavoritesFragment : Fragment() {
         storyViewModel.favoriteStories.observe(
             viewLifecycleOwner
         ) { stories ->
-            this.stories = stories
             recyclerView.adapter = storyAdapter
 //            val totalTime =
 //                stories.sumOf { it.duration } / 60
@@ -121,8 +120,7 @@ class FavoritesFragment : Fragment() {
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
                     requireContext(), binding.root as ViewGroup, view, listOf(
-                        com.autio.android_app.data.api.model.PlaylistOption.DOWNLOAD,
-                        com.autio.android_app.data.api.model.PlaylistOption.REMOVE
+                        PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE
                     ).map {
                         it.also { option ->
                             option.disabled = stories.isEmpty()
@@ -140,7 +138,7 @@ class FavoritesFragment : Fragment() {
                 binding.rlStories.visibility = View.GONE
                 binding.llNoContent.visibility = View.VISIBLE
             } else {
-                val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
+                val storiesWithoutRecords = stories.filter { it.toModel().recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
                     lifecycleScope.launch {
                         val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
@@ -218,21 +216,21 @@ class FavoritesFragment : Fragment() {
                 }
                 PlaylistOption.REMOVE -> {
                     //TODO(LOCAL METHOD)
-                  //  FirebaseStoryRepository.removeAllLikes(prefRepository.firebaseKey,
-              //    stories!!.map { it.id },
-              //    onSuccessListener = {
-              //        storyViewModel.removeAllBookmarks() TODO(Need online BACKEND method)
-              //        binding.pbLoadingProcess.visibility = View.GONE
-              //        showFeedbackSnackBar(
-              //            "Removed All Bookmarks"
-              //        )
-              //    },
-              //    onFailureListener = {
-              //        binding.pbLoadingProcess.visibility = View.GONE
-              //        showFeedbackSnackBar(
-              //            "Connection Failure"
-              //        )
-              //    })
+                    //  FirebaseStoryRepository.removeAllLikes(prefRepository.firebaseKey,
+                    //    stories!!.map { it.id },
+                    //    onSuccessListener = {
+                    //        storyViewModel.removeAllBookmarks() TODO(Need online BACKEND method)
+                    //        binding.pbLoadingProcess.visibility = View.GONE
+                    //        showFeedbackSnackBar(
+                    //            "Removed All Bookmarks"
+                    //        )
+                    //    },
+                    //    onFailureListener = {
+                    //        binding.pbLoadingProcess.visibility = View.GONE
+                    //        showFeedbackSnackBar(
+                    //            "Connection Failure"
+                    //        )
+                    //    })
                 }
                 else -> Log.d(
                     "FavoritesFragment", "option not available for this playlist"
@@ -291,7 +289,7 @@ class FavoritesFragment : Fragment() {
                     )
                 }
                 StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lon
+                    requireActivity(), story.lat, story.lng
                 )
                 StoryOption.SHARE -> {
                     shareStory(
@@ -322,12 +320,12 @@ class FavoritesFragment : Fragment() {
                     2000
                 )
                 snackBarView.animate().alpha(
-                        0F
-                    ).withEndAction {
-                        activityLayout.removeView(
-                            snackBarView
-                        )
-                    }
+                    0F
+                ).withEndAction {
+                    activityLayout.removeView(
+                        snackBarView
+                    )
+                }
             }
         }
     }

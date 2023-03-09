@@ -271,7 +271,7 @@ class BookmarksFragment : Fragment() {
                         story.id
                     ) }
                 StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lon
+                    requireActivity(), story.lat, story.lng
                 )
                 StoryOption.SHARE -> {
                     shareStory(requireContext(), story.id)

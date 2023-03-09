@@ -46,11 +46,11 @@ class PurchaseViewModel @Inject constructor(
             if (result.isSuccess) { //TODO(Double check this)
                 result.getOrNull()?.let {
                     saveUserInfo(it)
-                    handleSuccessViewState(it)
+                    setViewState(PurchaseViewState.SuccessViewState(it))
                     revenueCatRepository.login(result.getOrNull()?.id.toString())
-                } ?: handleFailureViewState(result.exceptionOrNull() as Exception)
+                } ?: setViewState(PurchaseViewState.ErrorViewState)
             } else
-                handleFailureViewState(result.exceptionOrNull() as Exception)
+                setViewState(PurchaseViewState.ErrorViewState)
         }
     }
 
@@ -60,21 +60,14 @@ class PurchaseViewModel @Inject constructor(
             if (result.isSuccess) { //TODO(Double check this)
                 result.getOrNull()?.let { user ->
                     saveUserInfo(user)
-                    handleSuccessViewState(user)
+                    setViewState(PurchaseViewState.SuccessViewState(user))
                     revenueCatRepository.login(user.id.toString())
                 }
             } else
-                handleFailureViewState(result.exceptionOrNull() as Exception)
+                setViewState(PurchaseViewState.ErrorViewState)
         }
     }
 
-    private fun handleSuccessViewState(data: User) {
-        setViewState(PurchaseViewState.SuccessViewState(data))
-    }
-
-    private fun handleFailureViewState(exception: Exception) {
-        setViewState(PurchaseViewState.ErrorViewState(exception))
-    }
 
     private fun setViewState(purchaseViewState: PurchaseViewState) {
         _viewState.postValue(purchaseViewState)
@@ -127,7 +120,7 @@ class PurchaseViewModel @Inject constructor(
 }
 
 sealed interface PurchaseViewState {
-    data class ErrorViewState(val exception: Exception) : PurchaseViewState
+    object ErrorViewState : PurchaseViewState
     data class SuccessViewState(val data: User) : PurchaseViewState
 }
 

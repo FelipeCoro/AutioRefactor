@@ -136,13 +136,13 @@ class HistoryFragment : Fragment() {
                 binding.rlStories.visibility = View.GONE
                 binding.llNoContent.visibility = View.VISIBLE
             } else {
-                val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
+                val storiesWithoutRecords = stories.filter { it.toModel().recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
                     lifecycleScope.launch {
                         val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
                             prefRepository.userApiToken,
-                            //TODO DTO has a val "original id" we need to see if mapPointEntity might need it
-                            storiesWithoutRecords.map { it.toModel().toDto().id })
+
+                            storiesWithoutRecords.map { it.toModel() .toDto().id })
 
                         if (storiesFromAPI.isSuccessful) {
                             for (story in storiesFromAPI.body()!!) //TODO(need to extract list from result)
@@ -300,7 +300,7 @@ class HistoryFragment : Fragment() {
                     )
                 }
                 StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lon
+                    requireActivity(), story.lat, story.lng
                 )
                 StoryOption.SHARE -> {
                     shareStory(

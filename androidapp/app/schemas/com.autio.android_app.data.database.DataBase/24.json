@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 24,
-    "identityHash": "88fb87f17690e78ecf0073d8ee598d88",
+    "identityHash": "477dd38333189fef53a8f09eaf9009a8",
     "entities": [
       {
-        "tableName": "stories",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `publishedAt` INTEGER NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `range` INTEGER NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `recordUrl` TEXT NOT NULL, `duration` INTEGER NOT NULL, `state` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `isLiked` INTEGER NOT NULL, `listenedAt` TEXT NOT NULL, `modifiedDate` INTEGER NOT NULL, `isBookmarked` INTEGER, `listenedAtLeast30Secs` INTEGER, `isDownloaded` INTEGER, PRIMARY KEY(`id`))",
+        "tableName": "map_points",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `published_at` INTEGER NOT NULL, `fbid` TEXT NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `range_in_meters` INTEGER NOT NULL, `state` TEXT, `country_code` TEXT, `title` TEXT, `description` TEXT, `narrator_name` TEXT, `author_name` TEXT, `category` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -16,8 +16,100 @@
           },
           {
             "fieldPath": "publishedAt",
-            "columnName": "publishedAt",
+            "columnName": "published_at",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fbid",
+            "columnName": "fbid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lat",
+            "columnName": "lat",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lng",
+            "columnName": "lng",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "range",
+            "columnName": "range_in_meters",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "countryCode",
+            "columnName": "country_code",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "narratorName",
+            "columnName": "narrator_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "authorName",
+            "columnName": "author_name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "story",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `fbid` TEXT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `range` INTEGER NOT NULL, `state` TEXT NOT NULL, `countryCode` TEXT NOT NULL, `title` TEXT NOT NULL, `description` TEXT NOT NULL, `narratorName` TEXT NOT NULL, `authorName` TEXT NOT NULL, `category` TEXT NOT NULL, `imageUrl` TEXT NOT NULL, `recordUrl` TEXT NOT NULL, `duration` INTEGER NOT NULL, `isLiked` INTEGER, `listenedAt` TEXT, `modifiedDate` INTEGER NOT NULL, `isBookmarked` INTEGER, `listenedAtLeast30Secs` INTEGER, `isDownloaded` INTEGER, `publishedDate` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fbid",
+            "columnName": "fbid",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -39,6 +131,18 @@
             "notNull": true
           },
           {
+            "fieldPath": "state",
+            "columnName": "state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "countryCode",
+            "columnName": "countryCode",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "title",
             "columnName": "title",
             "affinity": "TEXT",
@@ -47,6 +151,24 @@
           {
             "fieldPath": "description",
             "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "narratorName",
+            "columnName": "narratorName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "authorName",
+            "columnName": "authorName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -69,28 +191,16 @@
             "notNull": true
           },
           {
-            "fieldPath": "state",
-            "columnName": "state",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "countryCode",
-            "columnName": "countryCode",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "isLiked",
             "columnName": "isLiked",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "listenedAt",
             "columnName": "listenedAt",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "modifiedDate",
@@ -115,6 +225,12 @@
             "columnName": "isDownloaded",
             "affinity": "INTEGER",
             "notNull": false
+          },
+          {
+            "fieldPath": "publishedDate",
+            "columnName": "publishedDate",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -334,7 +450,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '88fb87f17690e78ecf0073d8ee598d88')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '477dd38333189fef53a8f09eaf9009a8')"
     ]
   }
 }
