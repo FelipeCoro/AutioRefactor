@@ -9,8 +9,10 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 class AutioLocalDataSourceImpl @Inject constructor(
     private val mapPointDao: MapPointDao,
@@ -44,14 +46,9 @@ class AutioLocalDataSourceImpl @Inject constructor(
         )
     }
 
-    override fun getAllStories(): Flow<Result<List<MapPointEntity>?>> = flow {
-        kotlin.runCatching { storyDao.readLiveStories() }
-            .onSuccess {
-                Result.success(it)
-            }.onFailure {
-                Result.failure<List<MapPointEntity>?>(it)
-            }
-    }
+    override suspend fun getAllStories() = mapPointDao.readLiveStories()
+
+
 
     override suspend fun getMapPointById(id: String): Result<MapPointEntity?> {
         return kotlin.runCatching {
