@@ -32,7 +32,7 @@ object PersistenceModule {
     ): DataBase {
         return Room.databaseBuilder(context, DataBase::class.java, CONST_DATABASE_NAME)
             .createFromAsset("database/published_map_points.db")
-           //.fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration()
            //.addCallback(callback)
            //.enableMultiInstanceInvalidation()
             .build()

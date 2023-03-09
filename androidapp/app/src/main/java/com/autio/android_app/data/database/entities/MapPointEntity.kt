@@ -22,15 +22,15 @@ data class MapPointEntity(
     @ColumnInfo(name = "state")
     val state: String? = "",
     @ColumnInfo(name = "country_code")
-    val countryCode: String? = "",
+    val countryCode: String?,
     @ColumnInfo(name = "title")
-    val title: String? = "",
+    val title: String?,
     @ColumnInfo(name = "description")
-    val description: String? = "",
+    val description: String?,
     @ColumnInfo(name = "narrator_name")
-    val narratorName: String? = "",
+    val narratorName: String?,
     @ColumnInfo(name = "author_name")
-    val authorName: String? = "",
+    val authorName: String?,
     @ColumnInfo(name = "category")
     val category: String? = "",
 )
