@@ -134,13 +134,13 @@ class BookmarksFragment : Fragment() {
                         val result = apiClient.getStoriesByIds(
                             prefRepository.userId,
                             prefRepository.userApiToken,
-                            ids
+                            ids[0]
                         )
                         if (result.isSuccessful) {
-                            val storiesFromAPI = result.body()
+                            val storiesFromAPI = listOf(result.body())//TODO(REVIEW THIS QUICK FIX)
                             if (storiesFromAPI != null) {
                                 for (story in storiesFromAPI) {
-                                    storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
+                                    storyViewModel.cacheRecordOfStory(story!!.id, story!!.recordUrl)
                                 }
                             }
                         }

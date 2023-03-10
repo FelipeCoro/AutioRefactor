@@ -53,7 +53,7 @@ fun StoryDto.toModel(): Story {
         description,
         narrator,
         author,
-        category?.title.toString(),
+        category?.title.toString(), //Todo(Check this later)
         imageUrl,
         recordUrl,
         duration,

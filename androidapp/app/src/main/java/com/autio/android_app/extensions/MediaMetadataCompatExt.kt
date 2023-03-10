@@ -195,7 +195,7 @@ fun MediaMetadataCompat.Builder.from(
         story.duration.toLong()
     )
 
-    id = story.id.toString()
+    id = story.id.toString() //TODO(SHOULD BE ID BUT MEDIA DATA PLAYER_ID ONLY RECEIVES STRING)
     title = story.title
     narrator = story.narrator
     duration = durationMs

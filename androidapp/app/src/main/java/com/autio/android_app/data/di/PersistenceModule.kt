@@ -68,6 +68,5 @@ object PersistenceModule {
 
     @Singleton
     @Provides
-    fun providesStoryDao(database: DataBase): StoryDao =
-        database.storyDao()
+    fun providesStoryDao(database: DataBase): StoryDao = database.storyDao()
 }

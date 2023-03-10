@@ -21,6 +21,7 @@ import androidx.room.Database
 import com.autio.android_app.R
 import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.domain.mappers.toModel
+import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.album
 import com.autio.android_app.extensions.flag
 import com.autio.android_app.extensions.from
@@ -77,16 +78,16 @@ import javax.inject.Inject
  */
 
 @AndroidEntryPoint
-class PlayerService(
-    //private val database: DataBase,
-    // private val jsonSource: JsonSource
-) : MediaBrowserServiceCompat() {
+class PlayerService() : MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var database: DataBase
 
     @Inject
     lateinit var jsonSource: JsonSource
+
+    @Inject
+    lateinit var autioRepository:AutioRepository
 
 
     private lateinit var notificationManager: MediaNotificationManager
@@ -135,19 +136,13 @@ class PlayerService(
         ExoPlayer.Builder(
             this
         ).build().apply {
-            setAudioAttributes(
-                autioAttributes, true
-            )
-            setHandleAudioBecomingNoisy(
-                true
-            )
-            addListener(
-                playerListener
-            )
-            addAnalyticsListener(
-                PlaybackStatsListener(
-                    true, null
-                )
+            setAudioAttributes(autioAttributes, true)
+
+            setHandleAudioBecomingNoisy(true)
+
+            addListener(playerListener)
+
+            addAnalyticsListener(PlaybackStatsListener(true, null)
             )
         }
     }
@@ -245,8 +240,8 @@ class PlayerService(
         )
 
         switchToPlayer(
-            previousPlayer = null,
-            newPlayer = if (castPlayer?.isCastSessionAvailable == true) castPlayer!! else exoPlayer
+            null,
+            if (castPlayer?.isCastSessionAvailable == true) castPlayer!! else exoPlayer
         )
         notificationManager.showNotificationForPlayer(
             currentPlayer
@@ -464,8 +459,8 @@ class PlayerService(
             if (currentPlaylistItems.isEmpty()) {
                 // We are joining a playback session. Loading the session from the new player is
                 // not supported, so we stop playback.
-                currentPlayer.clearMediaItems()
                 currentPlayer.stop()
+                currentPlayer.clearMediaItems()
             } else if (playbackState != STATE_IDLE && playbackState != STATE_ENDED) {
                 preparePlaylist(
                     metadataList = currentPlaylistItems,
@@ -475,9 +470,8 @@ class PlayerService(
                 )
             }
         }
-        mediaSessionConnector.setPlayer(
-            newPlayer
-        )
+        mediaSessionConnector.setPlayer(newPlayer)
+
         previousPlayer?.run {
             stop()
             clearMediaItems()
@@ -554,12 +548,12 @@ class PlayerService(
             mediaId: String, playWhenReady: Boolean, extras: Bundle?
         ) {
             serviceScope.launch {
-                val itemToPlay = database.mapPointDao().getMapPointById(mediaId)
+                val itemToPlay = autioRepository.getStoryById(1,"Bearer tok_Q22sw7X2iN2jcVQgRfRRo8tm4anlVwX2AVgvZH7amzs0HqNRtDpBxoZtCK7h",mediaId.toInt())
                 if (itemToPlay == null) {
                     Log.w(TAG, "Content not found: MediaID=$mediaId")
                 } else {
                     val itemMetadata = MediaMetadataCompat.Builder().from(
-                        itemToPlay.toModel()
+                        itemToPlay.getOrNull()!!
                     ).build()
                     val playbackStartPositionMs = extras?.getLong(
                         MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS, C.TIME_UNSET
@@ -665,9 +659,7 @@ class PlayerService(
             }
         }
 
-        override fun onPlaybackStateChanged(
-            playbackState: Int
-        ) {
+        override fun onPlaybackStateChanged(playbackState: Int) {
             when (playbackState) {
                 STATE_BUFFERING, STATE_READY -> {
                     notificationManager.showNotificationForPlayer(

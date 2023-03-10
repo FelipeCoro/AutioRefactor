@@ -13,6 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
+import com.autio.android_app.extensions.flag
 import com.autio.android_app.extensions.id
 import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
 import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnectionCallback
@@ -140,9 +141,11 @@ class PlayerServiceConnection(
                 nowPlaying.postValue(null)
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
-                    val currentStory = autioRepository.getStoryById(metadata.id.toString().toInt(),"",0) //TODO Check this
+
+                    val currentStory = autioRepository.getStoryById(1,"Bearer tok_Q22sw7X2iN2jcVQgRfRRo8tm4anlVwX2AVgvZH7amzs0HqNRtDpBxoZtCK7h",
+                        metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt()) //TODO Check this
                     currentStory.let {
-                        nowPlaying.value = it
+                        nowPlaying.value = it.getOrNull()
                     }
                 }
             }

@@ -196,21 +196,23 @@ class AutioRepositoryImpl @Inject constructor(
         TODO("RETUR FLOW CORRECTLY")
     }
 
-    override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Story {
-        runCatching {
-            autioRemoteDataSource.getStoryById(
-                xUserId, apiToken, id
-            )
-        }.onSuccess {
-            val story = it.body()
-            if (story != null) {
-                autioLocalDataSource.cacheRecordOfStory(
-                    story.id, story.recordUrl
-                )
-            }
-        }.onFailure { }
+    override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result <Story> {
 
-        return Story() //TODO(TEMP FIX)
+        val result =  autioRemoteDataSource.getStoriesByIds(xUserId, apiToken, listOf(id))
+
+        return if(result.isSuccessful) {
+            val story = result.let { storyResponse ->
+                storyResponse.body()!!.map { it.toModel()}
+            }
+            autioLocalDataSource.cacheRecordOfStory(story[0].id , story[0].recordUrl)
+            Result.success(story[0])
+
+
+        } else {
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
+        }
+
     }
 
 

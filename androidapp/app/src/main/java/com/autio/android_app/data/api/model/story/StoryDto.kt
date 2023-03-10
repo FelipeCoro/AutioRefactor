@@ -2,8 +2,6 @@ package com.autio.android_app.data.api.model.story
 
 import androidx.room.*
 import com.autio.android_app.ui.stories.models.Category
-import com.google.firebase.database.PropertyName
-import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 import java.io.Serializable
 
@@ -53,37 +51,28 @@ import java.io.Serializable
  * Another database table was created for downloaded stories in
  * device
  */
-@Entity(tableName = "stories", indices = [Index(value = ["id"], unique = true)])
+@kotlinx.serialization.Serializable
 data class StoryDto(
     // Story ID
-    @get:PropertyName("hhId") @set:PropertyName("hhId") @SerialName("hhId")
+    @SerialName("id")
     var id: Int = 0,
     var fbid: String = "",
     val title: String = "",
     val description: String = "",
-    @get:PropertyName("latitude") @set:PropertyName("latitude")
     @SerialName("latitude")
     var lat: Double = 0.0,
-    @get:PropertyName("longitude") @set:PropertyName("longitude")
     @SerialName("longitude")
     var lon: Double = 0.0,
-    @get:PropertyName("rangeInMeters") @set:PropertyName("rangeInMeters")
     var range: Int = 0,
-    @PropertyName("imageURL")
     @SerialName("imageURL")
     val imageUrl: String = "",
-    @PropertyName("recordURL")
     @SerialName("recordURL")
     val recordUrl: String = "",
-    @get:PropertyName("durationInSeconds") @set:PropertyName("durationInSeconds")
     var duration: Int = 0,
-    @get:PropertyName("dateModifiedTimestamp") @set:PropertyName("dateModifiedTimestamp")
     @SerialName("dateModified")
     var modifiedDate: Int = 0,
-    @get:PropertyName("narratorName") @set:PropertyName("narratorName")
     @SerialName("narratorName")
     var narrator: String = "",
-    @get:PropertyName("authorName") @set:PropertyName("authorName")
     @SerialName("authorName")
     var author: String = "",
     val state: String = "",

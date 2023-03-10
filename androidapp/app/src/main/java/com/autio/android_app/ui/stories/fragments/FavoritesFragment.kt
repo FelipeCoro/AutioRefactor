@@ -144,13 +144,15 @@ class FavoritesFragment : Fragment() {
                         val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
                             prefRepository.userApiToken,
                             //TODO DTO has a val "original id" we need to see if mapPointEntity might need it
-                            storiesWithoutRecords.map { it.toModel().toDto().id })
+                            //storiesWithoutRecords.map { it.toModel().toDto().id})//TODO(fix this)
+                        storiesWithoutRecords[0].toModel().toDto().id)
                         if (storiesFromAPI.isSuccessful) {
-                            for (story in storiesFromAPI.body()!!) { //TODO(need to extract list from result)
+                           // for (story in storiesFromAPI.body()!!) { //TODO(need to extract list from result)
                                 storyViewModel.cacheRecordOfStory(
-                                    story.id, story.recordUrl
+                            //        story.id, story.recordUrl //TODO(KEEP THIS)
+                                    storiesFromAPI.body()!!.id, storiesFromAPI.body()!!.recordUrl
                                 )
-                            }
+                            //}
                         }
                     }
                 }

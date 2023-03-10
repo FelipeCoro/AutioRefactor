@@ -298,7 +298,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         storyViewModel.getAllStories()
 
-/*
+
         bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) {
             it?.let {
                 updateMarker(it, markers[it.id]!!)
@@ -314,7 +314,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation()
-        */
+
+
+
     }
 
     private fun highlightClusterItem(storyClusterItem: StoryClusterItem) {
@@ -539,9 +541,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
         binding.btnSelectedStoryPlay.setOnClickListener {
-            UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) {
+       //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
                 bottomNavigationViewModel.playMediaId(storyDto.id)
-            }
+            //}
         }
         binding.btnSelectedStoryInfo.setOnClickListener {
             storyDisplayTimer?.pauseTimer()
@@ -699,8 +701,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             // can be performed when the camera stops moving
             clusterManager.onCameraIdle()
             updateMapBounds(map)
+
+
             mapFragmentViewModel.fetchRecordsOfStories(
-                prefRepository.userId, prefRepository.userApiToken
+                prefRepository.userId, prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
             )
         }
         cameraIdleTimer = Timer(15000)
