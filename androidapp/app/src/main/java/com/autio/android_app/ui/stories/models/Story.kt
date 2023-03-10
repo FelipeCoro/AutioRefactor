@@ -6,7 +6,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class Story(
     val id: Int = 0,
-    val fbid: String = "",
     val lat: Double = 0.0,
     val lng: Double = 0.0,
     val range: Int = 0,
@@ -16,7 +15,7 @@ data class Story(
     val description: String = "",
     val narrator: String = "",
     val author: String = "",
-    val category: String? = null,
+    val category: String = "",
     val imageUrl: String = "",
     val recordUrl: String = "",
     var duration: Int = 0,

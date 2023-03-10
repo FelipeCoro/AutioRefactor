@@ -1,17 +1,16 @@
 package com.autio.android_app.ui.stories.view_model
 
 import androidx.lifecycle.*
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.History
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,9 +54,15 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun downloadStory(story: DownloadedStoryEntity) {
+    fun downloadStory(story: Story) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.downloadStory(story)
+            runCatching {
+                autioRepository.downloadStory(story)
+            }.onSuccess {
+                setViewState(StoryViewState.StoryDownloaded)
+            }.onFailure {
+                setViewState(StoryViewState.FailedStoryDownloaded)
+            }
         }
     }
 

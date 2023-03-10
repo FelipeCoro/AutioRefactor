@@ -53,10 +53,8 @@ import java.io.Serializable
  */
 @kotlinx.serialization.Serializable
 data class StoryDto(
-    // Story ID
-    @SerialName("id")
+
     var id: Int = 0,
-    var fbid: String = "",
     val title: String = "",
     val description: String = "",
     @SerialName("latitude")
@@ -68,23 +66,27 @@ data class StoryDto(
     val imageUrl: String = "",
     @SerialName("recordURL")
     val recordUrl: String = "",
+    val authorId:Int = 0,
     var duration: Int = 0,
+    @Embedded()
+    var category: Category? = null,
+    @SerialName("dateAdded")
+    var publishedDate: Int = 0,
     @SerialName("dateModified")
     var modifiedDate: Int = 0,
+    var imageAttribution:String ="",
     @SerialName("narratorName")
     var narrator: String = "",
     @SerialName("authorName")
     var author: String = "",
     val state: String = "",
-    @SerialName("country_code")
     val countryCode: String = "",
-    @Embedded(prefix = "category_")
-    var category: Category? = null,
+    @SerialName("private_id")
+    val privateId:String ="",
     val isLiked: Boolean? = false,
     val isBookmarked: Boolean? = false,
     val isDownloaded: Boolean? = false,
     val listenedAt: String? = null,
     val listenedAtLeast30Secs: Boolean? = false,
-    @SerialName("dateAdded")
-    var publishedDate: Int = 0
+
 ) : Serializable

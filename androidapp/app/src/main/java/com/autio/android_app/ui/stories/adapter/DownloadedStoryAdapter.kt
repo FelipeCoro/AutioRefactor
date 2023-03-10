@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
+import com.autio.android_app.data.api.model.StoryOption
+import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.util.showStoryOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -19,15 +21,15 @@ import java.io.File
 
 class DownloadedStoryAdapter(
     private var onStoryPlay: ((Int) -> Unit)?,
-    private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
-) : ListAdapter<DownloadedStoryEntity, DownloadedStoryAdapter.DownloadedStoryViewHolder>(
+    private var onOptionClick: ((StoryOption, Story) -> Unit)?
+) : ListAdapter<Story, DownloadedStoryAdapter.DownloadedStoryViewHolder>(
     DownloadedStoryComparator()
 ) {
 
     class DownloadedStoryViewHolder(
         itemView: View,
         private var onStoryPlay: ((Int) -> Unit)?,
-        private var onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
+        private var onOptionClick: ((StoryOption, Story) -> Unit)?
     ) : RecyclerView.ViewHolder(
         itemView
     ) {
@@ -56,9 +58,9 @@ class DownloadedStoryAdapter(
                 R.id.ivStoryItemOptions
             )
 
-        fun bind(model: DownloadedStoryEntity) {
+        fun bind(model: Story) {
             Glide.with(itemView)
-                .load(model.image?.let { path ->
+                .load(model.imageUrl.let { path ->
                     Uri.parse(path).path?.let {
                         File(it)
                     }
@@ -81,12 +83,12 @@ class DownloadedStoryAdapter(
                     it,
                     model,
                     arrayListOf(
-                        com.autio.android_app.data.api.model.StoryOption.DELETE,
-                        if (model.isBookmarked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
-                        if (model.isLiked == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
-                        com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD,
-                        com.autio.android_app.data.api.model.StoryOption.DIRECTIONS,
-                        com.autio.android_app.data.api.model.StoryOption.SHARE
+                        StoryOption.DELETE,
+                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
+                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
+                        StoryOption.REMOVE_DOWNLOAD,
+                        StoryOption.DIRECTIONS,
+                        StoryOption.SHARE
                     ),
                     onOptionClick = onOptionClick
                 )
@@ -97,7 +99,7 @@ class DownloadedStoryAdapter(
             fun create(
                 parent: ViewGroup,
                 onStoryPlay: ((Int) -> Unit)?,
-                onOptionClick: ((com.autio.android_app.data.api.model.StoryOption, DownloadedStoryEntity) -> Unit)?
+                onOptionClick: ((StoryOption, Story) -> Unit)?
             ): DownloadedStoryViewHolder {
                 val view =
                     LayoutInflater.from(
@@ -118,19 +120,19 @@ class DownloadedStoryAdapter(
     }
 
     class DownloadedStoryComparator :
-        DiffUtil.ItemCallback<DownloadedStoryEntity>() {
+        DiffUtil.ItemCallback<Story>() {
         override fun areItemsTheSame(
-            oldItem: DownloadedStoryEntity,
-            newItem: DownloadedStoryEntity
+            oldItem: Story,
+            newItem: Story
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: DownloadedStoryEntity,
-            newItem: DownloadedStoryEntity
+            oldItem: Story,
+            newItem: Story
         ): Boolean {
-            return oldItem.recordPath == newItem.recordPath
+            return oldItem.recordUrl == newItem.recordUrl
                     || oldItem.isLiked == newItem.isLiked
                     || oldItem.isBookmarked == newItem.isBookmarked
         }

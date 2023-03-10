@@ -1,8 +1,6 @@
 package com.autio.android_app.data.database.dao
 
-import androidx.room.Dao
-import androidx.room.Query
-import androidx.room.Transaction
+import androidx.room.*
 import com.autio.android_app.data.database.entities.StoryEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -22,6 +20,21 @@ interface StoryDao {
         setLikesToStories(storiesIds)
         removeLikesFromStories(storiesIds)
     }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addStory(story: StoryEntity): Long
+
+    @Query("SELECT * FROM story ORDER BY id ASC")
+    fun readLiveStories(): Flow<List<StoryEntity>>
+
+    @Query("SELECT * FROM story WHERE id = :id")
+    suspend fun getStoryById(id: Int): StoryEntity?
+
+
+    @Query("DELETE FROM story WHERE id = :id")
+    fun removeStory(id: Int)
+
+    @Query("DELETE FROM story")
+    fun clearTable()
 
     @Query("UPDATE story SET isBookmarked = 1 WHERE id = :id")
     fun setBookmarkToStory(id: Int)

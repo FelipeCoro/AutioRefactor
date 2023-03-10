@@ -111,6 +111,34 @@ fun showPaywall(activity: Activity) {
     (activity as BottomNavigation).showPayWall()
 }
 
+fun showPaywallOrProceedWithNormalProcess(
+    prefRepository: PrefRepository,
+    activity: Activity,
+    isActionExclusiveForSignedInUser: Boolean = false,
+    normalProcess: () -> Unit
+) {
+    Purchases.sharedInstance.getCustomerInfoWith {
+        if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
+            normalProcess.invoke()
+        } else {
+            try {
+                val isUserGuest = prefRepository.isUserGuest
+                val remainingStories = prefRepository.remainingStories
+                if ((isActionExclusiveForSignedInUser && isUserGuest) || remainingStories <= 0) {
+                    showPaywall(activity)
+                } else {
+                    normalProcess.invoke()
+                }
+            } catch (exception: java.lang.ClassCastException) {
+                Log.e(
+                    "CastException",
+                    "Activity is not a subtype of BottomNavigation"
+                )
+            }
+        }
+    }
+}
+
 
 
 

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutioLocalDataSource {
     val userCategories: Flow<List<CategoryEntity>>
-    val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
+    val getDownloadedStories: Flow<List<StoryEntity>>
     val bookmarkedStories: Flow<List<StoryEntity>>
     val favoriteStories: Flow<List<StoryEntity>>
     val history: Flow<List<StoryEntity>>
@@ -28,15 +28,15 @@ interface AutioLocalDataSource {
     suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int)
     suspend fun removeStoryFromHistory(id: Int)
     suspend fun clearStoryHistory()
-    suspend fun bookmarkStory(id: Int): DownloadedStoryEntity?
-    suspend fun removeBookmarkFromStory(id: Int): DownloadedStoryEntity?
+    suspend fun bookmarkStory(id: Int): StoryEntity?
+    suspend fun removeBookmarkFromStory(id: Int): StoryEntity?
     suspend fun removeAllBookmarks()
     suspend fun giveLikeToStory(id: Int)
     suspend fun removeLikeFromStory(id: Int)
-    suspend fun downloadStory(story: DownloadedStoryEntity)
+    suspend fun downloadStory(story: StoryEntity)
     suspend fun removeDownloadedStory(id: Int)
     suspend fun removeAllDownloads()
-    suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity?
+    suspend fun getDownloadedStoryById(id: Int): StoryEntity?
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
     suspend fun clearUserData()

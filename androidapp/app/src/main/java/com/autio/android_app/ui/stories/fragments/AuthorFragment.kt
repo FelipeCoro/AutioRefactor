@@ -20,10 +20,8 @@ import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.StoryOption
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAuthorBinding
-import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.Story
@@ -93,14 +91,12 @@ class AuthorFragment : Fragment() {
         recyclerView = binding.rvAuthorStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
-                    requireActivity(), true
+                showPaywallOrProceedWithNormalProcess(
+                    prefRepository, requireActivity(), true
                 ) {
-                    bottomNavigationViewModel.playMediaId(
-                        id
-                    )
+                    bottomNavigationViewModel.playMediaId(                        id                    )
                 }
-            }, onOptionClick = ::onOptionClicked
+            }, onOptionClick = ::optionClicked
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(
@@ -117,9 +113,7 @@ class AuthorFragment : Fragment() {
 
         storyId?.let {
             storyViewModel.getAuthorOfStory(
-                prefRepository.userId,
-                "Bearer " + prefRepository.userApiToken,
-                it
+                prefRepository.userId, "Bearer " + prefRepository.userApiToken, it
             )
 
 
@@ -132,17 +126,19 @@ class AuthorFragment : Fragment() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
+    //TODO(this handle repeats in all fragments could it be global?)
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
             is StoryViewState.FetchedStoriesByIds -> storiesByIdsSuccess(viewState.stories)
             is StoryViewState.FetchedAllStories -> allStoriesSuccess(viewState.stories)
             is StoryViewState.FetchedAuthor -> authorSuccess(viewState.author)
-            is StoryViewState.AddedBookmark -> addedBookmark()
-            is StoryViewState.RemovedBookmark -> removeBookmark()
-            is StoryViewState.StoryLiked -> storyLiked()
-            is StoryViewState.LikedRemoved -> likedRemoved()
-            is StoryViewState.StoryRemoved -> removedFromDownload()
-            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
+            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
 
@@ -150,14 +146,11 @@ class AuthorFragment : Fragment() {
 
         author?.let {
             if (author.imageUrl != null) {
-                Glide.with(this@AuthorFragment).load(author.imageUrl)
-                    .transition(
-                        DrawableTransitionOptions.withCrossFade(
-                            100
-                        )
-                    ).into(
-                        binding.ivAuthorPic
+                Glide.with(this@AuthorFragment).load(author.imageUrl).transition(
+                    DrawableTransitionOptions.withCrossFade(
+                        100
                     )
+                ).into(binding.ivAuthorPic)
             }
             binding.tvAuthorName.apply {
                 visibility = View.VISIBLE
@@ -183,8 +176,7 @@ class AuthorFragment : Fragment() {
     }
 
     private fun storiesByIdsSuccess(stories: List<Story>) {
-        binding.tvPublishedStoriesSubtitle.visibility =
-            View.VISIBLE
+        binding.tvPublishedStoriesSubtitle.visibility = View.VISIBLE
         storyAdapter.submitList(
             stories
         )
@@ -192,110 +184,19 @@ class AuthorFragment : Fragment() {
 
     private fun allStoriesSuccess(stories: List<Story>) {}
 
-    private fun addedBookmark() {
-        showFeedbackSnackBar("Added To Bookmarks")
-    }
-
-    private fun removeBookmark() {
-        showFeedbackSnackBar("Removed From Bookmarks")
-    }
-
-    private fun storyLiked() {
-        showFeedbackSnackBar("Added To Favorites")
-    }
-
-    private fun likedRemoved() {
-        showFeedbackSnackBar("Removed From Favorites")
-    }
-
-    private fun removedFromDownload() {
-        showFeedbackSnackBar("Story Removed From My Device")
-    }
-
-    private fun viewStateError() {
-        //TODO(Macro error handling for viewstate error)
-        showFeedbackSnackBar("Connection Failure")
-    }
-
-    private fun onOptionClicked(
+    private fun optionClicked(
         option: StoryOption, story: Story
     ) {
-        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(
-            requireActivity(),  true
-        ) {
-            when (option) {
-                StoryOption.BOOKMARK -> {
-
-                    storyViewModel.bookmarkStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.REMOVE_BOOKMARK -> {
-
-                    storyViewModel.removeBookmarkFromStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.LIKE -> {
-
-                    storyViewModel.giveLikeToStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.REMOVE_LIKE -> {
-                    storyViewModel.removeLikeFromStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
-
-                    try { //TODO(Temp fix for runability)
-                        val downloadedStory = DownloadedStoryEntity.fromStory(
-                            requireContext(), story.toDto()
-                        )
-                        storyViewModel.downloadStory(
-                            downloadedStory!!
-                        )
-                        showFeedbackSnackBar(
-                            "Story Saved To My Device"
-                        )
-                    } catch (e: Exception) {
-                        Log.e(
-                            "BookmarksFragment", "exception: ", e
-                        )
-                        showFeedbackSnackBar(
-                            "Failed Downloading Story"
-                        )
-                    }
-                }
-                StoryOption.REMOVE_DOWNLOAD -> {
-                    storyViewModel.removeDownloadedStory(
-                        story.id
-                    )
-                }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lng
-                )
-                StoryOption.SHARE -> {
-                    shareStory(
-                        requireContext(), story.id
-                    )
-                }
-                else -> Log.d(
-                    "AuthorFragment", "no option available"
+        activity?.let { verifiedActivity ->
+            context?.let { verifiedContext ->
+                onOptionClicked(
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
             }
         }
     }
 
+    //TODO(This repeats in all fragments, should extract alongside CancelJob())
     private fun showFeedbackSnackBar(
         feedback: String
     ) {

@@ -65,7 +65,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(
     override suspend fun getStoriesByIds(
         xUserId: Int, apiToken: String, ids: List<Int>
     ): Response<List<StoryDto>> {
-        return Response.success(listOf(apiClient.getStoriesByIds(xUserId, apiToken, ids[0]).body()!!))
+        return Response.success(apiClient.getStoriesByIds(xUserId, apiToken, ids).body()!!)
     }
 
     override suspend fun getStoryById(

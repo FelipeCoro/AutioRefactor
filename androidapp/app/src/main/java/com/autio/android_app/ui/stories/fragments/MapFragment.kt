@@ -29,11 +29,11 @@ import com.autio.android_app.R
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.api.model.modelLegacy.StoryClusterRenderer
 import com.autio.android_app.data.api.model.pendings.StoryClusterItem
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMapBinding
 import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.domain.mappers.toModel
+import com.autio.android_app.domain.mappers.toStoryEntity
 import com.autio.android_app.extensions.findNearestToCoordinates
 import com.autio.android_app.extensions.toPx
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
@@ -122,10 +122,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) {
+                showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity()) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
-            }, onOptionClick = ::onOptionClicked, shouldPinLocationBeShown = true
+            }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -190,41 +190,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
-            is StoryViewState.AddedBookmark -> addedBookmark()
-            is StoryViewState.RemovedBookmark -> removeBookmark()
-            is StoryViewState.StoryLiked -> storyLiked()
-            is StoryViewState.LikedRemoved -> likedRemoved()
-            is StoryViewState.StoryRemoved -> removedFromDownload()
             is StoryViewState.FetchedAllStories -> addClusteredMarkers(viewState.stories)
-            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
+            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
-    private fun addedBookmark() {
-        showFeedbackSnackBar("Added To Bookmarks")
-    }
-
-    private fun removeBookmark() {
-        showFeedbackSnackBar("Removed From Bookmarks")
-    }
-
-    private fun storyLiked() {
-        showFeedbackSnackBar("Added To Favorites")
-    }
-
-    private fun likedRemoved() {
-        showFeedbackSnackBar("Removed From Favorites")
-    }
-
-    private fun removedFromDownload() {
-        showFeedbackSnackBar("Story Removed From My Device")
-    }
-
-    private fun viewStateError() {
-        //TODO(Macro error handling for viewstate error)
-        showFeedbackSnackBar("Connection Failure")
-    }
-
-
 
     private fun setListeners() {
         with(
@@ -314,7 +289,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         // Get the current location of the device and set the position of the map.
         getDeviceLocation()
-
 
 
     }
@@ -541,8 +515,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
         binding.btnSelectedStoryPlay.setOnClickListener {
-       //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
-                bottomNavigationViewModel.playMediaId(storyDto.id)
+            //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
+            bottomNavigationViewModel.playMediaId(storyDto.id)
             //}
         }
         binding.btnSelectedStoryInfo.setOnClickListener {
@@ -558,7 +532,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     StoryOption.DIRECTIONS,
                     StoryOption.SHARE
                 ),
-                onOptionClick = ::onOptionClicked,
+                onOptionClick = ::optionClicked,
                 onDismiss = { storyDisplayTimer?.finishTimer() })
         }
         showSelectedStoryComponent()
@@ -674,7 +648,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     /**
      * Adds markers to the map with clustering support. As response to the viewModel liveData.
      */
-    private fun addClusteredMarkers(stories: List<Story>){
+    private fun addClusteredMarkers(stories: List<Story>) {
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         clusterManager.setAnimation(false)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
@@ -704,7 +678,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
             mapFragmentViewModel.fetchRecordsOfStories(
-                prefRepository.userId, prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
+                prefRepository.userId,
+                prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
             )
         }
         cameraIdleTimer = Timer(15000)
@@ -767,67 +742,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun onOptionClicked(option: StoryOption, story: Story) {
-        storyDisplayTimer?.finishTimer()
-        UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-            when (option) {
-                StoryOption.BOOKMARK -> {
-
-                    storyViewModel.bookmarkStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.REMOVE_BOOKMARK -> {
-
-                    storyViewModel.removeBookmarkFromStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.LIKE -> {
-
-                    storyViewModel.giveLikeToStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.REMOVE_LIKE -> {
-                    storyViewModel.removeLikeFromStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
-                    try {
-                        val downloadedStory =
-                            DownloadedStoryEntity.fromStory(requireContext(), story.toDto())
-                        storyViewModel.downloadStory(downloadedStory!!)
-                        val updatedStory = story.copy(isDownloaded = true)
-//                        updateMarker( updatedStory )
-                        showFeedbackSnackBar("Story Saved To My Device")
-                    } catch (e: Exception) {
-                        Log.e("BookmarksFragment", "exception: ", e)
-                        showFeedbackSnackBar("Failed Downloading Story")
-                    }
-                }
-                StoryOption.REMOVE_DOWNLOAD -> {
-                    storyViewModel.removeDownloadedStory(story.id)
-                    val updatedStory = story.copy(isDownloaded = false)
-//                    updateMarker( updatedStory )
-                    showFeedbackSnackBar("Story Removed From My Device")
-                }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lng
+    private fun optionClicked(
+        option: StoryOption, story: Story
+    ) {
+        activity?.let { verifiedActivity ->
+            context?.let { verifiedContext ->
+                onOptionClicked(
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
-                StoryOption.SHARE -> {
-                    shareStory(requireContext(), story.id)
-                }
-                else -> Log.d(TAG, "No option available")
             }
         }
     }

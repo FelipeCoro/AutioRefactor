@@ -2,7 +2,6 @@ package com.autio.android_app.domain.repository
 
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
@@ -12,10 +11,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutioRepository {
     val userCategories: Flow<List<Category>>
-    val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
-    val bookmarkedStories: Flow<List<StoryEntity>>
-    val favoriteStories: Flow<List<StoryEntity>>
-    val history: Flow<List<StoryEntity>>
+    val getDownloadedStories: Flow<List<Story>>
+    val bookmarkedStories: Flow<List<Story>>
+    val favoriteStories: Flow<List<Story>>
+    val history: Flow<List<Story>>
 
     suspend fun createAccount(accountRequest: AccountRequest): Result<User>
     suspend fun login(loginRequest: LoginRequest): Result<User>
@@ -50,9 +49,9 @@ interface AutioRepository {
 
     suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto)
 
-    suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity?
+    suspend fun getDownloadedStoryById(id: Int): StoryEntity?
 
-    suspend fun downloadStory(story: DownloadedStoryEntity)
+    suspend fun downloadStory(storyId: Story)
 
     suspend fun getAllStories(): Flow<List<Story>?>
 
@@ -102,8 +101,9 @@ interface AutioRepository {
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
 
     suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
-    suspend fun deleteCachedData()
-    suspend fun addStories(stories: List<Story>)
 
+    suspend fun deleteCachedData()
+
+    suspend fun addStories(stories: List<Story>)
 
 }

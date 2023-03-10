@@ -17,6 +17,8 @@ sealed interface StoryViewState {
     object FailedLikedStory : StoryViewState
     object LikedRemoved : StoryViewState
     object FailedLikedRemoved : StoryViewState
+    object StoryDownloaded : StoryViewState
+    object FailedStoryDownloaded : StoryViewState
     object StoryRemoved : StoryViewState
     object FailedStoryRemoved : StoryViewState
 
