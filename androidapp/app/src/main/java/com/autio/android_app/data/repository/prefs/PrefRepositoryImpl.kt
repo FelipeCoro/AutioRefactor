@@ -52,7 +52,7 @@ class PrefRepositoryImpl @Inject constructor(
     override var userEmail: String = USER_EMAIL.getString()
         set(email) = USER_EMAIL.put(email)
 
-    override var userApiToken: String = USER_API_TOKEN.getString()
+    override var userApiToken: String = "Bearer tok_Q22sw7X2iN2jcVQgRfRRo8tm4anlVwX2AVgvZH7amzs0HqNRtDpBxoZtCK7h"// USER_API_TOKEN.getString()TODO(Change this back after fix)
         set(apiToken) = USER_API_TOKEN.put(apiToken)
 
     override var isUserGuest: Boolean = USER_IS_GUEST.getBoolean()

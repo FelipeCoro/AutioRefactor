@@ -7,7 +7,6 @@ import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
 import com.autio.android_app.data.api.model.history.ClearHistoryResponse
 import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
-import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.api.model.story.*
 import retrofit2.Response
 import javax.inject.Inject

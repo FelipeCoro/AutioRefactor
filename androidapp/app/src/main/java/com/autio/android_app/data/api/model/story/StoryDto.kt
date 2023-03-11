@@ -74,7 +74,7 @@ data class StoryDto(
     var publishedDate: Int = 0,
     @SerialName("dateModified")
     var modifiedDate: Int = 0,
-    var imageAttribution:String ="",
+    var imageAttribution:String? ="",
     @SerialName("narratorName")
     var narrator: String = "",
     @SerialName("authorName")

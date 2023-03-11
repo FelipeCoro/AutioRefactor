@@ -11,7 +11,6 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.*
 import com.autio.android_app.R
-import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.currentPlayBackPosition
@@ -23,6 +22,7 @@ import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
+import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -45,10 +45,17 @@ class BottomNavigationViewModel @Inject constructor(
     app
 ) {
 
+    private val _bottomNavigationViewState = MutableLiveData<BottomNavigationViewState>()
+    val bottomNavigationViewState: LiveData<BottomNavigationViewState> = _bottomNavigationViewState
+
     val initialRemainingStories = prefRepository.remainingStories
     val remainingStoriesLiveData = prefRepository.remainingStoriesLiveData
 
     private val storiesJob = SupervisorJob()
+
+    private fun setViewState(newState: BottomNavigationViewState) {
+        _bottomNavigationViewState.postValue(newState)
+    }
 
     fun onCreate() {
         playerServiceConnection.apply {
@@ -60,6 +67,7 @@ class BottomNavigationViewModel @Inject constructor(
 
     private var postedPlay = false
     private var playbackState = EMPTY_PLAYBACK_STATE
+
     val playingStory = MutableLiveData<Story?>()
     private val mediaPosition = MutableLiveData<Int>().apply {
         postValue(0)
@@ -97,34 +105,31 @@ class BottomNavigationViewModel @Inject constructor(
         }, POSITION_UPDATE_INTERVAL_MILLIS
     )
 
-    private fun postPlay() {
+    fun postPlay() {
         val storyToPost = playingStory.value
         postedPlay = true
         viewModelScope.launch(coroutineDispatcher) {
+            if (storyToPost != null) {
             val downloadedStory = autioRepository.getDownloadedStoryById(playingStory.value!!.id)
             val connectivityManager =
                 app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val networkInfo = connectivityManager.activeNetwork
             val network = getNetworkStatus(networkInfo, connectivityManager)
 
-            val playsDto = if (storyToPost != null)
-                PlaysDto(
-                    storyToPost.id,
+                autioRepository.postStoryPlayed(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    storyToPost,
                     wasPresent = true,
                     autoPlay = true,
                     downloadedStory != null,
-                    network,
-                    storyToPost.lat,
-                    storyToPost.lng
-                ) else PlaysDto()
-
-            autioRepository.postStoryPlayed(
-                prefRepository.userId,
-                prefRepository.userApiToken,
-                playsDto
-            )
+                    network
+                )
+                setViewState(BottomNavigationViewState.FetchedStoryToPlay(storyToPost))
+            } else setViewState(BottomNavigationViewState.FetchedStoryToPlayFailed)
         }
     }
+
 
     private fun getNetworkStatus(
         networkInfo: Network?,
@@ -212,14 +217,13 @@ class BottomNavigationViewModel @Inject constructor(
             postedPlay = false
             transportControls.playFromMediaId(mediaItem.mediaId.toString(), null)
             //TODO(Use ourRepo)
-          // FirebaseStoryRepository.addStoryToUserHistory(
-          //     prefRepository.firebaseKey, mediaItem.mediaId,
-          //     onSuccessListener = { timestamp ->
-          //         viewModelScope.launch(Dispatchers.IO) {
-          //             autioRepository.addStoryToHistory(History(mediaItem.mediaId, timestamp))
-                    }
-                }
-
+            // FirebaseStoryRepository.addStoryToUserHistory(
+            //     prefRepository.firebaseKey, mediaItem.mediaId,
+            //     onSuccessListener = { timestamp ->
+            //         viewModelScope.launch(Dispatchers.IO) {
+            //             autioRepository.addStoryToHistory(History(mediaItem.mediaId, timestamp))
+        }
+    }
 
 
     fun playMediaId(mediaId: Int) {
@@ -246,15 +250,15 @@ class BottomNavigationViewModel @Inject constructor(
                 mediaId.toString(), null
             )
             //TODO(Use ourRepo)
-           //FirebaseStoryRepository
-           //    .addStoryToUserHistory(
-           //        prefRepository.firebaseKey,
-           //        mediaId,
-           //        onSuccessListener = { timestamp ->
-           //            viewModelScope.launch(coroutineDispatcher) {
-           //                autioRepository.addStoryToHistory(History(mediaId, timestamp))
-           //            }
-           //        })
+            //FirebaseStoryRepository
+            //    .addStoryToUserHistory(
+            //        prefRepository.firebaseKey,
+            //        mediaId,
+            //        onSuccessListener = { timestamp ->
+            //            viewModelScope.launch(coroutineDispatcher) {
+            //                autioRepository.addStoryToHistory(History(mediaId, timestamp))
+            //            }
+            //        })
         }
     }
 
@@ -325,7 +329,7 @@ class BottomNavigationViewModel @Inject constructor(
                     val date = result.modifiedDate ?: 63808881662
                     //TODO (Move to Repository)
                     //TODO: change Firebase code with commented code once endpoint is stable
-                   val stories = autioRepository.getStoriesAfterModifiedDate(date.toInt())
+                    val stories = autioRepository.getStoriesAfterModifiedDate(date.toInt())
                     autioRepository.addStories(stories)
                 }
             }.onFailure { }
@@ -339,7 +343,7 @@ class BottomNavigationViewModel @Inject constructor(
                 prefRepository.userId
             )
             //TODO(Finish this)
-         //   autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.id .toString })
+            //   autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.id .toString })
         }
     }
 
@@ -349,10 +353,10 @@ class BottomNavigationViewModel @Inject constructor(
                 prefRepository.userId
             )
             //TODO(Finish this)
-          //  autioRepository.setLikesDataToLocalStories(userFavoriteStories
-          //      .filter { it.isGiven == true }
-          //      .map { it.storyId }
-           // )
+            //  autioRepository.setLikesDataToLocalStories(userFavoriteStories
+            //      .filter { it.isGiven == true }
+            //      .map { it.storyId }
+            // )
         }
     }
 
@@ -362,7 +366,7 @@ class BottomNavigationViewModel @Inject constructor(
                 prefRepository.userId
             )
             //TODO(Finish this)
-          //  autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
+            //  autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
         }
     }
 

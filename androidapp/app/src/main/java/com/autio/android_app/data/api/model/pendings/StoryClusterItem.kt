@@ -2,26 +2,27 @@ package com.autio.android_app.data.api.model.pendings
 
 import android.graphics.Bitmap
 import com.autio.android_app.data.api.model.story.StoryDto
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterItem
 
-class StoryClusterItem(mStoryDto: StoryDto) : ClusterItem {
+class StoryClusterItem(mStory: Story) : ClusterItem {
 
-    private val position: LatLng = LatLng(mStoryDto.lat, mStoryDto.lon)
-    private val title: String = mStoryDto.title
+    private val position: LatLng = LatLng(mStory.lat, mStory.lng)
+    private val title: String = mStory.title
     private val snippet: String = ""
 
-    var story = mStoryDto
+    var story = mStory
         private set
     var marker: Marker? = null
     var bitmap: Bitmap? = null
 
-    fun updateStory(storyDto: StoryDto) {
-        if (storyDto.id != this.story.id) {
+    fun updateStory(story: Story) {
+        if (story.id != this.story.id) {
             throw Exception("Story is not the same!")
         }
-        this.story = storyDto
+        this.story = story
     }
 
     override fun getPosition() = position

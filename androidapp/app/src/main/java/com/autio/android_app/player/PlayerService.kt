@@ -20,6 +20,7 @@ import androidx.media.MediaBrowserServiceCompat
 import androidx.room.Database
 import com.autio.android_app.R
 import com.autio.android_app.data.database.DataBase
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.album
@@ -87,7 +88,10 @@ class PlayerService() : MediaBrowserServiceCompat() {
     lateinit var jsonSource: JsonSource
 
     @Inject
-    lateinit var autioRepository:AutioRepository
+    lateinit var autioRepository: AutioRepository
+
+    @Inject
+    lateinit var prefRepository: PrefRepository
 
 
     private lateinit var notificationManager: MediaNotificationManager
@@ -142,7 +146,8 @@ class PlayerService() : MediaBrowserServiceCompat() {
 
             addListener(playerListener)
 
-            addAnalyticsListener(PlaybackStatsListener(true, null)
+            addAnalyticsListener(
+                PlaybackStatsListener(true, null)
             )
         }
     }
@@ -548,7 +553,11 @@ class PlayerService() : MediaBrowserServiceCompat() {
             mediaId: String, playWhenReady: Boolean, extras: Bundle?
         ) {
             serviceScope.launch {
-                val itemToPlay = autioRepository.getStoryById(1,"Bearer tok_Q22sw7X2iN2jcVQgRfRRo8tm4anlVwX2AVgvZH7amzs0HqNRtDpBxoZtCK7h",mediaId.toInt())
+                val itemToPlay = autioRepository.getStoryById(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    mediaId.toInt()
+                )
                 if (itemToPlay == null) {
                     Log.w(TAG, "Content not found: MediaID=$mediaId")
                 } else {

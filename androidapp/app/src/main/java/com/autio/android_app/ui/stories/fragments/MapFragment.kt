@@ -125,7 +125,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity()) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
-            }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true
+            }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true,viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -294,8 +294,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun highlightClusterItem(storyClusterItem: StoryClusterItem) {
-        if (highlightedItem != null) {
-            unhighlightClusterItem(highlightedItem!!)
+        highlightedItem?.let{
+            unhighlightClusterItem(it)
         }
         highlightedItem = storyClusterItem.apply {
             val originalBitmap = bitmap
@@ -314,7 +314,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         largerBitmap?.let {
             val originalBitmap = getOriginalBitmap(it)
             val smallerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(originalBitmap)
-            storyClusterItem.marker!!.setIcon(smallerBitmapDescriptor)
+            storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
         }
     }
 
@@ -375,7 +375,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      */
     private fun getDeviceLocation() {
         try {
-            if (locationPermissionGranted) {
+            if (locationPermissionGranted && false) { //TODO(CHANGE BACK AFTER TEESTING)
                 val locationResult = fusedLocationClient.lastLocation
                 locationResult.addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
@@ -504,11 +504,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun tapClusterItem(clusterItem: StoryClusterItem) {
         storyDisplayTimer?.cancelTimer()
         storyDisplayTimer = Timer()
-        val storyDto = clusterItem.story
-        binding.tvSelectedStoryTitle.text = storyDto.title
-        binding.tvSelectedStoryNarrator.text = storyDto.narrator
+        val story = clusterItem.story
+        binding.tvSelectedStoryTitle.text = story.title
+        binding.tvSelectedStoryNarrator.text = story.narrator
         bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
-            if (storyDto.id == bottomNavigationViewModel.playingStory.value?.id) {
+            if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
                 binding.btnSelectedStoryPlay.setImageResource(res)
             } else {
                 binding.btnSelectedStoryPlay.setImageResource(R.drawable.ic_player_play)
@@ -516,7 +516,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
         binding.btnSelectedStoryPlay.setOnClickListener {
             //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
-            bottomNavigationViewModel.playMediaId(storyDto.id)
+            bottomNavigationViewModel.playMediaId(story.id)
             //}
         }
         binding.btnSelectedStoryInfo.setOnClickListener {
@@ -524,10 +524,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             showStoryOptions(requireContext(),
                 binding.root as ViewGroup,
                 it,
-                storyDto.toModel(),
+                story,
                 arrayListOf(
-                    if (storyDto.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                    if (storyDto.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                    if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                    if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
                     StoryOption.DOWNLOAD,
                     StoryOption.DIRECTIONS,
                     StoryOption.SHARE
@@ -653,61 +653,63 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         clusterManager.setAnimation(false)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
         clusterManager.renderer = clusterRenderer
-        markers.putAll(stories.associate { it.id to StoryClusterItem(it.toDto()) })
 
-        clusterManager.addItems(markers.values)
-        clusterManager.cluster()
-        clusterManager.setOnClusterItemClickListener { storyItem ->
-            tapClusterItem(storyItem)
-            false
-        }
-        clusterManager.setOnClusterClickListener {
-            moveCamera(it.position, map.cameraPosition.zoom + 1)
-            true
-        }
+            markers.putAll(stories.take(200).associate { it.id to StoryClusterItem(it) })//todo(eliminate take truncation)
 
-        map.setOnCameraMoveStartedListener {
-            cameraIdleTimer?.cancelTimer()
-        }
-        map.setOnCameraIdleListener {
-            cameraPosition = map.cameraPosition
-            // Call clusterManager.onCameraIdle() when the camera stops moving so that re-clustering
-            // can be performed when the camera stops moving
-            clusterManager.onCameraIdle()
-            updateMapBounds(map)
+            clusterManager.addItems(markers.values)
+            clusterManager.cluster()
+            clusterManager.setOnClusterItemClickListener { storyItem ->
+                tapClusterItem(storyItem)
+                true //TODO(false)
+            }
+            clusterManager.setOnClusterClickListener {
+                moveCamera(it.position, map.cameraPosition.zoom + 1)
+                true
+            }
+
+            map.setOnCameraMoveStartedListener {
+                cameraIdleTimer?.cancelTimer()
+            }
+            map.setOnCameraIdleListener {
+                cameraPosition = map.cameraPosition
+                // Call clusterManager.onCameraIdle() when the camera stops moving so that re-clustering
+                // can be performed when the camera stops moving
+                clusterManager.onCameraIdle()
+                updateMapBounds(map)
 
 
-            mapFragmentViewModel.fetchRecordsOfStories(
-                prefRepository.userId,
-                prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
-            )
-        }
-        cameraIdleTimer = Timer(15000)
-        cameraIdleTimer?.startTimer()
-        cameraIdleTimer?.isActive?.observe(this@MapFragment) {
-            if (it == false) {
-                val center = map.cameraPosition.target
-                val nearestStory =
-                    mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(
-                        center
-                    )
-                if (nearestStory != null) {
-                    moveCamera(
-                        latitude = nearestStory.lat,
-                        longitude = nearestStory.lng,
-                        zoom = map.cameraPosition.zoom
-                    )
-                    if (clusterRenderer.getMarker(markers[nearestStory.id]!!) != null) {
-                        highlightClusterItem(markers[nearestStory.id]!!)
+                mapFragmentViewModel.fetchRecordsOfStories(
+                    prefRepository.userId,
+                    prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
+                )
+            }
+            cameraIdleTimer = Timer(15000)
+            cameraIdleTimer?.startTimer()
+            cameraIdleTimer?.isActive?.observe(this@MapFragment) {
+                if (it == false) {
+                    val center = map.cameraPosition.target
+                    val nearestStory =
+                        mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(
+                            center
+                        )
+                    if (nearestStory != null) {
+                        moveCamera(
+                            latitude = nearestStory.lat,
+                            longitude = nearestStory.lng,
+                            zoom = map.cameraPosition.zoom
+                        )
+                        if (clusterRenderer.getMarker(markers[nearestStory.id]) != null) {
+                            highlightClusterItem(markers[nearestStory.id]!!)
+                        }
                     }
                 }
             }
-        }
+
 
     }
 
     private fun updateMarker(story: Story, item: StoryClusterItem) {
-        item.updateStory(story.toDto())
+        item.updateStory(story)
         clusterManager.updateItem(item)
         clusterManager.cluster()
     }

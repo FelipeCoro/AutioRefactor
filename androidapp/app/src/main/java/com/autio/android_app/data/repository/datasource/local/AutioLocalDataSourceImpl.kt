@@ -44,21 +44,20 @@ class AutioLocalDataSourceImpl @Inject constructor(
     override suspend fun getAllStories() = mapPointDao.readLiveStories()
 
 
-
     override suspend fun getMapPointById(id: String): Result<MapPointEntity?> {
         return kotlin.runCatching {
             mapPointDao.getMapPointById(id)
         }.onSuccess { Result.success(it) }.onFailure { Result.failure<MapPointEntity>(it) }
     }
 
-    override suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<MapPointEntity>> {
+    override suspend fun getMapPointsByIds(ids: List<Int>): Result<List<MapPointEntity>> {
         val listMapPointEntities = mutableListOf<MapPointEntity>()
         ids.forEach { id ->
             mapPointDao.getMapPointById(id.toString())?.let {
                 listMapPointEntities.add(it)
             }
         }
-        return flowOf(listMapPointEntities)
+        return Result.success (listMapPointEntities)
     }
 
     override suspend fun getLastModifiedStory(): Result<StoryEntity?> {
@@ -172,7 +171,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
 // Downloaded stories
 
-    override suspend fun downloadStory(story :StoryEntity) {
+    override suspend fun downloadStory(story: StoryEntity) {
         executor.execute {
             storyDao.addStory(story)
         }

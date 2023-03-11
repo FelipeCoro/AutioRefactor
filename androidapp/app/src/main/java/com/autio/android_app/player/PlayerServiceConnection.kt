@@ -11,6 +11,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.flag
@@ -42,11 +43,12 @@ import javax.inject.Inject
  *  parameters, rather than private properties. They're only required to build the
  *  [MediaBrowserConnectionCallback] and [MediaBrowserCompat] objects.
  */
-class PlayerServiceConnection(
+class PlayerServiceConnection @Inject constructor(
     @ApplicationContext context: Context,
     serviceComponent: ComponentName,
     private val autioRepository: AutioRepository,
-    @MainDispatcher private val coroutineDispatcher: CoroutineDispatcher
+    @MainDispatcher private val coroutineDispatcher: CoroutineDispatcher,
+    private val prefRepository: PrefRepository
 ) {
 
     val isConnected = MutableLiveData<Boolean>().apply {
@@ -142,8 +144,8 @@ class PlayerServiceConnection(
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
 
-                    val currentStory = autioRepository.getStoryById(1,"Bearer tok_Q22sw7X2iN2jcVQgRfRRo8tm4anlVwX2AVgvZH7amzs0HqNRtDpBxoZtCK7h",
-                        metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt()) //TODO Check this
+                    val currentStory = autioRepository.getStoryById(prefRepository.userId,prefRepository.userApiToken,
+                        metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt())
                     currentStory.let {
                         nowPlaying.value = it.getOrNull()
                     }

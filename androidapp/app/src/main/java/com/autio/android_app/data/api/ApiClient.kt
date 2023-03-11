@@ -7,7 +7,6 @@ import com.autio.android_app.data.api.model.history.ClearHistoryResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
 import com.autio.android_app.data.api.model.story.StoryLikedResponse
 import com.autio.android_app.data.api.model.account.*
-import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.api.model.story.*
 import retrofit2.Response
 import retrofit2.http.*
@@ -133,11 +132,11 @@ interface ApiClient {
        @Query("ids[]") ids: List<Int>
    ): Response<List<StoryDto>>
 
-    @GET("/api/v1/stories/by-ids-v2")//TODO(Check endpoint with BO, this is just a copy paste from above)
+    @GET("/api/v1/stories/{id}")
     suspend fun getStoryById(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,
-        @Query("id") id: Int
+        @Path("id") id: Int
     ): Response<StoryDto>
 
     @Deprecated(

@@ -1,7 +1,6 @@
 package com.autio.android_app.domain.repository
 
 import com.autio.android_app.data.api.model.account.ProfileDto
-import com.autio.android_app.data.api.model.story.PlaysDto
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
@@ -11,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutioRepository {
     val userCategories: Flow<List<Category>>
-    val getDownloadedStories: Flow<List<Story>>
+
     val bookmarkedStories: Flow<List<Story>>
     val favoriteStories: Flow<List<Story>>
     val history: Flow<List<Story>>
@@ -28,9 +27,9 @@ interface AutioRepository {
     )
 
     suspend fun getMapPointById(id: String): Result<Story?>
-    suspend fun getMapPointsByIds(ids: List<Int>): Flow<List<Story>>
+    suspend fun getMapPointsByIds(ids: List<Int>): Result<List<Story>>
     suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result<Story>
-    suspend fun getStoriesByIds(userId: Int, apiToken: String, storiesWithoutRecords: List<Story>)
+    suspend fun getStoriesByIds(userId: Int, apiToken: String, stories: List<Int>):Result<List<Story>>
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng,
         neCoordinates: LatLng
@@ -47,15 +46,23 @@ interface AutioRepository {
 
     suspend fun giveLikeToStory(xUserId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
-    suspend fun postStoryPlayed(xUserId: Int, userApiToken: String, playsDto: PlaysDto)
+    suspend fun postStoryPlayed(
+        xUserId: Int,
+        userApiToken: String,
+        story: Story,
+        wasPresent: Boolean,
+        autoPlay: Boolean,
+        isDownloaded: Boolean,
+        network: String
+    )
 
     suspend fun getDownloadedStoryById(id: Int): StoryEntity?
 
-    suspend fun downloadStory(storyId: Story)
+    suspend fun downloadStory(story: Story)
 
     suspend fun getAllStories(): Flow<List<Story>?>
 
-    suspend fun getStoriesAfterModifiedDate(date:Int):List<Story>
+    suspend fun getStoriesAfterModifiedDate(date: Int): List<Story>
 
     suspend fun removeDownloadedStory(id: Int)
 
@@ -69,9 +76,9 @@ interface AutioRepository {
 
     suspend fun bookmarkStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
-    suspend fun getUserBookmarks(firebaseId:Int):List<String>
+    suspend fun getUserBookmarks(firebaseId: Int): List<String>
 
-    suspend fun getStoriesFromUserBookmarks(userId: Int, apiToken: String) :Result<List<Story>>
+    suspend fun getStoriesFromUserBookmarks(userId: Int, apiToken: String): Result<List<Story>>
 
     //TODO(Same as with storyViewModel we need to have parallel methods to avoid contradictions)
     suspend fun removeAllBookmarks()
@@ -101,7 +108,7 @@ interface AutioRepository {
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
 
     suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
-
+    suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
     suspend fun deleteCachedData()
 
     suspend fun addStories(stories: List<Story>)

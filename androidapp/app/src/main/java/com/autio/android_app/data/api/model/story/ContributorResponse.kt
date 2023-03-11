@@ -22,7 +22,7 @@ data class ContributorStoryData(
     @SerialName(
         "firebase_identifier"
     )
-    val firebaseId: String,
+    val firebaseId: String?,
     val title: String,
     @SerialName(
         "narration_url"

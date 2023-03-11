@@ -1,7 +1,6 @@
 package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -19,17 +18,22 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Slide
 import androidx.transition.TransitionManager
 import com.autio.android_app.R
-import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentNarratorBinding
-import com.autio.android_app.domain.mappers.toDto
+import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
+import com.autio.android_app.ui.stories.models.Contributor
+import com.autio.android_app.ui.stories.models.Narrator
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
+import com.autio.android_app.ui.stories.view_model.NarratorViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.stories.view_states.NarratorViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.openUrl
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,12 +48,9 @@ class NarratorFragment : Fragment() {
     @Inject
     lateinit var prefRepository: PrefRepository
 
-    //TODO(Move service calls)
-    @Inject
-    lateinit var apiClient: ApiClient
-
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
+    private val narratorViewModel: NarratorViewModel by viewModels()
     private lateinit var binding: FragmentNarratorBinding
     private lateinit var activityLayout: ConstraintLayout
     private lateinit var storyAdapter: StoryAdapter
@@ -64,7 +65,7 @@ class NarratorFragment : Fragment() {
         super.onCreate(
             savedInstanceState
         )
-        (requireActivity() as com.autio.android_app.ui.stories.BottomNavigation).showUpButton()
+        (requireActivity() as BottomNavigation).showUpButton()
     }
 
     override fun onCreateView(
@@ -90,14 +91,13 @@ class NarratorFragment : Fragment() {
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
                 showPaywallOrProceedWithNormalProcess(
-                    prefRepository,
-                    requireActivity(), true
+                    prefRepository, requireActivity(), true
                 ) {
                     bottomNavigationViewModel.playMediaId(
                         id
                     )
                 }
-            }, onOptionClick = ::optionClicked
+            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(
@@ -112,96 +112,126 @@ class NarratorFragment : Fragment() {
             R.id.activityRoot
         )
 
-        storyId?.let {
-            lifecycleScope.launch {
-                val narratorResponse = apiClient.getNarratorOfStory(
-                    prefRepository.userId, prefRepository.userApiToken, it
-                )
-                if (narratorResponse.isSuccessful) {
-                    val narrator = narratorResponse.body()!!
-                    if (narrator.imageUrl != null) {
-                        Glide.with(
-                            this@NarratorFragment
-                        ).load(
-                            narrator.imageUrl
-                        ).transition(
-                            DrawableTransitionOptions.withCrossFade(
-                                100
-                            )
-                        ).into(
-                            binding.ivNarratorPic
-                        )
-                    }
-                    binding.tvNarratorName.apply {
-                        visibility = View.VISIBLE
-                        text = narrator.name
-                    }
-                    binding.tvNarratorBio.apply {
-                        visibility = View.VISIBLE
-                        text = narrator.biography
-                    }
-                    if (narrator.url != null) {
-                        binding.btnVisitNarratorLink.apply {
-                            setOnClickListener {
-                                openUrl(
-                                    requireContext(), narrator.url
-                                )
-                            }
-                            visibility = View.VISIBLE
-                        }
-                    }
-                    val contributorApiResponse = apiClient.getStoriesByContributor(
-                        prefRepository.userId, prefRepository.userApiToken, narrator.id, 1
-                    )
-                    if (contributorApiResponse.isSuccessful) {
-                        for (story in contributorApiResponse.body()!!.data) {
-                            storyViewModel.cacheRecordOfStory(
-                                story.id, story.narrationUrl ?: ""
-                            )
-                        }
-                        storyViewModel.getStoriesByIds(contributorApiResponse.body()!!.data.map {
-                            it.id
-                        })  //TODO(This should change with livedata??)
-                        /* .observe(
-                             viewLifecycleOwner
-                         ) { stories ->
-                             if (stories.isNotEmpty()) {
-                                 binding.tvPublishedStoriesSubtitle.visibility =
-                                     View.VISIBLE
-                             }
-                             storyAdapter.submitList(
-                                 stories.toList()
-                             )
-                         }*/
-                    }
-                }
-            }
+        if (storyId != null) {
+            narratorViewModel.getNarratorOfStory(
+                prefRepository.userId, prefRepository.userApiToken, storyId
+            )
+
+
+            //TODO(This should change with livedata??)
+            /* .observe(
+                 viewLifecycleOwner
+             ) {
+             }*/
+
         }
+
+
         return binding.root
     }
 
-    fun bindObservers() {
-        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
+
+    private fun bindObservers() {
+        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleStoryViewState)
+        narratorViewModel.narratorViewState.observe(viewLifecycleOwner, ::handleNarratorViewState)
     }
 
-    private fun handleViewState(viewState: StoryViewState?) {
+    private fun handleStoryViewState(viewState: StoryViewState?) {
         when (viewState) {
+            is StoryViewState.FetchedStoriesByIds -> handleStoryViewStateSuccess(viewState.stories)
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
-            is StoryViewState.RemovedBookmark ->  showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
             is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
-            is StoryViewState.StoryDownloaded ->  showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
+
+    private fun handleNarratorViewState(viewState: NarratorViewState?) {
+        when (viewState) {
+            is NarratorViewState.FetchedNarrator -> handleNarratorViewStateSuccess(viewState.narrator)
+            is NarratorViewState.FetchedStoriesByContributor -> handleContributorViewStateSuccess(
+                viewState.contributor
+            )
+            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
+        }
+    }
+
+    private fun handleNarratorViewStateSuccess(narrator: Narrator) {
+        Glide.with(
+            this@NarratorFragment
+        ).load(narrator.imageUrl).transition(
+            DrawableTransitionOptions.withCrossFade(100)
+        ).into(
+            binding.ivNarratorPic
+        )
+        binding.tvNarratorName.apply {
+            visibility = View.VISIBLE
+            text = narrator.name
+        }
+        binding.tvNarratorBio.apply {
+            visibility = View.VISIBLE
+            text = narrator.biography
+        }
+        binding.btnVisitNarratorLink.apply {
+            setOnClickListener {
+                openUrl(
+                    requireContext(), narrator.url //TODO(INTENT FAILING)
+                )
+            }
+            visibility = View.VISIBLE
+        }
+
+        narratorViewModel.getStoriesByContributor(
+            prefRepository.userId,
+            prefRepository.userApiToken,
+            narrator,
+            1
+        )
+
+    }
+
+    private fun handleContributorViewStateSuccess(contributor: Contributor) {
+
+        for (story in contributor.data) {
+            storyViewModel.cacheRecordOfStory(
+                story.id, story.narrationUrl ?: ""
+            )
+        }
+        storyViewModel.getStoriesByIds(
+            prefRepository.userId,
+            prefRepository.userApiToken,
+            contributor.data.map { it.id })
+
+    }
+
+
+    private fun handleStoryViewStateSuccess(stories: List<Story>) {
+
+        if (stories.isNotEmpty()) {
+            binding.tvPublishedStoriesSubtitle.visibility =
+                View.VISIBLE
+        }
+        storyAdapter.submitList(
+            stories
+        )
+    }
+
+
     private fun optionClicked(
         option: StoryOption, story: Story
     ) {
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(
-                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
+                    option,
+                    story,
+                    storyViewModel,
+                    prefRepository,
+                    verifiedActivity,
+                    verifiedContext
                 )
             }
         }

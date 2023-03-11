@@ -6,27 +6,15 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.SerialName
 
-@Entity(
-    tableName = "narrators",
-    indices = [Index(
-        value = ["id"],
-        unique = true
-    )]
-)
+@kotlinx.serialization.Serializable
 data class NarratorDto constructor(
     @PrimaryKey
     val id: Int,
     val name: String,
-    @SerialName(
-        "bio"
-    )
+    @SerialName("bio")
     val biography: String,
-    @SerialName(
-        "website"
-    )
+    @SerialName("website")
     val url: String?,
-    @SerialName(
-        "profile_image_url"
-    )
+    @SerialName("profile_image_url")
     val imageUrl: String?
 )

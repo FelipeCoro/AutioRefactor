@@ -4,9 +4,7 @@ import com.autio.android_app.data.api.model.account.CreateAccountDto
 import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
-import com.autio.android_app.data.api.model.story.AuthorDto
-import com.autio.android_app.data.api.model.story.ContributorResponse
-import com.autio.android_app.data.api.model.story.StoryDto
+import com.autio.android_app.data.api.model.story.*
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
@@ -21,12 +19,16 @@ fun CategoryEntity.toModel(): Category {
 fun MapPointEntity.toModel(): Story {
     return Story(
         id,
-        lat = lat,
-        lng = lng,
-        range = range,
-        publishedDate = publishedAt,
-        state = state!!,
-        countryCode = countryCode!!
+        lat,
+        lng,
+        range,
+        state ?: "",
+        countryCode ?: "",
+        title ?: "",
+        description ?: "",
+        narratorName ?: "",
+        authorName ?: "",
+        category ?: "",
     )
 }
 
@@ -167,6 +169,24 @@ fun Story.toDto(): StoryDto {
     )
 }
 
+fun Story.toPlaysDto(
+    wasPresent: Boolean = false,
+    autoPlay: Boolean = false,
+    isDownloaded: Boolean = false,
+    connection: String = "",
+): PlaysDto {
+    return PlaysDto(
+        id,
+        wasPresent = wasPresent,
+        autoPlay = autoPlay,
+        isDownloaded = isDownloaded,
+        connection = connection,
+        lat,
+        lng
+    )
+
+}
+
 fun GuestResponse.toModel(): User {
     return User(
         id, name = "", email = "", apiToken, isGuest
@@ -210,5 +230,15 @@ fun AuthorDto.toModel(): Author {
 fun ContributorResponse.toModel(): Contributor {
     return Contributor(
         currentPage, data, totalPages
+    )
+}
+
+fun NarratorDto.toModel(): Narrator {
+    return Narrator(
+        id,
+        name,
+        biography,
+        url ?: "",
+        imageUrl ?: ""
     )
 }

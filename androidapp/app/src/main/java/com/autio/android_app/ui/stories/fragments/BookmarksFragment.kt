@@ -80,7 +80,7 @@ class BookmarksFragment : Fragment() {
                 showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity(), true) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
-            }, onOptionClick = ::optionClicked
+            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

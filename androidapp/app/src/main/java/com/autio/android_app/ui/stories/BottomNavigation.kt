@@ -23,6 +23,8 @@ import com.autio.android_app.ui.network_monitor.NetworkManager
 import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
+import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
+import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.subscribe.SubscribeActivity
 import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.util.Constants
@@ -84,16 +86,18 @@ class BottomNavigation : AppCompatActivity() {
             lifecycleScope.launchWhenResumed {
                 networkManager.networkStatus.collect {
                     isNetworkAvailable = it.isConnected
-
                      updateConnectionUI(
                     isNetworkAvailable
                 )
                 }
             }
 
-        bottomNavigationViewModel.playingStory.observe(this) { mediaItem ->
-            updatePlayer(mediaItem)
+        bottomNavigationViewModel.bottomNavigationViewState.observe(this, :: handleViewState)
+
+        bottomNavigationViewModel.playingStory.observe(this) {
+            bottomNavigationViewModel.postPlay()
         }
+
         bottomNavigationViewModel.remainingStoriesLiveData.observe(
             this
         ) {
@@ -110,6 +114,16 @@ class BottomNavigation : AppCompatActivity() {
                     else VISIBLE
             }
         }
+    }
+
+    private fun handleViewState(viewState: BottomNavigationViewState?) {
+        when (viewState) {
+            is BottomNavigationViewState.FetchedStoryToPlay -> handleSuccessViewState(viewState.story)
+            else -> { }
+        }
+    }
+    private fun handleSuccessViewState(mediaItem:Story){
+        updatePlayer(mediaItem)
     }
 
     override fun onStart() {

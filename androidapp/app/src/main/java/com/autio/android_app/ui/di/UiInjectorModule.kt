@@ -2,6 +2,7 @@ package com.autio.android_app.ui.di
 
 import android.content.ComponentName
 import android.content.Context
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.player.PlayerService
 import com.autio.android_app.player.PlayerServiceConnection
@@ -26,13 +27,15 @@ object UiInjectorModule {
         context: Context,
         autioRepository: AutioRepository,
         @MainDispatcher
-        coroutineDispatcher: CoroutineDispatcher
+        coroutineDispatcher: CoroutineDispatcher,
+        prefRepository: PrefRepository
     ): PlayerServiceConnection {
         return PlayerServiceConnection(
             context,
             ComponentName(context, PlayerService::class.java),
             autioRepository,
-            coroutineDispatcher
+            coroutineDispatcher,
+            prefRepository
         )
     }
 

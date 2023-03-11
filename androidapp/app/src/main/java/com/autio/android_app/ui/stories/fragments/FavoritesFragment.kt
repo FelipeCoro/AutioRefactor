@@ -91,7 +91,7 @@ class FavoritesFragment : Fragment() {
                         id
                     )
                 }
-            }, onOptionClick = ::optionClicked
+            }, onOptionClick = ::optionClicked,lifecycleOwner = viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(

@@ -96,7 +96,7 @@ class AuthorFragment : Fragment() {
                 ) {
                     bottomNavigationViewModel.playMediaId(                        id                    )
                 }
-            }, onOptionClick = ::optionClicked
+            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(

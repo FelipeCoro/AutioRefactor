@@ -14,7 +14,7 @@ data class Contributor(
 @Parcelize
 data class ContributorStoryData(
     val id: Int,
-    val firebaseId: String,
+    val firebaseId: String?,
     val title: String,
     val narrationUrl: String?
 ):Parcelable

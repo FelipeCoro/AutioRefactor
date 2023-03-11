@@ -25,7 +25,6 @@ class StoryViewModel @Inject constructor(
 
 
     val userCategories = autioRepository.userCategories.asLiveData()
-    val downloadedStories = autioRepository.getDownloadedStories.asLiveData()
     val bookmarkedStories = autioRepository.bookmarkedStories.asLiveData()
     val storiesHistory = autioRepository.history.asLiveData()
     val favoriteStories = autioRepository.favoriteStories.asLiveData()
@@ -44,12 +43,16 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun getStoriesByIds(ids: List<Int>) {
+    fun getStoriesByIds(userId: Int, apiToken: String, storyIds: List<Int>) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.getMapPointsByIds(ids).catch {
+            runCatching {
+                autioRepository.getStoriesByIds(userId, apiToken, storyIds)
+            }.onSuccess { result ->
+                val stories = result.getOrNull()
+                if(stories != null)
+                setViewState(StoryViewState.FetchedStoriesByIds(stories))
+            }.onFailure {
                 setViewState(StoryViewState.FetchedStoriesByIdsFailed)
-            }.collect {
-                setViewState(StoryViewState.FetchedStoriesByIds(it))
             }
         }
     }
@@ -96,9 +99,10 @@ class StoryViewModel @Inject constructor(
                             story.id, story.narrationUrl ?: ""
                         )
                     }
-                    getStoriesByIds(contributor.data.map {
-                        it.id
-                    })
+                    getStoriesByIds(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        contributor.data.map { it.id })
                 }
             }
         }

@@ -90,7 +90,7 @@ class DownloadedStoriesFragment : Fragment() {
         activityLayout = requireActivity().findViewById(
             R.id.activityRoot
         )
-
+/* TODO(FIX THIS OBERVER DEPENDECY AND USE VIEWSTATE)
         storyViewModel.downloadedStories.observe(viewLifecycleOwner) { stories ->
             recyclerView.adapter = storyAdapter
 //                binding.tvToolbarSubtitle.text =
@@ -123,10 +123,10 @@ class DownloadedStoriesFragment : Fragment() {
                 binding.llNoContent.visibility = View.GONE
                 binding.rlStories.visibility = View.VISIBLE
             }
-        }
+        }*/
     }
 
-    fun bindObservers() {
+    private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
@@ -154,14 +154,14 @@ class DownloadedStoriesFragment : Fragment() {
     }
 
     private fun onPlaylistOptionClicked(
-        option: com.autio.android_app.data.api.model.PlaylistOption
+        option: PlaylistOption
     ) {
         showPaywallOrProceedWithNormalProcess(prefRepository,
             requireActivity(), true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
-                com.autio.android_app.data.api.model.PlaylistOption.REMOVE -> {
+                PlaylistOption.REMOVE -> {
                     storyViewModel.removeAllDownloads()
                     binding.pbLoadingProcess.visibility = View.GONE
                     showFeedbackSnackBar("Removed Downloads")
