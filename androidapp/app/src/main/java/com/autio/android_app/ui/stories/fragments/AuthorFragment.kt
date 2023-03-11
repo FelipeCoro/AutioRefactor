@@ -113,7 +113,7 @@ class AuthorFragment : Fragment() {
 
         storyId?.let {
             storyViewModel.getAuthorOfStory(
-                prefRepository.userId, "Bearer " + prefRepository.userApiToken, it
+                prefRepository.userId, prefRepository.userApiToken, it
             )
 
 
@@ -122,7 +122,7 @@ class AuthorFragment : Fragment() {
 
     }
 
-    fun bindObservers() {
+    private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
