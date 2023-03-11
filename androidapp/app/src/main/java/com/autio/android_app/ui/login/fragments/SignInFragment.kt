@@ -12,8 +12,9 @@ import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentSignInBinding
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
 import com.autio.android_app.ui.stories.models.LoginRequest
-import com.autio.android_app.ui.viewmodel.PurchaseViewModel
-import com.autio.android_app.ui.viewmodel.PurchaseViewState
+import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.pleaseFillText
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,6 +32,8 @@ class SignInFragment : Fragment() {
         binding = DataBindingUtil.inflate(
             layoutInflater, R.layout.fragment_sign_in, container, false
         )
+        binding.viewModel = loginViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -44,27 +47,17 @@ class SignInFragment : Fragment() {
     }
 
     private fun setListeners() {
-        binding.btnSignIn.setOnClickListener { loginUser() }
+        binding.btnSignIn.setOnClickListener { signInUser() }
         binding.btnGuestMode.setOnClickListener { loginViewModel.loginGuest() }
         binding.btnCancel.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            activity?.onBackPressedDispatcher?.onBackPressed()
         }
     }
 
-    private fun showLoadingView() {
-        binding.flLoading.root.visibility = View.VISIBLE
-    }
-
-    private fun hideLoadingView() {
-        binding.flLoading.root.visibility = View.GONE
-    }
-
-    private fun loginUser() {
-        if (checkEmptyField(binding.editTextEmail) || checkEmptyField(binding.editTextPassword)
-        ) {
+    private fun signInUser() {
+        if (checkEmptyField(binding.editTextEmail) || checkEmptyField(binding.editTextPassword)) {
             context?.let { pleaseFillText(it) }
         } else {
-            showLoadingView()
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
             val loginRequest = LoginRequest(email, password)
@@ -75,20 +68,24 @@ class SignInFragment : Fragment() {
 
     private fun handleViewState(viewState: PurchaseViewState?) {
         when (viewState) {
-            is PurchaseViewState.ErrorViewState -> showError()
-            else -> showSuccess(viewState)
+            is PurchaseViewState.OnLoginSuccess -> handleOnLoginSuccess(viewState.data)
+            is PurchaseViewState.OnLoginFailed -> handleOnLoginFailed()
+            else -> showError()
         }
-
     }
 
-    private fun showSuccess(user: PurchaseViewState?) {
+    private fun handleOnLoginFailed() {
+        //TODO(handle login Failed)
+        val errorMessage = getString(R.string.sign_in_error_text)
+    }
+
+    private fun handleOnLoginSuccess(user: User) {
         findNavController().navigate(R.id.action_signInFragment_to_bottomNavigation)
     }
 
     private fun showError() {
         //TODO (Handle Error)
-        hideLoadingView()
-        val savedMessage = "The user and/or password are incorrect"
+
     }
 }
 

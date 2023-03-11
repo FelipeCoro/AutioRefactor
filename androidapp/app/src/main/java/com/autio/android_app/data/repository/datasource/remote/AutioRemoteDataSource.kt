@@ -25,7 +25,6 @@ import retrofit2.Response
 
 interface AutioRemoteDataSource {
 
-
     suspend fun login(loginDto: LoginDto): Response<LoginResponse>
 
     suspend fun createGuestAccount(): Response<GuestResponse>

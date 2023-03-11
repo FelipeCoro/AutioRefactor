@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.GONE
-import android.view.View.OnClickListener
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.net.toUri
@@ -34,8 +33,8 @@ import com.autio.android_app.extensions.makeLinks
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
-import com.autio.android_app.ui.viewmodel.PurchaseViewModel
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.openUrl
@@ -218,17 +217,15 @@ class AccountFragment : Fragment() {
                     requireContext()
                 )
             }
-
-            val contactSupport = Pair("Contact Autio", OnClickListener {
+            tvQuestionsAbout.makeLinks("Contact Autio" to { v ->
                 writeEmailToCustomerSupport(requireContext())
             })
 
-            tvQuestionsAbout.makeLinks(contactSupport)
-
-            tvContactSupport.makeLinks(contactSupport)
+            tvContactSupport.makeLinks("Contact Autio" to { v ->
+                writeEmailToCustomerSupport(requireContext())
+            })
         }
     }
-
     private fun updateUserData() {
         if (checkEmptyField(binding.etName) || checkEmptyField(binding.etEmail)) {
             pleaseFillText(requireContext())

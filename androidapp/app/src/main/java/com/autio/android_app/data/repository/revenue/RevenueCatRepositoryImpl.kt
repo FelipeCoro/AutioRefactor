@@ -1,17 +1,28 @@
 package com.autio.android_app.data.repository.revenue
 
 import android.app.Activity
-import android.app.Application
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.revenuecat.purchases.*
+import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.Offerings
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.PurchasesConfiguration
+import com.revenuecat.purchases.PurchasesError
+import com.revenuecat.purchases.PurchasesErrorCode
+import com.revenuecat.purchases.getCustomerInfoWith
+import com.revenuecat.purchases.getOfferingsWith
+import com.revenuecat.purchases.logInWith
 import com.revenuecat.purchases.models.StoreTransaction
+import com.revenuecat.purchases.purchasePackageWith
+import com.revenuecat.purchases.restorePurchasesWith
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
+
 class RevenueCatRepositoryImpl  @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : RevenueCatRepository {
     private val _customerInfo = MutableLiveData<CustomerInfo>().apply {
         value = null
@@ -34,12 +45,8 @@ class RevenueCatRepositoryImpl  @Inject constructor(
     ) {
         with(Purchases.sharedInstance) {
             logInWith(userId, { error ->
-                onError?.invoke(
-                    error
-                )
-                displayError(
-                    error
-                )
+                onError?.invoke(error)
+                displayError(error)
             }) { customerInfo, created ->
 
                 // Set user's data in RevenueCat
@@ -83,13 +90,12 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         onError: ((PurchasesError, Boolean) -> Unit),
         onSuccess: ((StoreTransaction, CustomerInfo) -> Unit)
     ) {
-        Purchases.sharedInstance.purchasePackageWith(activity,
+        Purchases.sharedInstance.purchasePackageWith(
+            activity,
             packageToPurchase,
             onError = onError,
             onSuccess = { transaction, customerInfo ->
-                updateUserInfo(
-                    customerInfo
-                )
+                updateUserInfo(customerInfo)
                 onSuccess.invoke(
                     transaction, customerInfo
                 )
@@ -116,9 +122,7 @@ class RevenueCatRepositoryImpl  @Inject constructor(
      */
     override fun getUserInfo() {
         Purchases.sharedInstance.getCustomerInfoWith {
-            _customerInfo.postValue(
-                it
-            )
+            _customerInfo.postValue(it)
         }
     }
 
@@ -177,8 +181,8 @@ class RevenueCatRepositoryImpl  @Inject constructor(
             PurchasesConfiguration.Builder(
                 context, "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS"
             ).observerMode(
-                    false
-                ).build()
+                false
+            ).build()
         )
     }
 }

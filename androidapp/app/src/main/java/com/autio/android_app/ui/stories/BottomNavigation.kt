@@ -1,7 +1,6 @@
 package com.autio.android_app.ui.stories
 
 import android.Manifest
-import android.content.Intent
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -23,8 +22,7 @@ import com.autio.android_app.ui.network_monitor.NetworkManager
 import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
-import com.autio.android_app.ui.subscribe.SubscribeActivity
-import com.autio.android_app.ui.viewmodel.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
@@ -34,27 +32,23 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class BottomNavigation : AppCompatActivity() {
 
+    @Inject
+    lateinit var networkManager: NetworkManager
+
     private val bottomNavigationViewModel: BottomNavigationViewModel by viewModels()
-
     private val purchaseViewModel: PurchaseViewModel by viewModels()
-
-    private var castContext: CastContext? = null
 
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
-
-    @Inject
-    lateinit var networkManager:NetworkManager
-
     private lateinit var navHostFragment: NavHostFragment
 
+    private var castContext: CastContext? = null
     private var isNetworkAvailable = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         purchaseViewModel.getUserInfo()
-
 
         bindObservables()
 
@@ -68,14 +62,10 @@ class BottomNavigation : AppCompatActivity() {
             bottomNavigationViewModel.initialRemainingStories
         )
 
-
-
         setListeners()
         volumeControlStream = AudioManager.STREAM_MUSIC
 
-        bottomNavigationViewModel.mediaButtonRes.observe(
-            this
-        ) { res ->
+        bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
             binding.btnFloatingPlayerPlay.setImageResource(res)
         }
     }
@@ -84,19 +74,14 @@ class BottomNavigation : AppCompatActivity() {
             lifecycleScope.launchWhenResumed {
                 networkManager.networkStatus.collect {
                     isNetworkAvailable = it.isConnected
-
-                     updateConnectionUI(
-                    isNetworkAvailable
-                )
+                    updateConnectionUI(isNetworkAvailable)
                 }
             }
 
         bottomNavigationViewModel.playingStory.observe(this) { mediaItem ->
             updatePlayer(mediaItem)
         }
-        bottomNavigationViewModel.remainingStoriesLiveData.observe(
-            this
-        ) {
+        bottomNavigationViewModel.remainingStoriesLiveData.observe(this) {
             updateAvailableStoriesUI(
                 it
             )
@@ -143,7 +128,7 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun setListeners() {
         navHostFragment = supportFragmentManager.findFragmentById(
-            R.id.mainContainer
+            R.id.main_container
         ) as NavHostFragment
         navController = navHostFragment.navController
         setupWithNavController(
@@ -167,11 +152,10 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     fun showPayWall() {
-        val subscribeIntent = Intent(this, SubscribeActivity::class.java)
-        subscribeIntent.putExtra(
-            "ACTIVITY_NAME", BottomNavigation::class.simpleName
-        )
-        startActivity(subscribeIntent)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
+        val nav = navHostFragment.navController
+        nav.navigate(R.id.action_global_subscribeFragment)
     }
 
     private fun updateSnackBarMessageDisplay() {

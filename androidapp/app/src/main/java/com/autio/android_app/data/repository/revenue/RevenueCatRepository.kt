@@ -1,10 +1,11 @@
 package com.autio.android_app.data.repository.revenue
 
 import android.app.Activity
-import android.app.Application
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.revenuecat.purchases.*
+import com.revenuecat.purchases.CustomerInfo
+import com.revenuecat.purchases.Offerings
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.models.StoreTransaction
 
 interface RevenueCatRepository {

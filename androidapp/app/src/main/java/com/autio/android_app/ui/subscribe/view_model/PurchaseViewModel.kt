@@ -1,6 +1,7 @@
-package com.autio.android_app.ui.viewmodel
+package com.autio.android_app.ui.subscribe.view_model
 
 import android.app.Activity
+import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.AccountRequest
 import com.autio.android_app.ui.stories.models.LoginRequest
 import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
@@ -29,7 +31,7 @@ class PurchaseViewModel @Inject constructor(
     private val prefRepository: PrefRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-
+    val isLoading = ObservableBoolean(false)
     private val _viewState = MutableLiveData<PurchaseViewState>()
     val viewState: LiveData<PurchaseViewState> = _viewState
     val customerInfo = revenueCatRepository.customerInfo
@@ -39,38 +41,43 @@ class PurchaseViewModel @Inject constructor(
     }
 
     fun login(loginRequest: LoginRequest) {
+        isLoading.set(true)
         viewModelScope.launch(coroutineDispatcher) {
-
-            val result = autioRepository.login(loginRequest)
-
-            if (result.isSuccess) { //TODO(Double check this)
-                result.getOrNull()?.let {
-                    saveUserInfo(it)
-                    setViewState(PurchaseViewState.SuccessViewState(it))
-                    revenueCatRepository.login(result.getOrNull()?.id.toString())
-                } ?: setViewState(PurchaseViewState.ErrorViewState)
-            } else
-                setViewState(PurchaseViewState.ErrorViewState)
+            kotlin.runCatching {
+                autioRepository.login(loginRequest)
+            }.onSuccess { result ->
+                result.getOrNull()?.let { user ->
+                    saveUserInfo(user)
+                    setViewState(PurchaseViewState.OnLoginSuccess(user))
+                    revenueCatRepository.login(user.id.toString())
+                } ?: setViewState(PurchaseViewState.OnLoginFailed)
+            }.onFailure {
+                setViewState(PurchaseViewState.OnLoginFailed)
+            }
         }
     }
 
     fun createAccount(accountRequest: AccountRequest) {
+        isLoading.set(true)
         viewModelScope.launch(coroutineDispatcher) {
-            val result = autioRepository.createAccount(accountRequest)
-            if (result.isSuccess) { //TODO(Double check this)
+            kotlin.runCatching {
+                autioRepository.createAccount(accountRequest)
+            }.onSuccess { result ->   //TODO(Double check this)
                 result.getOrNull()?.let { user ->
                     saveUserInfo(user)
-                    setViewState(PurchaseViewState.SuccessViewState(user))
                     revenueCatRepository.login(user.id.toString())
-                }
-            } else
-                setViewState(PurchaseViewState.ErrorViewState)
+                    setViewState(PurchaseViewState.OnCreatedAccountSuccess(user))
+                } ?: setViewState(PurchaseViewState.OnCreatedAccountFailed)
+            }.onFailure {
+                setViewState(PurchaseViewState.OnCreatedAccountFailed)
+            }
         }
     }
 
 
     private fun setViewState(purchaseViewState: PurchaseViewState) {
         _viewState.postValue(purchaseViewState)
+        isLoading.set(false)
     }
 
     /**
@@ -89,40 +96,50 @@ class PurchaseViewModel @Inject constructor(
         revenueCatRepository.logOut()
     }
 
-    fun getOfferings(
-        onError: (PurchasesError) -> Unit = {},
-        onSuccess: (Offerings) -> Unit
-    ) {
-        revenueCatRepository.getOfferings(
-            onError, onSuccess
-        )
+    fun getOfferings() {
+        isLoading.set(true)
+        viewModelScope.launch(coroutineDispatcher) {
+            revenueCatRepository.getOfferings(
+                ::handleGetOfferingsFailed, ::handleSuccessOfferingFetched
+            )
+        }
     }
 
-    fun purchasePackage(
-        activity: Activity,
-        packageToPurchase: Package,
-        onError: ((PurchasesError, Boolean) -> Unit) = { _, _ -> },
-        onSuccess: ((StoreTransaction, CustomerInfo) -> Unit) = { _, _ -> }
+    private fun handleSuccessOfferingFetched(offerings: Offerings) {
+        setViewState(PurchaseViewState.OnOfferingsFetched(offerings))
+    }
+
+    private fun handleGetOfferingsFailed(error: PurchasesError) {
+        setViewState(PurchaseViewState.OnFetchedOfferingsFailed)
+    }
+
+    fun purchasePackage(activity: Activity, packageToPurchase: Package) {
+        viewModelScope.launch(coroutineDispatcher) {
+            revenueCatRepository.purchasePackage(
+                activity,
+                packageToPurchase, ::handlePurchaseError, ::handleSuccessTransaction
+            )
+        }
+    }
+
+    private fun handleSuccessTransaction(
+        storeTransaction: StoreTransaction, customerInfo: CustomerInfo
     ) {
-        revenueCatRepository.purchasePackage(
-            activity, packageToPurchase, onError, onSuccess
-        )
+        TODO("handleSuccessTransaction Purchase")
+    }
+
+    private fun handlePurchaseError(error: PurchasesError, isTrue: Boolean) {
+        TODO("handlePurchaseError Purchase")
     }
 
     fun restorePurchase(
-        onError: ((PurchasesError) -> Unit) = { },
-        onSuccess: ((CustomerInfo) -> Unit) = { }
+        onError: ((PurchasesError) -> Unit) = {}, onSuccess: ((CustomerInfo) -> Unit) = {}
     ) {
-        revenueCatRepository.restorePurchase(
-            onError, onSuccess
-        )
+        revenueCatRepository.restorePurchase(onError, onSuccess)
     }
 }
 
-sealed interface PurchaseViewState {
-    object ErrorViewState : PurchaseViewState
-    data class SuccessViewState(val data: User) : PurchaseViewState
-}
+
 
 //    class ProductDetails internal constructor(
 //        product: String,
@@ -317,7 +334,5 @@ sealed interface PurchaseViewState {
 }
 
 private val TAG =
-    PurchaseViewModel::class.java.simpleName*/
-
-
-
+    PurchaseViewModel::class.java.simpleName
+    */

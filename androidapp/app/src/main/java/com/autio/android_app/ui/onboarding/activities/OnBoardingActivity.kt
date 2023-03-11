@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.onboarding
+package com.autio.android_app.ui.onboarding.activities
 
 import android.os.Build
 import android.os.Bundle

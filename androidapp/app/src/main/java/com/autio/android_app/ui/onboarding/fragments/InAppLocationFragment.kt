@@ -1,59 +1,50 @@
-package com.autio.android_app.ui.onboarding.screens
+package com.autio.android_app.ui.onboarding.fragments
 
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentInAppLocationBinding
-import com.autio.android_app.ui.subscribe.SubscribeActivity
+import com.autio.android_app.util.ON_BOARDING_SHARE_PREFERENCES_FILE_NAME
+import com.autio.android_app.util.SHARED_PREFERENCES_FINISHED_ON_BOARDING_FLAG
 import com.autio.android_app.util.TrackingUtility
+import com.autio.android_app.util.resources.DeepLinkingActions
+import com.autio.android_app.util.resources.getDeepLinkingNavigationRequest
 
 class InAppLocationFragment : Fragment() {
 
-    private var _binding: FragmentInAppLocationBinding? =
-        null
-    private val binding get() = _binding!!
+    private lateinit var binding: FragmentInAppLocationBinding
 
     private lateinit var viewPager: ViewPager2
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding =
-            FragmentInAppLocationBinding.inflate(
-                inflater,
-                container,
-                false
-            )
-
-        viewPager =
-            requireActivity().findViewById(
-                R.id.viewPager
-            )
-
-        binding.buttonLocationPermission.setOnClickListener {
-            requestPermission()
-        }
-
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_in_app_location, container, false)
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewPager = requireActivity().findViewById(R.id.viewPager)
+        binding.buttonLocationPermission.setOnClickListener {
+            requestPermission()
+        }
+    }
+
     private fun requestPermission() {
-        if (TrackingUtility.hasCoreLocationPermissions(
-                requireContext()
-            )
-        ) {
+        if (TrackingUtility.hasCoreLocationPermissions(requireContext())) {
             moveToNextStep()
         } else {
             requestPermissionLauncher.launch(
@@ -74,44 +65,34 @@ class InAppLocationFragment : Fragment() {
     }
 
     private fun goToBackgroundLocationPermission() {
-        viewPager.currentItem =
-            2
+        viewPager.currentItem = 2
     }
 
     private fun goToSubscribeActivity() {
-        val subscribeIntent =
-            Intent(
-                activity,
-                SubscribeActivity::class.java
-            )
-        startActivity(
-            subscribeIntent
-        )
         onBoardingFinished()
+        val request =
+            getDeepLinkingNavigationRequest(DeepLinkingActions.SubscribeFragmentDeepLinkingAction)
+        val nav = findNavController()
+        nav.navigate(request)
         activity?.finish()
     }
 
     private fun onBoardingFinished() {
         val sharedPreferences =
             requireActivity().getSharedPreferences(
-                "onBoarding",
+                ON_BOARDING_SHARE_PREFERENCES_FILE_NAME,
                 Context.MODE_PRIVATE
             )
-        val editor =
-            sharedPreferences.edit()
-        editor.putBoolean(
-            "Finished",
-            true
-        )
-        editor.apply()
+        sharedPreferences.edit {
+            putBoolean(SHARED_PREFERENCES_FINISHED_ON_BOARDING_FLAG, true)
+        }
     }
 
     private val requestPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { permissionsResults ->
-            val allGranted =
-                permissionsResults.all { it.value }
+            val allGranted = permissionsResults.all { it.value }
             if (allGranted) {
                 moveToNextStep()
             } else {
@@ -120,25 +101,15 @@ class InAppLocationFragment : Fragment() {
         }
 
     private fun showWarningDialog() {
-        AlertDialog.Builder(
-            requireActivity()
-        )
-            .apply {
-                setMessage(
-                    "For a full experience of the app, accepting the " +
-                            "requested permissions are necessary. Are you sure want to continue?" +
-                            " You can change this later in your Settings."
-                )
-                setPositiveButton(
-                    "Continue"
-                ) { _, _ ->
-                    moveToNextStep()
-                }
-                setNegativeButton(
-                    "Request again"
-                ) { _, _ -> requestPermission() }
-                create()
-            }
-            .show()
+        AlertDialog.Builder(requireActivity()).apply {
+            setMessage(getString(R.string.in_app_location_warning_dialog_permissions_text))
+            setPositiveButton(
+                getString(R.string.subscribe_fragment_positive_button_dialog)
+            ) { _, _ -> moveToNextStep() }
+            setNegativeButton(
+                getString(R.string.subscribe_fragment_request_again_negative_button_dialog)
+            ) { _, _ -> requestPermission() }
+            create()
+        }.show()
     }
 }

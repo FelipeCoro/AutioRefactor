@@ -3,7 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_bottom"
-    app:startDestination="@id/map_fragment">
+    app:startDestination="@id/subscribeFragment">
+    <action
+        android:id="@+id/action_global_subscribeFragment"
+        app:destination="@id/subscribeFragment" />
     <fragment
         android:id="@+id/map_fragment"
         android:name="com.autio.android_app.ui.stories.fragments.MapFragment"
@@ -116,9 +119,16 @@
         android:name="com.autio.android_app.ui.stories.fragments.DownloadedStoriesFragment"
         android:label="fragment_downloaded_stories"
         tools:layout="@layout/fragment_playlist">
-
         <action
             android:id="@+id/action_downloaded_playlist_to_my_stories"
             app:destination="@id/my_stories" />
+    </fragment>
+    <fragment
+        android:id="@+id/subscribeFragment"
+        android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
+        android:label="SubscribeFragment"
+        tools:layout="@layout/fragment_subscribe">
+        <deepLink app:uri="android-app://navigation.autio.app/subscribe" />
+
     </fragment>
 </navigation>

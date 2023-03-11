@@ -38,18 +38,15 @@ object Constants {
     // In-App Products
     // The following SKU strings must match the ones we have in the Google Play developer console.
     // SKUs for non-subscription purchases
-    const val SINGLE_TRIP_PRODUCT =
-        "autio_single_trip_30d_one_time"
-    const val ADVENTURER_TRIP_PRODUCT =
-        "autio_adventurer_3y_one_time"
-    const val TRAVELER_TRIP_SUBSCRIPTION =
-        "autio_traveler_sub_1y_cancellable"
+    const val SINGLE_TRIP_PRODUCT = "autio_single_trip_30d_one_time"
+    const val ADVENTURER_TRIP_PRODUCT = "autio_adventurer_3y_one_time"
+    const val TRAVELER_TRIP_SUBSCRIPTION = "autio_traveler_sub_1y_cancellable"
 
-    const val REVENUE_CAT_ENTITLEMENT =
-        "Unlimited Stories"
+    const val REVENUE_CAT_ENTITLEMENT = "Unlimited Stories"
 }
 
-const val DEFAULT_LOCATION_LAT =
-    34.420830
-const val DEFAULT_LOCATION_LNG =
-    -119.698189
+const val DEFAULT_LOCATION_LAT = 34.420830
+const val DEFAULT_LOCATION_LNG = -119.698189
+
+const val SHARED_PREFERENCES_FINISHED_ON_BOARDING_FLAG = "Finished"
+const val ON_BOARDING_SHARE_PREFERENCES_FILE_NAME = "onBoarding"

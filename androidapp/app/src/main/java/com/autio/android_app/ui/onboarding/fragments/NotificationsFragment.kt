@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.onboarding.screens
+package com.autio.android_app.ui.onboarding.fragments
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.AlertDialog
@@ -28,9 +28,7 @@ class NotificationsFragment : Fragment() {
             inflater, container, false
         )
 
-        viewPager = requireActivity().findViewById(
-            R.id.viewPager
-        )
+        viewPager = requireActivity().findViewById(R.id.viewPager)
 
         binding.buttonNotificationPermission.setOnClickListener {
             requestPermission()
