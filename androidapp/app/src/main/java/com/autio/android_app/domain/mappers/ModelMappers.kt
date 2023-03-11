@@ -15,7 +15,7 @@ import com.autio.android_app.ui.stories.models.*
 
 //TODO(need to break this up for readability)
 fun CategoryEntity.toModel(): Category {
-    return Category(id, firebaseId, title, order)
+    return Category(id, title, order)
 }
 
 fun MapPointEntity.toModel(): Story {
@@ -23,8 +23,8 @@ fun MapPointEntity.toModel(): Story {
         id,
         lat = lat,
         lng = lng,
-        range = range!!,
-        publishedDate = publishedAt!!,
+        range = range,
+        publishedDate = publishedAt,
         state = state!!,
         countryCode = countryCode!!
     )
@@ -35,15 +35,12 @@ fun History.toMapPointEntity(): HistoryEntity {
 }
 
 fun Category.toMapPointEntity(): CategoryEntity {
-    return CategoryEntity(
-        id, firebaseId, title, order
-    )
+    return CategoryEntity(id, title, order)
 }
 
 fun StoryDto.toModel(): Story {
     return Story(
         id,
-        fbid,
         lat,
         lon,
         range,
@@ -53,7 +50,7 @@ fun StoryDto.toModel(): Story {
         description,
         narrator,
         author,
-        category?.title.toString(),
+        category?.title.toString(), //Todo(Check this later)
         imageUrl,
         recordUrl,
         duration,
@@ -88,34 +85,35 @@ fun Story.toMapPointEntity(): MapPointEntity {
 fun Story.toStoryEntity(): StoryEntity {
     return StoryEntity(
         id,
-        fbid,
+        title,
+        description,
         lat,
         lng,
         range,
-        state,
-        countryCode,
-        title,
-        description,
-        narrator,
-        author,
-        category.toString(),
         imageUrl,
         recordUrl,
+        authorId = 0,
         duration,
-        isLiked,
-        listenedAt,
-        modifiedDate,
-        isBookmarked,
-        listenedAtLeast30Secs,
-        isDownloaded,
+        category,
         publishedDate,
+        modifiedDate,
+        imageAttribution = "",
+        narrator,
+        author,
+        state,
+        countryCode,
+        privateId = "",
+        isLiked,
+        isBookmarked,
+        isDownloaded,
+        listenedAt,
+        listenedAtLeast30Secs,
     )
 }
 
 fun StoryEntity.toModel(): Story {
     return Story(
         id,
-        fbid,
         lat,
         lon,
         range,
@@ -123,8 +121,8 @@ fun StoryEntity.toModel(): Story {
         countryCode,
         title,
         description,
-        narratorName,
-        authorName,
+        narrator,
+        author,
         category,
         imageUrl,
         recordUrl,
@@ -143,7 +141,6 @@ fun StoryEntity.toModel(): Story {
 fun Story.toDto(): StoryDto {
     return StoryDto(
         id,
-        fbid,
         title,
         description,
         lat,
@@ -151,19 +148,22 @@ fun Story.toDto(): StoryDto {
         range,
         imageUrl,
         recordUrl,
+        authorId = 0,
         duration,
+        category?.let { Category(0, it, 0) }, //TODO(Check this later)
+        publishedDate,
         modifiedDate,
+        imageAttribution = "",
         narrator,
         author,
         state,
         countryCode,
-        category?.let { Category(0,"", it,0) }, //Check this later
+        privateId = "",
         isLiked,
         isBookmarked,
         isDownloaded,
         listenedAt,
         listenedAtLeast30Secs,
-        publishedDate,
     )
 }
 

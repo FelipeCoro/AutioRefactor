@@ -15,11 +15,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
+import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
+import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
@@ -71,9 +73,8 @@ class DownloadedStoriesFragment : Fragment() {
                 bottomNavigationViewModel.playMediaId(
                     id
                 )
-            }, ::onOptionClicked
+            }, ::optionClicked
         )
-
         return binding.root
     }
 
@@ -102,7 +103,7 @@ class DownloadedStoriesFragment : Fragment() {
             binding.btnPlaylistOptions.setOnClickListener { view ->
                 showPlaylistOptions(
                     requireContext(), binding.root as ViewGroup, view, listOf(
-                        com.autio.android_app.data.api.model.PlaylistOption.REMOVE
+                        PlaylistOption.REMOVE
                     ).map {
                         it.also { option ->
                             option.disabled = stories.isEmpty()
@@ -131,79 +132,25 @@ class DownloadedStoriesFragment : Fragment() {
 
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
-            is StoryViewState.AddedBookmark -> addedBookmark()
-            is StoryViewState.RemovedBookmark -> removeBookmark()
-            is StoryViewState.StoryLiked -> storyLiked()
-            is StoryViewState.LikedRemoved -> likedRemoved()
-            is StoryViewState.StoryRemoved -> removedFromDownload()
-            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
+            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
 
-    private fun addedBookmark() {
-        showFeedbackSnackBar("Added To Bookmarks")
-    }
-
-    private fun removeBookmark() {
-        showFeedbackSnackBar("Removed From Bookmarks")
-    }
-
-    private fun storyLiked() {
-        showFeedbackSnackBar("Added To Favorites")
-    }
-
-    private fun likedRemoved() {
-        showFeedbackSnackBar("Removed From Favorites")
-    }
-
-    private fun removedFromDownload() {
-        showFeedbackSnackBar("Story Removed From My Device")
-    }
-
-    private fun viewStateError() {
-        //TODO(Macro error handling for viewstate error)
-        showFeedbackSnackBar("Connection Failure")
-    }
-
-    private fun onOptionClicked(
-        option: StoryOption, story: DownloadedStoryEntity
+    private fun optionClicked(
+        option: StoryOption, story: Story
     ) {
-        when (option) {
-            StoryOption.BOOKMARK -> {
-                storyViewModel.bookmarkStory(
-                    prefRepository.userId, prefRepository.userApiToken, story.id
+        activity?.let { verifiedActivity ->
+            context?.let { verifiedContext ->
+                onOptionClicked(
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
             }
-            StoryOption.REMOVE_BOOKMARK -> {
-                storyViewModel.removeBookmarkFromStory(
-                    prefRepository.userId, prefRepository.userApiToken, story.id
-                )
-            }
-            StoryOption.LIKE -> {
-                storyViewModel.giveLikeToStory(
-                    prefRepository.userId, prefRepository.userApiToken, story.id
-                )
-            }
-            StoryOption.REMOVE_LIKE -> {
-                storyViewModel.removeLikeFromStory(
-                    prefRepository.userId, prefRepository.userApiToken, story.id
-                )
-            }
-            StoryOption.DELETE, StoryOption.REMOVE_DOWNLOAD -> {
-                storyViewModel.removeDownloadedStory(
-                    story.id
-                )
-                showFeedbackSnackBar("Story Removed From My Device")
-            }
-            StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                requireActivity(), story.lat, story.lon
-            )
-            StoryOption.SHARE -> {
-                shareStory(requireContext(), story.id)
-            }
-            else -> Log.d(
-                "HistoryFragment", "no action defined for this option"
-            )
         }
     }
 
@@ -211,7 +158,8 @@ class DownloadedStoriesFragment : Fragment() {
         option: com.autio.android_app.data.api.model.PlaylistOption
     ) {
         showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
+            prefRepository,
+            requireActivity(), true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {

@@ -10,8 +10,6 @@ import java.io.Serializable
 data class CategoryEntity(
     @PrimaryKey
     var id: Int = 0,
-    @Transient
-    var firebaseId: String = "",
     var title: String = "",
     var order: Int = 0
 ) : Serializable

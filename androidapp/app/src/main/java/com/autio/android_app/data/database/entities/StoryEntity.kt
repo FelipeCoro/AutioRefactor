@@ -7,27 +7,28 @@ import com.autio.android_app.ui.stories.models.Category
 @Entity(tableName = "story")
 data class StoryEntity(
     @PrimaryKey
-    val id: Int = 0,
-    val fbid: String = "",
-    val lat: Double = 0.0,
-    val lon: Double = 0.0,
-    val range: Int = 0,
-    val state: String = "",
-    val countryCode: String = "",
+    var id: Int = 0,
     val title: String = "",
     val description: String = "",
-    val narratorName: String = "",
-    val authorName: String = "",
-    val category: String = "",
-
+    var lat: Double = 0.0,
+    var lon: Double = 0.0,
+    var range: Int = 0,
     val imageUrl: String = "",
     val recordUrl: String = "",
+    val authorId: Int = 0,
     var duration: Int = 0,
-    val isLiked: Boolean? = false,
-    val listenedAt: String? = null, //TODO CHECK THIS Type
-    val modifiedDate: Int = 0, //TODO CHECK THIS Type
-    val isBookmarked: Boolean? = false,
-    val listenedAtLeast30Secs: Boolean? = false,
-    val isDownloaded: Boolean? = false,
+    var category: String = "",
     var publishedDate: Int = 0,
-    )
+    var modifiedDate: Int = 0,
+    var imageAttribution: String = "",
+    var narrator: String = "",
+    var author: String = "",
+    val state: String = "",
+    val countryCode: String = "",
+    val privateId: String = "",
+    val isLiked: Boolean? = false,
+    val isBookmarked: Boolean? = false,
+    val isDownloaded: Boolean? = false,
+    val listenedAt: String? = null,
+    val listenedAtLeast30Secs: Boolean? = false,
+)

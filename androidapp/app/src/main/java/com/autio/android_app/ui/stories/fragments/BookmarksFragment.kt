@@ -23,20 +23,14 @@ import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
-import com.autio.android_app.domain.mappers.toDto
-import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.openLocationInMapsApp
-import com.autio.android_app.util.shareStory
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showPlaylistOptions
+import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -83,10 +77,10 @@ class BookmarksFragment : Fragment() {
 
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
+                showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity(), true) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
-            }, onOptionClick = ::onStoryOptionClicked
+            }, onOptionClick = ::optionClicked
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -140,17 +134,15 @@ class BookmarksFragment : Fragment() {
                             ids
                         )
                         if (result.isSuccessful) {
-                            val storiesFromAPI = result.body()
-                            if (storiesFromAPI != null) {
-                                for (story in storiesFromAPI) {
-                                    storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
-                                }
+                            val storiesFromAPI = result.body()!!//TODO(REVIEW THIS QUICK FIX)
+                            for (story in storiesFromAPI) {
+                                storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
                             }
                         }
                     }
                 }
             }
-            storyAdapter.submitList(stories.map { it.toModel() })
+            storyAdapter.submitList(stories)
             binding.llNoContent.visibility = View.GONE
             binding.rlStories.visibility = View.VISIBLE
         }
@@ -161,39 +153,15 @@ class BookmarksFragment : Fragment() {
 
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
-            is StoryViewState.AddedBookmark -> addedBookmark()
-            is StoryViewState.RemovedBookmark -> removeBookmark()
-            is StoryViewState.StoryLiked -> storyLiked()
-            is StoryViewState.LikedRemoved -> likedRemoved()
-            is StoryViewState.StoryRemoved -> removedFromDownload()
-            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
+            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
-
-    private fun addedBookmark() {
-        showFeedbackSnackBar("Added To Bookmarks")
-    }
-    private fun removeBookmark() {
-        showFeedbackSnackBar("Removed From Bookmarks")
-    }
-
-    private fun storyLiked() {
-        showFeedbackSnackBar("Added To Favorites")
-    }
-
-    private fun likedRemoved() {
-        showFeedbackSnackBar("Removed From Favorites")
-    }
-
-    private fun removedFromDownload() {
-        showFeedbackSnackBar("Story Removed From My Device")
-    }
-
-    private fun viewStateError() {
-        //TODO(Macro error handling for viewstate error)
-        showFeedbackSnackBar("Connection Failure")
-    }
-
 
     private fun bindListeners() {
         binding.btnBack.setOnClickListener {
@@ -202,21 +170,21 @@ class BookmarksFragment : Fragment() {
     }
 
     private fun onPlaylistOptionClicked(option: PlaylistOption) {
-        showPaywallOrProceedWithNormalProcess(requireActivity(), true) {
+        showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity(), true) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 PlaylistOption.DOWNLOAD -> {}
                 PlaylistOption.REMOVE -> {
-                   // FirebaseStoryRepository.removeAllBookmarks(prefRepository.firebaseKey,
-                   //   onSuccessListener = {
-                   //       //         storyViewModel.removeAllBookmarks() //TODO(We need a backend method for online removal)
-                   //       binding.pbLoadingProcess.visibility = View.GONE
-                   //       showFeedbackSnackBar("Removed All Bookmarks")
-                   //   },
-                   //   onFailureListener = {
-                   //       binding.pbLoadingProcess.visibility = View.GONE
-                   //       showFeedbackSnackBar("Connection Failure")
-                   //   })
+                    // FirebaseStoryRepository.removeAllBookmarks(prefRepository.firebaseKey,
+                    //   onSuccessListener = {
+                    //       //         storyViewModel.removeAllBookmarks() //TODO(We need a backend method for online removal)
+                    //       binding.pbLoadingProcess.visibility = View.GONE
+                    //       showFeedbackSnackBar("Removed All Bookmarks")
+                    //   },
+                    //   onFailureListener = {
+                    //       binding.pbLoadingProcess.visibility = View.GONE
+                    //       showFeedbackSnackBar("Connection Failure")
+                    //   })
                 }
                 else -> Log.d("BookmarksFragment", "option not available for this playlist")
             }
@@ -224,59 +192,14 @@ class BookmarksFragment : Fragment() {
     }
 
     //TODO(This is all replicated code with authorFragment need to extract this into a util funtion later)
-    private fun onStoryOptionClicked(
+    private fun optionClicked(
         option: StoryOption, story: Story
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            requireActivity(), isActionExclusiveForSignedInUser = true
-        ) {
-            //  TODO(I dont see add bookmark option, need to double check if needed latter)
-            when (option) {
-                StoryOption.DELETE, StoryOption.REMOVE_BOOKMARK -> {
-
-                    storyViewModel.bookmarkStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-
-                }
-                StoryOption.LIKE -> {
-                    storyViewModel.giveLikeToStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.REMOVE_LIKE -> {
-                    storyViewModel.removeLikeFromStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        story.id
-                    )
-                }
-                StoryOption.DOWNLOAD -> lifecycleScope.launch {
-                    try {
-                        val downloadedStory =
-                            DownloadedStoryEntity.fromStory(requireContext(), story.toDto())
-                        storyViewModel.downloadStory(downloadedStory!!)
-                        showFeedbackSnackBar("Story Saved To My Device")
-                    } catch (e: Exception) {
-                        Log.e("BookmarksFragment", "exception: ", e)
-                        showFeedbackSnackBar("Failed Downloading Story")
-                    }
-                }
-                StoryOption.REMOVE_DOWNLOAD -> {
-                    storyViewModel.removeDownloadedStory(
-                        story.id
-                    ) }
-                StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                    requireActivity(), story.lat, story.lng
+        activity?.let { verifiedActivity ->
+            context?.let { verifiedContext ->
+                onOptionClicked(
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
-                StoryOption.SHARE -> {
-                    shareStory(requireContext(), story.id)
-                }
-                else -> Log.d("BookmarksFragment", "no action defined for this option")
             }
         }
     }

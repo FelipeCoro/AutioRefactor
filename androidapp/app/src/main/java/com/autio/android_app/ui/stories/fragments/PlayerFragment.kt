@@ -21,8 +21,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.autio.android_app.R
+import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.api.model.modelLegacy.NowPlayingMetadata
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
 import com.autio.android_app.domain.mappers.toDto
@@ -143,7 +143,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnHeart.setOnClickListener {
                     showPaywallOrProceedWithNormalProcess(
-                        requireActivity()
+                        prefRepository, requireActivity()
                     ) {
                         if (likes[prefRepository.userId] == true) {
                             storyViewModel.removeLikeFromStory(
@@ -174,7 +174,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             playerFragmentViewModel.currentStory.value?.let { story ->
                 binding.btnBookmark.setOnClickListener {
                     showPaywallOrProceedWithNormalProcess(
-                        requireActivity()
+                        prefRepository, requireActivity()
                     ) {
                         if (isBookmarked) {
                             storyViewModel.removeBookmarkFromStory(
@@ -225,7 +225,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnRewind.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                requireActivity()
+                prefRepository, requireActivity()
             ) {
                 bottomNavigationViewModel.rewindFifteenSeconds()
             }
@@ -241,7 +241,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnNext.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                requireActivity()
+                prefRepository, requireActivity()
             ) {
                 bottomNavigationViewModel.skipToNextStory()
             }
@@ -261,33 +261,14 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
-            is StoryViewState.AddedBookmark -> addedBookmark()
-            is StoryViewState.RemovedBookmark -> removeBookmark()
-            is StoryViewState.StoryLiked -> storyLiked()
-            is StoryViewState.LikedRemoved -> likedRemoved()
-            else -> viewStateError() //TODO(Ideally have error handling for each error, ideally would be not to have so many viewstates)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
+            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
-    }
-
-    private fun addedBookmark() {
-        showFeedbackSnackBar("Added To Bookmarks")
-    }
-
-    private fun removeBookmark() {
-        showFeedbackSnackBar("Removed From Bookmarks")
-    }
-
-    private fun storyLiked() {
-        showFeedbackSnackBar("Added To Favorites")
-    }
-
-    private fun likedRemoved() {
-        showFeedbackSnackBar("Removed From Favorites")
-    }
-
-    private fun viewStateError() {
-        //TODO(Macro error handling for viewstate error)
-        showFeedbackSnackBar("Connection Failure")
     }
 
     private fun updateUI(
@@ -330,7 +311,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 ) {
                     if (fromUser) {
                         showPaywallOrProceedWithNormalProcess(
-                            requireActivity()
+                            prefRepository, requireActivity()
                         ) {
                             bottomNavigationViewModel.setPlaybackPosition(
                                 progress
@@ -414,7 +395,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             }
             btnShare.setOnClickListener {
                 showPaywallOrProceedWithNormalProcess(
-                    requireActivity()
+                    prefRepository, requireActivity()
                 ) {
                     shareStory(
                         requireContext(), story.id
@@ -429,9 +410,9 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             btnOptions.setOnClickListener {
                 showStoryOptions(
                     requireContext(), binding.root as ViewGroup, it, story, arrayListOf(
-                        if (story.isDownloaded == true) com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD else com.autio.android_app.data.api.model.StoryOption.DOWNLOAD,
-                        com.autio.android_app.data.api.model.StoryOption.DIRECTIONS
-                    ), onOptionClick = ::onOptionClicked
+                        if (story.isDownloaded == true) StoryOption.REMOVE_DOWNLOAD else StoryOption.DOWNLOAD,
+                        StoryOption.DIRECTIONS
+                    ), onOptionClick = ::optionClicked
                 )
             }
             mapCard.visibility = View.VISIBLE
@@ -543,52 +524,15 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         return stateCode ?: ""
     }
 
-    private fun onOptionClicked(
-        option: com.autio.android_app.data.api.model.StoryOption, story: Story
+    private fun optionClicked(
+        option: StoryOption, story: Story
     ) {
-        when (option) {
-            com.autio.android_app.data.api.model.StoryOption.DOWNLOAD -> {
-                showPaywallOrProceedWithNormalProcess(
-                    requireActivity(), isActionExclusiveForSignedInUser = true
-                ) {
-                    lifecycleScope.launch {
-                        try {
-                            val downloadedStory = DownloadedStoryEntity.fromStory(
-                                requireContext(), story.toDto() //TODO(Temp fix)
-                            )
-                            lifecycleScope.launch {
-                                storyViewModel.downloadStory(
-                                    downloadedStory!!
-                                )
-                                showFeedbackSnackBar(
-                                    "Story Saved To My Device"
-                                )
-                            }
-                        } catch (e: Exception) {
-                            Log.e(
-                                "PlayerFragment", "exception: ", e
-                            )
-                            showFeedbackSnackBar(
-                                "Failed Downloading Story"
-                            )
-                        }
-                    }
-                }
-            }
-            com.autio.android_app.data.api.model.StoryOption.REMOVE_DOWNLOAD -> {
-                storyViewModel.removeDownloadedStory(
-                    story.id
-                )
-                showFeedbackSnackBar(
-                    "Story Removed From My Device"
+        activity?.let { verifiedActivity ->
+            context?.let { verifiedContext ->
+                onOptionClicked(
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
             }
-            com.autio.android_app.data.api.model.StoryOption.DIRECTIONS -> openLocationInMapsApp(
-                requireActivity(), story.lat, story.lng
-            )
-            else -> Log.d(
-                "PlayerFragment", "optionSelectedNotAdded"
-            )
         }
     }
 

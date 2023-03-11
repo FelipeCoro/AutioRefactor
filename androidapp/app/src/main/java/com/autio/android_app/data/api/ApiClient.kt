@@ -124,7 +124,9 @@ interface ApiClient {
      * Returns a list with data of all stories matching the ids inside the query
      * @param ids list of ids of each story that should be fetched
      */
-    @GET("/api/v1/stories/by-ids-v2")
+
+
+    @GET("/api/v1/stories/by-ids-v3")
     suspend fun getStoriesByIds(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,

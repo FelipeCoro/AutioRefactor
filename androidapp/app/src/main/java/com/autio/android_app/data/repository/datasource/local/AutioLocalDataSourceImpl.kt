@@ -1,28 +1,23 @@
 package com.autio.android_app.data.repository.datasource.local
 
 import com.autio.android_app.data.database.dao.CategoryDao
-import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.MapPointDao
 import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.database.entities.*
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.flowOn
 import java.util.concurrent.Executors
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 class AutioLocalDataSourceImpl @Inject constructor(
     private val mapPointDao: MapPointDao,
-    private val downloadedStoryDao: DownloadedStoryDao,
     private val categoryDao: CategoryDao,
     private val storyDao: StoryDao
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
-    override val getDownloadedStories = downloadedStoryDao.readLiveStories()
+    override val getDownloadedStories = storyDao.readLiveStories()
     override val bookmarkedStories = storyDao.getBookmarkedStories()
     override val favoriteStories = storyDao.getFavoriteStories()
     override val history = storyDao.getHistory()
@@ -90,12 +85,12 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>) {
-        for (history in storiesHistory) {
-            storyDao.setListenedAtData(history.storyId, history.playedAt)
-
-            if (getDownloadedStoryById(history.storyId) != null) {
-                downloadedStoryDao.setListenedAtData(
-                    history.storyId, history.playedAt
+        for (story in storiesHistory) {
+            storyDao.setListenedAtData(story.storyId, story.playedAt)
+//TODO(Check this)
+            if (getDownloadedStoryById(story.storyId) != null) {
+                storyDao.setListenedAtData(
+                    story.storyId, story.playedAt
                 )
             }
         }
@@ -108,7 +103,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         )
 
         if (getDownloadedStoryById(history.storyId) != null) {
-            downloadedStoryDao.setListenedAtData(
+            storyDao.setListenedAtData(
                 history.storyId, history.playedAt
             )
         }
@@ -118,7 +113,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         storyDao.markStoryAsListenedAtLeast30Secs(storyId)
 
         if (getDownloadedStoryById(storyId) != null) {
-            downloadedStoryDao.markStoryAsListenedAtLeast30Secs(storyId)
+            storyDao.markStoryAsListenedAtLeast30Secs(storyId)
         }
     }
 
@@ -126,44 +121,44 @@ class AutioLocalDataSourceImpl @Inject constructor(
         storyDao.removeListenedAtData(id)
 
         if (getDownloadedStoryById(id) != null) {
-            downloadedStoryDao.removeListenedAtData(id)
+            storyDao.removeListenedAtData(id)
         }
     }
 
     override suspend fun clearStoryHistory() {
         storyDao.clearStoryHistory()
-        downloadedStoryDao.clearStoryHistory()
+        storyDao.clearStoryHistory()
     }
 
-    override suspend fun bookmarkStory(id: Int): DownloadedStoryEntity? {
+    override suspend fun bookmarkStory(id: Int): StoryEntity? {
         storyDao.setBookmarkToStory(id)
         val checkForStory = getDownloadedStoryById(id)
         return checkForStory?.let {
-            downloadedStoryDao.setBookmarkToStory(id)
+            storyDao.setBookmarkToStory(id)
             checkForStory
         }
 
     }
 
-    override suspend fun removeBookmarkFromStory(id: Int): DownloadedStoryEntity? {
+    override suspend fun removeBookmarkFromStory(id: Int): StoryEntity? {
         storyDao.removeBookmarkFromStory(id)
         val checkForStory = getDownloadedStoryById(id)
         return checkForStory?.let {
-            downloadedStoryDao.removeBookmarkFromStory(id)
+            storyDao.removeBookmarkFromStory(id)
             checkForStory
         }
     }
 
     override suspend fun removeAllBookmarks() {
         storyDao.removeAllBookmarks()
-        downloadedStoryDao.removeAllBookmarks()
+        storyDao.removeAllBookmarks()
     }
 
     override suspend fun giveLikeToStory(id: Int) {
         storyDao.setLikeToStory(id)
 
         if (getDownloadedStoryById(id) != null) {
-            downloadedStoryDao.setLikeToStory(id)
+            storyDao.setLikeToStory(id)
         }
     }
 
@@ -171,32 +166,32 @@ class AutioLocalDataSourceImpl @Inject constructor(
         storyDao.removeLikeFromStory(id)
 
         if (getDownloadedStoryById(id) != null) {
-            downloadedStoryDao.removeLikeFromStory(id)
+            storyDao.removeLikeFromStory(id)
         }
     }
 
 // Downloaded stories
 
-    override suspend fun downloadStory(story: DownloadedStoryEntity) {
+    override suspend fun downloadStory(story: StoryEntity) {
         executor.execute {
-            downloadedStoryDao.addStory(story)
+            storyDao.addStory(story)
         }
     }
 
     override suspend fun removeDownloadedStory(id: Int) {
         executor.execute {
-            downloadedStoryDao.removeStory(id)
+            storyDao.removeStory(id)
         }
     }
 
     override suspend fun removeAllDownloads() {
         executor.execute {
-            downloadedStoryDao.clearTable()
+            storyDao.clearTable()
         }
     }
 
-    override suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity? {
-        return downloadedStoryDao.getStoryById(id)
+    override suspend fun getDownloadedStoryById(id: Int): StoryEntity? {
+        return storyDao.getStoryById(id)
     }
 
     override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
@@ -214,7 +209,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
     override suspend fun clearUserData() {
         executor.execute {
             storyDao.clearUserData()
-            downloadedStoryDao.clearTable()
+            storyDao.clearTable()
         }
     }
 

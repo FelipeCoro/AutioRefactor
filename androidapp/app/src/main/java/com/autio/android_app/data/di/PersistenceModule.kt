@@ -6,7 +6,6 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.database.dao.CategoryDao
-import com.autio.android_app.data.database.dao.DownloadedStoryDao
 import com.autio.android_app.data.database.dao.MapPointDao
 import com.autio.android_app.data.database.dao.StoryDao
 import dagger.Module
@@ -63,11 +62,5 @@ object PersistenceModule {
 
     @Singleton
     @Provides
-    fun providesDownloadedStoryDao(database: DataBase): DownloadedStoryDao =
-        database.downloadedStoryDao()
-
-    @Singleton
-    @Provides
-    fun providesStoryDao(database: DataBase): StoryDao =
-        database.storyDao()
+    fun providesStoryDao(database: DataBase): StoryDao = database.storyDao()
 }

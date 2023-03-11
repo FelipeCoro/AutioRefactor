@@ -10,10 +10,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.data.repository.prefs.PrefRepositoryImpl
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.*
+import javax.inject.Inject
+
 
 fun checkEmptyField(
     etText: EditText
@@ -108,6 +112,7 @@ fun showPaywall(activity: Activity) {
 }
 
 fun showPaywallOrProceedWithNormalProcess(
+    prefRepository: PrefRepository,
     activity: Activity,
     isActionExclusiveForSignedInUser: Boolean = false,
     normalProcess: () -> Unit
@@ -117,7 +122,6 @@ fun showPaywallOrProceedWithNormalProcess(
             normalProcess.invoke()
         } else {
             try {
-                lateinit var prefRepository: PrefRepository //TODO(check this later, cant inject)
                 val isUserGuest = prefRepository.isUserGuest
                 val remainingStories = prefRepository.remainingStories
                 if ((isActionExclusiveForSignedInUser && isUserGuest) || remainingStories <= 0) {
@@ -133,5 +137,10 @@ fun showPaywallOrProceedWithNormalProcess(
             }
         }
     }
-
 }
+
+
+
+
+
+

@@ -2,7 +2,6 @@ package com.autio.android_app.data.repository
 
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.database.entities.DownloadedStoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
@@ -12,6 +11,7 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.mappers.toDTO
 import com.autio.android_app.domain.mappers.toMapPointEntity
 import com.autio.android_app.domain.mappers.toModel
+import com.autio.android_app.domain.mappers.toStoryEntity
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.AccountRequest
@@ -43,17 +43,23 @@ class AutioRepositoryImpl @Inject constructor(
         }
 
 
-    override val getDownloadedStories: Flow<List<DownloadedStoryEntity>>
+    override val getDownloadedStories: Flow<List<Story>>
         get() = autioLocalDataSource.getDownloadedStories.transform { entities ->
-
-            //    entities.onEach { TODO("Create downloadedStoryEntityTODownloadedStory  Mapper and collect") }
+            entities.onEach { it.toModel() }
         }
-    override val bookmarkedStories: Flow<List<StoryEntity>>
-        get() = autioLocalDataSource.bookmarkedStories
-    override val favoriteStories: Flow<List<StoryEntity>>
-        get() = autioLocalDataSource.favoriteStories
-    override val history: Flow<List<StoryEntity>>
-        get() = autioLocalDataSource.history
+
+    override val bookmarkedStories: Flow<List<Story>>
+        get() = autioLocalDataSource.bookmarkedStories.transform { entities ->
+            entities.onEach { it.toModel() }
+        }
+    override val favoriteStories: Flow<List<Story>>
+        get() = autioLocalDataSource.favoriteStories.transform { entities ->
+            entities.onEach { it.toModel() }
+        }
+    override val history: Flow<List<Story>>
+        get() = autioLocalDataSource.history.transform { entities ->
+            entities.onEach { it.toModel() }
+        }
 
     override suspend fun createAccount(accountRequest: AccountRequest): Result<User> {
         val accountDto = accountRequest.toDTO()
@@ -196,21 +202,23 @@ class AutioRepositoryImpl @Inject constructor(
         TODO("RETUR FLOW CORRECTLY")
     }
 
-    override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Story {
-        runCatching {
-            autioRemoteDataSource.getStoryById(
-                xUserId, apiToken, id
-            )
-        }.onSuccess {
-            val story = it.body()
-            if (story != null) {
-                autioLocalDataSource.cacheRecordOfStory(
-                    story.id, story.recordUrl
-                )
-            }
-        }.onFailure { }
+    override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result<Story> {
 
-        return Story() //TODO(TEMP FIX)
+        val result = autioRemoteDataSource.getStoriesByIds(xUserId, apiToken, listOf(id))
+
+        return if (result.isSuccessful) {
+            val story = result.let { storyResponse ->
+                storyResponse.body()!!.map { it.toModel() }
+            }
+            autioLocalDataSource.cacheRecordOfStory(story[0].id, story[0].recordUrl)
+            Result.success(story[0])
+
+
+        } else {
+            val throwable = Error(result.errorBody().toString())
+            Result.failure(throwable)
+        }
+
     }
 
 
@@ -283,12 +291,12 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getDownloadedStoryById(id: Int): DownloadedStoryEntity? {
+    override suspend fun getDownloadedStoryById(id: Int): StoryEntity? {
         return autioLocalDataSource.getDownloadedStoryById(id)
     }
 
-    override suspend fun downloadStory(story: DownloadedStoryEntity) {
-        autioLocalDataSource.downloadStory(TODO("Map back from DownloadedStoryEntity to a DownloadedHistory Domain Model"))
+    override suspend fun downloadStory(story: Story) {
+        autioLocalDataSource.downloadStory(story.toStoryEntity())
     }
 
     override suspend fun getStoriesAfterModifiedDate(date: Int): List<Story> {
