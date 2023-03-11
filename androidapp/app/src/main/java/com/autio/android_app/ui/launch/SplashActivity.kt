@@ -6,7 +6,6 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.navigation.fragment.NavHostFragment
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.ui.login.fragments.LoginFragment
@@ -26,12 +25,7 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_start)
         isNightModeOn()
-        //navigate()
-    }
-
-    private fun isBoardingFinished(): Boolean {
-        val sharedPreferences = this.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
-        return sharedPreferences.getBoolean("Finished", false)
+        navigate()
     }
 
     private fun isNightModeOn() {
@@ -53,28 +47,6 @@ class SplashActivity : AppCompatActivity() {
      *   if user is logged, [LoginFragment] if false
      */
     private fun navigate() {
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.authentication_nav_host) as NavHostFragment
-        val nav = navHostFragment.navController
-
-        if (!isBoardingFinished()) {
-            startActivity(Intent(this, OnBoardingActivity::class.java))
-            finish()
-        }
-        // Checks if user is logged in based on the preferences saved
-        // It could be used any of the user's properties since all of them are saved
-        // once the user logs in (either with an account or as a guest),
-        // but it is found more properly to check for the API token and firebase key
-        // since the communication with backend requires any of these two
-        if (isUserLoggedIn()) {
-            nav.navigate(R.id.signIn)
-        } else {
-            nav.navigate(R.id.signUp)
-        }
+        startActivity(Intent(this, OnBoardingActivity::class.java))
     }
-
-    private fun isUserLoggedIn() =
-        prefRepository.userApiToken.isEmpty() //TODO(Shouldn't this be if its NOT empty?)
-
 }

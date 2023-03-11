@@ -4,6 +4,7 @@ import android.Manifest
 import android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,17 +12,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
+import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentViewPagerBinding
 import com.autio.android_app.ui.onboarding.adapters.ViewPagerAdapter
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.util.PermissionsManager
+import javax.inject.Inject
 
 class OnBoardingFragment : Fragment() {
 
 
+    @Inject
+    lateinit var prefRepository: PrefRepository
     lateinit var permissionsManager: PermissionsManager
-
     private lateinit var binding: FragmentViewPagerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,17 +77,23 @@ class OnBoardingFragment : Fragment() {
             navigateToBackgroundLocation()
             return
         }
-
-        navigateToBottomActivity()
-
+        navigateToAuthentication()
     }
 
-    private fun navigateToBottomActivity() {
-        val intent = Intent(context, BottomNavigation::class.java)
-        intent.addFlags(
-            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        )
-        startActivity(intent)
+    private fun navigateToAuthentication() {
+        if (isOnBoardingFinished()) {
+            if (isUserLoggedIn()) {
+                startActivity(Intent(activity, BottomNavigation::class.java))
+                activity?.finish()
+            } else findNavController().navigate(R.id.loginFragment)
+        }
+    }
+
+
+    private fun isOnBoardingFinished(): Boolean {
+        val sharedPreferences =
+            activity?.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+        return sharedPreferences?.getBoolean("Finished", false) ?: false
     }
 
     private fun validateBackgroundLocation(): Boolean {
@@ -124,4 +135,7 @@ class OnBoardingFragment : Fragment() {
     private fun setViewPagerPage(pageIndex: Int) {
         binding.viewPager.currentItem = pageIndex
     }
+
+    private fun isUserLoggedIn() =
+        prefRepository.userApiToken.isEmpty() //TODO(Shouldn't this be if its NOT empty?)
 }

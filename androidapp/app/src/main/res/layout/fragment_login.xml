@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="viewModel"
+            type="com.autio.android_app.ui.login.viewmodels.LoginViewModel" />
+    </data>
+
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -143,6 +151,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
             android:id="@+id/fl_loading"
             layout="@layout/loading_barrier" />
     </FrameLayout>

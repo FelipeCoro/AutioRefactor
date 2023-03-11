@@ -146,7 +146,7 @@
 
         <include
             android:id="@+id/fl_loading"
-            tools:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
             layout="@layout/loading_barrier" />
     </FrameLayout>
 </layout>

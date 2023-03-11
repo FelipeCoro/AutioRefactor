@@ -181,6 +181,9 @@
     <string name="background_location_fragment_main_dialog_text">For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue? You can change this later in your Settings.</string>
     <string name="background_location_fragment_positive_button_dialog_text">Continue</string>
     <string name="background_location_fragment_negative_button_dialog_text">Request again</string>
+    <string name="notification_fragment_dialog_text">For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue? You can change this later in your Settings.</string>
+    <string name="notification_fragment_dialog_positive_button_text">Continue</string>
+    <string name="notification_fragment_dialog_negative_button_text">Request again</string>
 
 
 </resources>

@@ -11,6 +11,7 @@
     <action
         android:id="@+id/signIn"
         app:destination="@id/signInFragment" />
+
     <fragment
         android:id="@+id/signUpFragment"
         android:name="com.autio.android_app.ui.login.fragments.SignUpFragment"

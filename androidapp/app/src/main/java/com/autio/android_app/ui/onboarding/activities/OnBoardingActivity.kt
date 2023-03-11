@@ -2,7 +2,6 @@ package com.autio.android_app.ui.onboarding.activities
 
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowInsetsController
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
@@ -38,4 +37,9 @@ class OnBoardingActivity : AppCompatActivity() {
             resources, R.color.autio_blue, null
         )
     }
+
+    companion object {
+        const val FINISHED_ONBOARDING = " finishe_onboarding"
+    }
+
 }

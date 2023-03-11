@@ -19,8 +19,6 @@ import com.autio.android_app.databinding.FragmentInAppLocationBinding
 import com.autio.android_app.util.ON_BOARDING_SHARE_PREFERENCES_FILE_NAME
 import com.autio.android_app.util.SHARED_PREFERENCES_FINISHED_ON_BOARDING_FLAG
 import com.autio.android_app.util.TrackingUtility
-import com.autio.android_app.util.resources.DeepLinkingActions
-import com.autio.android_app.util.resources.getDeepLinkingNavigationRequest
 
 class InAppLocationFragment : Fragment() {
 
@@ -60,21 +58,19 @@ class InAppLocationFragment : Fragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             goToBackgroundLocationPermission()
         } else {
-            goToSubscribeActivity()
+            goToAuthentication()
         }
+    }
+
+    private fun goToAuthentication() {
+        onBoardingFinished()
+        val nav = findNavController()
+        nav.navigate(R.id.action_onboarding_to_authentication_nav)
+        activity?.finish()
     }
 
     private fun goToBackgroundLocationPermission() {
         viewPager.currentItem = 2
-    }
-
-    private fun goToSubscribeActivity() {
-        onBoardingFinished()
-        val request =
-            getDeepLinkingNavigationRequest(DeepLinkingActions.SubscribeFragmentDeepLinkingAction)
-        val nav = findNavController()
-        nav.navigate(request)
-        activity?.finish()
     }
 
     private fun onBoardingFinished() {

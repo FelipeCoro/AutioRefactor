@@ -17,10 +17,20 @@
             app:exitAnim="@android:anim/fade_out"
             app:popUpTo="@id/welcomeExplorerFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_welcomeExplorerFragment_to_authentication_nav"
+            app:destination="@id/authentication_nav" />
     </fragment>
     <fragment
         android:id="@+id/viewPagerFragment"
         android:name="com.autio.android_app.ui.onboarding.fragments.OnBoardingFragment"
         android:label="fragment_view_pager"
-        tools:layout="@layout/fragment_view_pager" />
+        tools:layout="@layout/fragment_view_pager">
+        <action
+            android:id="@+id/action_onboarding_to_authentication_nav"
+            app:destination="@id/authentication_nav"
+            app:launchSingleTop="true"
+            app:popUpTo="@id/authentication_nav" />
+    </fragment>
+    <include app:graph="@navigation/nav_authentication" />
 </navigation>

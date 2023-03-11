@@ -13,8 +13,6 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentBackgroundLocationBinding
 import com.autio.android_app.util.TrackingUtility
-import com.autio.android_app.util.resources.DeepLinkingActions.Companion.LoginFragmentDeepLinkingAction
-import com.autio.android_app.util.resources.getDeepLinkingNavigationRequest
 
 class BackgroundLocationFragment : Fragment() {
     private var _binding: FragmentBackgroundLocationBinding? = null
@@ -26,26 +24,30 @@ class BackgroundLocationFragment : Fragment() {
         _binding = FragmentBackgroundLocationBinding.inflate(
             inflater, container, false
         )
-
         binding.buttonLocationPermission.setOnClickListener {
             requestPermission()
         }
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        requestPermission()
+    }
+
     private fun requestPermission() {
         if (TrackingUtility.hasBackgroundLocationPermission(requireContext())) {
-            goToSubscribeFragment()
+            goToAuthentication()
         } else {
             requestPermissionLauncher.launch(ACCESS_BACKGROUND_LOCATION)
         }
     }
 
-    private fun goToSubscribeFragment() {
+    private fun goToAuthentication() {
         onBoardingFinished()
-        val action = getDeepLinkingNavigationRequest(LoginFragmentDeepLinkingAction)
-        findNavController().navigate(action)
+        val nav = findNavController()
+        nav.navigate(R.id.action_onboarding_to_authentication_nav)
     }
+
 
     private fun onBoardingFinished() {
         val sharedPreferences = requireActivity().getSharedPreferences(
@@ -60,7 +62,7 @@ class BackgroundLocationFragment : Fragment() {
         ActivityResultContracts.RequestPermission()
     ) { permissionsResult ->
         if (permissionsResult) {
-            goToSubscribeFragment()
+            goToAuthentication()
         } else {
             showWarningDialog()
         }
@@ -71,7 +73,7 @@ class BackgroundLocationFragment : Fragment() {
             requireActivity()
         ).apply {
             setMessage(getString(R.string.background_location_fragment_main_dialog_text))
-            setPositiveButton(getString(R.string.background_location_fragment_positive_button_dialog_text)) { _, _ -> goToSubscribeFragment() }
+            setPositiveButton(getString(R.string.background_location_fragment_positive_button_dialog_text)) { _, _ -> goToAuthentication() }
             setNegativeButton(getString(R.string.background_location_fragment_negative_button_dialog_text)) { _, _ -> requestPermission() }
             create()
         }.show()

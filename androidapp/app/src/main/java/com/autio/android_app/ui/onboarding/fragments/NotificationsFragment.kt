@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentNotificationsBinding
-import com.autio.android_app.util.TrackingUtility
 
 class NotificationsFragment : Fragment() {
 
@@ -36,20 +35,19 @@ class NotificationsFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        requestPermission()
+    }
+
     private fun goToLocationPermission() {
-        viewPager.currentItem = 1
+        viewPager.currentItem = viewPager.currentItem + 1
     }
 
     private fun requestPermission() {
-        if (Build.VERSION.SDK_INT < 33 || TrackingUtility.hasNotificationPermissions(
-                requireContext()
-            )
-        ) {
+        if (Build.VERSION.SDK_INT < 33) {
             goToLocationPermission()
         } else {
-            requestPermissionLauncher.launch(
-                POST_NOTIFICATIONS
-            )
+            requestPermissionLauncher.launch(POST_NOTIFICATIONS)
         }
     }
 
@@ -68,11 +66,11 @@ class NotificationsFragment : Fragment() {
         AlertDialog.Builder(
             requireActivity()
         ).setMessage(
-                "For a full experience of the app, accepting the " + "requested permissions are necessary. Are you sure want to continue?" + " You can change this later in your Settings."
-            ).setPositiveButton(
-                "Continue"
-            ) { _, _ -> goToLocationPermission() }.setNegativeButton(
-                "Request again"
-            ) { _, _ -> requestPermission() }.create().show()
+            getString(R.string.notification_fragment_dialog_text)
+        ).setPositiveButton(
+            getString(R.string.notification_fragment_dialog_positive_button_text)
+        ) { _, _ -> goToLocationPermission() }.setNegativeButton(
+            getString(R.string.notification_fragment_dialog_negative_button_text)
+        ) { _, _ -> requestPermission() }.create().show()
     }
 }
