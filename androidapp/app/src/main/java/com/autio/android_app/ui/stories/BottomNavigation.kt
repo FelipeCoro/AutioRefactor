@@ -23,6 +23,7 @@ import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
