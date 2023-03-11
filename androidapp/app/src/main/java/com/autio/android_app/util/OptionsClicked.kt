@@ -10,14 +10,13 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 
 
-
 fun Fragment.onOptionClicked(
     option: StoryOption,
     story: Story,
     storyViewModel: StoryViewModel,
     prefRepository: PrefRepository,
     activity: Activity,
-    context:Context
+    context: Context
 ) {
     showPaywallOrProceedWithNormalProcess(
         prefRepository,

@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.onboarding.screens
+package com.autio.android_app.ui.onboarding.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater

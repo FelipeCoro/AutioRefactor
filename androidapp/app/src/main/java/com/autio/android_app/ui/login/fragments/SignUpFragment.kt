@@ -12,8 +12,10 @@ import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentSignUpBinding
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
 import com.autio.android_app.ui.stories.models.AccountRequest
-import com.autio.android_app.ui.viewmodel.PurchaseViewModel
-import com.autio.android_app.ui.viewmodel.PurchaseViewState
+import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
+
 import com.autio.android_app.util.checkEmptyFormFields
 import com.autio.android_app.util.pleaseFillText
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,33 +73,35 @@ class SignUpFragment : Fragment() {
                 pleaseFillText(it)
             }
         } else {
-            showLoadingView()
             val name = "${binding.tvName.text}"
             val password = "${binding.tvPassword.text}"
             val email = "${binding.tvEmail.text}"
             val createAccountRequest = AccountRequest(
                 email, email, password, password, name
             )
-
             purchaseViewModel.createAccount(createAccountRequest)
         }
     }
 
     private fun handleViewState(viewState: PurchaseViewState?) {
         when (viewState) {
-            is PurchaseViewState.ErrorViewState -> showError()
-            else -> showSuccess(viewState)
+            is PurchaseViewState.OnCreatedAccountSuccess -> handleOnCreateAccountSuccess(viewState.data)
+            is PurchaseViewState.OnCreatedAccountFailed -> handleOnCreateAccountFailed()
+            else -> showError()
         }
 
     }
 
-    private fun showSuccess(state: PurchaseViewState?) {
+    private fun handleOnCreateAccountSuccess(data: User) {
         findNavController().navigate(R.id.action_signUpFragment_to_bottomNavigation)
+    }
+
+    private fun handleOnCreateAccountFailed() {
+        showError()
     }
 
     private fun showError() {
         //TODO (Handle Error)
-        hideLoadingView()
         val savedMessage = "The mail is already associated to another account"
 
 

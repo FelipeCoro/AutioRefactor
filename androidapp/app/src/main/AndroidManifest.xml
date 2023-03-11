@@ -50,11 +50,7 @@
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
             android:value="com.autio.android_app.cast.CastOptionsProvider" />
         <activity
-            android:name=".ui.onboarding.OnBoardingActivity"
-            android:exported="false"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ui.subscribe.SubscribeActivity"
+            android:name=".ui.onboarding.activities.OnBoardingActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

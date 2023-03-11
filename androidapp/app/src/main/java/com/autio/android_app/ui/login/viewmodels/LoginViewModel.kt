@@ -1,6 +1,7 @@
 package com.autio.android_app.ui.login.viewmodels
 
 
+import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,19 +22,20 @@ class LoginViewModel @Inject constructor(
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
+    val isLoading = ObservableBoolean(false)
     private val _viewState = MutableLiveData<LoginViewState>()
     val viewState: LiveData<LoginViewState> = _viewState
 
-
     fun loginGuest() {
-
         viewModelScope.launch(coroutineDispatcher) {
+            isLoading.set(true)
             val result = autioRepository.loginAsGuest()
             if (result.isSuccess) { //TODO(Double check this)
-                result.getOrNull()?.let { saveGuestInfo(it) }
-                result.getOrNull()?.let { handleSuccessViewState(it) }
-            } else
-                handleFailureViewState(result.exceptionOrNull() as Exception)
+                result.getOrNull()?.let { user ->
+                    saveGuestInfo(user)
+                    handleSuccessViewState(user)
+                } ?: handleFailureViewState(result.exceptionOrNull() as Exception)
+            } else handleFailureViewState(result.exceptionOrNull() as Exception)
 
         }
     }
@@ -58,6 +60,7 @@ class LoginViewModel @Inject constructor(
 
     private fun setViewState(loginViewState: LoginViewState) {
         _viewState.postValue(loginViewState)
+        isLoading.set(false)
     }
 
 }

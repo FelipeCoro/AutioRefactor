@@ -149,4 +149,38 @@
     <string name="my_stories_favorites">Favorites</string>
     <string name="my_stories_history">History</string>
     <string name="my_stories_downloaded_stories">Downloaded Stories</string>
+
+    <!--Loading overlay-->
+    <string name="loading_loading_text">Loading</string>
+
+    <!-- subscribe fragment -->
+    <string name="youtube_using_autio_app_video_url" translatable="false">https://www.youtube.com/watch?v=SvbahDL4aYc&amp;ab_channel=Autio"</string>
+    <string name="sign_in_error_text">The user and/or password are incorrect</string>
+    <string name="subscribe_fragment_sign_in_link">Sign In</string>
+    <string name="subscribe_fragment_restore_purchase_link">Restore Purchase</string>
+    <string name="subscribe_fragment_url_moth_community_link">https://themoth.org/community</string>
+    <string name="subscribe_fragment_learn_more_link">Learn more</string>
+    <string name="subscribe_fragment_positive_button_dialog">Continue</string>
+    <string name="subscribe_fragment_request_again_negative_button_dialog">Request again</string>
+
+    <string-array name="subscribe_slider_titles">
+        <item>Take your journey to the next level with location-based audio stories</item>
+        <item>Go anywhere with nationwide coverage</item>
+        <item>Always more to discover with new original content</item>
+        <item>A collection of narrators as unique as the stories</item>
+    </string-array>
+
+    <string-array name="subscribe_slider_texts">
+        <item>Explore our collection of over 10,000+ stories exclusive to Autio.</item>
+        <item>Road trip across the country with new stories to discover wherever you travel.</item>
+        <item>New, unique stories added weekly.</item>
+        <item>Listen to some of your favorite voices, like Kevin Costner, Phil Jackson, &amp; John Lithgow.</item>
+    </string-array>
+
+    <string name="in_app_location_warning_dialog_permissions_text"> "For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue?\n You can change this later in your Settings.</string>
+    <string name="background_location_fragment_main_dialog_text">For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue? You can change this later in your Settings.</string>
+    <string name="background_location_fragment_positive_button_dialog_text">Continue</string>
+    <string name="background_location_fragment_negative_button_dialog_text">Request again</string>
+
+
 </resources>

@@ -133,10 +133,10 @@ class DownloadedStoriesFragment : Fragment() {
     private fun handleViewState(viewState: StoryViewState?) {
         when (viewState) {
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
-            is StoryViewState.RemovedBookmark ->  showFeedbackSnackBar("Removed From Bookmarks")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
             is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
-            is StoryViewState.StoryDownloaded ->  showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
@@ -144,19 +144,21 @@ class DownloadedStoriesFragment : Fragment() {
 
     private fun optionClicked(
         option: StoryOption, story: Story
-    ) {activity?.let { verifiedActivity ->
-        context?.let { verifiedContext ->
-            onOptionClicked(
-                option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
-            )
+    ) {
+        activity?.let { verifiedActivity ->
+            context?.let { verifiedContext ->
+                onOptionClicked(
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
+                )
+            }
         }
-    }
     }
 
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
     ) {
-        showPaywallOrProceedWithNormalProcess(prefRepository,
+        showPaywallOrProceedWithNormalProcess(
+            prefRepository,
             requireActivity(), true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE

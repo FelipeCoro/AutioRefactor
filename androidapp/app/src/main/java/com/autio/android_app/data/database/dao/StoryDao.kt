@@ -20,6 +20,7 @@ interface StoryDao {
         setLikesToStories(storiesIds)
         removeLikesFromStories(storiesIds)
     }
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addStory(story: StoryEntity): Long
 

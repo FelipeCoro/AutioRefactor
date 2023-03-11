@@ -58,18 +58,19 @@ class LoginFragment : Fragment() {
 
     private fun setUpBackgroundAnimation() {
         val imageDataset = Datasource().loadLocationViews()
+        val scrollingPosition = Integer.MAX_VALUE / 2
         firstRecyclerView = binding.rvFirstColumn
         secondRecyclerView = binding.rvSecondColumn
         thirdRecyclerView = binding.rvThirdColumn
 
         firstRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
-        firstRecyclerView.layoutManager!!.scrollToPosition(Integer.MAX_VALUE / 2)
+        firstRecyclerView.layoutManager?.scrollToPosition(scrollingPosition)
 
         secondRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
-        secondRecyclerView.layoutManager!!.scrollToPosition(Integer.MAX_VALUE / 2)
+        secondRecyclerView.layoutManager?.scrollToPosition(scrollingPosition)
 
         thirdRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
-        thirdRecyclerView.layoutManager!!.scrollToPosition(Integer.MAX_VALUE / 2)
+        thirdRecyclerView.layoutManager?.scrollToPosition(scrollingPosition)
 
         firstRecyclerView.setAutomaticScroll()
         secondRecyclerView.setAutomaticScroll(ScrollView.FOCUS_UP)
@@ -84,35 +85,22 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
         binding.btnLoginAsGuest.setOnClickListener {
-            showLoadingView()
             loginViewModel.loginGuest()
         }
     }
-
-    private fun showLoadingView() {
-        binding.flLoading.root.visibility = View.VISIBLE
-    }
-
-    private fun hideLoadingView() {
-        binding.flLoading.root.visibility = View.GONE
-    }
-
 
     private fun handleViewState(viewState: LoginViewState?) {
         when (viewState) {
             is LoginViewState.ErrorViewState -> showError(viewState.exception)
             else -> showSuccess(viewState)
         }
-
     }
 
     private fun showSuccess(user: LoginViewState?) {
         findNavController().navigate(R.id.action_loginFragment_to_bottomNavigation)
     }
 
-
     private fun showError(exception: Exception) {
         //TODO (Handle Error)
-        hideLoadingView()
     }
 }

@@ -94,7 +94,7 @@ class AuthorFragment : Fragment() {
                 showPaywallOrProceedWithNormalProcess(
                     prefRepository, requireActivity(), true
                 ) {
-                    bottomNavigationViewModel.playMediaId(                        id                    )
+                    bottomNavigationViewModel.playMediaId(id)
                 }
             }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )

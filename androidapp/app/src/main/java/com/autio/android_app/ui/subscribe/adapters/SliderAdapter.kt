@@ -1,38 +1,29 @@
-package com.autio.android_app.ui.subscribe
+package com.autio.android_app.ui.subscribe.adapters
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import com.autio.android_app.R
 import com.bumptech.glide.Glide
 import com.smarteist.autoimageslider.SliderViewAdapter
 
-class SliderAdapter(textListTitle: List<String>, textList: List<String>) :
-    SliderViewAdapter<SliderAdapter.SliderViewHolder>() {
-
-    private var titleList: List<String> = textListTitle
-    private var textSubList: List<String> = textList
-    private val images = intArrayOf(
-        R.drawable.photo_slider1,
-        R.drawable.photo_slider2,
-        R.drawable.photo_slider3,
-        R.drawable.photo_slider4
-    )
-
-    override fun getCount() = titleList.size
+data class SliderAdapter(
+    val titles: List<String>, val texts: List<String>, @DrawableRes val images: List<Int>
+) : SliderViewAdapter<SliderAdapter.SliderViewHolder>() {
+    override fun getCount() = titles.size
 
     override fun onCreateViewHolder(parent: ViewGroup): SliderViewHolder {
-        val inflate: View = LayoutInflater.from(parent.context).inflate(
-            R.layout.slider_item, parent, false
-        )
+        val inflate: View =
+            LayoutInflater.from(parent.context).inflate(R.layout.slider_item, parent, false)
         return SliderViewHolder(inflate)
     }
 
     override fun onBindViewHolder(viewHolder: SliderViewHolder, position: Int) {
-        viewHolder.textViewTitle.text = titleList[position]
-        viewHolder.textViewSubText.text = textSubList[position]
+        viewHolder.textViewTitle.text = titles[position]
+        viewHolder.textViewSubText.text = texts[position]
         Glide.with(viewHolder.imageView).load(images[position]).fitCenter()
             .into(viewHolder.imageView)
     }

@@ -125,12 +125,12 @@ interface ApiClient {
      */
 
 
-   @GET("/api/v1/stories/by-ids-v3")
-   suspend fun getStoriesByIds(
-       @Header("X-User-Id") xUserId: Int,
-       @Header("Authorization") apiToken: String,
-       @Query("ids[]") ids: List<Int>
-   ): Response<List<StoryDto>>
+    @GET("/api/v1/stories/by-ids-v3")
+    suspend fun getStoriesByIds(
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String,
+        @Query("ids[]") ids: List<Int>
+    ): Response<List<StoryDto>>
 
     @GET("/api/v1/stories/{id}")
     suspend fun getStoryById(

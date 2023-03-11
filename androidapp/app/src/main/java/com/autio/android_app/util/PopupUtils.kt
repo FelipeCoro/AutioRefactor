@@ -70,7 +70,7 @@ fun showStoryOptions(
     val storyOptionsAdapter =
         StoryOptionsAdapter(story, options) { storyOption: StoryOption, story: Story ->
             popup.dismiss()
-            onOptionClick?.invoke(storyOption, story )
+            onOptionClick?.invoke(storyOption, story)
         }
 
     recyclerView.layoutManager = NonScrollableLinearLayout(context)

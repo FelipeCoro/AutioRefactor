@@ -10,7 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.ui.login.fragments.LoginFragment
-import com.autio.android_app.ui.onboarding.OnBoardingActivity
+import com.autio.android_app.ui.onboarding.activities.OnBoardingActivity
 import com.autio.android_app.ui.stories.BottomNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -68,10 +68,9 @@ class SplashActivity : AppCompatActivity() {
         // but it is found more properly to check for the API token and firebase key
         // since the communication with backend requires any of these two
         if (isUserLoggedIn()) {
-            nav.navigate(R.id.loginFragment)
+            nav.navigate(R.id.signIn)
         } else {
-            startActivity(Intent(this, BottomNavigation::class.java))
-            finish()
+            nav.navigate(R.id.signUp)
         }
     }
 
