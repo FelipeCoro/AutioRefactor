@@ -6,6 +6,6 @@ data class Narrator(
     val id: Int = 0,
     val name: String = "",
     val biography: String = "",
-    val url: String = "",
-    val imageUrl: String = ""
+    val url: String? = "",
+    val imageUrl: String? = ""
 )

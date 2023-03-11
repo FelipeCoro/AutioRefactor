@@ -238,7 +238,7 @@ fun NarratorDto.toModel(): Narrator {
         id,
         name,
         biography,
-        url ?: "",
-        imageUrl ?: ""
+        url,
+        imageUrl
     )
 }

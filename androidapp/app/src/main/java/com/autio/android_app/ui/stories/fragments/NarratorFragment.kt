@@ -117,13 +117,6 @@ class NarratorFragment : Fragment() {
                 prefRepository.userId, prefRepository.userApiToken, storyId
             )
 
-
-            //TODO(This should change with livedata??)
-            /* .observe(
-                 viewLifecycleOwner
-             ) {
-             }*/
-
         }
 
 
@@ -159,38 +152,45 @@ class NarratorFragment : Fragment() {
         }
     }
 
-    private fun handleNarratorViewStateSuccess(narrator: Narrator) {
-        Glide.with(
-            this@NarratorFragment
-        ).load(narrator.imageUrl).transition(
-            DrawableTransitionOptions.withCrossFade(100)
-        ).into(
-            binding.ivNarratorPic
-        )
-        binding.tvNarratorName.apply {
-            visibility = View.VISIBLE
-            text = narrator.name
-        }
-        binding.tvNarratorBio.apply {
-            visibility = View.VISIBLE
-            text = narrator.biography
-        }
-        binding.btnVisitNarratorLink.apply {
-            setOnClickListener {
-                openUrl(
-                    requireContext(), narrator.url //TODO(INTENT FAILING)
+    private fun handleNarratorViewStateSuccess(narrator: Narrator?) {
+        narrator?.let {
+            if (narrator.imageUrl != null) {
+
+                Glide.with(
+                    this@NarratorFragment
+                ).load(narrator.imageUrl).transition(
+                    DrawableTransitionOptions.withCrossFade(100)
+                ).into(
+                    binding.ivNarratorPic
+                )
+                binding.tvNarratorName.apply {
+                    visibility = View.VISIBLE
+                    text = narrator.name
+                }
+                binding.tvNarratorBio.apply {
+                    visibility = View.VISIBLE
+                    text = narrator.biography
+
+                }
+            }
+            if (narrator.url != null) {
+                binding.btnVisitNarratorLink.apply {
+                    setOnClickListener {
+                        openUrl(
+                            requireContext(), narrator.url //TODO(INTENT FAILING)
+                        )
+                    }
+                    visibility = View.VISIBLE
+                }
+
+                narratorViewModel.getStoriesByContributor(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    narrator,
+                    1
                 )
             }
-            visibility = View.VISIBLE
         }
-
-        narratorViewModel.getStoriesByContributor(
-            prefRepository.userId,
-            prefRepository.userApiToken,
-            narrator,
-            1
-        )
-
     }
 
     private fun handleContributorViewStateSuccess(contributor: Contributor) {
@@ -217,19 +217,6 @@ class NarratorFragment : Fragment() {
         storyAdapter.submitList(
             stories
         )
-    }
-
-
-    private fun handleViewState(viewState: StoryViewState?) {
-        when (viewState) {
-            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
-            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
-            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
-            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
-            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
-            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
-            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
-        }
     }
 
     private fun optionClicked(

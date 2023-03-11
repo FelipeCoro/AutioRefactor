@@ -29,12 +29,16 @@ object PersistenceModule {
         coroutineScope: CoroutineScope,
         callback: RoomDatabase.Callback
     ): DataBase {
+
+        //database.mapPointDao().deleteAllStories()
+
         return Room.databaseBuilder(context, DataBase::class.java, CONST_DATABASE_NAME)
             .createFromAsset("database/published_map_points.db")
-            .fallbackToDestructiveMigration()
-           //.addCallback(callback)
-           //.enableMultiInstanceInvalidation()
+            //.fallbackToDestructiveMigration()
+            //.addCallback(callback)
+            //.enableMultiInstanceInvalidation()
             .build()
+
     }
 
     @Provides

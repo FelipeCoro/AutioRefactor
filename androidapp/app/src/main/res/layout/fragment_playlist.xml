@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fragment_background"
@@ -13,21 +13,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:contentInsetStart="15dp"
-        android:contentInsetEnd="15dp"
+        android:contentInsetStart="5dp"
+        android:contentInsetEnd="5dp"
         android:paddingTop="12dp">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="fill_horizontal">
+            android:layout_gravity="fill_horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5">
 
             <LinearLayout
                 android:id="@+id/btnBack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_centerVertical="true">
+                android:layout_centerVertical="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.55">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -48,17 +55,23 @@
                 android:id="@+id/tvToolbarTitle"
                 style="@style/Title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="38dp"
                 android:layout_centerInParent="true"
+                android:layout_centerHorizontal="true"
                 android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnPlaylistOptions"
+                app:layout_constraintStart_toEndOf="@+id/btnBack"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
                 tools:text="History" />
 
             <ProgressBar
                 android:id="@+id/pbLoadingProcess"
-                android:layout_marginStart="10dp"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
                 android:layout_toEndOf="@id/tvToolbarTitle"
                 android:indeterminate="true"
                 android:indeterminateTint="@color/normal_text"
@@ -71,12 +84,17 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
+                android:layout_marginTop="2dp"
                 android:minWidth="40dp"
                 android:minHeight="40dp"
                 android:scaleType="center"
                 android:src="@drawable/ic_three_dots"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
                 app:tint="@color/secondary_button" />
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </Toolbar>
 
     <FrameLayout
