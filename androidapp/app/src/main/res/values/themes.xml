@@ -778,4 +778,27 @@
             @drawable/splash_background
         </item>
     </style>
+
+    <style name="ClusterMapStyle" parent="Theme.AppCompat">
+        <item name="android:fontFamily">
+            @font/sf_pro_text_regular
+        </item>
+        <item name="android:textSize">
+            26sp
+        </item>
+        <item name="android:textColor">
+            @color/autio_blue
+        </item>
+        <item name="android:backgroundTint">
+            @color/white
+        </item>
+        <item name="android:colorBackground">
+            @color/white
+        </item>
+        <item name="android:background">
+            @color/autio_blue
+        </item>
+
+
+    </style>
 </resources>

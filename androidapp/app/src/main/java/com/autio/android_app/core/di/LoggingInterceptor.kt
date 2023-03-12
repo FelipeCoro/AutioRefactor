@@ -37,11 +37,11 @@ class LoggingInterceptor : Interceptor {
         chain: Chain,
         request: Request
     ): Response {
-        var response: Response = chain.proceed(request)
-        if (!response.isSuccessful) {
+        //var response: Response = chain.proceed(request)
+       /* if (!response.isSuccessful) {
             response = retryRequestToServer(response, chain, request)
-        }
-        return response
+        }*/
+        return chain.proceed(request)
     }
 
 

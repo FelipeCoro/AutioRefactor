@@ -64,7 +64,6 @@ android {
         correctErrorTypes true
     }
 
-
     namespace 'com.autio.android_app'
 
     flavorDimensions 'env'
@@ -98,7 +97,6 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    // Don't upgrade to major version since there are some forced features included > 1.7.0 we don't want in app
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
@@ -108,14 +106,13 @@ dependencies {
     implementation 'androidx.webkit:webkit:1.6.0'
 
     //FIREBASE - CRASHLYTICS
-    implementation platform('com.google.firebase:firebase-bom:31.1.0')
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     /*implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-perf-ktx'*/
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
-    //implementation 'com.google.firebase:firebase-storage-ktx'
 
     // dependency for loading image from url
     implementation 'com.github.bumptech.glide:glide:4.15.0'
@@ -148,9 +145,7 @@ dependencies {
     // Google Maps
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.libraries.places:places:3.0.0'
-    implementation 'com.google.maps.android:android-maps-utils:2.3.0'
-    // HTTP requests
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation 'com.google.maps.android:android-maps-utils:3.4.0'
 
     // API
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

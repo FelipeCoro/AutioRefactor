@@ -1,29 +1,27 @@
 package com.autio.android_app.ui.stories.fragments
 
-import android.Manifest.permission.*
-import android.annotation.SuppressLint
 import android.content.res.Resources
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import android.widget.TextView
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.view.contains
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.StoryOption
@@ -31,30 +29,36 @@ import com.autio.android_app.data.api.model.modelLegacy.StoryClusterRenderer
 import com.autio.android_app.data.api.model.pendings.StoryClusterItem
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMapBinding
-import com.autio.android_app.domain.mappers.toDto
-import com.autio.android_app.domain.mappers.toModel
-import com.autio.android_app.domain.mappers.toStoryEntity
 import com.autio.android_app.extensions.findNearestToCoordinates
-import com.autio.android_app.extensions.toPx
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
-import com.autio.android_app.util.*
+import com.autio.android_app.util.DEFAULT_LOCATION_LAT
+import com.autio.android_app.util.DEFAULT_LOCATION_LNG
+import com.autio.android_app.util.Timer
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.showStoryOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.maps.android.clustering.ClusterManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -69,7 +73,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mediaId: String
     private lateinit var binding: FragmentMapBinding
-    private lateinit var activityLayout: ConstraintLayout
+
+    //private lateinit var activityLayout: ConstraintLayout
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var clusterManager: ClusterManager<StoryClusterItem>
     private lateinit var map: GoogleMap
@@ -84,10 +89,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var placesClient: PlacesClient
 
     var locationPermissionGranted = false
-    private var locationBackgroundPermissionGranted = false
 
-    // The geographical location where the device is currently located. That is, the last-known
-    // location retrieved by the Fused Location Provider.
+    private var locationBackgroundPermissionGranted = false
     private var lastKnownLocation: Location? = null
 
     private lateinit var storyAdapter: StoryAdapter
@@ -96,28 +99,29 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationPermissionSnackBar: View
     private val set = ConstraintSet()
 
-    private lateinit var snackBarView: View
-    private var feedbackJob: Job? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Places.initialize(requireContext(), resources.getString(R.string.google_maps_key))
-        placesClient = Places.createClient(requireContext())
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
-    }
+    private var feedbackJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-
-        bindObservers()
         binding = FragmentMapBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        snackBarView = layoutInflater.inflate(
-            R.layout.feedback_snackbar, binding.root as ViewGroup, false
-        )
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Places.initialize(requireContext(), resources.getString(R.string.google_maps_key))
+        placesClient = Places.createClient(requireContext())
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        bindObservers()
+        bindArguments(savedInstanceState)
+        setListeners()
+        initView()
+    }
 
-        activityLayout = requireActivity().findViewById(R.id.activityRoot)
+    private fun initView() {
+        val mapFragment = childFragmentManager.findFragmentById(R.id.maps) as SupportMapFragment?
+        mapFragment?.getMapAsync(this)
 
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
@@ -125,154 +129,44 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity()) {
                     bottomNavigationViewModel.playMediaId(id)
                 }
-            }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true,viewLifecycleOwner
+            }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true, viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        val mapFragment = childFragmentManager.findFragmentById(R.id.maps) as? SupportMapFragment
-
-
-        lifecycleScope.launchWhenCreated {
-            mapFragment?.getMapAsync(this@MapFragment)
-        }
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        if (savedInstanceState != null) {
-            lastKnownLocation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                savedInstanceState.getParcelable(KEY_LOCATION, Location::class.java)
-            } else {
-                savedInstanceState.getParcelable(KEY_LOCATION)
-            }
-            cameraPosition = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                savedInstanceState.getParcelable(KEY_CAMERA_POSITION, CameraPosition::class.java)
-            } else {
-                savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
-            }
-        }
-
         // Always true, but lets lint know that as well
         mediaId = arguments?.getString(MEDIA_ID_ARG) ?: return
-
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
-
-        setListeners()
     }
+
+    private fun bindArguments(savedInstanceState: Bundle?) {
+        savedInstanceState?.let {
+            lastKnownLocation = getLastKnownLocation(it)
+            cameraPosition = getCameraPosition(it)
+        }
+    }
+
+    private fun getLastKnownLocation(savedInstanceState: Bundle) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState.getParcelable(KEY_LOCATION, Location::class.java)
+        } else savedInstanceState.getParcelable(KEY_LOCATION)
+
+    private fun getCameraPosition(savedInstanceState: Bundle) =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState.getParcelable(KEY_CAMERA_POSITION, CameraPosition::class.java)
+        } else savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (this::clusterManager.isInitialized)
-            clusterManager.clearItems() //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
+        if (this::clusterManager.isInitialized) clusterManager.clearItems() //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
     }
 
-    override fun onSaveInstanceState(
-        outState: Bundle
-    ) {
-        super.onSaveInstanceState(
-            outState
-        )
-        outState.putParcelable(
-            KEY_CAMERA_POSITION, map.cameraPosition
-        )
-        outState.putParcelable(
-            KEY_LOCATION, lastKnownLocation
-        )
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
+        outState.putParcelable(KEY_LOCATION, lastKnownLocation)
     }
 
-    fun bindObservers() {
+    private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
-    }
-
-    private fun handleViewState(viewState: StoryViewState?) {
-        when (viewState) {
-            is StoryViewState.FetchedAllStories -> addClusteredMarkers(viewState.stories)
-            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
-            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
-            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
-            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
-            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
-            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
-            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
-        }
-    }
-
-    private fun setListeners() {
-        with(
-            binding
-        ) {
-            cvToggleMapPlaylist.setOnClickListener {
-                mapFragmentViewModel.displayListForStoriesInScreen()
-            }
-            mapFragmentViewModel.isListDisplaying.observe(
-                viewLifecycleOwner
-            ) {
-                if (it) {
-                    ivToggleIcon.setImageResource(
-                        R.drawable.ic_map
-                    )
-                    layoutPlaylist.root.visibility = View.VISIBLE
-                    val animate = TranslateAnimation(
-                        0f,  // fromXDelta
-                        0f,  // toXDelta
-                        binding.root.height.toFloat(),  // fromYDelta
-                        binding.cvToggleMapPlaylist.translationY  // toYDelta
-                    )
-                    animate.duration = 500
-                    animate.fillAfter = true
-                    layoutPlaylist.root.startAnimation(
-                        animate
-                    )
-                } else {
-                    ivToggleIcon.setImageResource(
-                        R.drawable.ic_map_list
-                    )
-                    val animate = TranslateAnimation(
-                        0f,  // fromXDelta
-                        0f,  // toXDelta
-                        0f,  // fromYDelta
-                        binding.root.height.toFloat(), // toYDelta
-                    )
-                    animate.duration = 500
-                    layoutPlaylist.root.startAnimation(
-                        animate
-                    )
-                    layoutPlaylist.root.visibility = View.GONE
-                }
-            }
-        }
-    }
-
-    @SuppressLint(
-        "PotentialBehaviorOverride"
-    )
-    override fun onMapReady(
-        googleMap: GoogleMap
-    ) {
-        googleMap.clear()
-        googleMap.uiSettings.isMyLocationButtonEnabled = false
-        googleMap.uiSettings.isRotateGesturesEnabled = false
-        googleMap.uiSettings.isMapToolbarEnabled = false
-        map = googleMap
-
-        // Sets the light or dark mode of the map from the "map_style.json" inside
-        // raw resources
-        setMapLayout()
-
-        // Prompt the user for permission
-        getLocationPermission()
-
-        // Turn on the My Location layer and the related control on the map
-        updateLocationUI()
-
-        setGoogleLogoNewPosition()
-
-        storyViewModel.getAllStories()
-
 
         bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) {
             it?.let {
@@ -286,15 +180,89 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 storyAdapter.submitList(it)
             }
         }
+        mapFragmentViewModel.isListDisplaying.observe(viewLifecycleOwner) {
+            if (it) {
+                binding.ivToggleIcon.setImageResource(R.drawable.ic_map)
+                binding.layoutPlaylist.root.visibility = View.VISIBLE
+                val animate = TranslateAnimation(
+                    0f,  // fromXDelta
+                    0f,  // toXDelta
+                    binding.root.height.toFloat(),  // fromYDelta
+                    binding.cvToggleMapPlaylist.translationY  // toYDelta
+                )
+                animate.duration = 500
+                animate.fillAfter = true
+                binding.layoutPlaylist.root.startAnimation(animate)
+            } else {
+                binding.ivToggleIcon.setImageResource(R.drawable.ic_map_list)
+                val animate = TranslateAnimation(
+                    0f,  // fromXDelta
+                    0f,  // toXDelta
+                    0f,  // fromYDelta
+                    binding.root.height.toFloat(), // toYDelta
+                )
+                animate.duration = 500
+                binding.layoutPlaylist.root.startAnimation(animate)
+                binding.layoutPlaylist.root.visibility = View.GONE
+            }
+        }
+    }
 
+    private fun setListeners() {
+        binding.cvToggleMapPlaylist.setOnClickListener {
+            mapFragmentViewModel.displayListForStoriesInScreen()
+        }
+    }
+
+    private fun handleViewState(viewState: StoryViewState?) {
+        when (viewState) {
+            is StoryViewState.FetchedAllStories -> addClusteredMarkers(viewState.stories)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_added_to_bookmarks))
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_remove_from_bookmarks))
+            is StoryViewState.StoryLiked -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_added_to_favorites))
+            is StoryViewState.LikedRemoved -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_removed_from_favorites))
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_story_saved_to_my_device))
+            is StoryViewState.StoryRemoved -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_story_removed_from_my_device))
+            else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
+        }
+    }
+
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        googleMap.clear()
+        googleMap.uiSettings.isMyLocationButtonEnabled = false
+        googleMap.uiSettings.isRotateGesturesEnabled = false
+        googleMap.uiSettings.isMapToolbarEnabled = false
+        map = googleMap
+        customizeMap()
+        //getLocationPermission() //TODO(MOVE to initialization verification, this shouldn't be here)
+        updateLocationUI()
         // Get the current location of the device and set the position of the map.
+        //TODO(This should be called by updateLocationUIMethod)
         getDeviceLocation()
 
+        map.cameraPosition.target
+        // storyViewModel.getAllStories()
+        val bounds = map.projection.visibleRegion.latLngBounds
+        storyViewModel.getStoriesInBounds(bounds)
+//        map.setOnCameraIdleListener {
+//            updateMapWithStories()
+//        }
+    }
 
+    private fun updateMapWithStories() {
+        map.clear()
+        val bounds = map.projection.visibleRegion.latLngBounds
+        storyViewModel.getStoriesInBounds(bounds)
+    }
+
+    private fun customizeMap() {
+        setMapLayout()
+        setGoogleLogoNewPosition()
     }
 
     private fun highlightClusterItem(storyClusterItem: StoryClusterItem) {
-        highlightedItem?.let{
+        highlightedItem?.let {
             unhighlightClusterItem(it)
         }
         highlightedItem = storyClusterItem.apply {
@@ -303,7 +271,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (marker != null && originalBitmap != null) {
                 val largerBitmap = getLargerBitmap(originalBitmap)
                 val largerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(largerBitmap)
-
                 marker.setIcon(largerBitmapDescriptor)
             }
         }
@@ -374,33 +341,35 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * cases when a location is not available.
      */
     private fun getDeviceLocation() {
+        if (locationPermissionGranted && false) { //TODO(CHANGE BACK AFTER TESTING)
+            moveCameraToLastKnownLocation()
+        } else {
+            moveCamera(DEFAULT_LOCATION_LAT, DEFAULT_LOCATION_LNG)
+        }
+    }
+
+    private fun moveCameraToLastKnownLocation() {
         try {
-            if (locationPermissionGranted && false) { //TODO(CHANGE BACK AFTER TEESTING)
-                val locationResult = fusedLocationClient.lastLocation
-                locationResult.addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-                        // Set the map's camera position to the current location of the device.
-                        lastKnownLocation = task.result
-                        if (lastKnownLocation != null) {
-                            if (cameraPosition != null) {
-                                map.moveCamera(
-                                    CameraUpdateFactory.newLatLngZoom(
-                                        cameraPosition!!.target, cameraPosition!!.zoom
-                                    )
+            val locationResult = fusedLocationClient.lastLocation
+            locationResult.addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    // Set the map's camera position to the current location of the device.
+                    lastKnownLocation = task.result
+                    if (lastKnownLocation != null) {
+                        if (cameraPosition != null) {
+                            map.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    cameraPosition!!.target, cameraPosition!!.zoom
                                 )
-                            } else {
-                                moveCamera()
-                            }
-                            binding.cardLocationIcon.setOnClickListener {
-                                moveCamera()
-                            }
+                            )
+                        } else {
+                            moveCamera()
                         }
-                    } else {
-                        moveCamera(DEFAULT_LOCATION_LAT, DEFAULT_LOCATION_LNG)
+                        binding.cardLocationIcon.setOnClickListener { moveCamera() }
                     }
+                } else {
+                    moveCamera(DEFAULT_LOCATION_LAT, DEFAULT_LOCATION_LNG)
                 }
-            } else {
-                moveCamera(DEFAULT_LOCATION_LAT, DEFAULT_LOCATION_LNG)
             }
         } catch (e: SecurityException) {
             Log.e(TAG, e.message, e)
@@ -412,16 +381,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (locationPermissionGranted) {
                 map.isMyLocationEnabled = true
                 binding.cardLocationIcon.visibility = View.VISIBLE
-                if (!TrackingUtility.hasBackgroundLocationPermission(
-                        requireContext()
-                    ) && !locationBackgroundPermissionGranted
-                ) {
-                    showLocationPermissionAlwaysEnabledSnackBar()
-                }
+//                if (!TrackingUtility.hasBackgroundLocationPermission(
+//                        requireContext()
+//                    ) && !locationBackgroundPermissionGranted
+//                ) {
+//                    showLocationPermissionAlwaysEnabledSnackBar()
+//                }
             } else {
                 binding.cardLocationIcon.visibility = View.GONE
                 lastKnownLocation = null
-                getLocationPermission()
+                //getLocationPermission()
             }
         } catch (e: SecurityException) {
             Log.e(TAG, e.message, e)
@@ -451,13 +420,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * @param [position] moves camera so this point is located
      * at the center
      */
-    private fun moveCamera(
-        position: LatLng, zoom: Float? = null
-    ) {
+    private fun moveCamera(position: LatLng, zoom: Float? = null) {
         map.animateCamera(
             CameraUpdateFactory.newLatLngZoom(
                 position, zoom ?: DEFAULT_ZOOM.toFloat()
-            ), 200, null
+            ), 100, null
         )
     }
 
@@ -546,116 +513,18 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     /**
-     * Request location permission, so that we can get the location of the
-     * device. The result of the permission request is handled by a callback,
-     * onRequestPermissionsResult.
-     */
-    private fun getLocationPermission() {
-        if (TrackingUtility.hasCoreLocationPermissions(requireContext())) {
-            locationPermissionGranted = true
-            if (TrackingUtility.hasBackgroundLocationPermission(requireContext())) {
-                locationBackgroundPermissionGranted = true
-            }
-        } else {
-//            requestPermissionLauncher.launch(
-//                arrayOf(
-//                    ACCESS_FINE_LOCATION
-//                )
-//            )
-        }
-    }
-
-    /**
-     * Handles the result of the request for location permissions.
-     */
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissionResults ->
-        if (permissionResults.keys.contains(ACCESS_BACKGROUND_LOCATION)) {
-            if (permissionResults[ACCESS_BACKGROUND_LOCATION]!!) {
-                locationBackgroundPermissionGranted = true
-                hideLocationPermissionAlwaysEnabledSnackBar()
-            }
-        }
-        updateLocationUI()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun showLocationPermissionAlwaysEnabledSnackBar() {
-        locationPermissionSnackBar = layoutInflater.inflate(
-            R.layout.location_permission_snackbar, binding.mapsRoot, false
-        )
-        locationPermissionSnackBar.setOnClickListener {
-            requestPermissionLauncher.launch(
-                arrayOf(ACCESS_BACKGROUND_LOCATION)
-            )
-        }
-        binding.mapsRoot.addView(locationPermissionSnackBar)
-        val marginTopSnackBar = 30.toPx(requireContext()).toInt()
-        val marginTopButtons = 12.toPx(requireContext()).toInt()
-        set.apply {
-            clone(binding.mapsRoot)
-            connect(
-                R.id.rlPermissionSnackBar,
-                ConstraintSet.TOP,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.TOP,
-                marginTopSnackBar
-            )
-            connect(
-                R.id.card_location_icon,
-                ConstraintSet.TOP,
-                R.id.rlPermissionSnackBar,
-                ConstraintSet.BOTTOM,
-                marginTopButtons
-            )
-            connect(
-                R.id.cvToggleMapPlaylist,
-                ConstraintSet.TOP,
-                R.id.rlPermissionSnackBar,
-                ConstraintSet.BOTTOM,
-                marginTopButtons
-            )
-            applyTo(
-                binding.mapsRoot
-            )
-        }
-    }
-
-    private fun hideLocationPermissionAlwaysEnabledSnackBar() {
-        binding.mapsRoot.removeView(locationPermissionSnackBar)
-        val marginTop = 30.toPx(requireContext()).toInt()
-        set.apply {
-            clone(binding.mapsRoot)
-            connect(
-                R.id.card_location_icon,
-                ConstraintSet.TOP,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.TOP,
-                marginTop
-            )
-            connect(
-                R.id.cvToggleMapPlaylist,
-                ConstraintSet.TOP,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.TOP,
-                marginTop
-            )
-            applyTo(binding.mapsRoot)
-        }
-    }
-
-    /**
      * Adds markers to the map with clustering support. As response to the viewModel liveData.
      */
     private fun addClusteredMarkers(stories: List<Story>) {
-        if(::map.isInitialized){
+        if (!::map.isInitialized) return
+       //map.clear()
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
-        clusterManager.setAnimation(false)
+        clusterManager.setAnimation(true)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
         clusterManager.renderer = clusterRenderer
 
-        markers.putAll(stories.take(200).associate { it.id to StoryClusterItem(it) })//todo(eliminate take truncation)
+        val storiesMap = stories.associate { it.id to StoryClusterItem(it) }
+        markers.putAll(storiesMap)//todo(eliminate take truncation)
 
         clusterManager.addItems(markers.values)
         clusterManager.cluster()
@@ -668,44 +537,38 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             true
         }
 
-        map.setOnCameraMoveStartedListener {
-            cameraIdleTimer?.cancelTimer()
-        }
         map.setOnCameraIdleListener {
-            cameraPosition = map.cameraPosition
-            // Call clusterManager.onCameraIdle() when the camera stops moving so that re-clustering
-            // can be performed when the camera stops moving
-            clusterManager.onCameraIdle()
-            updateMapBounds(map)
-
-
-            mapFragmentViewModel.fetchRecordsOfStories(
-                prefRepository.userId,
-                prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
-            )
+            updateMapWithStories()
         }
-        cameraIdleTimer = Timer(15000)
-        cameraIdleTimer?.startTimer()
-        cameraIdleTimer?.isActive?.observe(this@MapFragment) {
-            if (it == false) {
-                val center = map.cameraPosition.target
-                val nearestStory =
-                    mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(
-                        center
-                    )
-                if (nearestStory != null) {
-                    moveCamera(
-                        latitude = nearestStory.lat,
-                        longitude = nearestStory.lng,
-                        zoom = map.cameraPosition.zoom
-                    )
-                    if (clusterRenderer.getMarker(markers[nearestStory.id]) != null) {
-                        highlightClusterItem(markers[nearestStory.id]!!)
-                    }
-                }
+        //TODO(MOVE to a view_state return from viewModel when map updates)
+        // highLightNearestStory(clusterRenderer)
+    }
+
+    //TODO(MOVE to a view_state return from viewModel when map updates)
+    private fun highLightNearestStory(clusterRenderer: StoryClusterRenderer) {
+        val center = map.cameraPosition.target
+        val nearestStory =
+            mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(center)
+        if (nearestStory != null) {
+            moveCamera(nearestStory.lat, nearestStory.lng, zoom = map.cameraPosition.zoom)
+            markers[nearestStory.id]?.let { storyClusterItem ->
+                highlightClusterItem(storyClusterItem)
             }
         }
-    }}
+    }
+
+    private fun handleMapCameraIdle() {
+        cameraPosition = map.cameraPosition
+        // Call clusterManager.onCameraIdle() when the camera stops moving so that re-clustering
+        // can be performed when the camera stops moving
+        clusterManager.onCameraIdle()
+        updateMapBounds(map)
+
+        mapFragmentViewModel.fetchRecordsOfStories(
+            prefRepository.userId,
+            prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
+        )
+    }
 
     private fun updateMarker(story: Story, item: StoryClusterItem) {
         item.updateStory(story)
@@ -715,11 +578,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun updateMapBounds(map: GoogleMap) {
         val bounds = map.projection.visibleRegion.latLngBounds
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            mapFragmentViewModel.changeLatLngBounds(bounds)
-        }
-
+        mapFragmentViewModel.changeLatLngBounds(bounds)
     }
 
     private fun hideSelectedStoryComponent() {
@@ -731,8 +590,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun showSelectedStoryComponent() {
-        val player = activityLayout.findViewById<LinearLayout>(R.id.persistentPlayer)
-        val displayingMessage = activityLayout.findViewById<FrameLayout>(R.id.flImportantMessage)
+        val player = binding.root.findViewById<LinearLayout>(R.id.persistentPlayer)
+        val displayingMessage = binding.root.findViewById<FrameLayout>(R.id.flImportantMessage)
         val totalHeight = -player.height - displayingMessage.height - 24F
         binding.floatingSelectedStory.apply {
             if (visibility != View.VISIBLE) {
@@ -743,9 +602,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun optionClicked(
-        option: StoryOption, story: Story
-    ) {
+    private fun optionClicked(option: StoryOption, story: Story) {
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(
@@ -755,32 +612,23 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun showFeedbackSnackBar(feedback: String) {
-        cancelJob()
-        snackBarView.alpha = 1F
-        snackBarView.findViewById<TextView>(R.id.tvFeedback).text = feedback
-        activityLayout.addView(snackBarView)
-        feedbackJob = lifecycleScope.launch {
-            delay(2000)
-            snackBarView.animate().alpha(0F).withEndAction {
-                activityLayout.removeView(snackBarView)
-            }
-        }
-    }
 
     private fun cancelJob() {
-        if (activityLayout.contains(snackBarView)) {
-            activityLayout.removeView(snackBarView)
-        }
+        /* if (activityLayout.contains(snackBarView)) {
+             activityLayout.removeView(snackBarView)
+         }*/
         feedbackJob?.cancel()
     }
+
+
+    companion object {
+        private val TAG = MapFragment::class.simpleName
+        private const val DEFAULT_ZOOM = 15
+
+        // Keys for storing activity state
+        private const val KEY_CAMERA_POSITION = "camera_position"
+        private const val KEY_LOCATION = "location"
+        private const val MEDIA_ID_ARG = "fragment.MediaItemFragment.MEDIA_ID"
+    }
+
 }
-
-private val TAG = MapFragment::class.simpleName
-private const val DEFAULT_ZOOM = 15
-
-// Keys for storing activity state
-private const val KEY_CAMERA_POSITION = "camera_position"
-private const val KEY_LOCATION = "location"
-private const val MEDIA_ID_ARG =
-    "com.autio.android_app.ui.view.usecases.home.fragment.MediaItemFragment.MEDIA_ID"

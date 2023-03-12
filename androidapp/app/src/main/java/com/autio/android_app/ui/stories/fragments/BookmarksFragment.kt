@@ -2,11 +2,9 @@ package com.autio.android_app.ui.stories.fragments
 
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.contains
 import androidx.databinding.DataBindingUtil
@@ -17,8 +15,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Slide
-import androidx.transition.TransitionManager
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
@@ -30,10 +26,12 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -84,7 +82,7 @@ class BookmarksFragment : Fragment() {
         )
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        activityLayout = requireActivity().findViewById(R.id.activityRoot)
+        activityLayout = requireActivity().findViewById(R.id.activity_layout)
     }
 
     private fun initView() {
@@ -200,22 +198,6 @@ class BookmarksFragment : Fragment() {
                 onOptionClicked(
                     option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
-            }
-        }
-    }
-
-    private fun showFeedbackSnackBar(feedback: String) {
-        if (isAdded && activity != null) {
-            cancelJob()
-            snackBarView.alpha = 1F
-            snackBarView.findViewById<TextView>(R.id.tvFeedback).text = feedback
-            TransitionManager.beginDelayedTransition(activityLayout, Slide(Gravity.TOP))
-            activityLayout.addView(snackBarView)
-            feedbackJob = lifecycleScope.launch {
-                delay(2000)
-                snackBarView.animate().alpha(0F).withEndAction {
-                    activityLayout.removeView(snackBarView)
-                }
             }
         }
     }

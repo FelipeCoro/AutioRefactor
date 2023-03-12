@@ -98,7 +98,7 @@ class HistoryFragment : Fragment() {
         )
 
         activityLayout = requireActivity().findViewById(
-            R.id.activityRoot
+            R.id.activity_layout
         )
 
         storyViewModel.storiesHistory.observe(
@@ -242,30 +242,6 @@ class HistoryFragment : Fragment() {
         }
     }
 
-    private fun showFeedbackSnackBar(
-        feedback: String
-    ) {
-        cancelJob()
-        snackBarView.alpha = 1F
-        snackBarView.findViewById<TextView>(
-            R.id.tvFeedback
-        ).text = feedback
-        activityLayout.addView(
-            snackBarView
-        )
-        feedbackJob = lifecycleScope.launch {
-            delay(
-                2000
-            )
-            snackBarView.animate().alpha(
-                0F
-            ).withEndAction {
-                activityLayout.removeView(
-                    snackBarView
-                )
-            }
-        }
-    }
 
     private fun cancelJob() {
         if (activityLayout.contains(

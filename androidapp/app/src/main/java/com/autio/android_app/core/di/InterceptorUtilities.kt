@@ -34,11 +34,18 @@ fun logResponse(
 }
 
 fun logRequest(request: Request, chain: Interceptor.Chain) {
+
+    val url = if (request.url.toString().length > 200) {
+        request.url.toString().substring(200) + "..."
+    } else request.url.toString()
+
     Http2Reader.logger.info(
         buildString {
             appendLine(" ")
             appendLine(LoggingInterceptor.INITIAL_DELIMITER)
-            appendLine("SENDING REQUEST: [${request.method.uppercase()}] to  ${request.url}")
+            appendLine(
+                "SENDING REQUEST: [${request.method.uppercase()}] to $url"
+            )
             appendLine("HTTPS : ${request.isHttps}")
             if (request.headers.size > 0) {
                 append("HEADERS : \n${request.headers}")

@@ -4,8 +4,11 @@ import android.Manifest
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
+import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +31,8 @@ import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -45,6 +50,7 @@ class BottomNavigation : AppCompatActivity() {
 
     private var castContext: CastContext? = null
     private var isNetworkAvailable = false
+    private lateinit var snackBarView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,14 +59,17 @@ class BottomNavigation : AppCompatActivity() {
 
         bindObservables()
 
-       // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
-
+        // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_bottom_navigation)
 
         updateSnackBarMessageDisplay()
 
         updateAvailableStoriesUI(
             bottomNavigationViewModel.initialRemainingStories
+        )
+
+        snackBarView = layoutInflater.inflate(
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
         )
 
         setListeners()
@@ -298,6 +307,18 @@ class BottomNavigation : AppCompatActivity() {
         if (permissionResults.keys.contains(Manifest.permission.POST_NOTIFICATIONS)) {
             if (permissionResults[Manifest.permission.POST_NOTIFICATIONS]!!) {
                 binding.rlAllowNotifications.visibility = GONE
+            }
+        }
+    }
+
+    fun showFeedbackSnackBar(feedback: String) {
+        snackBarView.alpha = 1F
+        snackBarView.findViewById<TextView>(R.id.snack_bar_text).text = feedback
+        binding.activityLayout.addView(snackBarView)
+        lifecycleScope.launch {
+            delay(1500)
+            snackBarView.animate().alpha(0F).withEndAction {
+                binding.activityLayout.removeView(snackBarView)
             }
         }
     }

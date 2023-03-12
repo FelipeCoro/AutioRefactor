@@ -1,17 +1,23 @@
 package com.autio.android_app.ui.stories.view_model
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.autio.android_app.data.repository.prefs.PrefRepository
+import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_states.StoryViewState
+import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,9 +42,7 @@ class StoryViewModel @Inject constructor(
     fun getAllStories() {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.getAllStories().collect { result ->
-                setViewState(
-                    StoryViewState.FetchedAllStories(result ?: listOf())
-                )
+                setViewState(StoryViewState.FetchedAllStories(result ?: listOf()))
             }
         }
     }
@@ -46,11 +50,12 @@ class StoryViewModel @Inject constructor(
     fun getStoriesByIds(userId: Int, apiToken: String, storyIds: List<Int>) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.getStoriesByIds(userId, apiToken, storyIds)
-            }.onSuccess { result ->
-                val stories = result.getOrNull()
-                if(stories != null)
-                setViewState(StoryViewState.FetchedStoriesByIds(stories))
+                val result = autioRepository.getStoriesByIds(userId, apiToken, storyIds)
+                result.getOrNull()
+            }.onSuccess { stories ->
+                stories?.let {
+                    setViewState(StoryViewState.FetchedStoriesByIds(it))
+                }
             }.onFailure {
                 setViewState(StoryViewState.FetchedStoriesByIdsFailed)
             }
@@ -231,6 +236,17 @@ class StoryViewModel @Inject constructor(
     fun clearUserData() {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.clearUserData()
+        }
+    }
+
+    fun getStoriesInBounds(bounds: LatLngBounds) {
+        viewModelScope.launch(coroutineDispatcher) {
+            withContext(coroutineDispatcher) {
+                val mapPoints =
+                    autioRepository.getStoriesInLatLngBoundaries(bounds.southwest, bounds.northeast)
+                val stories = mapPoints.map { it.toModel() }
+                setViewState(StoryViewState.FetchedAllStories(stories))
+            }
         }
     }
 

@@ -6,12 +6,10 @@ import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.contains
 import androidx.fragment.app.Fragment
@@ -25,7 +23,6 @@ import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.api.model.modelLegacy.NowPlayingMetadata
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
-import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.extensions.getAddress
 import com.autio.android_app.extensions.timestampToMSS
 import com.autio.android_app.ui.stories.models.Story
@@ -33,7 +30,12 @@ import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
-import com.autio.android_app.util.*
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.shareStory
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.showStoryOptions
+import com.autio.android_app.util.writeEmailToCustomerSupport
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -44,7 +46,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -68,12 +73,8 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
 
-    override fun onCreate(
-        savedInstanceState: Bundle?
-    ) {
-        super.onCreate(
-            savedInstanceState
-        )
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         // listen to backstack changes
         requireActivity().supportFragmentManager.addOnBackStackChangedListener(
             this
@@ -124,7 +125,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         bindObservers()
 
         activityLayout = requireActivity().findViewById(
-            R.id.activityRoot
+            R.id.activity_layout
         )
 
         playerFragmentViewModel.storyLikes.observe(
@@ -444,9 +445,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         setMapLayout()
 
         playerFragmentViewModel.currentStory.value?.let {
-            addStoryMarker(
-                it
-            )
+            addStoryMarker(it)
         }
     }
 
@@ -482,14 +481,10 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             }
         }
         this.map?.apply {
-            addMarker(
-                marker
-            )
+            addMarker(marker)
             moveCamera(
                 CameraUpdateFactory.newLatLngZoom(
-                    LatLng(
-                        story.lat, story.lng
-                    ), 15f
+                    LatLng(story.lat, story.lng), 15f
                 )
             )
         }
@@ -532,33 +527,6 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 onOptionClicked(
                     option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
-            }
-        }
-    }
-
-    private fun showFeedbackSnackBar(
-        feedback: String
-    ) {
-        if (isAdded && activity != null) {
-            cancelJob()
-            snackBarView.alpha = 1F
-            snackBarView.findViewById<TextView>(
-                R.id.tvFeedback
-            ).text = feedback
-            activityLayout.addView(
-                snackBarView
-            )
-            feedbackJob = lifecycleScope.launch {
-                delay(
-                    2000
-                )
-                snackBarView.animate().alpha(
-                    0F
-                ).withEndAction {
-                    activityLayout.removeView(
-                        snackBarView
-                    )
-                }
             }
         }
     }

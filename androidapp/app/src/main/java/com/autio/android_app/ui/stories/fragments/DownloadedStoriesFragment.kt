@@ -88,7 +88,7 @@ class DownloadedStoriesFragment : Fragment() {
         bindObservers()
 
         activityLayout = requireActivity().findViewById(
-            R.id.activityRoot
+            R.id.activity_layout
         )
 /* TODO(FIX THIS OBERVER DEPENDECY AND USE VIEWSTATE)
         storyViewModel.downloadedStories.observe(viewLifecycleOwner) { stories ->
@@ -171,19 +171,6 @@ class DownloadedStoriesFragment : Fragment() {
                 else -> Log.d(
                     "DownloadedStoriesFragment", "option not available for this playlist"
                 )
-            }
-        }
-    }
-
-    private fun showFeedbackSnackBar(feedback: String) {
-        cancelJob()
-        snackBarView.alpha = 1F
-        snackBarView.findViewById<TextView>(R.id.tvFeedback).text = feedback
-        activityLayout.addView(snackBarView)
-        feedbackJob = lifecycleScope.launch {
-            delay(2000)
-            snackBarView.animate().alpha(0F).withEndAction {
-                activityLayout.removeView(snackBarView)
             }
         }
     }

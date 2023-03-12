@@ -40,7 +40,7 @@ class NotificationsFragment : Fragment() {
     }
 
     private fun goToLocationPermission() {
-        viewPager.currentItem = viewPager.currentItem + 1
+        viewPager.currentItem += 1
     }
 
     private fun requestPermission() {

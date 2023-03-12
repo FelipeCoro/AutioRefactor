@@ -2,43 +2,29 @@ package com.autio.android_app.util
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-class Timer(
-    private val timeMillis: Long = 5000
-) {
-    private val job =
-        SupervisorJob()
-    private val scope =
-        CoroutineScope(
-            Dispatchers.Default + job
-        )
+class Timer(private val timeMillis: Long = 5000) {
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Default + job)
 
-    private var isPaused =
-        false
+    private var isPaused = false
 
     private val _isActive =
-        MutableLiveData<Boolean?>(
-            null
-        )
-    val isActive: LiveData<Boolean?> =
-        _isActive
+        MutableLiveData<Boolean?>(null)
+    val isActive: LiveData<Boolean?> = _isActive
 
     private val timer =
-        scope.launch(
-            Dispatchers.IO,
-            CoroutineStart.LAZY
-        ) {
-            _isActive.postValue(
-                true
-            )
-            delay(
-                timeMillis
-            )
+        scope.launch(Dispatchers.IO, CoroutineStart.LAZY) {
+            _isActive.postValue(true)
+            delay(timeMillis)
             if (!isPaused) {
-                _isActive.postValue(
-                    false
-                )
+                _isActive.postValue(false)
             }
         }
 
@@ -47,24 +33,17 @@ class Timer(
     }
 
     fun pauseTimer() {
-        isPaused =
-            true
+        isPaused = true
     }
 
     fun finishTimer() {
-        isPaused =
-            false
-        _isActive.postValue(
-            false
-        )
+        isPaused = false
+        _isActive.postValue(false)
     }
 
     fun cancelTimer() {
-        _isActive.postValue(
-            null
-        )
-        isPaused =
-            false
+        _isActive.postValue(null)
+        isPaused = false
         timer.cancel()
     }
 }

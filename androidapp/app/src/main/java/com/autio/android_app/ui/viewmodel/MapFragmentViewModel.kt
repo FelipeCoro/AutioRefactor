@@ -9,16 +9,19 @@ import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MapFragmentViewModel @Inject constructor(
-    playerServiceConnection: PlayerServiceConnection,
+    private val playerServiceConnection: PlayerServiceConnection,
     private val autioRepository: AutioRepository,
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     //TODO (media ID - should be a safeArgs parameter and pass as a parameter )
@@ -29,6 +32,23 @@ class MapFragmentViewModel @Inject constructor(
     private val _isListDisplaying = MutableLiveData(false)
     val isListDisplaying: LiveData<Boolean> = _isListDisplaying
 
+    /**
+     * There's three things watched that will cause the
+     * [LiveData] exposed from this class to be updated
+     *
+     * [PlayerServiceConnection.playbackState] changes state based on the playback state of
+     * the player, which can change the [MediaItemData.playbackRes] in the list
+     *
+     * [PlayerServiceConnection.nowPlaying] changes based on the item that's being played,
+     * which can also change the [MediaItemData.playbackRes] in the list
+     */
+    /*
+    playerServiceConnection.apply { //TODO(REVIEW LOGIC HERE)
+        subscribe(mediaId, subscriptionCallback)
+        playbackState.observeForever(playbackStateObserver)
+//        it.nowPlaying.observeForever(mediaMetadataObserver)
+    }
+*/
     private val subscriptionCallback = object : SubscriptionCallback() {
         override fun onChildrenLoaded(
             parentId: String, children: MutableList<MediaBrowserCompat.MediaItem>
@@ -61,22 +81,6 @@ class MapFragmentViewModel @Inject constructor(
     }
 
     /**
-     * There's three things watched that will cause the
-     * [LiveData] exposed from this class to be updated
-     *
-     * [PlayerServiceConnection.playbackState] changes state based on the playback state of
-     * the player, which can change the [MediaItemData.playbackRes] in the list
-     *
-     * [PlayerServiceConnection.nowPlaying] changes based on the item that's being played,
-     * which can also change the [MediaItemData.playbackRes] in the list
-     */
-    private val playerServiceConnection = playerServiceConnection.also {
-        it.subscribe(mediaId, subscriptionCallback)
-        it.playbackState.observeForever(playbackStateObserver)
-//        it.nowPlaying.observeForever(mediaMetadataObserver)
-    }
-
-    /**
      * Since we use [LiveData.observeForever], it should be called [LiveData.removeObserver]
      * here to prevent leaking resources when the [ViewModel] is not longer in use
      */
@@ -94,8 +98,8 @@ class MapFragmentViewModel @Inject constructor(
         _isListDisplaying.postValue(!(_isListDisplaying.value ?: false))
     }
 
-    suspend fun changeLatLngBounds(latLngBounds: LatLngBounds) {
-        viewModelScope.launch {
+    fun changeLatLngBounds(latLngBounds: LatLngBounds) {
+        viewModelScope.launch(coroutineDispatcher) {
             val storiesInBounds = autioRepository.getStoriesInLatLngBoundaries(
                 latLngBounds.southwest, latLngBounds.northeast
             )
@@ -104,7 +108,7 @@ class MapFragmentViewModel @Inject constructor(
     }
 
     fun fetchRecordsOfStories(userId: Int, apiToken: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(coroutineDispatcher) {
             _storiesInScreen.value?.let { stories ->
                 if (stories.isEmpty()) return@launch
                 val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }

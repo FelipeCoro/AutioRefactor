@@ -1,7 +1,6 @@
 package com.autio.android_app.data.api.model.pendings
 
 import android.graphics.Bitmap
-import com.autio.android_app.data.api.model.story.StoryDto
 import com.autio.android_app.ui.stories.models.Story
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -26,18 +25,12 @@ class StoryClusterItem(mStory: Story) : ClusterItem {
     }
 
     override fun getPosition() = position
-
-    override fun getTitle(): String? = null
-
-    override fun getSnippet(): String? = null
-
+    override fun getTitle(): String? = title
+    override fun getSnippet(): String? = snippet
+    override fun getZIndex(): Float? = 0f
     override fun toString(): String {
-        return """
-            StoryClusterItem: {
-                position: $position,
-                title: $title,
-                snippet: $snippet
-            }
-        """.trimIndent()
+        return "StoryClusterItem(position=$position, title='$title', snippet='$snippet', story=$story, marker=$marker, bitmap=$bitmap)"
     }
+
+
 }

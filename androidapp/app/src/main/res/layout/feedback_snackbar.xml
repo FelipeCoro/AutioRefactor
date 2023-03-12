@@ -23,7 +23,7 @@
             app:contentPaddingTop="15dp">
 
             <TextView
-                android:id="@+id/tvFeedback"
+                android:id="@+id/snack_bar_text"
                 style="@style/FeedbackSnackBar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

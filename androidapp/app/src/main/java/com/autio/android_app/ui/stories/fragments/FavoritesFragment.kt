@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.contains
 import androidx.fragment.app.Fragment
@@ -28,10 +27,12 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -99,7 +100,7 @@ class FavoritesFragment : Fragment() {
         )
 
         activityLayout = requireActivity().findViewById(
-            R.id.activityRoot
+            R.id.activity_layout
         )
 
         storyViewModel.favoriteStories.observe(
@@ -221,33 +222,6 @@ class FavoritesFragment : Fragment() {
                 onOptionClicked(
                     option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
-            }
-        }
-    }
-
-    private fun showFeedbackSnackBar(
-        feedback: String
-    ) {
-        if (isAdded && activity != null) {
-            cancelJob()
-            snackBarView.alpha = 1F
-            snackBarView.findViewById<TextView>(
-                R.id.tvFeedback
-            ).text = feedback
-            activityLayout.addView(
-                snackBarView
-            )
-            feedbackJob = lifecycleScope.launch {
-                delay(
-                    2000
-                )
-                snackBarView.animate().alpha(
-                    0F
-                ).withEndAction {
-                    activityLayout.removeView(
-                        snackBarView
-                    )
-                }
             }
         }
     }

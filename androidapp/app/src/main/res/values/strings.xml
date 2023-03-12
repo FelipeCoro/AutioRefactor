@@ -132,7 +132,7 @@
     <string name="map_list_subtitle">Adjust the map for more stories</string>
     <!-- Player -->
     <string name="allowed_caller_log">
-        Caller has a valid certificate, but its package doesn\'t match any expected package for the
+        Caller has a valid certificate, but its package does nott match any expected package for the
         given certificate. To allow this caller, add the following to the allowed callers list:\n
         <![CDATA[
         <signature name=\"%1$s\" package=\"%2$s\">\n\t<key>%3$s</key>\n</signature>\n
@@ -142,7 +142,7 @@
     <string name="pause">Pause</string>
     <string name="story_art_alt">Story art</string>
     <string name="duration_unknown">--:--</string>
-    <string name="duration_format">%d:%02d</string>
+    <string name="duration_format">%1$d:%2$02d</string>
     <string name="address">%1$s, %2$s</string>
     <!-- My Stories Categories -->
     <string name="my_stories_bookmarks">Bookmarks</string>
@@ -184,6 +184,13 @@
     <string name="notification_fragment_dialog_text">For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue? You can change this later in your Settings.</string>
     <string name="notification_fragment_dialog_positive_button_text">Continue</string>
     <string name="notification_fragment_dialog_negative_button_text">Request again</string>
+    <string name="map_fragment_feedback_added_to_bookmarks">Added To Bookmarks</string>
+    <string name="map_fragment_feedback_remove_from_bookmarks">Removed From Bookmarks</string>
+    <string name="map_fragment_feedback_added_to_favorites">Added To Favorites</string>
+    <string name="map_fragment_feedback_removed_from_favorites">Removed From Favorites</string>
+    <string name="map_fragment_feedback_story_saved_to_my_device">Story Saved To My Device</string>
+    <string name="map_fragment_feedback_story_removed_from_my_device">Story Removed From My Device</string>
+    <string name="map_fragment_feedback_connection_failure">Connection Failure</string>
 
 
 </resources>
