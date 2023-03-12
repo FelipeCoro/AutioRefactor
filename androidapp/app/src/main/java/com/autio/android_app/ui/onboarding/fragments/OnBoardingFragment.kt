@@ -19,10 +19,11 @@ import com.autio.android_app.databinding.FragmentViewPagerBinding
 import com.autio.android_app.ui.onboarding.adapters.ViewPagerAdapter
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.util.PermissionsManager
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class OnBoardingFragment : Fragment() {
-
 
     @Inject
     lateinit var prefRepository: PrefRepository
@@ -33,9 +34,7 @@ class OnBoardingFragment : Fragment() {
         super.onCreate(savedInstanceState)
         permissionsManager =
             PermissionsManager(requireActivity(), requireActivity().activityResultRegistry)
-        if (::permissionsManager.isInitialized) {
-            lifecycle.addObserver(permissionsManager)
-        }
+        lifecycle.addObserver(permissionsManager)
     }
 
     override fun onCreateView(
@@ -50,7 +49,10 @@ class OnBoardingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = ViewPagerAdapter(
             listOf(
-                NotificationsFragment(), InAppLocationFragment(), BackgroundLocationFragment()
+                WelcomeExplorerFragment(),
+                NotificationsFragment(),
+                InAppLocationFragment(),
+                BackgroundLocationFragment()
             ), requireActivity().supportFragmentManager, lifecycle
         )
 
@@ -89,7 +91,6 @@ class OnBoardingFragment : Fragment() {
         }
     }
 
-
     private fun isOnBoardingFinished(): Boolean {
         val sharedPreferences =
             activity?.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
@@ -125,11 +126,11 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun navigateToInAppLocationPermissionFragment(backgroundLocation: Boolean) {
-        setViewPagerPage(1)
+        setViewPagerPage(2)
     }
 
     private fun navigateToBackgroundLocation() {
-        setViewPagerPage(2)
+        setViewPagerPage(3)
     }
 
     private fun setViewPagerPage(pageIndex: Int) {

@@ -45,7 +45,7 @@ class BackgroundLocationFragment : Fragment() {
     private fun goToAuthentication() {
         onBoardingFinished()
         val nav = findNavController()
-        nav.navigate(R.id.action_onboarding_to_authentication_nav)
+        nav.navigate(R.id.action_onBoardingFragment_to_loginFragment)
     }
 
 

@@ -273,7 +273,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         largerBitmap?.let {
             val originalBitmap = getOriginalBitmap(it)
             val smallerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(originalBitmap)
-            storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
+             storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
         }
     }
 

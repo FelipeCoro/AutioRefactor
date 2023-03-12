@@ -39,7 +39,7 @@ class OnBoardingActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val FINISHED_ONBOARDING = " finishe_onboarding"
+        const val FINISHED_ONBOARDING = " finished_onboarding"
     }
 
 }
