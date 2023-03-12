@@ -30,8 +30,8 @@ class AutioRemoteDataSourceImpl @Inject constructor(
     override suspend fun changePassword(
         xUserId: Int,
         apiToken: String,
-        changePasswordDto: com.autio.android_app.data.api.model.account.ChangePasswordDto
-    ): Response<com.autio.android_app.data.api.model.account.ChangePasswordResponse> {
+        changePasswordDto: ChangePasswordDto
+    ): Response<ChangePasswordResponse> {
         return apiClient.changePassword(xUserId, apiToken, changePasswordDto)
     }
 
@@ -64,7 +64,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(
     override suspend fun getStoriesByIds(
         xUserId: Int, apiToken: String, ids: List<Int>
     ): Response<List<StoryDto>> {
-        return Response.success(apiClient.getStoriesByIds(xUserId, apiToken, ids).body()!!)
+        return apiClient.getStoriesByIds(xUserId, apiToken, ids)
     }
 
     override suspend fun getStoryById(
@@ -128,10 +128,12 @@ class AutioRemoteDataSourceImpl @Inject constructor(
         return apiClient.isStoryLikedByUser(xUserId, apiToken, storyId)
     }
 
-    override suspend fun likesByStory(
+    override suspend fun storyLikesCount(
         xUserId: Int, apiToken: String, storyId: Int
     ): Response<StoryLikesResponse> {
-        return apiClient.likesByStory(xUserId, apiToken, storyId)
+        return apiClient.storyLikesCount(xUserId, apiToken, storyId)
+
+
     }
 
     override suspend fun giveLikeToStory(

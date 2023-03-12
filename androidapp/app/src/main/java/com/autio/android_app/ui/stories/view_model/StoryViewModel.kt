@@ -179,9 +179,9 @@ class StoryViewModel @Inject constructor(
                 autioRepository.giveLikeToStory(userId, apiToken, storyId)
             }.onSuccess { result ->
                 val likedStory = result.getOrNull()
-                likedStory.let {
-                    if (it == true) {
-                        setViewState(StoryViewState.StoryLiked)
+                likedStory?.let {isItLiked->
+                    if (isItLiked.first) {
+                        setViewState(StoryViewState.StoryLiked(isItLiked.second))
                     } else setViewState(StoryViewState.FailedLikedStory)
                 }
             }.onFailure {
@@ -196,13 +196,29 @@ class StoryViewModel @Inject constructor(
                 autioRepository.removeLikeFromStory(userId, apiToken, storyId)
             }.onSuccess { result ->
                 val removedLike = result.getOrNull()
-                removedLike.let {
-                    if (it == true) {
-                        setViewState(StoryViewState.LikedRemoved)
+                removedLike?.let {isItLiked->
+                    if (!isItLiked.first) {
+                        setViewState(StoryViewState.LikedRemoved(isItLiked.second))
                     } else setViewState(StoryViewState.FailedLikedRemoved)
                 }
             }.onFailure {
                 setViewState(StoryViewState.FailedLikedRemoved)
+            }
+        }
+    }
+
+    fun storyLikesCount(userId: Int, apiToken: String, storyId: Int) {
+        viewModelScope.launch(coroutineDispatcher) {
+            runCatching {
+                autioRepository.storyLikesCount(userId, apiToken, storyId)
+            }.onSuccess { result ->
+                val storyLikes = result.getOrNull()
+                storyLikes?.let {
+                    setViewState(StoryViewState.StoryLikesCount(it))
+
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FailedStoryLikesCount)
             }
         }
     }
@@ -221,6 +237,21 @@ class StoryViewModel @Inject constructor(
 
     fun clearStoryHistory() = viewModelScope.launch(coroutineDispatcher) {
         autioRepository.clearStoryHistory()
+    }
+
+    fun isStoryLiked(userId: Int, apiToken: String, storyId: Int) {
+        viewModelScope.launch(coroutineDispatcher) {
+            runCatching {
+                autioRepository.isStoryLiked(userId, apiToken, storyId)
+            }.onSuccess { result ->
+                val isLiked = result.getOrNull()
+                isLiked?.let {
+                    setViewState(StoryViewState.IsStoryLiked(it))
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FailedStoryLikesCount)
+            }
+        }
     }
 
     fun cacheRecordOfStory(storyId: Int, recordUrl: String) {

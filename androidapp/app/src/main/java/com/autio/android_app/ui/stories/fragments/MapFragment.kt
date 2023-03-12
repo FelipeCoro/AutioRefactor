@@ -14,8 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.TranslateAnimation
-import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.fragment.app.Fragment
@@ -36,13 +34,7 @@ import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
-import com.autio.android_app.util.DEFAULT_LOCATION_LAT
-import com.autio.android_app.util.DEFAULT_LOCATION_LNG
-import com.autio.android_app.util.Timer
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showStoryOptions
+import com.autio.android_app.util.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -170,7 +162,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) {
             it?.let {
-                updateMarker(it, markers[it.id]!!)
+                markers[it.id]?.let { it1 -> updateMarker(it, it1) }
             }
         }
 
@@ -502,7 +494,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 onOptionClick = ::optionClicked,
                 onDismiss = { storyDisplayTimer?.finishTimer() })
         }
-        showSelectedStoryComponent()
+        getFloatingComponentHeight()?.let { showFloatingComponent(it) }
         highlightClusterItem(clusterItem)
         storyDisplayTimer?.startTimer()
         storyDisplayTimer?.isActive?.observe(this) {
@@ -589,25 +581,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun showSelectedStoryComponent() {
-        val player = binding.root.findViewById<LinearLayout>(R.id.persistentPlayer)
-        val displayingMessage = binding.root.findViewById<FrameLayout>(R.id.flImportantMessage)
-        val totalHeight = -player.height - displayingMessage.height - 24F
-        binding.floatingSelectedStory.apply {
-            if (visibility != View.VISIBLE) {
-                translationY = totalHeight
-                visibility = View.VISIBLE
-                animate().alpha(1.0f)
-            }
-        }
-    }
-
     private fun optionClicked(option: StoryOption, story: Story) {
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(
                     option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
+            }
+        }
+    }
+
+    fun showFloatingComponent(totalHeight:Float){
+        binding.floatingSelectedStory.apply {
+            if (visibility != View.VISIBLE) {
+                translationY = totalHeight
+                visibility = View.VISIBLE
+                animate().alpha(1.0f)
             }
         }
     }

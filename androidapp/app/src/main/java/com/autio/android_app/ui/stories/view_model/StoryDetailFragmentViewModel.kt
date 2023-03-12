@@ -12,10 +12,11 @@ import com.autio.android_app.extensions.isPlaying
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
+
 
 @HiltViewModel
 class StoryDetailFragmentViewModel @Inject constructor(

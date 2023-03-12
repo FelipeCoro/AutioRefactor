@@ -155,18 +155,10 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun giveLikeToStory(id: Int) {
         storyDao.setLikeToStory(id)
-
-        if (getDownloadedStoryById(id) != null) {
-            storyDao.setLikeToStory(id)
-        }
     }
 
     override suspend fun removeLikeFromStory(id: Int) {
         storyDao.removeLikeFromStory(id)
-
-        if (getDownloadedStoryById(id) != null) {
-            storyDao.removeLikeFromStory(id)
-        }
     }
 
 // Downloaded stories

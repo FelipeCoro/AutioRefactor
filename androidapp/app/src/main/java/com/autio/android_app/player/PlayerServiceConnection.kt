@@ -20,6 +20,7 @@ import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
 import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnectionCallback
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.MainDispatcher
+import com.google.android.exoplayer2.ExoPlayer
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -74,25 +75,21 @@ class PlayerServiceConnection @Inject constructor(
     ).apply { connect() }
     private lateinit var mediaController: MediaControllerCompat
 
-    fun subscribe(
-        parentId: String, callback: MediaBrowserCompat.SubscriptionCallback
-    ) {
+    fun subscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) {
         mediaBrowser.subscribe(
             parentId, callback
         )
     }
 
-    fun unsubscribe(
-        parentId: String, callback: MediaBrowserCompat.SubscriptionCallback
-    ) {
+    fun unsubscribe(parentId: String, callback: MediaBrowserCompat.SubscriptionCallback) {
         mediaBrowser.unsubscribe(
             parentId, callback
         )
     }
 
-    private inner class MediaBrowserConnectionCallback(
-        private val context: Context
-    ) : MediaBrowserCompat.ConnectionCallback() {
+
+    private inner class MediaBrowserConnectionCallback(private val context: Context) :
+        MediaBrowserCompat.ConnectionCallback() {
         /**
          * Invoked after [MediaBrowserCompat.connect] when the request has successfully
          * completed.
@@ -124,7 +121,7 @@ class PlayerServiceConnection @Inject constructor(
     }
 
     //TODO(Cannot inject to inner classes, invetigate fix later for coroutine which was injected at MediaControllerCallback())
-    private  inner  class MediaControllerCallback () : MediaControllerCompat.Callback() {
+    private inner class MediaControllerCallback() : MediaControllerCompat.Callback() {
 
         override fun onPlaybackStateChanged(
             state: PlaybackStateCompat?
@@ -144,8 +141,11 @@ class PlayerServiceConnection @Inject constructor(
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
 
-                    val currentStory = autioRepository.getStoryById(prefRepository.userId,prefRepository.userApiToken,
-                        metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt())
+                    val currentStory = autioRepository.getStoryById(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt()
+                    )
                     currentStory.let {
                         nowPlaying.value = it.getOrNull()
                     }
@@ -198,11 +198,8 @@ class PlayerServiceConnection @Inject constructor(
 }
 
 val EMPTY_PLAYBACK_STATE: PlaybackStateCompat =
-    PlaybackStateCompat.Builder()
-        .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
-        .build()
+    PlaybackStateCompat.Builder().setState(PlaybackStateCompat.STATE_NONE, 0, 0f).build()
 
 val NOTHING_PLAYING: MediaMetadataCompat =
-    MediaMetadataCompat.Builder()
-        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")
+    MediaMetadataCompat.Builder().putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "")
         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 0).build()

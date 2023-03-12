@@ -210,7 +210,7 @@ interface ApiClient {
     ): Response<StoryLikedResponse>
 
     @GET("/api/v1/likes/{story_id}/count")
-    suspend fun likesByStory(
+    suspend fun storyLikesCount(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,
         @Path("story_id") storyId: Int
@@ -259,7 +259,8 @@ interface ApiClient {
 
     @GET("/api/v1/library")
     suspend fun getStoriesFromUserBookmarks(
-        @Header("X-User-Id") xUserId: Int, @Header("Authorization") apiToken: String
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String
     ): Response<List<StoryDto>>
 
     @POST("/api/v1/library/{user_id}")

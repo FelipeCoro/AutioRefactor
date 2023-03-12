@@ -132,7 +132,7 @@
     <string name="map_list_subtitle">Adjust the map for more stories</string>
     <!-- Player -->
     <string name="allowed_caller_log">
-        Caller has a valid certificate, but its package does nott match any expected package for the
+        Caller has a valid certificate, but its package does not match any expected package for the
         given certificate. To allow this caller, add the following to the allowed callers list:\n
         <![CDATA[
         <signature name=\"%1$s\" package=\"%2$s\">\n\t<key>%3$s</key>\n</signature>\n
@@ -191,6 +191,8 @@
     <string name="map_fragment_feedback_story_saved_to_my_device">Story Saved To My Device</string>
     <string name="map_fragment_feedback_story_removed_from_my_device">Story Removed From My Device</string>
     <string name="map_fragment_feedback_connection_failure">Connection Failure</string>
+    <string name="free_stories_banner_title">You\'ve Got 5 Free Stories</string>
+    <string name="free_stories_banner_content">Tap a story nearby, or browse destinations around the country. When you\'re done, you can select one of three different plans to access our growing library of 9,000+ stories.\n \nSafe travels!\n-The Autio Team</string> /string>
 
 
 </resources>
