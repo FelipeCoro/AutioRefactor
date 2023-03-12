@@ -127,12 +127,6 @@ interface AutioRemoteDataSource {
         storyId: Int
     ): Response<StoryLikedResponse>
 
-    suspend fun likesByStory(
-        xUserId: Int,
-        apiToken: String,
-        storyId: Int
-    ): Response<StoryLikesResponse>
-
     suspend fun giveLikeToStory(
         xUserId: Int,
         apiToken: String,
@@ -144,6 +138,12 @@ interface AutioRemoteDataSource {
         apiToken: String,
         storyId: Int
     ): Response<LikeResponse>
+
+    suspend fun  storyLikesCount(
+        xUserId: Int,
+        apiToken: String,
+        storyId: Int
+    ):Response<StoryLikesResponse>
 
     suspend fun getUserHistory(
         xUserId: Int,

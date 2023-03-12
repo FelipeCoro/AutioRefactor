@@ -506,9 +506,11 @@ class PlayerService() : MediaBrowserServiceCompat() {
          * remote Cast receiver rather than play audio locally.
          */
         override fun onCastSessionAvailable() {
-            switchToPlayer(
-                currentPlayer, castPlayer!!
-            )
+            castPlayer?.let {
+                switchToPlayer(
+                    currentPlayer, it
+                )
+            }
         }
 
         /**
@@ -561,17 +563,23 @@ class PlayerService() : MediaBrowserServiceCompat() {
                 if (itemToPlay == null) {
                     Log.w(TAG, "Content not found: MediaID=$mediaId")
                 } else {
-                    val itemMetadata = MediaMetadataCompat.Builder().from(
-                        itemToPlay.getOrNull()!!
-                    ).build()
+                    val itemMetadata = itemToPlay.getOrNull()?.let {
+                        MediaMetadataCompat.Builder().from(
+                            it
+                        ).build()
+                    }
                     val playbackStartPositionMs = extras?.getLong(
                         MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS, C.TIME_UNSET
                     ) ?: C.TIME_UNSET
-                    preparePlaylist(
+                    itemMetadata?.let {
                         buildPlaylist(
-                            itemMetadata
-                        ), itemMetadata, playWhenReady, playbackStartPositionMs
-                    )
+                            it
+                        )
+                    }?.let {
+                        preparePlaylist(
+                            it, itemMetadata, playWhenReady, playbackStartPositionMs
+                        )
+                    }
                 }
             }
         }
@@ -718,6 +726,8 @@ class PlayerService() : MediaBrowserServiceCompat() {
                 applicationContext, message, Toast.LENGTH_LONG
             ).show()
         }
+
+
     }
 
     companion object {

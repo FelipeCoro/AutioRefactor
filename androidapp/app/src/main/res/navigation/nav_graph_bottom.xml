@@ -21,7 +21,14 @@
         android:id="@+id/account"
         android:name="com.autio.android_app.ui.stories.fragments.AccountFragment"
         android:label="fragment_account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account" >
+        <action
+            android:id="@+id/action_account_to_signInFragment2"
+            app:destination="@id/signInFragment2" />
+        <action
+            android:id="@+id/action_account_to_signUpFragment2"
+            app:destination="@id/signUpFragment2" />
+    </fragment>
     <fragment
         android:id="@+id/my_stories"
         android:name="com.autio.android_app.ui.stories.fragments.MyStoriesFragment"
@@ -39,6 +46,12 @@
         <action
             android:id="@+id/action_my_stories_to_downloaded_playlist"
             app:destination="@id/downloaded_playlist" />
+        <action
+            android:id="@+id/action_my_stories_to_signInFragment2"
+            app:destination="@id/signInFragment2" />
+        <action
+            android:id="@+id/action_my_stories_to_signUpFragment2"
+            app:destination="@id/signUpFragment2" />
     </fragment>
     <fragment
         android:id="@+id/player"
@@ -130,5 +143,21 @@
         tools:layout="@layout/fragment_subscribe">
         <deepLink app:uri="android-app://navigation.autio.app/subscribe" />
 
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment2"
+        android:name="com.autio.android_app.ui.login.fragments.SignInFragment"
+        android:label="SignInFragment">
+        <deepLink
+            android:id="@+id/deepLink4"
+            app:uri="android-app://navigation.autio.app/sign-in" />
+    </fragment>
+    <fragment
+        android:id="@+id/signUpFragment2"
+        android:name="com.autio.android_app.ui.login.fragments.SignUpFragment"
+        android:label="SignUpFragment">
+        <deepLink
+            android:id="@+id/deepLink5"
+            app:uri="android-app://navigation.autio.app/login" />
     </fragment>
 </navigation>

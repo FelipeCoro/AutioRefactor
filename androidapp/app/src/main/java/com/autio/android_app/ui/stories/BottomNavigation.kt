@@ -8,6 +8,8 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -60,6 +62,7 @@ class BottomNavigation : AppCompatActivity() {
         bindObservables()
 
         // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_bottom_navigation)
 
         updateSnackBarMessageDisplay()
@@ -230,6 +233,7 @@ class BottomNavigation : AppCompatActivity() {
 
             if (remainingStories < 0) {
                 llTickMarks.visibility = GONE
+                showPayWall()
             } else {
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
@@ -321,5 +325,12 @@ class BottomNavigation : AppCompatActivity() {
                 binding.activityLayout.removeView(snackBarView)
             }
         }
+    }
+
+    fun getFloatingComponentHeight():Float {
+        val player = binding.root.findViewById<LinearLayout>(R.id.persistentPlayer)
+        val displayingMessage = binding.root.findViewById<FrameLayout>(R.id.flImportantMessage)
+        val totalHeight = -player.height - displayingMessage.height - 24F
+        return totalHeight
     }
 }

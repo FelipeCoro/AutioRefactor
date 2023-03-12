@@ -22,7 +22,9 @@ import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
+import com.autio.android_app.ui.login.viewmodels.LoginViewState
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
+import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -31,7 +33,7 @@ import javax.inject.Inject
  * [ViewModel] that watches a [PlayerServiceConnection] to become connected
  * and provides the root/initial media ID of the underlying MediaBrowserCompat
  */
-private const val POSITION_UPDATE_INTERVAL_MILLIS = 100L
+
 
 @HiltViewModel
 class BottomNavigationViewModel @Inject constructor(
@@ -41,9 +43,7 @@ class BottomNavigationViewModel @Inject constructor(
     private val prefRepository: PrefRepository,
     @IoDispatcher
     private val coroutineDispatcher: CoroutineDispatcher
-) : AndroidViewModel(
-    app
-) {
+) : AndroidViewModel(app) {
 
     private val _bottomNavigationViewState = MutableLiveData<BottomNavigationViewState>()
     val bottomNavigationViewState: LiveData<BottomNavigationViewState> = _bottomNavigationViewState
@@ -110,12 +110,12 @@ class BottomNavigationViewModel @Inject constructor(
         postedPlay = true
         viewModelScope.launch(coroutineDispatcher) {
             if (storyToPost != null) {
-            val downloadedStory = autioRepository.getDownloadedStoryById(playingStory.value!!.id)
-            val connectivityManager =
-                app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val networkInfo = connectivityManager.activeNetwork
-            val network = getNetworkStatus(networkInfo, connectivityManager)
-
+                val downloadedStory =
+                    autioRepository.getDownloadedStoryById(playingStory.value!!.id)
+                val connectivityManager =
+                    app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val networkInfo = connectivityManager.activeNetwork
+                val network = getNetworkStatus(networkInfo, connectivityManager)
                 autioRepository.postStoryPlayed(
                     prefRepository.userId,
                     prefRepository.userApiToken,
@@ -312,13 +312,7 @@ class BottomNavigationViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Get remote stories stored in Firebase to save them into
-     * room database
-     * It starts by fetching inside room the last modified story date
-     * so it uses this data to request to Firebase the stories updated
-     * after it
-     */
+
     private suspend fun getRemoteStories() {
         viewModelScope.launch(coroutineDispatcher) {
             kotlin.runCatching {
@@ -327,9 +321,10 @@ class BottomNavigationViewModel @Inject constructor(
                 val result = it.getOrNull()
                 result?.let {
                     val date = result.modifiedDate ?: 63808881662
-                    //TODO (Move to Repository)
-                    //TODO: change Firebase code with commented code once endpoint is stable
+                    //TODO(double check this logic later, my quick fix for updating new stories(not in mappoint datatable))
+
                     val stories = autioRepository.getStoriesAfterModifiedDate(date.toInt())
+                    //TODO(COULD THIS BE CAUSING ON MIGRATION ROOM ERROR)
                     autioRepository.addStories(stories)
                 }
             }.onFailure { }
@@ -338,12 +333,12 @@ class BottomNavigationViewModel @Inject constructor(
 
     private suspend fun setBookmarksToStories() {
         withContext(coroutineDispatcher) {
-            // TODO: change Firebase code with commented code once stable
+
             val userBookmarkedStories = autioRepository.getUserBookmarks(
                 prefRepository.userId
             )
-            //TODO(Finish this)
-            //   autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it.id .toString })
+            //TODO(CHECK THIS)
+            autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it })
         }
     }
 
@@ -353,10 +348,9 @@ class BottomNavigationViewModel @Inject constructor(
                 prefRepository.userId
             )
             //TODO(Finish this)
-            //  autioRepository.setLikesDataToLocalStories(userFavoriteStories
-            //      .filter { it.isGiven == true }
-            //      .map { it.storyId }
-            // )
+            // autioRepository.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
+            //   .map { it.storyId }
+            //)
         }
     }
 

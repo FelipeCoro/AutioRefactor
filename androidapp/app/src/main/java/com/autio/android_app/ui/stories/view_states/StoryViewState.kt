@@ -13,13 +13,18 @@ sealed interface StoryViewState {
     object AddedBookmark : StoryViewState
     object RemovedBookmark : StoryViewState
     object FailedBookmark : StoryViewState
-    object StoryLiked : StoryViewState
+    class StoryLiked(val likeCount: Int) : StoryViewState
     object FailedLikedStory : StoryViewState
-    object LikedRemoved : StoryViewState
+    class LikedRemoved(val likeCount: Int) : StoryViewState
     object FailedLikedRemoved : StoryViewState
     object StoryDownloaded : StoryViewState
     object FailedStoryDownloaded : StoryViewState
     object StoryRemoved : StoryViewState
     object FailedStoryRemoved : StoryViewState
+    data class StoryLikesCount(val storyLikesCount: Int) : StoryViewState
+    object FailedStoryLikesCount : StoryViewState
+
+    data class IsStoryLiked(val isLiked: Boolean) : StoryViewState
+
 
 }

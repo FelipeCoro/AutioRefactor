@@ -25,17 +25,13 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
 import com.autio.android_app.extensions.getAddress
 import com.autio.android_app.extensions.timestampToMSS
+import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
+import com.autio.android_app.ui.stories.view_model.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.ui.viewmodel.PlayerFragmentViewModel
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.shareStory
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showStoryOptions
-import com.autio.android_app.util.writeEmailToCustomerSupport
+import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -73,19 +69,19 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
 
+    private var storyId = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // listen to backstack changes
-        requireActivity().supportFragmentManager.addOnBackStackChangedListener(
-            this
-        )
+        requireActivity().supportFragmentManager.addOnBackStackChangedListener(this)
     }
 
     override fun onBackStackChanged() {
         if (activity != null) {
             // enable Up button only if there are entries on the backstack
             if (requireActivity().supportFragmentManager.backStackEntryCount < 1) {
-                (requireActivity() as com.autio.android_app.ui.stories.BottomNavigation).hideUpButton()
+                (requireActivity() as BottomNavigation).hideUpButton()
             }
         }
     }
@@ -127,39 +123,30 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
+        val story = playerFragmentViewModel.story
+        storyId = story.id
 
-        playerFragmentViewModel.storyLikes.observe(
-            viewLifecycleOwner
-        ) { likes ->
-            if (likes[prefRepository.userId] == true) {
-                binding.btnHeart.setImageResource(
-                    R.drawable.ic_heart_filled
-                )
-            } else {
-                binding.btnHeart.setImageResource(
-                    R.drawable.ic_heart
-                )
-            }
-            binding.tvNumberOfLikes.text = likes.filter { it.value }.size.toString()
-            playerFragmentViewModel.currentStory.value?.let { story ->
-                binding.btnHeart.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess(
-                        prefRepository, requireActivity()
-                    ) {
-                        if (likes[prefRepository.userId] == true) {
-                            storyViewModel.removeLikeFromStory(
-                                prefRepository.userId, prefRepository.userApiToken, story.id
-                            )
-                        } else {
 
-                            storyViewModel.giveLikeToStory(
-                                prefRepository.userId, prefRepository.userApiToken, story.id
-                            )
-                        }
-                    }
-                }
+        storyViewModel.isStoryLiked(
+            prefRepository.userId,
+            prefRepository.userApiToken,
+            story.id
+        )
+
+        binding.btnHeart.setOnClickListener {
+            showPaywallOrProceedWithNormalProcess(
+                prefRepository, requireActivity(), true
+            ) {
+                storyViewModel.getStoriesByIds(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    listOf(story.id)
+                )
             }
         }
+
+
+
         playerFragmentViewModel.isStoryBookmarked.observe(
             viewLifecycleOwner
         ) { isBookmarked ->
@@ -190,33 +177,24 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 }
             }
         }
-        playerFragmentViewModel.currentStory.observe(
-            viewLifecycleOwner
-        ) { mediaItem ->
+        playerFragmentViewModel.currentStory.observe(viewLifecycleOwner)
+        { mediaItem ->
             updateUI(
-                view, mediaItem
+                view,
+                mediaItem
             )
         }
-        playerFragmentViewModel.speedButtonRes.observe(
-            viewLifecycleOwner
-        ) { res ->
-            binding.btnChangeSpeed.setImageResource(
-                res
-            )
+        playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner)
+        { res ->
+            binding.btnChangeSpeed.setImageResource(res)
         }
-        playerFragmentViewModel.mediaButtonRes.observe(
-            viewLifecycleOwner
-        ) { res ->
-            binding.btnPlay.setImageResource(
-                res
-            )
+        playerFragmentViewModel.mediaButtonRes.observe(viewLifecycleOwner)
+        { res ->
+            binding.btnPlay.setImageResource(res)
         }
-        playerFragmentViewModel.mediaPosition.observe(
-            viewLifecycleOwner
-        ) { pos ->
-            binding.tvNowPlayingSeek.text = NowPlayingMetadata.timestampToMSS(
-                context, pos
-            )
+        playerFragmentViewModel.mediaPosition.observe(viewLifecycleOwner)
+        { pos ->
+            binding.tvNowPlayingSeek.text = NowPlayingMetadata.timestampToMSS(context, pos)
             binding.sBTrack.progress = (pos / 1000).toInt()
         }
 
@@ -256,20 +234,63 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         )
     }
 
-    fun bindObservers() {
-        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
+
+    private fun bindObservers() {
+        storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleStoryViewState)
     }
 
-    private fun handleViewState(viewState: StoryViewState?) {
+    private fun handleStoryViewState(viewState: StoryViewState?) {
         when (viewState) {
+            is StoryViewState.StoryLikesCount -> handleStoryLikesCount(viewState.storyLikesCount)
+            is StoryViewState.FetchedStoriesByIds -> handleFetchedStory(viewState.stories.first())
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
             is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
-            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
-            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
+            is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
+            is StoryViewState.StoryLiked -> handleLIsLikedState(viewState.likeCount)
+            is StoryViewState.LikedRemoved -> handleLIsNotLikedState(viewState.likeCount)
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
+    }
+
+    private fun isStoryLiked(liked: Boolean) {
+        if (liked) {
+            binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
+        }
+        storyViewModel.storyLikesCount(
+            prefRepository.userId, prefRepository.userApiToken, storyId
+        )
+    }
+
+    private fun handleFetchedStory(story: Story) {
+
+        if (story.isLiked == true) {
+            storyViewModel.removeLikeFromStory(
+                prefRepository.userId, prefRepository.userApiToken, story.id
+            )
+            binding.btnHeart.setImageResource(R.drawable.ic_heart)
+
+        } else {
+            storyViewModel.giveLikeToStory(
+                prefRepository.userId, prefRepository.userApiToken, story.id
+            )
+            binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
+        }
+    }
+
+    private fun handleLIsLikedState(likeCount: Int) {
+        showFeedbackSnackBar("Added To Favorites")
+        binding.tvNumberOfLikes.text = likeCount.toString()
+    }
+
+    private fun handleLIsNotLikedState(likeCount: Int) {
+        showFeedbackSnackBar("Removed From Favorites")
+        binding.tvNumberOfLikes.text = likeCount.toString()
+    }
+
+    private fun handleStoryLikesCount(storyLikesInt: Int) {
+        binding.tvNumberOfLikes.text = storyLikesInt.toString()
     }
 
     private fun updateUI(
@@ -286,13 +307,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 val uri = Uri.parse(
                     story.imageUrl
                 )
-                Glide.with(
-                    view
-                ).load(
-                    uri
-                ).into(
-                    ivStoryImage
-                )
+                Glide.with(view).load(uri).into(ivStoryImage)
             }
             sBTrack.isEnabled = true
             sBTrack.max = story.duration
@@ -367,23 +382,13 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                             }
                         }
                     }
-                    //TODO(Add our repo)
-                    // FirebaseStoryRepository.getCategory(
-                    //     "${story.category?.id}"
-                    // ) { category ->
-                    //     lifecycleScope.launch {
-                    //         withContext(
-                    //             Dispatchers.Main
-                    //         ) {
-                    //             Constants.categoryIcons[category.title.uppercase()]?.let {
-                    //                 ivCategoryIcon.setImageResource(
-                    //                     it
-                    //                 )
-                    //             }
-                    //             tvStoryCategory.text = category.title
-                    //         }
-                    //     }
-                    // }
+                }
+                val category = story.category
+                Constants.categoryIcons[category.uppercase()]?.let {
+                    ivCategoryIcon.setImageResource(
+                        it
+                    )
+                    tvStoryCategory.text = category
                 }
             }
             llCategory.visibility = View.VISIBLE
@@ -525,7 +530,12 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(
-                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
+                    option,
+                    story,
+                    storyViewModel,
+                    prefRepository,
+                    verifiedActivity,
+                    verifiedContext
                 )
             }
         }

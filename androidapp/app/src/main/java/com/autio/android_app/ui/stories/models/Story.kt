@@ -19,7 +19,7 @@ data class Story(
     val imageUrl: String = "",
     val recordUrl: String = "",
     var duration: Int = 0,
-    val isLiked: Boolean? = false,
+    var isLiked: Boolean? = false,
     val listenedAt: String? = "", //TODO CHECK THIS Type
     val modifiedDate: Int = 0, //TODO CHECK THIS Type
     val isBookmarked: Boolean? = false,

@@ -207,6 +207,18 @@ class AutioRepositoryImpl @Inject constructor(
         return if (result.isSuccessful) {
             val storiesFromService = result.body()!!.map { it.toModel() }
             for (story in storiesFromService) {
+                val isStoryLiked = autioRemoteDataSource.isStoryLikedByUser(
+                    userId,
+                    apiToken,
+                    story.id
+                )
+                if (isStoryLiked.isSuccessful) {
+                    story.isLiked = isStoryLiked.body()!!.isLiked
+                } else {
+                    story.isLiked = false
+                }
+            }
+            for (story in storiesFromService) {
                 autioLocalDataSource.cacheRecordOfStory(
                     story.id, story.recordUrl
                 )
@@ -312,17 +324,31 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun giveLikeToStory(
         userId: Int, apiToken: String, storyId: Int
-    ): Result<Boolean> {
-        val likedStory = autioLocalDataSource.giveLikeToStory(storyId)
-        return likedStory.let {
-            val remoteLike =
-                autioRemoteDataSource.giveLikeToStory(userId, apiToken, storyId)
-            if (remoteLike.isSuccessful) {
-                Result.success(remoteLike.body().toString().toBoolean())
-            } else {
-                val throwable = Error(remoteLike.errorBody().toString())
-                Result.failure(throwable)
-            }
+    ): Result<Pair<Boolean,Int>> {
+        autioLocalDataSource.giveLikeToStory(storyId)
+        val remoteLike = autioRemoteDataSource.giveLikeToStory(userId, apiToken, storyId)
+        val likeCount = autioRemoteDataSource.storyLikesCount(userId, apiToken, storyId)
+        return if (remoteLike.isSuccessful) {
+            val result = Pair(remoteLike.body()!!.liked.toString().toBoolean(),likeCount.body()!!.likes )
+            Result.success(result)
+        } else {
+            val throwable = Error(remoteLike.errorBody().toString())
+            Result.failure(throwable)
+        }
+    }
+
+    override suspend fun removeLikeFromStory(
+        userId: Int, apiToken: String, storyId: Int
+    ): Result<Pair<Boolean,Int>> {
+        autioLocalDataSource.removeLikeFromStory(storyId)
+        val remoteRemovedLike = autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
+        val likeCount = autioRemoteDataSource.storyLikesCount(userId, apiToken, storyId)
+        return if (remoteRemovedLike.isSuccessful) {
+            val result = Pair(remoteRemovedLike.body()!!.liked.toString().toBoolean(),likeCount.body()!!.likes )
+            Result.success(result)
+        }else {
+            val throwable = Error(remoteRemovedLike.errorBody().toString())
+            Result.failure(throwable)
         }
     }
 
@@ -397,34 +423,35 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.giveLikeToStory(id)
     }
 
-    override suspend fun removeLikeFromStory(
-        userId: Int, apiToken: String, storyId: Int
-    ): Result<Boolean> {
-        val removedLike = autioLocalDataSource.removeLikeFromStory(storyId)
-        return removedLike.let {
-            val remoteRemovedLike =
-                autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
-            if (remoteRemovedLike.isSuccessful) {
-                Result.success(remoteRemovedLike.body().toString().toBoolean())
-            } else {
-                val throwable = Error(remoteRemovedLike.errorBody().toString())
-                Result.failure(throwable)
-            }
-        }
-    }
-
-    override suspend fun likesByStory(
+    override suspend fun storyLikesCount(
         userId: Int,
         apiToken: String,
         storyId: Int
     ): Result<Int> {
 
-        val likesByStory = autioRemoteDataSource.likesByStory(userId, apiToken, storyId)
+        val likesByStory = autioRemoteDataSource.storyLikesCount(userId, apiToken, storyId)
         return if (likesByStory.isSuccessful) {
             Result.success(likesByStory.body()!!.likes)
         } else {
             val throwable = Error(likesByStory.errorBody().toString())
             Result.failure(throwable)
+        }
+    }
+
+    override suspend fun isStoryLiked(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Boolean> {
+        val isStoryLiked = autioRemoteDataSource.isStoryLikedByUser(
+            userId,
+            apiToken,
+            storyId
+        )
+        return if (isStoryLiked.isSuccessful) {
+            Result.success(isStoryLiked.body()!!.isLiked)
+        } else {
+            Result.success(false)
         }
     }
 
@@ -495,7 +522,6 @@ class AutioRepositoryImpl @Inject constructor(
             Result.failure(throwable)
         }
     }
-
 
     override suspend fun deleteCachedData() {
         autioLocalDataSource.deleteCachedData()

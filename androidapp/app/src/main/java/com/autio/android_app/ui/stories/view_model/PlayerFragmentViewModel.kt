@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.viewmodel
+package com.autio.android_app.ui.stories.view_model
 
 import android.os.Handler
 import android.os.Looper
@@ -12,11 +12,11 @@ import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.view_states.PlayerViewState
+import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-const val POSITION_UPDATE_INTERVAL_MILLIS = 17L
 
 @HiltViewModel
 class PlayerFragmentViewModel @Inject constructor(
@@ -26,27 +26,26 @@ class PlayerFragmentViewModel @Inject constructor(
 ) : ViewModel() {
 
 
+    private val _playerViewState = MutableLiveData<PlayerViewState>()
+    val playerViewState: LiveData<PlayerViewState> = _playerViewState
+
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
+
+    lateinit var story:Story
+
     val currentStory = MutableLiveData<Story?>()
+
+
+
     val mediaPosition = MutableLiveData<Long>().apply {
-        postValue(
-            0L
-        )
+        postValue(0L)
     }
 
-    private val _speed = MutableLiveData(
-        1F
-    )
-    private val _speedButtonRes = MutableLiveData(
-        R.drawable.ic_speed_audio_1x
-    )
+    private val _speed = MutableLiveData(1F)
+    private val _speedButtonRes = MutableLiveData(R.drawable.ic_speed_audio_1x)
     val speedButtonRes: LiveData<Int> = _speedButtonRes
 
-    val mediaButtonRes = MutableLiveData<Int>().apply {
-        postValue(
-            R.drawable.ic_album
-        )
-    }
+    val mediaButtonRes = MutableLiveData<Int>().apply { postValue(R.drawable.ic_album) }
 
     private val _storyLikes = MutableLiveData<Map<Int, Boolean>>()
     val storyLikes: LiveData<Map<Int, Boolean>> = _storyLikes
@@ -163,7 +162,7 @@ class PlayerFragmentViewModel @Inject constructor(
     }
 
     private fun updateState(
-        playbackState: PlaybackStateCompat, story: Story?
+        playbackState: PlaybackStateCompat, storyUpdate: Story?
     ) {
         // Update the playback speed button resource ID
 
@@ -188,36 +187,18 @@ class PlayerFragmentViewModel @Inject constructor(
             }
         )
 
-        if (story?.id != null) {
-            viewModelScope.launch {//TODO(Handle viewState and result where this goes up)
-                autioRepository.likesByStory(
-                    prefRepository.userId, prefRepository.userApiToken, story.id
+        // Only update media item once we have duration available
+        if (storyUpdate != null) {
+            if (storyUpdate.duration != 0) {
+                story = storyUpdate
+                this.currentStory.postValue(
+                    storyUpdate
                 )
-                val storiesResult = autioRepository.getStoriesFromUserBookmarks(
-                    prefRepository.userId, prefRepository.userApiToken
-                )
-                val stories = storiesResult.getOrNull()
-
-                //TODO(Make this logic work, supposively this checks if the story is bookmarked and updates live data with true or false)
-
-                // _isStoryBookmarked.value =
-                //  stories.map {
-                //      it.firstOrNull() { it.id == story.id } != null
-                //  }
-
-            }
-
-            // Only update media item once we have duration available
-            if (story != null) {
-                if (story.duration != 0) {
-                    this.currentStory.postValue(
-                        story
-                    )
-                }
             }
         }
     }
 }
+
 
 
 
