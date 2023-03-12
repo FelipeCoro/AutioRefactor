@@ -517,7 +517,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      */
     private fun addClusteredMarkers(stories: List<Story>) {
         if (!::map.isInitialized) return
-       //map.clear()
+        
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         clusterManager.setAnimation(true)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
