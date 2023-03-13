@@ -50,8 +50,8 @@ class StoryViewModel @Inject constructor(
                 val result = autioRepository.getStoriesByIds(userId, apiToken, storyIds)
                 result.getOrNull()
             }.onSuccess { stories ->
-                stories?.let {
-                    setViewState(StoryViewState.FetchedStoriesByIds(it))
+                stories?.let {if (it.isNotEmpty()){
+                    setViewState(StoryViewState.FetchedStoriesByIds(it))}
                 }
             }.onFailure {
                 setViewState(StoryViewState.FetchedStoriesByIdsFailed)

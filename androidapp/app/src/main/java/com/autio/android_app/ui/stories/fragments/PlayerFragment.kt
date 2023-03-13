@@ -252,17 +252,17 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             is StoryViewState.FetchedStoriesByIds -> handleFetchedStory(viewState.stories.first())
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
             is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
-            is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             is StoryViewState.StoryLiked -> handleLIsLikedState(viewState.likeCount)
             is StoryViewState.LikedRemoved -> handleLIsNotLikedState(viewState.likeCount)
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
 
-    private fun isStoryLiked(liked: Boolean) {
-        if (liked) {
+    private fun isStoryLiked(isLiked:Boolean) {
+        if (isLiked) {
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
         }
         storyViewModel.storyLikesCount(
@@ -343,6 +343,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     }
                 }
             })
+            storyViewModel.isStoryLiked(prefRepository.userId,prefRepository.userApiToken,storyId)
             tvStoryTitle.text = story.title
             tvStoryAuthor.apply {
                 text = story.author

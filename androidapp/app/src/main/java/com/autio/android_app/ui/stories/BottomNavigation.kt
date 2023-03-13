@@ -33,6 +33,7 @@ import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -84,14 +85,14 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun bindObservables() {
-            lifecycleScope.launchWhenResumed {
-                networkManager.networkStatus.collect {
-                    isNetworkAvailable = it.isConnected
-                    updateConnectionUI(isNetworkAvailable)
-                }
+        lifecycleScope.launchWhenResumed {
+            networkManager.networkStatus.collect {
+                isNetworkAvailable = it.isConnected
+                updateConnectionUI(isNetworkAvailable)
             }
+        }
 
-        bottomNavigationViewModel.bottomNavigationViewState.observe(this, :: handleViewState)
+        bottomNavigationViewModel.bottomNavigationViewState.observe(this, ::handleViewState)
 
         bottomNavigationViewModel.playingStory.observe(this) {
             bottomNavigationViewModel.postPlay()
@@ -115,10 +116,11 @@ class BottomNavigation : AppCompatActivity() {
     private fun handleViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
             is BottomNavigationViewState.FetchedStoryToPlay -> handleSuccessViewState(viewState.story)
-            else -> { }
+            else -> {}
         }
     }
-    private fun handleSuccessViewState(mediaItem:Story){
+
+    private fun handleSuccessViewState(mediaItem: Story) {
         updatePlayer(mediaItem)
     }
 
@@ -315,11 +317,16 @@ class BottomNavigation : AppCompatActivity() {
         }
     }
 
+    private lateinit var snackBarJob: Job
     fun showFeedbackSnackBar(feedback: String) {
+        if (::snackBarJob.isInitialized && snackBarJob.isActive) {
+            snackBarJob.cancel()
+        }
         snackBarView.alpha = 1F
         snackBarView.findViewById<TextView>(R.id.snack_bar_text).text = feedback
+        binding.activityLayout.removeView(snackBarView)
         binding.activityLayout.addView(snackBarView)
-        lifecycleScope.launch {
+        snackBarJob = lifecycleScope.launch {
             delay(1500)
             snackBarView.animate().alpha(0F).withEndAction {
                 binding.activityLayout.removeView(snackBarView)
@@ -327,7 +334,7 @@ class BottomNavigation : AppCompatActivity() {
         }
     }
 
-    fun getFloatingComponentHeight():Float {
+    fun getFloatingComponentHeight(): Float {
         val player = binding.root.findViewById<LinearLayout>(R.id.persistentPlayer)
         val displayingMessage = binding.root.findViewById<FrameLayout>(R.id.flImportantMessage)
         val totalHeight = -player.height - displayingMessage.height - 24F
