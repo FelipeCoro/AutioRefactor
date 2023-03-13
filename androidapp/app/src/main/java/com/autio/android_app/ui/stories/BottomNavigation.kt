@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
@@ -100,7 +101,7 @@ class BottomNavigation : AppCompatActivity() {
         }
         purchaseViewModel.customerInfo.observe(this) {
             it?.let {
-                binding.rlSeePlans.visibility =
+                binding.storiesFreePlansBanner.visibility =
                     if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) GONE
                     else VISIBLE
             }
@@ -152,7 +153,7 @@ class BottomNavigation : AppCompatActivity() {
                 showPlayerComponent()
             }
         }
-        binding.rlSeePlans.setOnClickListener {
+        binding.storiesFreePlansBanner.setOnClickListener {
             showPayWall()
         }
         binding.btnFloatingPlayerPlay.setOnClickListener {
@@ -164,18 +165,24 @@ class BottomNavigation : AppCompatActivity() {
 
     fun showPayWall() {
         bottomNavigationViewModel.setPayWallVisible(true)
+        showUiElements(true)
+    }
+
+    private fun showUiElements(isVisible: Boolean) {
+        binding.persistentPlayer.isVisible = isVisible
+        binding.storiesFreePlansBanner.isVisible = isVisible
+        binding.rlAllowNotifications.isVisible = isVisible
+        binding.bottomNavigationView.isVisible = isVisible
     }
 
     fun hidePaywall() {
         bottomNavigationViewModel.setPayWallVisible(false)
+        showUiElements(false)
     }
 
     private fun updateSnackBarMessageDisplay() {
         with(binding) {
-            if (!TrackingUtility.hasCoreLocationPermissions(
-                    this@BottomNavigation
-                )
-            ) {
+            if (!TrackingUtility.hasCoreLocationPermissions(this@BottomNavigation)) {
                 rlAllowLocationAccess.visibility = VISIBLE
                 rlAllowLocationAccess.setOnClickListener {
                     requestPermissionLauncher.launch(
@@ -195,11 +202,7 @@ class BottomNavigation : AppCompatActivity() {
             ) {
                 rlAllowNotifications.visibility = VISIBLE
                 rlAllowNotifications.setOnClickListener {
-                    requestPermissionLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.POST_NOTIFICATIONS
-                        )
-                    )
+                    requestPermissionLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
                 }
                 ivCloseNotificationsMessage.setOnClickListener {
                     rlAllowNotifications.visibility = GONE

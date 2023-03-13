@@ -1,6 +1,7 @@
 package com.autio.android_app.ui.login.fragments
 
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.Datasource
@@ -59,20 +61,43 @@ class LoginFragment : Fragment() {
     }
 
     private fun setUpBackgroundAnimation() {
+
+        val smoothScroller: RecyclerView.SmoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
+            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
+                return MILLISECONDS_PER_INCH / (displayMetrics?.densityDpi ?: 0f).toFloat()
+            }
+        }
+        val smoothScroller2: RecyclerView.SmoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
+            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
+                return MILLISECONDS_PER_INCH / (displayMetrics?.densityDpi ?: 0f).toFloat()
+            }
+        }
+        val smoothScroller3: RecyclerView.SmoothScroller = object : LinearSmoothScroller(context) {
+            override fun getVerticalSnapPreference(): Int = LinearSmoothScroller.SNAP_TO_START
+            override fun calculateSpeedPerPixel(displayMetrics: DisplayMetrics?): Float {
+                return MILLISECONDS_PER_INCH / (displayMetrics?.densityDpi ?: 0f).toFloat()
+            }
+        }
+
         val imageDataset = Datasource().loadLocationViews()
         val scrollingPosition = Integer.MAX_VALUE / 2
+        smoothScroller.targetPosition = scrollingPosition;
+        smoothScroller2.targetPosition = scrollingPosition;
+        smoothScroller3.targetPosition = scrollingPosition;
         firstRecyclerView = binding.rvFirstColumn
         secondRecyclerView = binding.rvSecondColumn
         thirdRecyclerView = binding.rvThirdColumn
 
-        firstRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
-        firstRecyclerView.layoutManager?.scrollToPosition(scrollingPosition)
-
-        secondRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
-        secondRecyclerView.layoutManager?.scrollToPosition(scrollingPosition)
-
         thirdRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
-        thirdRecyclerView.layoutManager?.scrollToPosition(scrollingPosition)
+        firstRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
+        secondRecyclerView.adapter = ImageAdapter(imageDataset.shuffled())
+
+
+        firstRecyclerView.layoutManager?.startSmoothScroll(smoothScroller)
+        secondRecyclerView.layoutManager?.startSmoothScroll(smoothScroller2)
+        thirdRecyclerView.layoutManager?.startSmoothScroll(smoothScroller3)
 
         firstRecyclerView.setAutomaticScroll()
         secondRecyclerView.setAutomaticScroll(ScrollView.FOCUS_UP)
@@ -106,4 +131,9 @@ class LoginFragment : Fragment() {
     private fun showError(exception: Exception) {
         //TODO (Handle Error)
     }
+
+    companion object {
+        const val MILLISECONDS_PER_INCH = 1550f
+    }
+
 }

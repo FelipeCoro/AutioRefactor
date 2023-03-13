@@ -12,47 +12,21 @@ import com.autio.android_app.extensions.animateFlip
 class ImageAdapter(
     private val dataset: List<LocationView>
 ) : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>() {
-    class ImageViewHolder(
-        view: View
-    ) : RecyclerView.ViewHolder(
-        view
-    ) {
-        val imageView: ImageView =
-            view.findViewById(
-                R.id.image_name
-            )
+    class ImageViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val imageView: ImageView = view.findViewById(R.id.image_name)
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ImageViewHolder {
-        val adapterLayout =
-            LayoutInflater.from(
-                parent.context
-            )
-                .inflate(
-                    R.layout.image_item,
-                    parent,
-                    false
-                )
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+        val adapterLayout = LayoutInflater.from(parent.context)
+            .inflate(R.layout.image_item, parent, false)
 
-        return ImageViewHolder(
-            adapterLayout
-        )
+        return ImageViewHolder(adapterLayout)
     }
 
-    override fun onBindViewHolder(
-        holder: ImageViewHolder,
-        position: Int
-    ) {
-        val fakePosition =
-            position % dataset.size
-        val item =
-            dataset[fakePosition]
-        holder.imageView.setImageResource(
-            item.resourceId
-        )
+    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+        val fakePosition = position % dataset.size
+        val item = dataset[fakePosition]
+        holder.imageView.setImageResource(item.resourceId)
 
         holder.imageView.animateFlip()
     }

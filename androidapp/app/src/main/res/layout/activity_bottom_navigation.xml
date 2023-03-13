@@ -13,17 +13,10 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/navigation_main_container"
+        android:id="@+id/activity_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/activity_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:visibility="@{viewModel.isPayWallVisible ? View.GONE : View.VISIBLE}">
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/main_container"
@@ -31,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 app:defaultNavHost="true"
-                app:layout_constraintBottom_toTopOf="@+id/rlSeePlans"
+                app:layout_constraintBottom_toTopOf="@+id/stories_free_plans_banner"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:navGraph="@navigation/nav_graph_bottom" />
@@ -145,7 +138,7 @@
             android:id="@+id/flImportantMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@id/rlSeePlans"
+            app:layout_constraintBottom_toTopOf="@id/stories_free_plans_banner"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -224,7 +217,7 @@
         </FrameLayout>
 
         <RelativeLayout
-            android:id="@+id/rlSeePlans"
+            android:id="@+id/stories_free_plans_banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/normal_text"
@@ -299,23 +292,4 @@
                 app:menu="@menu/bottom_nav_menu" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/pay_wall_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:animateLayoutChanges="true"
-            android:visibility="@{viewModel.isPayWallVisible ? View.VISIBLE : View.GONE}">
-
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/paywall"
-                android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:tag="paywall"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

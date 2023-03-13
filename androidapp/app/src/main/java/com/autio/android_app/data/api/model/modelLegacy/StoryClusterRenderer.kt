@@ -38,20 +38,6 @@ class StoryClusterRenderer(
         )?.toBitmap()
     }
 
-/*
-    private val mClusterIconGenerator = IconGenerator(context).apply {
-        setBackground(context.let {
-            ContextCompat.getDrawable(it, R.drawable.cluster_background_white)
-        })
-        setTextAppearance(R.style.ClusterMapStyle)
-    }
-
-    override fun getDescriptorForCluster(cluster: Cluster<StoryClusterItem>): BitmapDescriptor {
-        val icon = mClusterIconGenerator.makeIcon(cluster.size.toString())
-        return BitmapDescriptorFactory.fromBitmap(icon)
-    }
-*/
-
     override fun getClusterTextAppearance(clusterSize: Int): Int {
         return R.style.ClusterMapStyle
     }
@@ -97,6 +83,6 @@ class StoryClusterRenderer(
     }
 
     override fun shouldRenderAsCluster(cluster: Cluster<StoryClusterItem>): Boolean {
-        return cluster.size > 8
+        return cluster.size > 5
     }
 }

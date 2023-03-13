@@ -55,8 +55,8 @@ class BottomNavigationViewModel @Inject constructor(
     private val coroutineDispatcher: CoroutineDispatcher
 ) : AndroidViewModel(app) {
 
-    private val _isPayWallVisible = ObservableBoolean(false)
-    val isPayWallVisible = _isPayWallVisible.get()
+    val isPayWallVisible = ObservableBoolean(false)
+
 
     private val _bottomNavigationViewState = MutableLiveData<BottomNavigationViewState>()
     val bottomNavigationViewState: LiveData<BottomNavigationViewState> = _bottomNavigationViewState
@@ -66,7 +66,7 @@ class BottomNavigationViewModel @Inject constructor(
 
     private val storiesJob = SupervisorJob()
     fun setPayWallVisible(isVisible: Boolean) {
-        _isPayWallVisible.set(isVisible)
+        isPayWallVisible.set(isVisible)
     }
 
     private fun setViewState(newState: BottomNavigationViewState) {
