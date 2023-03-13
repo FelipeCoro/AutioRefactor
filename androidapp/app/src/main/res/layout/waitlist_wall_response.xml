@@ -43,7 +43,7 @@
             android:layout_marginEnd="60dp"
             android:fontFamily="@font/sf_pro_text_regular"
             android:justificationMode="none"
-            android:text="@string/waitlist_content"
+            android:text="@string/waitlist_content_response"
             android:textAlignment="center"
             android:textAppearance="@style/Title"
             android:textColor="@color/autio_white"
@@ -54,18 +54,20 @@
             app:layout_constraintTop_toBottomOf="@+id/waitlistDivider" />
 
 
-        <Button
-            android:id="@+id/button_enable_notifications"
+        <ImageView
+            android:id="@+id/notifications_enabled"
             style="@style/Button.Shape"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="63dp"
+            android:layout_width="48dp"
+            android:layout_height="26dp"
+            android:layout_marginStart="-6dp"
+            android:layout_marginTop="68dp"
             android:text="@string/enable_notifications"
             android:textColor="@color/autio_blue"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.439"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/watilistText" />
-
+            app:layout_constraintTop_toBottomOf="@+id/watilistText"
+            app:srcCompat="@drawable/icons8_done_50" />
 
         <ImageView
             android:id="@+id/waitlistAutioLogo"
@@ -74,7 +76,7 @@
             android:layout_marginTop="100dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button_enable_notifications"
+            app:layout_constraintTop_toBottomOf="@+id/notifications_enabled"
             app:srcCompat="@drawable/group_699" />
 
         <TextView
@@ -118,6 +120,21 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/privacy_policy"
             app:layout_constraintTop_toTopOf="@+id/terms_of_service" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-8dp"
+            android:fontFamily="@font/sf_pro_text_regular"
+
+            android:text="Done"
+            android:textColor="@color/autio_white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="@+id/notifications_enabled"
+            app:layout_constraintStart_toEndOf="@+id/notifications_enabled"
+            app:layout_constraintTop_toTopOf="@+id/notifications_enabled"
+            tools:text="Done" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

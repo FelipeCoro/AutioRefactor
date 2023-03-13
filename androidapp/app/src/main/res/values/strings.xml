@@ -195,6 +195,7 @@
     <string name="free_stories_banner_content">Tap a story nearby, or browse destinations around the country. When you\'re done, you can select one of three different plans to access our growing library of 9,000+ stories.\n \nSafe travels!\n-The Autio Team</string>
     <string name="waitlist_title">You\'re on the waitlist</string>
     <string name="waitlist_content">Due to overwhelming demand, we’ll be granting access in phases.\n \nEnable notifications so we can let you know when the Autio app is ready for you!</string>
+    <string name="waitlist_content_response">Due to overwhelming demand, we’ll be granting access in phases.\n \nThe current estimated wait time is 7 days</string>
     <string name="enable_notifications">Enable Notifications</string>
     <string name="termsOfService">TERMS OF SERVICE</string>
     <string name="privacyPolicy">PRIVACY POLICY</string>

@@ -3,12 +3,14 @@ package com.autio.android_app.ui.stories.fragments
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.WaitlistWallBinding
 import com.autio.android_app.util.PermissionsManager
@@ -35,26 +37,43 @@ class WaitlistFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
 
         with(binding) {
-            buttonEnableNotifications.setOnClickListener { requestNotification() }
+            buttonEnableNotifications.setOnClickListener { navigate() }
             termsOfService.setOnClickListener { openTerms() }
             privacyPolicy.setOnClickListener { openPrivacy() }
             security.setOnClickListener { openSecurity() }
         }
-        initView()
-
-    }
-
-    private fun initView() {
-        validateNotificationsPermission()
+        if (validateNotificationsPermission()) {
+            navigateToDone()
+        }
     }
 
 
-    private fun requestNotification() {
+    private fun requestPermission() {
+        if (Build.VERSION.SDK_INT < 33) {
+            navigateToDone()
+        } else {
+            permissionsManager.requestPermission(
+                Manifest.permission.POST_NOTIFICATIONS,
+                { navigateToDone() },
+                { navigateToDone() },
+                { navigateToDone() }
+            )
+        }
+    }
 
+
+    private fun navigate() {
+        if (validateNotificationsPermission()) {
+            navigateToDone()
+        } else {
+            requestPermission()
+        }
+    }
+
+    private fun navigateToDone() {
+        findNavController().navigate(R.id.action_waitlistFragment_to_waitlistFragmentResponse)
     }
 
     private fun openTerms() {
@@ -73,12 +92,11 @@ class WaitlistFragment : Fragment() {
     }
 
     private fun validateNotificationsPermission(): Boolean {
-        return requireContext().let {
-            if (android.os.Build.VERSION.SDK_INT < 33) {
-                true //we don't need to ask for this versions for push notifications
-            } else {
-                permissionsManager.checkPermission(Manifest.permission.POST_NOTIFICATIONS)
-            }
-        } ?: false
+        return if (android.os.Build.VERSION.SDK_INT < 33) {
+            true //we don't need to ask for this versions for push notifications
+        } else {
+            permissionsManager.checkPermission(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
     }
 }

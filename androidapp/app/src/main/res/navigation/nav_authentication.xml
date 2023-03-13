@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/authentication_nav"
-    app:startDestination="@id/onBoardingFragment">
+    app:startDestination="@id/waitlistFragment">
 
     <action
         android:id="@+id/signUp"
@@ -61,4 +61,16 @@
             android:id="@+id/action_onBoardingFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/waitlistFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.WaitlistFragment"
+        android:label="WaitlistFragment" >
+        <action
+            android:id="@+id/action_waitlistFragment_to_waitlistFragmentResponse"
+            app:destination="@id/waitlistFragmentResponse" />
+    </fragment>
+    <fragment
+        android:id="@+id/waitlistFragmentResponse"
+        android:name="com.autio.android_app.ui.stories.fragments.WaitlistFragmentResponse"
+        android:label="WaitlistFragmentResponse" />
 </navigation>
