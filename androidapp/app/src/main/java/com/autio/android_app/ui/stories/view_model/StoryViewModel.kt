@@ -28,10 +28,7 @@ class StoryViewModel @Inject constructor(
 ) : ViewModel() {
     private val _storyViewState = MutableLiveData<StoryViewState>()
     val storyViewState: LiveData<StoryViewState> = _storyViewState
-
-
     val userCategories = autioRepository.userCategories.asLiveData()
-    val bookmarkedStories = autioRepository.bookmarkedStories.asLiveData()
     val storiesHistory = autioRepository.history.asLiveData()
     val favoriteStories = autioRepository.favoriteStories.asLiveData()
 
@@ -179,7 +176,7 @@ class StoryViewModel @Inject constructor(
                 autioRepository.giveLikeToStory(userId, apiToken, storyId)
             }.onSuccess { result ->
                 val likedStory = result.getOrNull()
-                likedStory?.let {isItLiked->
+                likedStory?.let { isItLiked ->
                     if (isItLiked.first) {
                         setViewState(StoryViewState.StoryLiked(isItLiked.second))
                     } else setViewState(StoryViewState.FailedLikedStory)
@@ -196,7 +193,7 @@ class StoryViewModel @Inject constructor(
                 autioRepository.removeLikeFromStory(userId, apiToken, storyId)
             }.onSuccess { result ->
                 val removedLike = result.getOrNull()
-                removedLike?.let {isItLiked->
+                removedLike?.let { isItLiked ->
                     if (!isItLiked.first) {
                         setViewState(StoryViewState.LikedRemoved(isItLiked.second))
                     } else setViewState(StoryViewState.FailedLikedRemoved)
@@ -281,6 +278,22 @@ class StoryViewModel @Inject constructor(
         }
     }
 
+    fun getDownloadedStories() {
+        viewModelScope.launch(coroutineDispatcher) {
+            runCatching {
+                autioRepository.getDownloadedStories()
+            }.onSuccess { result ->
+                val stories = result.getOrNull()
+                stories?.let {
+                    setViewState(StoryViewState.FetchedAllDownloadedStories(it))
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FetchedAllDownloadedStoriesFailed)
+
+            }
+        }
+    }
 }
+
 
 

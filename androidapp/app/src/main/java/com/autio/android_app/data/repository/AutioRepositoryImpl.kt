@@ -31,10 +31,6 @@ class AutioRepositoryImpl @Inject constructor(
             entities.onEach { it.toModel() }
         }
 
-    override val bookmarkedStories: Flow<List<Story>>
-        get() = autioLocalDataSource.bookmarkedStories.transform { entities ->
-            entities.onEach { it.toModel() }
-        }
     override val favoriteStories: Flow<List<Story>>
         get() = autioLocalDataSource.favoriteStories.transform { entities ->
             entities.onEach { it.toModel() }
@@ -283,6 +279,10 @@ class AutioRepositoryImpl @Inject constructor(
         return autioLocalDataSource.getDownloadedStoryById(id)
     }
 
+    override suspend fun getDatabaseStoryById(id: Int): StoryEntity? {
+        return autioLocalDataSource.getDownloadedStoryById(id)
+    }
+
     override suspend fun downloadStory(story: Story) {
         autioLocalDataSource.downloadStory(story.toStoryEntity())
     }
@@ -324,12 +324,13 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun giveLikeToStory(
         userId: Int, apiToken: String, storyId: Int
-    ): Result<Pair<Boolean,Int>> {
+    ): Result<Pair<Boolean, Int>> {
         autioLocalDataSource.giveLikeToStory(storyId)
         val remoteLike = autioRemoteDataSource.giveLikeToStory(userId, apiToken, storyId)
         val likeCount = autioRemoteDataSource.storyLikesCount(userId, apiToken, storyId)
         return if (remoteLike.isSuccessful) {
-            val result = Pair(remoteLike.body()!!.liked.toString().toBoolean(),likeCount.body()!!.likes )
+            val result =
+                Pair(remoteLike.body()!!.liked.toString().toBoolean(), likeCount.body()!!.likes)
             Result.success(result)
         } else {
             val throwable = Error(remoteLike.errorBody().toString())
@@ -339,14 +340,17 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun removeLikeFromStory(
         userId: Int, apiToken: String, storyId: Int
-    ): Result<Pair<Boolean,Int>> {
+    ): Result<Pair<Boolean, Int>> {
         autioLocalDataSource.removeLikeFromStory(storyId)
         val remoteRemovedLike = autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
         val likeCount = autioRemoteDataSource.storyLikesCount(userId, apiToken, storyId)
         return if (remoteRemovedLike.isSuccessful) {
-            val result = Pair(remoteRemovedLike.body()!!.liked.toString().toBoolean(),likeCount.body()!!.likes )
+            val result = Pair(
+                remoteRemovedLike.body()!!.liked.toString().toBoolean(),
+                likeCount.body()!!.likes
+            )
             Result.success(result)
-        }else {
+        } else {
             val throwable = Error(remoteRemovedLike.errorBody().toString())
             Result.failure(throwable)
         }
@@ -529,6 +533,20 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun addStories(stories: List<Story>) {
         autioLocalDataSource.addStories(stories.map { it.toMapPointEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
+    }
+
+    override suspend fun getDownloadedStories(): Result<List<Story>> {
+
+        val result = autioLocalDataSource.getDownloadedStories()
+       return if (result.isSuccess) {
+            val stories = result.getOrNull()?.let { downloadedStories ->
+                downloadedStories.map { it.toModel() }
+            } ?: listOf()
+            Result.success(stories)
+        } else {
+            val throwable = Error(result.toString())
+            Result.failure(throwable)
+        }
     }
 }
 

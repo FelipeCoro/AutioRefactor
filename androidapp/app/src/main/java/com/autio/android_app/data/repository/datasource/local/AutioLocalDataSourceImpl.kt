@@ -17,8 +17,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
-    override val getDownloadedStories = storyDao.readLiveStories()
-    override val bookmarkedStories = storyDao.getBookmarkedStories()
     override val favoriteStories = storyDao.getFavoriteStories()
     override val history = storyDao.getHistory()
 
@@ -183,6 +181,14 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getDownloadedStoryById(id: Int): StoryEntity? {
         return storyDao.getStoryById(id)
+    }
+
+    override suspend fun getDownloadedStories():Result<List<StoryEntity>> {
+      return  runCatching { storyDao.getDownloadedStories()
+        }.onSuccess {
+            Result.success(it)
+        }.onFailure { emptyList<StoryEntity>() }
+
     }
 
     override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {

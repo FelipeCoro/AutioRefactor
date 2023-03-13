@@ -8,6 +8,9 @@ sealed interface StoryViewState {
     object FetchedStoriesByIdsFailed : StoryViewState
     data class FetchedAllStories(val stories: List<Story>) : StoryViewState
     object FetchedAllStoriesFailed : StoryViewState
+
+    data class FetchedAllDownloadedStories(val stories: List<Story>) : StoryViewState
+    object FetchedAllDownloadedStoriesFailed : StoryViewState
     data class FetchedAuthor(val author: Author) : StoryViewState
     object FetchedAuthorFailed : StoryViewState
     object AddedBookmark : StoryViewState

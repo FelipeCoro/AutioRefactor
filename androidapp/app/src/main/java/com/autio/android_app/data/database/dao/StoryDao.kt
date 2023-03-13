@@ -65,7 +65,10 @@ interface StoryDao {
     fun removeBookmarkFromStory(id: Int)
 
     @Query("SELECT * FROM story WHERE isBookmarked = 1")
-    fun getBookmarkedStories(): Flow<List<StoryEntity>>
+    fun getBookmarkedStories(): List<StoryEntity>
+
+    @Query("SELECT * FROM story WHERE isDownloaded = 1  ORDER BY id ASC")
+    fun getDownloadedStories(): List<StoryEntity>
 
     @Query("SELECT * FROM story WHERE modifiedDate = (SELECT MAX(modifiedDate) FROM story)")
     suspend fun readLastModifiedStory(): StoryEntity?

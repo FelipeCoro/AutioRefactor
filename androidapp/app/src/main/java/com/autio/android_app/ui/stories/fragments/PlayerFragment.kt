@@ -123,14 +123,18 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
-        val story = playerFragmentViewModel.story
-        storyId = story.id
 
+
+       val story = playerFragmentViewModel.currentStory
+
+        story.value?.let {
+            storyId = it.id
+        }
 
         storyViewModel.isStoryLiked(
             prefRepository.userId,
             prefRepository.userApiToken,
-            story.id
+            storyId
         )
 
         binding.btnHeart.setOnClickListener {
@@ -140,7 +144,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 storyViewModel.getStoriesByIds(
                     prefRepository.userId,
                     prefRepository.userApiToken,
-                    listOf(story.id)
+                    listOf(storyId)
                 )
             }
         }
@@ -424,9 +428,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             mapCard.visibility = View.VISIBLE
         } else {
             sBTrack.setOnSeekBarChangeListener(null)
-            ivStoryImage.setImageResource(
-                0
-            )
+            ivStoryImage.setImageResource(0)
             tvStoryTitle.text = requireContext().resources.getResourceName(
                 R.string.no_story_loaded
             )

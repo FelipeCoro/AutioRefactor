@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -90,6 +91,8 @@ class BottomNavigationViewModel @Inject constructor(
     private val mediaMetadataObserver = Observer<Story?> {
         updateMediaState(playbackState, it)
     }
+
+
 
 
     private fun checkPlaybackPosition(): Boolean = handler.postDelayed(

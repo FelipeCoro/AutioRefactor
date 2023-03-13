@@ -73,7 +73,7 @@
     <string name="adventurer_plan_note">One-time payment.</string>
     <string name="guest_authenticate_message">You\'re not currently signed in.\nCreate an account or sign in to\nmanage your account.</string>
     <string name="contact_support">Questions about your account or subscription? <u>Contact Autio</u>.</string>
-    <string name="no_story_loaded">No story loaded</string>
+    <string name="no_story_loaded">Pick a story from the map</string>
     <string name="empty_bookmarks_message">Bookmarked stories will appear on this list. Bookmarks are only visible to you and are a great way to earmark stories to revisit later.</string>
     <string name="empty_favorites_message">Liked stories will appear on this list. Everyone can see likes — they’re a great way to show some love for your absolute favorite stories.</string>
     <string name="empty_history_message">Listened-to stories will appear here in the order you discover them. Start listening now by choosing a story from the map.</string>
