@@ -20,7 +20,7 @@ fun Fragment.onOptionClicked(
 ) {
     showPaywallOrProceedWithNormalProcess(
         prefRepository,
-        activity, true
+        activity, false //TODO(CHANGE TO TRUE)
     ) {
         when (option) {
             StoryOption.BOOKMARK -> {

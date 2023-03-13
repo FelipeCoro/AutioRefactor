@@ -31,6 +31,7 @@ import com.autio.android_app.extensions.findNearestToCoordinates
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
+import com.autio.android_app.ui.stories.view_model.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
@@ -59,6 +60,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val mapFragmentViewModel: MapFragmentViewModel by viewModels()
     private val storyViewModel: StoryViewModel by viewModels()
+    private val playerViewModel: PlayerFragmentViewModel by viewModels()
 
     @Inject
     lateinit var prefRepository: PrefRepository
@@ -466,6 +468,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val story = clusterItem.story
         binding.tvSelectedStoryTitle.text = story.title
         binding.tvSelectedStoryNarrator.text = story.narrator
+        playerViewModel.setCurrentStory(story)
         bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
             if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
                 binding.btnSelectedStoryPlay.setImageResource(res)

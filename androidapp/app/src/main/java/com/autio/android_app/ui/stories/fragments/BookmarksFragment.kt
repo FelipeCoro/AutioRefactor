@@ -91,7 +91,7 @@ class BookmarksFragment : Fragment() {
     }
 
     private fun bindObservables() {
-        storyViewModel.bookmarkedStories.observe(viewLifecycleOwner) { stories ->
+     //   storyViewModel.bookmarkedStories.observe(viewLifecycleOwner) { stories ->
 //            val totalTime =
 //                stories.sumOf { it.duration } / 60
 //            binding.tvToolbarSubtitle.text =
@@ -101,49 +101,49 @@ class BookmarksFragment : Fragment() {
 //                    stories.size,
 //                    totalTime
 //                )
-            binding.pbLoadingStories.visibility = View.GONE
-            if (stories.isEmpty()) {
-                binding.ivNoContentIcon.setImageResource(
-                    R.drawable.ic_player_bookmark
-                )
-                binding.tvNoContentMessage.text = resources.getText(
-                    R.string.empty_bookmarks_message
-                )
-                binding.rlStories.visibility = View.GONE
-                binding.llNoContent.visibility = View.VISIBLE
-            } else {
-                binding.btnPlaylistOptions.setOnClickListener {
-                    showPlaylistOptions(
-                        requireContext(),
-                        binding.root as ViewGroup,
-                        it,
-                        listOf(PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE),
-                        onOptionClicked = ::onPlaylistOptionClicked
-                    )
-                }
-                val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
-                if (storiesWithoutRecords.isNotEmpty()) {
-                    lifecycleScope.launch {
-                        val ids =
-                            storiesWithoutRecords.map { it.id }
-                        val result = apiClient.getStoriesByIds(
-                            prefRepository.userId,
-                            prefRepository.userApiToken,
-                            ids
-                        )
-                        if (result.isSuccessful) {
-                            val storiesFromAPI = result.body()!!//TODO(REVIEW THIS QUICK FIX)
-                            for (story in storiesFromAPI) {
-                                storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
-                            }
-                        }
-                    }
-                }
-            }
-            storyAdapter.submitList(stories)
-            binding.llNoContent.visibility = View.GONE
-            binding.rlStories.visibility = View.VISIBLE
-        }
+  //      binding.pbLoadingStories.visibility = View.GONE
+  //      if (stories.isEmpty()) {
+  //          binding.ivNoContentIcon.setImageResource(
+  //              R.drawable.ic_player_bookmark
+  //          )
+  //          binding.tvNoContentMessage.text = resources.getText(
+  //              R.string.empty_bookmarks_message
+  //          )
+  //          binding.rlStories.visibility = View.GONE
+  //          binding.llNoContent.visibility = View.VISIBLE
+  //      } else {
+  //          binding.btnPlaylistOptions.setOnClickListener {
+  //              showPlaylistOptions(
+  //                  requireContext(),
+  //                  binding.root as ViewGroup,
+  //                  it,
+  //                  listOf(PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE),
+  //                  onOptionClicked = ::onPlaylistOptionClicked
+  //              )
+  //          }
+  //          val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
+  //          if (storiesWithoutRecords.isNotEmpty()) {
+  //              lifecycleScope.launch {
+  //                  val ids =
+  //                      storiesWithoutRecords.map { it.id }
+  //                  val result = apiClient.getStoriesByIds(
+  //                      prefRepository.userId,
+  //                      prefRepository.userApiToken,
+  //                      ids
+  //                  )
+  //                  if (result.isSuccessful) {
+  //                      val storiesFromAPI = result.body()!!//TODO(REVIEW THIS QUICK FIX)
+  //                      for (story in storiesFromAPI) {
+  //                          storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
+  //                      }
+  //                  }
+  //              }
+  //          }
+  //      }
+  //      storyAdapter.submitList(stories)
+  //      binding.llNoContent.visibility = View.GONE
+  //      binding.rlStories.visibility = View.VISIBLE
+  //  }
 
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
 

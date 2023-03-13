@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface AutioRepository {
     val userCategories: Flow<List<Category>>
-
-    val bookmarkedStories: Flow<List<Story>>
     val favoriteStories: Flow<List<Story>>
     val history: Flow<List<Story>>
 
@@ -57,6 +55,8 @@ interface AutioRepository {
     )
 
     suspend fun getDownloadedStoryById(id: Int): StoryEntity?
+
+    suspend fun getDatabaseStoryById(id: Int): StoryEntity?
 
     suspend fun downloadStory(story: Story)
 
@@ -115,5 +115,7 @@ interface AutioRepository {
     suspend fun deleteCachedData()
 
     suspend fun addStories(stories: List<Story>)
+
+    suspend fun getDownloadedStories():Result<List<Story>>
 
 }

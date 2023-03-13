@@ -106,6 +106,8 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
 
+
+
     private fun checkPlaybackPosition(): Boolean = handler.postDelayed(
         {
             val currPosition = playbackState.currentPlayBackPosition.toInt()

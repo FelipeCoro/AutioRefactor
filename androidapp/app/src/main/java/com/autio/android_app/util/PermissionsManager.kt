@@ -46,9 +46,7 @@ class PermissionsManager constructor(
         grantedListener: (() -> Unit)? = null,
         deniedListener: (() -> Unit)? = null
     ) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                activity, permission
-            )
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
         ) {
             rationaleListener?.invoke(permission)
         } else {

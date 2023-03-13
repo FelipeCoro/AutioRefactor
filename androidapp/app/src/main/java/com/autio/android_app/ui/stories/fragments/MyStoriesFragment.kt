@@ -36,7 +36,7 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun initView() {
-        val isUser = isUserGuest()
+        val isUser = false //isUserGuest()
 
         binding.lySignIn.isVisible = isUser
         binding.lyStoriesList.isGone = isUser

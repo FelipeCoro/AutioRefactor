@@ -31,10 +31,8 @@ class PlayerFragmentViewModel @Inject constructor(
 
     private var playbackState: PlaybackStateCompat = EMPTY_PLAYBACK_STATE
 
-    lateinit var story:Story
 
     val currentStory = MutableLiveData<Story?>()
-
 
 
     val mediaPosition = MutableLiveData<Long>().apply {
@@ -102,6 +100,10 @@ class PlayerFragmentViewModel @Inject constructor(
             mediaMetadataObserver
         )
         checkPlaybackPosition()
+    }
+
+    fun setCurrentStory(story: Story) {
+        currentStory.postValue(story)
     }
 
     /**
@@ -190,7 +192,6 @@ class PlayerFragmentViewModel @Inject constructor(
         // Only update media item once we have duration available
         if (storyUpdate != null) {
             if (storyUpdate.duration != 0) {
-                story = storyUpdate
                 this.currentStory.postValue(
                     storyUpdate
                 )

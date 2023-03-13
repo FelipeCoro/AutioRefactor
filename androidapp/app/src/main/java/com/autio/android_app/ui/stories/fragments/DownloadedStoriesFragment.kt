@@ -90,40 +90,10 @@ class DownloadedStoriesFragment : Fragment() {
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
-/* TODO(FIX THIS OBERVER DEPENDECY AND USE VIEWSTATE)
-        storyViewModel.downloadedStories.observe(viewLifecycleOwner) { stories ->
-            recyclerView.adapter = storyAdapter
-//                binding.tvToolbarSubtitle.text =
-//                    resources.getQuantityString(
-//                        R.plurals.toolbar_stories_subtitle,
-//                        stories.size,
-//                        stories.size
-//                    )
-            binding.pbLoadingStories.visibility = View.GONE
-            binding.btnPlaylistOptions.setOnClickListener { view ->
-                showPlaylistOptions(
-                    requireContext(), binding.root as ViewGroup, view, listOf(
-                        PlaylistOption.REMOVE
-                    ).map {
-                        it.also { option ->
-                            option.disabled = stories.isEmpty()
-                        }
-                    }, onOptionClicked = ::onPlaylistOptionClicked
-                )
-            }
-            if (stories.isEmpty()) {
-                binding.ivNoContentIcon.setImageResource(R.drawable.ic_download)
-                binding.tvNoContentMessage.text = resources.getText(
-                    R.string.empty_downloads_message
-                )
-                binding.rlStories.visibility = View.GONE
-                binding.llNoContent.visibility = View.VISIBLE
-            } else {
-                storyAdapter.submitList(stories)
-                binding.llNoContent.visibility = View.GONE
-                binding.rlStories.visibility = View.VISIBLE
-            }
-        }*/
+
+
+        storyViewModel.getDownloadedStories()
+
     }
 
     private fun bindObservers() {
@@ -137,8 +107,44 @@ class DownloadedStoriesFragment : Fragment() {
             is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.FetchedAllDownloadedStories -> showAllDownloadedStories(viewState.stories)
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
+        }
+    }
+
+    private fun showAllDownloadedStories(stories:List<Story>){
+
+        recyclerView.adapter = storyAdapter
+              //binding.tvToolbarSubtitle.text =
+              //    resources.getQuantityString(
+              //        R.plurals.toolbar_stories_subtitle,
+              //        stories.size,
+              //        stories.size
+              //    )
+        binding.pbLoadingStories.visibility = View.GONE
+        binding.btnPlaylistOptions.setOnClickListener { view ->
+            showPlaylistOptions(
+                requireContext(), binding.root as ViewGroup, view, listOf(
+                    PlaylistOption.REMOVE
+                ).map {
+                    it.also { option ->
+                        option.disabled = stories.isEmpty()
+                    }
+                }, onOptionClicked = ::onPlaylistOptionClicked
+            )
+        }
+        if (stories.isEmpty()) {
+            binding.ivNoContentIcon.setImageResource(R.drawable.ic_download)
+            binding.tvNoContentMessage.text = resources.getText(
+                R.string.empty_downloads_message
+            )
+            binding.rlStories.visibility = View.GONE
+            binding.llNoContent.visibility = View.VISIBLE
+        } else {
+            storyAdapter.submitList(stories)
+            binding.llNoContent.visibility = View.GONE
+            binding.rlStories.visibility = View.VISIBLE
         }
     }
 

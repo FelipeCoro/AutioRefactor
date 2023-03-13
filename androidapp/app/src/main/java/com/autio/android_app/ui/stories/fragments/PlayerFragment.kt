@@ -123,24 +123,28 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
-        val story = playerFragmentViewModel.story
-        storyId = story.id
 
+
+       val story = playerFragmentViewModel.currentStory
+
+        story.value?.let {
+            storyId = it.id
+        }
 
         storyViewModel.isStoryLiked(
             prefRepository.userId,
             prefRepository.userApiToken,
-            story.id
+            storyId
         )
 
         binding.btnHeart.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(), true
+                prefRepository, requireActivity(), false //TODO(CHANGE TO TRUE)
             ) {
                 storyViewModel.getStoriesByIds(
                     prefRepository.userId,
                     prefRepository.userApiToken,
-                    listOf(story.id)
+                    listOf(storyId)
                 )
             }
         }
@@ -183,6 +187,9 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 view,
                 mediaItem
             )
+            if (mediaItem != null) {
+                storyId = mediaItem.id
+            }
         }
         playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner)
         { res ->
@@ -245,17 +252,17 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             is StoryViewState.FetchedStoriesByIds -> handleFetchedStory(viewState.stories.first())
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
             is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
-            is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             is StoryViewState.StoryLiked -> handleLIsLikedState(viewState.likeCount)
             is StoryViewState.LikedRemoved -> handleLIsNotLikedState(viewState.likeCount)
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
 
-    private fun isStoryLiked(liked: Boolean) {
-        if (liked) {
+    private fun isStoryLiked(isLiked:Boolean) {
+        if (isLiked) {
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
         }
         storyViewModel.storyLikesCount(
@@ -336,6 +343,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     }
                 }
             })
+            storyViewModel.isStoryLiked(prefRepository.userId,prefRepository.userApiToken,storyId)
             tvStoryTitle.text = story.title
             tvStoryAuthor.apply {
                 text = story.author
@@ -424,9 +432,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             mapCard.visibility = View.VISIBLE
         } else {
             sBTrack.setOnSeekBarChangeListener(null)
-            ivStoryImage.setImageResource(
-                0
-            )
+            ivStoryImage.setImageResource(0)
             tvStoryTitle.text = requireContext().resources.getResourceName(
                 R.string.no_story_loaded
             )
