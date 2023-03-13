@@ -8,9 +8,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
+import com.autio.android_app.BuildConfig
 import com.autio.android_app.R
 import com.autio.android_app.databinding.WaitlistWallBinding
 import com.autio.android_app.util.PermissionsManager
@@ -37,6 +40,12 @@ class WaitlistFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        if (BuildConfig.DEBUG) {
+            val request = NavDeepLinkRequest.Builder.fromUri("android-app://navigation.autio.app/onboarding".toUri()).build()
+            val nav = findNavController()
+            nav.navigate(request)
+        }
 
         with(binding) {
             buttonEnableNotifications.setOnClickListener { navigate() }
