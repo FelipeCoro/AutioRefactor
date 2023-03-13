@@ -39,6 +39,8 @@ class LoginFragment : Fragment() {
             container,
             false
         )
+        binding.viewModel = loginViewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -85,6 +87,7 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
         binding.btnLoginAsGuest.setOnClickListener {
+            loginViewModel.isLoading.set(true)
             loginViewModel.loginGuest()
         }
     }

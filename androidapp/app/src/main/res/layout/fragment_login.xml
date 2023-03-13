@@ -151,8 +151,8 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include
-            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}"
             android:id="@+id/fl_loading"
-            layout="@layout/loading_barrier" />
+            layout="@layout/loading_barrier"
+            android:visibility="@{viewModel.isLoading ? View.VISIBLE : View.GONE}" />
     </FrameLayout>
 </layout>

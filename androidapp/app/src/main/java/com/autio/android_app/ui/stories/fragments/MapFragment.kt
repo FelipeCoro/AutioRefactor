@@ -275,7 +275,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         largerBitmap?.let {
             val originalBitmap = getOriginalBitmap(it)
             val smallerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(originalBitmap)
-            storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
+             storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
         }
     }
 
@@ -512,7 +512,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      */
     private fun addClusteredMarkers(stories: List<Story>) {
         if (!::map.isInitialized) return
-       //map.clear()
+        
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         clusterManager.setAnimation(true)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)

@@ -779,7 +779,7 @@
         </item>
     </style>
 
-    <style name="ClusterMapStyle" parent="Theme.AppCompat">
+    <style name="ClusterMapStyle" parent="ThemeOverlay.AppCompat">
         <item name="android:fontFamily">
             @font/sf_pro_text_regular
         </item>

@@ -65,12 +65,12 @@ class InAppLocationFragment : Fragment() {
     private fun goToAuthentication() {
         onBoardingFinished()
         val nav = findNavController()
-        nav.navigate(R.id.action_onboarding_to_authentication_nav)
+        nav.navigate(R.id.action_onBoardingFragment_to_loginFragment)
         activity?.finish()
     }
 
     private fun goToBackgroundLocationPermission() {
-        viewPager.currentItem = 2
+        viewPager.currentItem += 1
     }
 
     private fun onBoardingFinished() {

@@ -9,8 +9,13 @@ import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
@@ -21,13 +26,17 @@ import com.autio.android_app.extensions.isPrepared
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
-import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
-import com.autio.android_app.ui.login.viewmodels.LoginViewState
+import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -46,6 +55,9 @@ class BottomNavigationViewModel @Inject constructor(
     private val coroutineDispatcher: CoroutineDispatcher
 ) : AndroidViewModel(app) {
 
+    private val _isPayWallVisible = ObservableBoolean(false)
+    val isPayWallVisible = _isPayWallVisible.get()
+
     private val _bottomNavigationViewState = MutableLiveData<BottomNavigationViewState>()
     val bottomNavigationViewState: LiveData<BottomNavigationViewState> = _bottomNavigationViewState
 
@@ -53,6 +65,9 @@ class BottomNavigationViewModel @Inject constructor(
     val remainingStoriesLiveData = prefRepository.remainingStoriesLiveData
 
     private val storiesJob = SupervisorJob()
+    fun setPayWallVisible(isVisible: Boolean) {
+        _isPayWallVisible.set(isVisible)
+    }
 
     private fun setViewState(newState: BottomNavigationViewState) {
         _bottomNavigationViewState.postValue(newState)
@@ -78,9 +93,7 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     private var updatePosition = true
-    private val handler = Handler(
-        Looper.getMainLooper()
-    )
+    private val handler = Handler(Looper.getMainLooper())
 
     private val playbackStateObserver = Observer<PlaybackStateCompat> {
         playbackState = it ?: EMPTY_PLAYBACK_STATE

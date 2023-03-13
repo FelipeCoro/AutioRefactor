@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentWelcomeExplorerBinding
@@ -21,20 +22,22 @@ class WelcomeExplorerFragment : Fragment() {
     @Inject
     lateinit var prefRepository: PrefRepository
     private lateinit var binding: FragmentWelcomeExplorerBinding
-
+    private lateinit var viewPager: ViewPager2
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentWelcomeExplorerBinding.inflate(
             inflater, container, false
         )
+        viewPager = requireActivity().findViewById(R.id.viewPager)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.buttonLetsGo.setOnClickListener {
-            findNavController().navigate(R.id.action_welcomeExplorerFragment_to_viewPagerFragment)
+            viewPager.currentItem += 1
         }
         initView()
-
-        return binding.root
     }
 
     private fun initView() {
@@ -42,7 +45,7 @@ class WelcomeExplorerFragment : Fragment() {
             if (isUserLoggedIn()) {
                 startActivity(Intent(activity, BottomNavigation::class.java))
                 activity?.finish()
-            } else findNavController().navigate(R.id.action_welcomeExplorerFragment_to_authentication_nav)
+            } else findNavController().navigate(R.id.action_onBoardingFragment_to_loginFragment)
         }
         startAnimation()
     }

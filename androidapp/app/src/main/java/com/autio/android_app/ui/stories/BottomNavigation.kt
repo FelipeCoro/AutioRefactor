@@ -50,61 +50,56 @@ class BottomNavigation : AppCompatActivity() {
     private lateinit var binding: ActivityBottomNavigationBinding
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
+    private lateinit var snackBarView: View
 
     private var castContext: CastContext? = null
     private var isNetworkAvailable = false
-    private lateinit var snackBarView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        purchaseViewModel.getUserInfo()
-
-        bindObservables()
-
-        // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
-
         binding = DataBindingUtil.setContentView(this, R.layout.activity_bottom_navigation)
-
-        updateSnackBarMessageDisplay()
-
-        updateAvailableStoriesUI(
-            bottomNavigationViewModel.initialRemainingStories
-        )
+        bindNetworkManager()
+        bindObservables()
 
         snackBarView = layoutInflater.inflate(
             R.layout.feedback_snackbar, binding.root as ViewGroup, false
         )
 
         setListeners()
-        volumeControlStream = AudioManager.STREAM_MUSIC
-
-        bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
-            binding.btnFloatingPlayerPlay.setImageResource(res)
-        }
+        initView()
     }
 
-    private fun bindObservables() {
+    private fun bindNetworkManager() {
         lifecycleScope.launchWhenResumed {
             networkManager.networkStatus.collect {
                 isNetworkAvailable = it.isConnected
                 updateConnectionUI(isNetworkAvailable)
             }
         }
+    }
 
+    private fun initView() {
+        // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
+        volumeControlStream = AudioManager.STREAM_MUSIC
+        purchaseViewModel.getUserInfo()
+        updateSnackBarMessageDisplay()
+        updateAvailableStoriesUI(bottomNavigationViewModel.initialRemainingStories)
+    }
+
+    private fun bindObservables() {
         bottomNavigationViewModel.bottomNavigationViewState.observe(this, ::handleViewState)
 
+        bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
+            binding.btnFloatingPlayerPlay.setImageResource(res)
+        }
         bottomNavigationViewModel.playingStory.observe(this) {
             bottomNavigationViewModel.postPlay()
         }
         bottomNavigationViewModel.remainingStoriesLiveData.observe(this) {
-            updateAvailableStoriesUI(
-                it
-            )
+            updateAvailableStoriesUI(it)
         }
-        purchaseViewModel.customerInfo.observe(
-            this
-        ) {
+        purchaseViewModel.customerInfo.observe(this) {
             it?.let {
                 binding.rlSeePlans.visibility =
                     if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) GONE
@@ -126,9 +121,7 @@ class BottomNavigation : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        updateConnectionUI(
-            isNetworkAvailable
-        )
+        updateConnectionUI(isNetworkAvailable)
     }
 
     override fun onStop() {
@@ -142,25 +135,18 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     fun showUpButton() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(
-            true
-        )
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
     fun hideUpButton() {
-        supportActionBar?.setDisplayHomeAsUpEnabled(
-            false
-        )
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     private fun setListeners() {
-        navHostFragment = supportFragmentManager.findFragmentById(
-            R.id.main_container
-        ) as NavHostFragment
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
         navController = navHostFragment.navController
-        setupWithNavController(
-            binding.bottomNavigationView, navController
-        )
+        setupWithNavController(binding.bottomNavigationView, navController)
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             if (controller.graph[R.id.player] == destination) {
                 hidePlayerComponent()
@@ -179,10 +165,11 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     fun showPayWall() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
-        val nav = navHostFragment.navController
-        nav.navigate(R.id.action_global_subscribeFragment)
+        bottomNavigationViewModel.setPayWallVisible(true)
+    }
+
+    fun hidePaywall() {
+        bottomNavigationViewModel.setPayWallVisible(false)
     }
 
     private fun updateSnackBarMessageDisplay() {
@@ -223,12 +210,8 @@ class BottomNavigation : AppCompatActivity() {
         }
     }
 
-    private fun updateAvailableStoriesUI(
-        remainingStories: Int
-    ) {
-        with(
-            binding
-        ) {
+    private fun updateAvailableStoriesUI(remainingStories: Int) {
+        with(binding) {
             val tickMarks = arrayOf(
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )
