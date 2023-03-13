@@ -163,10 +163,11 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     fun showPayWall() {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
-        val nav = navHostFragment.navController
-        nav.navigate(R.id.action_global_subscribeFragment)
+        bottomNavigationViewModel.setPayWallVisible(true)
+    }
+
+    fun hidePaywall() {
+        bottomNavigationViewModel.setPayWallVisible(false)
     }
 
     private fun updateSnackBarMessageDisplay() {
@@ -207,12 +208,8 @@ class BottomNavigation : AppCompatActivity() {
         }
     }
 
-    private fun updateAvailableStoriesUI(
-        remainingStories: Int
-    ) {
-        with(
-            binding
-        ) {
+    private fun updateAvailableStoriesUI(remainingStories: Int) {
+        with(binding) {
             val tickMarks = arrayOf(
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )

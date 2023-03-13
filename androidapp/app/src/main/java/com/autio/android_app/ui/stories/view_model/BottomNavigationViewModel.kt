@@ -9,6 +9,7 @@ import android.os.Handler
 import android.os.Looper
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -54,6 +55,9 @@ class BottomNavigationViewModel @Inject constructor(
     private val coroutineDispatcher: CoroutineDispatcher
 ) : AndroidViewModel(app) {
 
+    private val _isPayWallVisible = ObservableBoolean(false)
+    val isPayWallVisible = _isPayWallVisible.get()
+
     private val _bottomNavigationViewState = MutableLiveData<BottomNavigationViewState>()
     val bottomNavigationViewState: LiveData<BottomNavigationViewState> = _bottomNavigationViewState
 
@@ -61,6 +65,9 @@ class BottomNavigationViewModel @Inject constructor(
     val remainingStoriesLiveData = prefRepository.remainingStoriesLiveData
 
     private val storiesJob = SupervisorJob()
+    fun setPayWallVisible(isVisible: Boolean) {
+        _isPayWallVisible.set(isVisible)
+    }
 
     private fun setViewState(newState: BottomNavigationViewState) {
         _bottomNavigationViewState.postValue(newState)
