@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
+import com.autio.android_app.ui.login.viewstates.LoginViewState
 import com.autio.android_app.ui.stories.models.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -33,9 +34,9 @@ class LoginViewModel @Inject constructor(
             if (result.isSuccess) { //TODO(Double check this)
                 result.getOrNull()?.let { user ->
                     saveGuestInfo(user)
-                    handleSuccessViewState(user)
-                } ?: handleFailureViewState(result.exceptionOrNull() as Exception)
-            } else handleFailureViewState(result.exceptionOrNull() as Exception)
+                    setViewState(LoginViewState.GuestLoginSuccess(user))
+                } ?:setViewState(LoginViewState.LoginError)
+            } else setViewState(LoginViewState.LoginError)
 
         }
     }
@@ -49,25 +50,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun handleSuccessViewState(data: User) {
-        setViewState(LoginViewState.SuccessViewState(data))
-
-    }
-
-    private fun handleFailureViewState(exception: Exception) {
-        setViewState(LoginViewState.ErrorViewState(exception))
-    }
-
     private fun setViewState(loginViewState: LoginViewState) {
         _viewState.postValue(loginViewState)
         isLoading.set(false)
     }
 
-}
-
-sealed interface LoginViewState {
-    data class ErrorViewState(val exception: Exception) : LoginViewState
-    data class SuccessViewState(val data: User) : LoginViewState
 }
 
 

@@ -1,5 +1,7 @@
 package com.autio.android_app.ui.login.fragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentSignInBinding
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
+import com.autio.android_app.ui.login.viewstates.LoginViewState
 import com.autio.android_app.ui.stories.models.LoginRequest
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
@@ -18,6 +21,7 @@ import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.pleaseFillText
 import dagger.hilt.android.AndroidEntryPoint
+import kotlin.math.log
 
 @AndroidEntryPoint
 class SignInFragment : Fragment() {
@@ -43,14 +47,16 @@ class SignInFragment : Fragment() {
     }
 
     private fun bindObservables() {
-        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
+        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handlePurchaseViewState)
+        loginViewModel.viewState.observe(viewLifecycleOwner, ::handleLoginViewState)
     }
 
     private fun setListeners() {
         binding.btnSignIn.setOnClickListener { signInUser() }
         binding.btnGuestMode.setOnClickListener { loginViewModel.loginGuest() }
+        binding.btnForgotPassword.setOnClickListener {passwordReset()}
         binding.btnCancel.setOnClickListener {
-            activity?.onBackPressedDispatcher?.onBackPressed()
+            findNavController().navigate(R.id.action_signInFragment_to_loginFragment)
         }
     }
 
@@ -66,11 +72,18 @@ class SignInFragment : Fragment() {
         }
     }
 
-    private fun handleViewState(viewState: PurchaseViewState?) {
+    private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
         when (viewState) {
             is PurchaseViewState.OnLoginSuccess -> handleOnLoginSuccess(viewState.data)
             is PurchaseViewState.OnLoginFailed -> handleOnLoginFailed()
             else -> showError()
+        }
+    }
+
+    private fun handleLoginViewState(viewState: LoginViewState?) {
+        when (viewState) {
+            is LoginViewState.GuestLoginSuccess -> handleOnLoginSuccess(viewState.data)
+            else -> handleOnLoginFailed()
         }
     }
 
@@ -86,6 +99,11 @@ class SignInFragment : Fragment() {
     private fun showError() {
         //TODO (Handle Error)
 
+    }
+
+    private fun passwordReset() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.passwordResetLink)))
+        startActivity(browse)
     }
 }
 

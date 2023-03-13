@@ -17,7 +17,7 @@ import com.autio.android_app.data.Datasource
 import com.autio.android_app.databinding.FragmentLoginBinding
 import com.autio.android_app.extensions.setAutomaticScroll
 import com.autio.android_app.ui.login.viewmodels.LoginViewModel
-import com.autio.android_app.ui.login.viewmodels.LoginViewState
+import com.autio.android_app.ui.login.viewstates.LoginViewState
 import com.autio.android_app.ui.stories.adapter.ImageAdapter
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -119,7 +119,7 @@ class LoginFragment : Fragment() {
 
     private fun handleViewState(viewState: LoginViewState?) {
         when (viewState) {
-            is LoginViewState.ErrorViewState -> showError(viewState.exception)
+            is LoginViewState.LoginError -> showError()
             else -> showSuccess(viewState)
         }
     }
@@ -128,7 +128,7 @@ class LoginFragment : Fragment() {
         findNavController().navigate(R.id.action_loginFragment_to_bottomNavigation)
     }
 
-    private fun showError(exception: Exception) {
+    private fun showError() {
         //TODO (Handle Error)
     }
 
