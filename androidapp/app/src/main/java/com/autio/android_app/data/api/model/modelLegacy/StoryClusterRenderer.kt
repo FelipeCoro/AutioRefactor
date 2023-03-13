@@ -38,9 +38,19 @@ class StoryClusterRenderer(
         )?.toBitmap()
     }
 
-    override fun getColor(clusterSize: Int): Int {
-        return R.color.white
+/*
+    private val mClusterIconGenerator = IconGenerator(context).apply {
+        setBackground(context.let {
+            ContextCompat.getDrawable(it, R.drawable.cluster_background_white)
+        })
+        setTextAppearance(R.style.ClusterMapStyle)
     }
+
+    override fun getDescriptorForCluster(cluster: Cluster<StoryClusterItem>): BitmapDescriptor {
+        val icon = mClusterIconGenerator.makeIcon(cluster.size.toString())
+        return BitmapDescriptorFactory.fromBitmap(icon)
+    }
+*/
 
     override fun getClusterTextAppearance(clusterSize: Int): Int {
         return R.style.ClusterMapStyle
@@ -50,7 +60,9 @@ class StoryClusterRenderer(
      * Method called before the cluster item (i.e. the marker) is rendered. This is where marker
      * options should be set
      */
-    override fun onBeforeClusterItemRendered(item: StoryClusterItem, markerOptions: MarkerOptions) {
+    override fun onBeforeClusterItemRendered(
+        item: StoryClusterItem, markerOptions: MarkerOptions
+    ) {
 
         val markerBitmap: Bitmap? =
             if (item.story.listenedAtLeast30Secs == true) {
@@ -75,7 +87,6 @@ class StoryClusterRenderer(
     ) {
         super.onClusterItemRendered(item, marker)
         marker.tag = item
-
         item.marker = marker
 
         if (item.story.listenedAtLeast30Secs == true) {
@@ -86,6 +97,6 @@ class StoryClusterRenderer(
     }
 
     override fun shouldRenderAsCluster(cluster: Cluster<StoryClusterItem>): Boolean {
-        return cluster.size > 1
+        return cluster.size > 8
     }
 }
