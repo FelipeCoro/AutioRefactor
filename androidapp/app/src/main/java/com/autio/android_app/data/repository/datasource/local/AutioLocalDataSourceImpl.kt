@@ -162,9 +162,8 @@ class AutioLocalDataSourceImpl @Inject constructor(
 // Downloaded stories
 
     override suspend fun downloadStory(story: StoryEntity) {
-        executor.execute {
             storyDao.addStory(story)
-        }
+
     }
 
     override suspend fun removeDownloadedStory(id: Int) {

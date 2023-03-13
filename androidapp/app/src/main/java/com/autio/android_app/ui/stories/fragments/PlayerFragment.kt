@@ -139,7 +139,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnHeart.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(), true
+                prefRepository, requireActivity(), false //TODO(CHANGE TO TRUE)
             ) {
                 storyViewModel.getStoriesByIds(
                     prefRepository.userId,
@@ -187,6 +187,9 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 view,
                 mediaItem
             )
+            if (mediaItem != null) {
+                storyId = mediaItem.id
+            }
         }
         playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner)
         { res ->
