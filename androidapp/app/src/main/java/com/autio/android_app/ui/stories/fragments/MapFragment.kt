@@ -35,7 +35,14 @@ import com.autio.android_app.ui.stories.view_model.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
-import com.autio.android_app.util.*
+import com.autio.android_app.util.DEFAULT_LOCATION_LAT
+import com.autio.android_app.util.DEFAULT_LOCATION_LNG
+import com.autio.android_app.util.Timer
+import com.autio.android_app.util.getFloatingComponentHeight
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.showStoryOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -220,28 +227,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
         }
     }
-
-
+    
     override fun onMapReady(googleMap: GoogleMap) {
         googleMap.clear()
-        googleMap.uiSettings.isMyLocationButtonEnabled = false
-        googleMap.uiSettings.isRotateGesturesEnabled = false
-        googleMap.uiSettings.isMapToolbarEnabled = false
+        with(googleMap.uiSettings) {
+            isMyLocationButtonEnabled = false
+            isRotateGesturesEnabled = false
+            isMapToolbarEnabled = false
+        }
+
         map = googleMap
         customizeMap()
-        //getLocationPermission() //TODO(MOVE to initialization verification, this shouldn't be here)
         updateLocationUI()
-        // Get the current location of the device and set the position of the map.
-        //TODO(This should be called by updateLocationUIMethod)
         getDeviceLocation()
-
-        map.cameraPosition.target
-        // storyViewModel.getAllStories()
         val bounds = map.projection.visibleRegion.latLngBounds
         storyViewModel.getStoriesInBounds(bounds)
-//        map.setOnCameraIdleListener {
-//            updateMapWithStories()
-//        }
     }
 
     private fun updateMapWithStories() {
@@ -512,7 +512,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      */
     private fun addClusteredMarkers(stories: List<Story>) {
         if (!::map.isInitialized) return
-        
+        map.clear()
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         clusterManager.setAnimation(true)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
@@ -528,7 +528,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             true //TODO(false)
         }
         clusterManager.setOnClusterClickListener {
-            moveCamera(it.position, map.cameraPosition.zoom + 1)
+            moveCamera(it.position, map.cameraPosition.zoom + 2)
             true
         }
 

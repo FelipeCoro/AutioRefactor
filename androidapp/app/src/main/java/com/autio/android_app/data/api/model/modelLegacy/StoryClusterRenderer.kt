@@ -14,7 +14,6 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 
-
 class StoryClusterRenderer(
     private val context: Context, map: GoogleMap,
     clusterManager: ClusterManager<StoryClusterItem>
@@ -38,10 +37,17 @@ class StoryClusterRenderer(
         )?.toBitmap()
     }
 
+    override fun getColor(clusterSize: Int): Int {
+        return ResourcesCompat.getColor(context.resources, R.color.white, null)
+    }
+
     override fun getClusterTextAppearance(clusterSize: Int): Int {
         return R.style.ClusterMapStyle
     }
 
+    override fun getMinClusterSize(): Int {
+        return super.getMinClusterSize()
+    }
     /**
      * Method called before the cluster item (i.e. the marker) is rendered. This is where marker
      * options should be set
@@ -49,7 +55,6 @@ class StoryClusterRenderer(
     override fun onBeforeClusterItemRendered(
         item: StoryClusterItem, markerOptions: MarkerOptions
     ) {
-
         val markerBitmap: Bitmap? =
             if (item.story.listenedAtLeast30Secs == true) {
                 listenedMarkerIcon
@@ -68,9 +73,7 @@ class StoryClusterRenderer(
      * Method called right after the cluster item (i.e. the marker) is rendered. This is where
      * properties for the Marker object should be set.
      */
-    override fun onClusterItemRendered(
-        item: StoryClusterItem, marker: Marker
-    ) {
+    override fun onClusterItemRendered(item: StoryClusterItem, marker: Marker) {
         super.onClusterItemRendered(item, marker)
         marker.tag = item
         item.marker = marker

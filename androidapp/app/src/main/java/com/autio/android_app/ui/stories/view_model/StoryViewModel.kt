@@ -16,6 +16,7 @@ import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -26,7 +27,10 @@ class StoryViewModel @Inject constructor(
     private val prefRepository: PrefRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+
+    private lateinit var getStoriesJob: Job
     private val _storyViewState = MutableLiveData<StoryViewState>()
+
     val storyViewState: LiveData<StoryViewState> = _storyViewState
     val userCategories = autioRepository.userCategories.asLiveData()
     val storiesHistory = autioRepository.history.asLiveData()
@@ -268,7 +272,10 @@ class StoryViewModel @Inject constructor(
     }
 
     fun getStoriesInBounds(bounds: LatLngBounds) {
-        viewModelScope.launch(coroutineDispatcher) {
+        if (::getStoriesJob.isInitialized && getStoriesJob.isActive) {
+            getStoriesJob.cancel()
+        }
+        getStoriesJob = viewModelScope.launch(coroutineDispatcher) {
             withContext(coroutineDispatcher) {
                 val mapPoints =
                     autioRepository.getStoriesInLatLngBoundaries(bounds.southwest, bounds.northeast)
@@ -289,7 +296,6 @@ class StoryViewModel @Inject constructor(
                 }
             }.onFailure {
                 setViewState(StoryViewState.FetchedAllDownloadedStoriesFailed)
-
             }
         }
     }
