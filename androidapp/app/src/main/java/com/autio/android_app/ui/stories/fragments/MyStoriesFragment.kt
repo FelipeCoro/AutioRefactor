@@ -36,7 +36,7 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun initView() {
-        val isUser = false //isUserGuest()
+        val isUser = isUserGuest()//TODO(tHIS SHOULD ACTUALLY BE isUserSubcribed [From RevenueCAT])
 
         binding.lySignIn.isVisible = isUser
         binding.lyStoriesList.isGone = isUser

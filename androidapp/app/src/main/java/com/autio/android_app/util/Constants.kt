@@ -22,6 +22,8 @@ object Constants {
         "USER_FIREBASE_KEY"
     const val REMAINING_STORIES =
         "REMAINING_STORIES"
+    const val USER_SUB_IS_ACTIVE =
+        "USER_SUB_IS_ACTIVE"
 
     val categoryIcons =
         hashMapOf(

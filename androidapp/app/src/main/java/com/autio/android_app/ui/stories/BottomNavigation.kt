@@ -223,7 +223,7 @@ class BottomNavigation : AppCompatActivity() {
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )
 
-            if (remainingStories < 0) {
+            if (remainingStories < 0) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
                 llTickMarks.visibility = GONE
                 showPayWall()
             } else {

@@ -43,34 +43,30 @@ class PurchaseViewModel @Inject constructor(
     fun login(loginRequest: LoginRequest) {
         isLoading.set(true)
         viewModelScope.launch(coroutineDispatcher) {
-            kotlin.runCatching {
-                autioRepository.login(loginRequest)
-            }.onSuccess { result ->
+            val result = autioRepository.login(loginRequest)
+            if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
-                    saveUserInfo(user)
                     setViewState(PurchaseViewState.OnLoginSuccess(user))
                     revenueCatRepository.login(user.id.toString())
+                    revenueCatRepository.getUserInfo()
+                    saveUserInfo(user)
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
-            }.onFailure {
-                setViewState(PurchaseViewState.OnLoginFailed)
-            }
+            } else setViewState(PurchaseViewState.OnLoginFailed)
         }
     }
 
     fun createAccount(accountRequest: AccountRequest) {
         isLoading.set(true)
+
         viewModelScope.launch(coroutineDispatcher) {
-            kotlin.runCatching {
-                autioRepository.createAccount(accountRequest)
-            }.onSuccess { result ->   //TODO(Double check this)
+            val result = autioRepository.createAccount(accountRequest)
+            if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
-                    saveUserInfo(user)
                     revenueCatRepository.login(user.id.toString())
+                    saveUserInfo(user)
                     setViewState(PurchaseViewState.OnCreatedAccountSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnCreatedAccountFailed)
-            }.onFailure {
-                setViewState(PurchaseViewState.OnCreatedAccountFailed)
-            }
+            } else setViewState(PurchaseViewState.OnCreatedAccountFailed)
         }
     }
 
@@ -90,6 +86,8 @@ class PurchaseViewModel @Inject constructor(
         prefRepository.userName = loginResponse.name
         prefRepository.userEmail = loginResponse.email
         prefRepository.remainingStories = -1
+        if (customerInfo.value?.activeSubscriptions?.isNotEmpty() == true){//TODO(SHOULD BE SOMETHING LIKE THIS BUT IS NOT WORKING)
+        prefRepository.userSubIsActive = true}
     }
 
     fun logOut() {
@@ -138,7 +136,6 @@ class PurchaseViewModel @Inject constructor(
         revenueCatRepository.restorePurchase(onError, onSuccess)
     }
 }
-
 
 
 //    class ProductDetails internal constructor(

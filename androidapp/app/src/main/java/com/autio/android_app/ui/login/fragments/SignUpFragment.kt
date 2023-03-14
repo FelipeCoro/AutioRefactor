@@ -18,6 +18,7 @@ import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 
 import com.autio.android_app.util.checkEmptyFormFields
 import com.autio.android_app.util.pleaseFillText
+import com.autio.android_app.util.showToast
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -72,7 +73,13 @@ class SignUpFragment : Fragment() {
             context?.let {
                 pleaseFillText(it)
             }
-        } else {
+        }
+        else if (!isEmailValid(binding.tvEmail.text)){
+            context?.let {
+                showToast(it,getString(R.string.enterValidEmailMessage))
+            }
+        }
+        else {
             val name = "${binding.tvName.text}"
             val password = "${binding.tvPassword.text}"
             val email = "${binding.tvEmail.text}"
@@ -81,6 +88,10 @@ class SignUpFragment : Fragment() {
             )
             purchaseViewModel.createAccount(createAccountRequest)
         }
+    }
+
+    private fun isEmailValid(email: CharSequence ): Boolean{
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private fun handleViewState(viewState: PurchaseViewState?) {

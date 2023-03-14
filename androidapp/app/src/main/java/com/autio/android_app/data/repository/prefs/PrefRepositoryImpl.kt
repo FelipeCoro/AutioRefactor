@@ -10,6 +10,7 @@ import com.autio.android_app.util.Constants.USER_ID
 import com.autio.android_app.util.Constants.USER_IS_GUEST
 import com.autio.android_app.util.Constants.USER_NAME
 import com.autio.android_app.util.Constants.USER_PREFERENCES
+import com.autio.android_app.util.Constants.USER_SUB_IS_ACTIVE
 import com.autio.android_app.util.SharedPreferenceIntLiveData
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -60,6 +61,9 @@ class PrefRepositoryImpl @Inject constructor(
 
     override var remainingStories: Int = REMAINING_STORIES.getInt()
         set(remainingStories) = REMAINING_STORIES.put(remainingStories)
+
+    override var userSubIsActive: Boolean = USER_SUB_IS_ACTIVE.getBoolean()
+        set(userSubIsActive) = USER_SUB_IS_ACTIVE.put(userSubIsActive)
 
     override fun clearData() {
         editor.clear()
