@@ -61,76 +61,80 @@
 
         </FrameLayout>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/floatingSelectedStory"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
-        android:visibility="gone"
-        app:cardBackgroundColor="@color/selected_story_card"
-        app:cardCornerRadius="12dp"
-        app:contentPaddingBottom="10dp"
-        app:contentPaddingTop="10dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:visibility="visible">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.cardview.widget.CardView
+            android:id="@+id/floatingSelectedStory"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/autio_blue"
+            app:cardCornerRadius="12dp"
+            app:contentPaddingBottom="10dp"
+            app:contentPaddingTop="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:visibility="visible">
 
-            <ImageView
-                android:id="@+id/btn_selected_story_play"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="13dp"
-                android:src="@drawable/ic_player_play"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="@color/secondary_button" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/btn_selected_story_play"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="13dp"
+                    android:src="@drawable/play__story_card__light_mode"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
 
-            <TextView
-                android:id="@+id/tv_selected_story_title"
-                style="@style/StoryTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/btn_selected_story_info"
-                app:layout_constraintStart_toEndOf="@id/btn_selected_story_play"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.25"
-                tools:text="San Francisco from the Beginning" />
+                <TextView
+                    android:id="@+id/tv_selected_story_title"
+                    style="@style/StoryTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:gravity="start"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/button_text"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/btn_selected_story_play"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.25"
+                    tools:text="San Francisco from the Beginning" />
 
-            <TextView
-                android:id="@+id/tv_selected_story_narrator"
-                style="@style/StoryNarrator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="@id/tv_selected_story_title"
-                app:layout_constraintTop_toBottomOf="@id/tv_selected_story_title"
-                tools:text="Kevin Costner" />
+                <TextView
+                    android:id="@+id/tv_selected_story_narrator"
+                    style="@style/StoryNarrator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintStart_toStartOf="@id/tv_selected_story_title"
+                    app:layout_constraintTop_toBottomOf="@id/tv_selected_story_title"
+                    tools:text="Kevin Costner" />
 
-            <ImageView
-                android:id="@+id/btn_selected_story_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minWidth="48dp"
-                android:minHeight="48dp"
-                android:scaleType="center"
-                android:src="@drawable/ic_drag"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.5"
-                app:tint="@color/secondary_button" />
+                <ImageView
+                    android:id="@+id/btn_selected_story_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minWidth="48dp"
+                    android:minHeight="48dp"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_drag"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.5"
+                    app:tint="@color/secondary_button"
+                    tools:visibility="gone" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
     <include
         android:id="@+id/layoutPlaylist"

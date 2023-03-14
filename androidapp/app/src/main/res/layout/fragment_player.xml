@@ -151,7 +151,7 @@
 
                 <TextView
                     android:id="@+id/tvStoryTitle"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="10dp"
@@ -225,7 +225,7 @@
 
                     <ImageView
                         android:id="@+id/ivCategoryIcon"
-                        android:layout_width="wrap_content"
+                        android:layout_width="20dp"
                         android:layout_height="match_parent"
                         android:layout_marginTop="2dp"
                         tools:src="@drawable/ic_category_culture" />

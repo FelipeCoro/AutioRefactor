@@ -361,7 +361,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * cases when a location is not available.
      */
     private fun getDeviceLocation() {
-        if (locationPermissionGranted && false) { //TODO(CHANGE BACK AFTER TESTING)
+        if (locationPermissionGranted) { //TODO(CHANGE THIS TO FALSE FOR TESTING)
             moveCameraToLastKnownLocation()
         } else {
             moveCamera(DEFAULT_LOCATION_LAT, DEFAULT_LOCATION_LNG)
