@@ -36,6 +36,7 @@ import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
+import com.autio.android_app.util.bottomNavigationActivity
 import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.openUrl
 import com.autio.android_app.util.pleaseFillText
@@ -142,6 +143,9 @@ class AccountFragment : Fragment() {
 
             btnSendDiscount.setOnClickListener {
                 // TODO: Create discount code from Google Play
+            }
+            seePlans.setOnClickListener {
+                bottomNavigationActivity?.showPayWall()
             }
         }
     }
