@@ -139,7 +139,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnHeart.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(), false //TODO(CHANGE TO TRUE)
+                prefRepository, requireActivity(), true
             ) {
                 storyViewModel.getStoriesByIds(
                     prefRepository.userId,
@@ -227,7 +227,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnNext.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity()
+                prefRepository, requireActivity(),
             ) {
                 bottomNavigationViewModel.skipToNextStory()
             }

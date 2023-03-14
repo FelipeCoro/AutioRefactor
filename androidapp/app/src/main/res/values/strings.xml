@@ -203,6 +203,7 @@
     <string name="termsOfServiceLink">https://autio.com/terms-of-service</string>
     <string name="securityLink">https://autio.com/security</string>
     <string name="security">SECURITY</string>
+    <string name="passwordResetLink">https://app.autio.com/password/reset</string>
     /string>
 
 

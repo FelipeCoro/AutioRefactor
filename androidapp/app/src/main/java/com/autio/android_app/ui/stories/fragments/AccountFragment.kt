@@ -375,12 +375,14 @@ class AccountFragment : Fragment() {
     }
 
     private fun gotoLoginFragment() {
-        val request =
-            NavDeepLinkRequest.Builder
-                .fromUri("android-app://navigation.autio.app/sign-up".toUri())
-                .build()
-        val nav = findNavController()
-        nav.navigate(request)
+
+    //TODO(This is not working)
+    val request =
+         NavDeepLinkRequest.Builder
+             .fromUri("android-app://navigation.autio.app/login".toUri())
+             .build()
+     val nav = findNavController()
+     nav.navigate(request)
     }
 
     private fun goToSignIn() {
