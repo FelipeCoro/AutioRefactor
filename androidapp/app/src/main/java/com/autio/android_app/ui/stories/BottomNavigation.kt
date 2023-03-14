@@ -86,6 +86,7 @@ class BottomNavigation : AppCompatActivity() {
         purchaseViewModel.getUserInfo()
         updateSnackBarMessageDisplay()
         updateAvailableStoriesUI(bottomNavigationViewModel.initialRemainingStories)
+        showPlayerComponent()
     }
 
     private fun bindObservables() {
@@ -162,17 +163,15 @@ class BottomNavigation : AppCompatActivity() {
         setupWithNavController(binding.bottomNavigationView, navController)
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             val subscribeFragmentDestination = controller.graph[R.id.subscribeFragment].label
-            when (destination.label) {
-                controller.graph[R.id.player].label -> hidePlayerComponent()
-                subscribeFragmentDestination -> showUiElements(false)
-                else -> {
-                    showPlayerComponent()
+            if (destination.label ==  controller.graph[R.id.player].label ) {
+                hidePlayerComponent() //TODO(had to disable this BECAUSE WE WHERE LOSING IT ON THE OTHER FRAGMENTS)
+            }
+            else if (destination == subscribeFragmentDestination){
+                showUiElements(false)}
+                else  {
                     showUiElements(true)
                 }
-            }
         }
-
-
     }
 
 
@@ -219,13 +218,17 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun updateAvailableStoriesUI(remainingStories: Int) {
         with(binding) {
+
+
             val tickMarks = arrayOf(
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )
 
-            if (remainingStories < 0) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
+
+          //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
+            if (remainingStories < 0){
                 llTickMarks.visibility = GONE
-                showPayWall()
+             //   showPayWall() //TODO(UNCOMMENT)
             } else {
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
@@ -266,22 +269,23 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun hidePlayerComponent() {
-        binding.persistentPlayer.animate().alpha(0.0f)
-            .translationY(binding.persistentPlayer.height.toFloat())
-            .withEndAction {
-                binding.mainContainer.requestLayout()
-                binding.persistentPlayer.visibility = GONE
-            }
+       //binding.persistentPlayer.animate().alpha(0.0f)
+       //    .translationY(binding.persistentPlayer.height.toFloat())
+       //    .withEndAction {
+              //  binding.mainContainer.requestLayout()
+               binding.persistentPlayer.visibility = GONE
+           // }
     }
 
     private fun showPlayerComponent() {
+
         binding.persistentPlayer.visibility = VISIBLE
         binding.persistentPlayer.animate().alpha(1.0f)
             //TODO(FIX ANIMATION )
-    // .translationYBy(-binding.persistentPlayer.height.toFloat())
-//            .withEndAction {
-//                binding.mainContainer.requestLayout()
-//            }
+             .translationYBy(-binding.persistentPlayer.height.toFloat())
+                    .withEndAction {
+                        binding.mainContainer.requestLayout()
+                    }
     }
 
     /**

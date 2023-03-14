@@ -4,15 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,7 +26,7 @@ class MyStoriesFragment : Fragment() {
     @Inject
     lateinit var prefRepository: PrefRepository
     private lateinit var binding: FragmentMyStoriesBinding
-
+    private val purchaseViewModel: PurchaseViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -36,7 +40,8 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun initView() {
-        val isUser = isUserGuest()//TODO(tHIS SHOULD ACTUALLY BE isUserSubcribed [From RevenueCAT])
+       val isUser = isUserGuest()//TODO(tHIS SHOULD ACTUALLY BE isUserSubcribed [From RevenueCAT])
+      //  val isUser = purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true
 
         binding.lySignIn.isVisible = isUser
         binding.lyStoriesList.isGone = isUser

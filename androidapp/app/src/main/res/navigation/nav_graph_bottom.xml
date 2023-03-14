@@ -140,6 +140,9 @@
         <deepLink
             android:id="@+id/deepLink4"
             app:uri="android-app://navigation.autio.app/sign-in" />
+        <action
+            android:id="@+id/action_signInFragment2_to_bottomNavigation2"
+            app:destination="@id/bottomNavigation2" />
     </fragment>
     <fragment
         android:id="@+id/signUpFragment2"
@@ -148,10 +151,17 @@
         <deepLink
             android:id="@+id/deepLink5"
             app:uri="android-app://navigation.autio.app/login" />
+        <action
+            android:id="@+id/action_signUpFragment2_to_bottomNavigation2"
+            app:destination="@id/bottomNavigation2" />
     </fragment>
     <fragment
         android:id="@+id/subscribeFragment"
         android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
         android:label="SubscribeFragment"
         tools:layout="@layout/fragment_subscribe" />
+    <activity
+        android:id="@+id/bottomNavigation2"
+        android:name="com.autio.android_app.ui.stories.BottomNavigation"
+        android:label="BottomNavigation" />
 </navigation>

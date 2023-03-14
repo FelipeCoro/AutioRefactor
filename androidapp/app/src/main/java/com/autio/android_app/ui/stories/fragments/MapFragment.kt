@@ -247,7 +247,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        googleMap.clear()
+       // googleMap.clear()
         with(googleMap.uiSettings) {
             isMyLocationButtonEnabled = false
             isRotateGesturesEnabled = false
@@ -273,11 +273,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         setGoogleLogoNewPosition()
     }
 
-    private fun highlightClusterItem(storyClusterItem: StoryClusterItem) {
+    private fun highlightClusterItem(storyClusterItem: StoryClusterItem?) {
         highlightedItem?.let {
             unhighlightClusterItem(it)
         }
-        highlightedItem = storyClusterItem.apply {
+
+        highlightedItem = storyClusterItem?.apply {
             val originalBitmap = bitmap
             val marker = this.marker
             if (marker != null && originalBitmap != null) {
@@ -288,12 +289,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun unhighlightClusterItem(storyClusterItem: StoryClusterItem) {
-        val largerBitmap = storyClusterItem.bitmap
+    private fun unhighlightClusterItem(storyClusterItem: StoryClusterItem?) {
+        val largerBitmap = storyClusterItem?.bitmap
         largerBitmap?.let {
             val originalBitmap = getOriginalBitmap(it)
             val smallerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(originalBitmap)
-             storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
+         try{   storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)}catch (_:Exception){}
         }
     }
 
@@ -584,8 +585,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         )
     }
 
-    private fun updateMarker(story: Story, item: StoryClusterItem) {
-        item.updateStory(story)
+    private fun updateMarker(story: Story, item: StoryClusterItem?) {
+        item?.updateStory(story)
         clusterManager.updateItem(item)
         clusterManager.cluster()
     }
@@ -613,7 +614,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    fun showFloatingComponent(totalHeight:Float){
+    private fun showFloatingComponent(totalHeight:Float){
         binding.floatingSelectedStory.apply {
             if (visibility != View.VISIBLE) {
                 translationY = totalHeight
