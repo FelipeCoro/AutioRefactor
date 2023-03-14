@@ -167,7 +167,7 @@ class BottomNavigation : AppCompatActivity() {
 
     fun showPayWall() {
         bottomNavigationViewModel.setPayWallVisible(true)
-        showUiElements(true)
+        showUiElements(false)
     }
 
     private fun showUiElements(isVisible: Boolean) {
@@ -179,7 +179,7 @@ class BottomNavigation : AppCompatActivity() {
 
     fun hidePaywall() {
         bottomNavigationViewModel.setPayWallVisible(false)
-        showUiElements(false)
+        showUiElements(true)
     }
 
     private fun updateSnackBarMessageDisplay() {
