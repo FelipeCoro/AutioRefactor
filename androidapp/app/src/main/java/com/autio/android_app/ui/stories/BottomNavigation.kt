@@ -164,7 +164,7 @@ class BottomNavigation : AppCompatActivity() {
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             val subscribeFragmentDestination = controller.graph[R.id.subscribeFragment].label
             if (destination.label ==  controller.graph[R.id.player].label ) {
-                hidePlayerComponent() //TODO(had to disable this BECAUSE WE WHERE LOSING IT ON THE OTHER FRAGMENTS)
+                hidePlayerComponent()
             }
             else if (destination == subscribeFragmentDestination){
                 showUiElements(false)}

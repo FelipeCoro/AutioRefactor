@@ -178,7 +178,7 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result<Story> {
 
-        val result = autioRemoteDataSource.getStoryById(xUserId, apiToken, id)
+        val result = autioRemoteDataSource.getStoryById(xUserId,  "Bearer $apiToken", id)
 
         return if (result.isSuccessful) {
             val story = result.body()!!.toModel()
