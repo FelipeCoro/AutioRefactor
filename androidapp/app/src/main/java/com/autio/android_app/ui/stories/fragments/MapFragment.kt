@@ -284,7 +284,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun getLargerBitmap(bitmap: Bitmap): Bitmap {
         val width = bitmap.width * 1.5
-        val height = bitmap.height * 1.5
+        val height = bitmap.height * 1.5F
         return Bitmap.createScaledBitmap(bitmap, width.toInt(), height.toInt(), false)
     }
 
@@ -323,15 +323,16 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * https://cloud.google.com/maps-platform/terms/
      */
     private fun setGoogleLogoNewPosition() {
-        val googleLogo: View = binding.maps.findViewWithTag("GoogleWatermark")
-        val glLayoutParams = googleLogo.layoutParams as RelativeLayout.LayoutParams
-        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0)
-        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0)
-        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_START, 0)
-        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-        glLayoutParams.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-        googleLogo.layoutParams = glLayoutParams
-    }
+        val googleLogo: View? = binding.maps.findViewWithTag("GoogleWatermark")
+        val glLayoutParams = googleLogo?.layoutParams as RelativeLayout.LayoutParams?
+       glLayoutParams?.let{
+        it.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0)
+        it.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0)
+        it.addRule(RelativeLayout.ALIGN_PARENT_START, 0)
+        it.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+        it.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
+        googleLogo?.layoutParams = glLayoutParams
+    }}
 
     /**
      * Get the best and most recent location of the device, which may be null in rare
@@ -539,7 +540,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             updateMapWithStories()
         }
         //TODO(MOVE to a view_state return from viewModel when map updates)
-        // highLightNearestStory(clusterRenderer)
+        //highLightNearestStory(clusterRenderer)
     }
 
     //TODO(MOVE to a view_state return from viewModel when map updates)

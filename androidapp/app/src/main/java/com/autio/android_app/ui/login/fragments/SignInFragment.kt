@@ -7,10 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentSignInBinding
@@ -67,7 +69,7 @@ class SignInFragment : Fragment() {
         binding.btnGuestMode.setOnClickListener { loginViewModel.loginGuest() }
         binding.btnForgotPassword.setOnClickListener { passwordReset() }
         binding.btnCancel.setOnClickListener {
-            findNavController().navigate(R.id.action_signInFragment_to_loginFragment)
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
@@ -113,6 +115,13 @@ class SignInFragment : Fragment() {
         startActivity(browse)
     }
 
+    private fun navigateToLogin() {
+        val request =
+            NavDeepLinkRequest.Builder.fromUri("android-app://navigation.autio.app/onboarding".toUri())
+                .build()
+        val nav = findNavController()
+        nav.navigate(request)
+    }
 }
 
 

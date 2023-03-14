@@ -10,6 +10,7 @@ interface PrefRepository {
     var isUserGuest: Boolean
     var remainingStories: Int
     val remainingStoriesLiveData: SharedPreferenceIntLiveData
+    var userSubIsActive:Boolean
     fun String.put(int: Int)
     fun String.put(string: String)
     fun String.put(boolean: Boolean)
