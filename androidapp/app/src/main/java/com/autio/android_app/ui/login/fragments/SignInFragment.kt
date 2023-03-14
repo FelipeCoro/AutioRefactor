@@ -106,6 +106,7 @@ class SignInFragment : Fragment() {
     }
 
     private fun handleOnLoginSuccess(user: User) {
+
         findNavController().navigate(R.id.action_signInFragment_to_bottomNavigation)
     }
 
