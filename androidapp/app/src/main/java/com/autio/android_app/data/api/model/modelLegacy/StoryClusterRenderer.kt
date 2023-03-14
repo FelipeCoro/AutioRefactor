@@ -38,7 +38,7 @@ class StoryClusterRenderer(
     }
 
     override fun getColor(clusterSize: Int): Int {
-        return ResourcesCompat.getColor(context.resources, R.color.white, null)
+        return ResourcesCompat.getColor(context.resources, R.color.autio_blue, null)
     }
 
     override fun getClusterTextAppearance(clusterSize: Int): Int {

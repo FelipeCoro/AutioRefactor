@@ -787,7 +787,7 @@
             26sp
         </item>
         <item name="android:textColor">
-            @color/autio_blue
+            @color/autio_white
         </item>
         <item name="android:backgroundTint">
             @color/white
