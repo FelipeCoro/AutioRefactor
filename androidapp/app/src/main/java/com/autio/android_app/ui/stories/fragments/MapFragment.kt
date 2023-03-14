@@ -155,12 +155,27 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             savedInstanceState.getParcelable(KEY_CAMERA_POSITION, CameraPosition::class.java)
         } else savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
 
+
+    override fun onPause() {
+        super.onPause()
+        if (this::clusterManager.isInitialized) {
+            clusterManager.clearItems()
+
+        }
+        if (::map.isInitialized) {
+            map.clear()
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         if (this::clusterManager.isInitialized) {
             clusterManager.clearItems()
+
+        }
+        if (::map.isInitialized) {
             map.clear()
-        } //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
