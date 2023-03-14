@@ -155,7 +155,7 @@
 
     <!-- subscribe fragment -->
     <string name="youtube_using_autio_app_video_url" translatable="false">https://www.youtube.com/watch?v=SvbahDL4aYc&amp;ab_channel=Autio"</string>
-    <string name="sign_in_error_text">The user and/or password are incorrect</string>
+    <string name="sign_in_error_text">Please check your email or password</string>
     <string name="subscribe_fragment_sign_in_link">Sign In</string>
     <string name="subscribe_fragment_restore_purchase_link">Restore Purchase</string>
     <string name="subscribe_fragment_url_moth_community_link">https://themoth.org/community</string>
@@ -204,6 +204,7 @@
     <string name="securityLink">https://autio.com/security</string>
     <string name="security">SECURITY</string>
     <string name="passwordResetLink">https://app.autio.com/password/reset</string>
+    <string name="enterValidEmailMessage">Please enter a valid Email</string>
     /string>
 
 

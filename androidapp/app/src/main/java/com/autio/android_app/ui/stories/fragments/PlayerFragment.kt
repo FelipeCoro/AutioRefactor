@@ -64,6 +64,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
     private lateinit var activityLayout: ConstraintLayout
 
+
     private var map: GoogleMap? = null
 
     private lateinit var snackBarView: View

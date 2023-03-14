@@ -43,34 +43,29 @@ class PurchaseViewModel @Inject constructor(
     fun login(loginRequest: LoginRequest) {
         isLoading.set(true)
         viewModelScope.launch(coroutineDispatcher) {
-            kotlin.runCatching {
-                autioRepository.login(loginRequest)
-            }.onSuccess { result ->
+           val result = autioRepository.login(loginRequest)
+            if(result.isSuccess ){
                 result.getOrNull()?.let { user ->
                     saveUserInfo(user)
                     setViewState(PurchaseViewState.OnLoginSuccess(user))
                     revenueCatRepository.login(user.id.toString())
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
-            }.onFailure {
-                setViewState(PurchaseViewState.OnLoginFailed)
-            }
+            } else  setViewState(PurchaseViewState.OnLoginFailed)
         }
     }
 
     fun createAccount(accountRequest: AccountRequest) {
         isLoading.set(true)
+
         viewModelScope.launch(coroutineDispatcher) {
-            kotlin.runCatching {
-                autioRepository.createAccount(accountRequest)
-            }.onSuccess { result ->   //TODO(Double check this)
+            val result = autioRepository.createAccount(accountRequest)
+            if(result.isSuccess ){
                 result.getOrNull()?.let { user ->
                     saveUserInfo(user)
                     revenueCatRepository.login(user.id.toString())
                     setViewState(PurchaseViewState.OnCreatedAccountSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnCreatedAccountFailed)
-            }.onFailure {
-                setViewState(PurchaseViewState.OnCreatedAccountFailed)
-            }
+            } else  setViewState(PurchaseViewState.OnCreatedAccountFailed)
         }
     }
 
