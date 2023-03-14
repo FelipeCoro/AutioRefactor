@@ -28,20 +28,24 @@ class LoginViewModel @Inject constructor(
     val viewState: LiveData<LoginViewState> = _viewState
 
     fun loginGuest() {
+        isLoading.set(true)
         viewModelScope.launch(coroutineDispatcher) {
-            isLoading.set(true)
-            val result = autioRepository.loginAsGuest()
-            if (result.isSuccess) { //TODO(Double check this)
-                result.getOrNull()?.let { user ->
+            kotlin.runCatching {
+                val result = autioRepository.loginAsGuest()
+                result.getOrNull()
+            }.onSuccess { user ->
+                user?.let {
                     saveGuestInfo(user)
                     setViewState(LoginViewState.GuestLoginSuccess(user))
-                } ?:setViewState(LoginViewState.LoginError)
-            } else setViewState(LoginViewState.LoginError)
+                } ?: setViewState(LoginViewState.LoginError)
+            }
+                .onFailure { setViewState(LoginViewState.LoginError) }
 
         }
     }
 
     private fun saveGuestInfo(guestResponse: User) {
+        prefRepository.userApiToken = guestResponse.apiToken
         with(prefRepository) {
             isUserGuest = true
             userId = guestResponse.id

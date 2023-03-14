@@ -3,9 +3,7 @@ package com.autio.android_app.data.repository.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import com.autio.android_app.util.Constants.REMAINING_STORIES
-import com.autio.android_app.util.Constants.USER_API_TOKEN
 import com.autio.android_app.util.Constants.USER_EMAIL
-import com.autio.android_app.util.Constants.USER_FIREBASE_KEY
 import com.autio.android_app.util.Constants.USER_ID
 import com.autio.android_app.util.Constants.USER_IS_GUEST
 import com.autio.android_app.util.Constants.USER_NAME
@@ -21,6 +19,9 @@ class PrefRepositoryImpl @Inject constructor(
     private val pref: SharedPreferences = context.getSharedPreferences(
         USER_PREFERENCES, Context.MODE_PRIVATE
     )
+
+    private val _userToken: String = ""
+
     private val editor = pref.edit()
 
     override fun String.put(int: Int) {
@@ -52,9 +53,11 @@ class PrefRepositoryImpl @Inject constructor(
 
     override var userEmail: String = USER_EMAIL.getString()
         set(email) = USER_EMAIL.put(email)
+//
+//    override var userApiToken: String = USER_API_TOKEN.getString()
+//        set(apiToken) = USER_API_TOKEN.put(apiToken)
 
-    override var userApiToken: String = "Bearer tok_Q22sw7X2iN2jcVQgRfRRo8tm4anlVwX2AVgvZH7amzs0HqNRtDpBxoZtCK7h"// USER_API_TOKEN.getString()TODO(Change this back after fix)
-        set(apiToken) = USER_API_TOKEN.put(apiToken)
+    override var userApiToken: String = ""
 
     override var isUserGuest: Boolean = USER_IS_GUEST.getBoolean()
         set(isGuest) = USER_IS_GUEST.put(isGuest)

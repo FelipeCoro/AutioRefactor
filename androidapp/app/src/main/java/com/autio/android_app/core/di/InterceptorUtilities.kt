@@ -48,9 +48,9 @@ fun logRequest(request: Request, chain: Interceptor.Chain) {
             )
             appendLine("HTTPS : ${request.isHttps}")
             if (request.headers.size > 0) {
-                append("HEADERS : \n${request.headers}")
+                appendLine("HEADERS : \n${request.headers}")
             } else {
-                append("HEADERS : NONE")
+                appendLine("HEADERS : NONE")
             }
             append(LoggingInterceptor.DELIMITER)
             if (request.method in listOf("POST", "PUT", "PATCH")) {

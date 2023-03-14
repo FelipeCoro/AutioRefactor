@@ -59,7 +59,7 @@ object ApiModule {
     @Provides
     fun provideOkHttpClient(interceptor: Interceptor): OkHttpClient {
         val builder = OkHttpClient.Builder()
-       // builder.addInterceptor(interceptor)
+        builder.addInterceptor(interceptor)
         return builder.build()
     }
 

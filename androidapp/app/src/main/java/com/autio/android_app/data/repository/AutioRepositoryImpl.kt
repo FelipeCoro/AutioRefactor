@@ -77,13 +77,13 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun loginAsGuest(): Result<User> {
-
         val result = autioRemoteDataSource.createGuestAccount()
 
         return if (result.isSuccessful) {
             val user = result.let { guestResponse ->
                 guestResponse.body()!!.toModel()
             }
+            prefRepository.userApiToken = user.apiToken
             Result.success(user)
 
         } else {

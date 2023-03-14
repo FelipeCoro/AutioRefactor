@@ -245,7 +245,6 @@ class BottomNavigationViewModel @Inject constructor(
     fun playMediaId(mediaId: Int) {
         val nowPlaying = playerServiceConnection.nowPlaying.value
         val transportControls = playerServiceConnection.transportControls
-
         val isPrepared = playerServiceConnection.playbackState.value?.isPrepared ?: false
         if (isPrepared && mediaId == nowPlaying?.id) {
             playerServiceConnection.playbackState.value?.let { playbackState ->
