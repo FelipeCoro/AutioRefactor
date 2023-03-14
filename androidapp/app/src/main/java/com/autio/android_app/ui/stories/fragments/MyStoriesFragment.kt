@@ -15,6 +15,7 @@ import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
+import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.util.Constants
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,21 +70,13 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun goToSignIn() {
-        val request =
-            NavDeepLinkRequest.Builder
-                .fromUri("android-app://navigation.autio.app/sign-in".toUri())
-                .build()
-        val nav = findNavController()
-        nav.navigate(request)
+        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        (activity as BottomNavigation).finish()
     }
 
     private fun goToSignUp() {
-        val request =
-            NavDeepLinkRequest.Builder
-                .fromUri("android-app://navigation.autio.app/login".toUri())
-                .build()
-        val nav = findNavController()
-        nav.navigate(request)
+        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        (activity as BottomNavigation).finish()
     }
 
     private fun isUserGuest(): Boolean = prefRepository.isUserGuest

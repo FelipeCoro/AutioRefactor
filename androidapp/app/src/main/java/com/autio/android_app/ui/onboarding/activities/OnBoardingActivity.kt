@@ -6,8 +6,10 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.navArgs
 import com.autio.android_app.R
 import com.autio.android_app.databinding.ActivityOnBoardingBinding
+import com.autio.android_app.ui.onboarding.fragments.OnBoardingFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

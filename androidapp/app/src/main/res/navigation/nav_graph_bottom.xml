@@ -18,13 +18,18 @@
         android:id="@+id/account"
         android:name="com.autio.android_app.ui.stories.fragments.AccountFragment"
         android:label="fragment_account"
-        tools:layout="@layout/fragment_account" >
+        tools:layout="@layout/fragment_account">
         <action
-            android:id="@+id/action_account_to_signInFragment2"
-            app:destination="@id/signInFragment2" />
+            android:id="@+id/action_account_to_main_navigation_graph"
+            app:destination="@id/main_navigation_graph" />
         <action
-            android:id="@+id/action_account_to_signUpFragment2"
-            app:destination="@id/signUpFragment2" />
+            android:id="@+id/action_account_to_authentication_nav"
+            app:destination="@id/authentication_nav">
+            <argument
+                android:name="goToSignUpOrIn"
+                android:defaultValue="-1"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/my_stories"
@@ -44,11 +49,13 @@
             android:id="@+id/action_my_stories_to_downloaded_playlist"
             app:destination="@id/downloaded_playlist" />
         <action
-            android:id="@+id/action_my_stories_to_signInFragment2"
-            app:destination="@id/signInFragment2" />
-        <action
-            android:id="@+id/action_my_stories_to_signUpFragment2"
-            app:destination="@id/signUpFragment2" />
+            android:id="@+id/action_my_stories_to_authentication_nav"
+            app:destination="@id/authentication_nav">
+            <argument
+                android:name="goToSignUpOrIn"
+                android:defaultValue="-1"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/player"
@@ -134,34 +141,9 @@
             app:destination="@id/my_stories" />
     </fragment>
     <fragment
-        android:id="@+id/signInFragment2"
-        android:name="com.autio.android_app.ui.login.fragments.SignInFragment"
-        android:label="SignInFragment">
-        <deepLink
-            android:id="@+id/deepLink4"
-            app:uri="android-app://navigation.autio.app/sign-in" />
-        <action
-            android:id="@+id/action_signInFragment2_to_bottomNavigation2"
-            app:destination="@id/bottomNavigation2" />
-    </fragment>
-    <fragment
-        android:id="@+id/signUpFragment2"
-        android:name="com.autio.android_app.ui.login.fragments.SignUpFragment"
-        android:label="SignUpFragment">
-        <deepLink
-            android:id="@+id/deepLink5"
-            app:uri="android-app://navigation.autio.app/login" />
-        <action
-            android:id="@+id/action_signUpFragment2_to_bottomNavigation2"
-            app:destination="@id/bottomNavigation2" />
-    </fragment>
-    <fragment
         android:id="@+id/subscribeFragment"
         android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
         android:label="SubscribeFragment"
         tools:layout="@layout/fragment_subscribe" />
-    <activity
-        android:id="@+id/bottomNavigation2"
-        android:name="com.autio.android_app.ui.stories.BottomNavigation"
-        android:label="BottomNavigation" />
+    <include app:graph="@navigation/nav_authentication" />
 </navigation>

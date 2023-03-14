@@ -13,6 +13,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
+import androidx.navigation.navArgs
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentViewPagerBinding
@@ -29,12 +31,21 @@ class OnBoardingFragment : Fragment() {
     lateinit var prefRepository: PrefRepository
     lateinit var permissionsManager: PermissionsManager
     private lateinit var binding: FragmentViewPagerBinding
+    val args: OnBoardingFragmentArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         permissionsManager =
             PermissionsManager(requireActivity(), requireActivity().activityResultRegistry)
         lifecycle.addObserver(permissionsManager)
+
+        if(args.goToSignUpOrIn == 0){
+            findNavController().navigate(R.id.signIn)
+        }
+        else if (args.goToSignUpOrIn == 1){
+            findNavController().navigate(R.id.signUp)
+        }
+
     }
 
     override fun onCreateView(

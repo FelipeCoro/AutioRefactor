@@ -70,6 +70,16 @@
         <deepLink
             android:id="@+id/deepLink"
             app:uri="android-app://navigation.autio.app/onboarding" />
+        <action
+            android:id="@+id/action_onBoardingFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_onBoardingFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <argument
+            android:name="goToSignUpOrIn"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
     <fragment
         android:id="@+id/waitlistFragment"

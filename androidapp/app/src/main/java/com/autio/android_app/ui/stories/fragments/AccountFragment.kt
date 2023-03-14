@@ -30,6 +30,7 @@ import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
 import com.autio.android_app.extensions.makeLinks
+import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
@@ -390,19 +391,22 @@ class AccountFragment : Fragment() {
     }
 
     private fun goToSignIn() {
-        val request =
-            NavDeepLinkRequest.Builder.fromUri("android-app://navigation.autio.app/sign-in".toUri())
-                .build()
-        val nav = findNavController()
-        nav.navigate(request)
+
+        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        (activity as BottomNavigation).finish()
+
+  //  val request =
+  //      NavDeepLinkRequest.Builder.fromUri("android-app://navigation.autio.app/sign-in".toUri())
+  //          .build()
+  //  val nav = findNavController()
+  //  nav.navigate(request)
     }
 
     private fun goToSignUp() {
-        val request =
-            NavDeepLinkRequest.Builder.fromUri("android-app://navigation.autio.app/login".toUri())
-                .build()
-        val nav = findNavController()
-        nav.navigate(request)
+      // val action = AccountFragmentDirections.actionAccountToAuthenticationNav(1)
+        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        (activity as BottomNavigation).finish()
+
     }
 
     private val itemTouchHelper by lazy {
