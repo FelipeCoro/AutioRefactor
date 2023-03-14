@@ -43,9 +43,7 @@ class SubscribeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_subscribe, container, false
-        )
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_subscribe, container, false)
         return binding.root
     }
 

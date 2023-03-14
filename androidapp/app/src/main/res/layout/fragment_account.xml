@@ -77,6 +77,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
+                android:id="@+id/see_plans"
                 style="@style/Button.Strong"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
