@@ -180,8 +180,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
-        outState.putParcelable(KEY_LOCATION, lastKnownLocation)
+        if (::map.isInitialized) {
+            outState.putParcelable(KEY_CAMERA_POSITION, map.cameraPosition)
+            outState.putParcelable(KEY_LOCATION, lastKnownLocation)
+        }
     }
 
     private fun bindObservers() {
@@ -247,7 +249,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-       // googleMap.clear()
+        // googleMap.clear()
         with(googleMap.uiSettings) {
             isMyLocationButtonEnabled = false
             isRotateGesturesEnabled = false
@@ -294,7 +296,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         largerBitmap?.let {
             val originalBitmap = getOriginalBitmap(it)
             val smallerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(originalBitmap)
-         try{   storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)}catch (_:Exception){}
+            try {
+                storyClusterItem.marker?.setIcon(smallerBitmapDescriptor)
+            } catch (_: Exception) {
+            }
         }
     }
 
@@ -341,14 +346,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun setGoogleLogoNewPosition() {
         val googleLogo: View? = binding.maps.findViewWithTag("GoogleWatermark")
         val glLayoutParams = googleLogo?.layoutParams as RelativeLayout.LayoutParams?
-       glLayoutParams?.let{
-        it.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0)
-        it.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0)
-        it.addRule(RelativeLayout.ALIGN_PARENT_START, 0)
-        it.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
-        it.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
-        googleLogo?.layoutParams = glLayoutParams
-    }}
+        glLayoutParams?.let {
+            it.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0)
+            it.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0)
+            it.addRule(RelativeLayout.ALIGN_PARENT_START, 0)
+            it.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE)
+            it.addRule(RelativeLayout.ALIGN_PARENT_END, RelativeLayout.TRUE)
+            googleLogo?.layoutParams = glLayoutParams
+        }
+    }
 
     /**
      * Get the best and most recent location of the device, which may be null in rare
@@ -614,7 +620,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    private fun showFloatingComponent(totalHeight:Float){
+    private fun showFloatingComponent(totalHeight: Float) {
         binding.floatingSelectedStory.apply {
             if (visibility != View.VISIBLE) {
                 translationY = totalHeight

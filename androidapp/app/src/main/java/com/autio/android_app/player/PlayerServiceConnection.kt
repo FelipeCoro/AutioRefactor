@@ -140,14 +140,15 @@ class PlayerServiceConnection @Inject constructor(
                 nowPlaying.postValue(null)
             } else {
                 CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
-
-                    val currentStory = autioRepository.getStoryById(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt()
-                    )
-                    currentStory.let {
-                        nowPlaying.value = it.getOrNull()
+                    if (MediaMetadataCompat.METADATA_KEY_MEDIA_ID != null) {
+                        val currentStory = autioRepository.getStoryById(
+                            prefRepository.userId,
+                            prefRepository.userApiToken,
+                            metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID).toInt()
+                        )
+                        currentStory.let {
+                            nowPlaying.value = it.getOrNull()
+                        }
                     }
                 }
             }

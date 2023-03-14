@@ -108,13 +108,12 @@ class SignUpFragment : Fragment() {
     }
 
     private fun handleOnCreateAccountFailed() {
-        showError()
+        context?.let {
+            showToast(it,getString(R.string.emailOnAnotherAccount))
+        }
     }
 
     private fun showError() {
-        //TODO (Handle Error)
-        val savedMessage = "The mail is already associated to another account"
-
 
     }
 }

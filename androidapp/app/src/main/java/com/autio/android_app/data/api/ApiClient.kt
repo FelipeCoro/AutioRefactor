@@ -33,6 +33,7 @@ interface ApiClient {
      * Authenticates user as guest and returns the guest's
      * data
      */
+
     @POST("/api/v1/guests")
     suspend fun createGuestAccount(): Response<GuestResponse>
 
@@ -41,6 +42,7 @@ interface ApiClient {
      * profile data
      * @param createAccountDto object including user's data (name, email, password)
      */
+    @Headers("Accept: application/json")
     @POST("/api/v1/accounts")
     suspend fun createAccount(
         @Body createAccountDto: CreateAccountDto): Response<LoginResponse>

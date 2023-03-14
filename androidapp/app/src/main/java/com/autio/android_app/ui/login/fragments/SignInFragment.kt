@@ -122,6 +122,7 @@ class SignInFragment : Fragment() {
                 .build()
         val nav = findNavController()
         nav.navigate(request)
+
     }
 }
 

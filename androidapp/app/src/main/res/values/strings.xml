@@ -205,6 +205,7 @@
     <string name="security">SECURITY</string>
     <string name="passwordResetLink">https://app.autio.com/password/reset</string>
     <string name="enterValidEmailMessage">Please enter a valid Email</string>
+    <string name="emailOnAnotherAccount">The mail is already used by another account</string>
     /string>
 
 
