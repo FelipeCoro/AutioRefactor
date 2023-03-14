@@ -149,4 +149,9 @@
             android:id="@+id/deepLink5"
             app:uri="android-app://navigation.autio.app/login" />
     </fragment>
+    <fragment
+        android:id="@+id/subscribeFragment"
+        android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
+        android:label="SubscribeFragment"
+        tools:layout="@layout/fragment_subscribe" />
 </navigation>

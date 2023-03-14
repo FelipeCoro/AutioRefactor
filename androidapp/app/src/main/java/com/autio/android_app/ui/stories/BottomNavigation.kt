@@ -144,17 +144,7 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun setListeners() {
-        navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
-        navController = navHostFragment.navController
-        setupWithNavController(binding.bottomNavigationView, navController)
-        navController.addOnDestinationChangedListener { controller, destination, _ ->
-            if (controller.graph[R.id.player] == destination) {
-                hidePlayerComponent()
-            } else if (binding.persistentPlayer.visibility != VISIBLE) {
-                showPlayerComponent()
-            }
-        }
+        setupNavigationListener()
         binding.storiesFreePlansBanner.setOnClickListener {
             showPayWall()
         }
@@ -165,9 +155,29 @@ class BottomNavigation : AppCompatActivity() {
         }
     }
 
+    private fun setupNavigationListener() {
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.main_container) as NavHostFragment
+        navController = navHostFragment.navController
+        setupWithNavController(binding.bottomNavigationView, navController)
+        navController.addOnDestinationChangedListener { controller, destination, _ ->
+            val subscribeFragmentDestination = controller.graph[R.id.subscribeFragment].label
+            when (destination.label) {
+                controller.graph[R.id.player].label -> hidePlayerComponent()
+                subscribeFragmentDestination -> showUiElements(false)
+                else -> {
+                    showPlayerComponent()
+                    showUiElements(true)
+                }
+            }
+        }
+
+
+    }
+
+
     fun showPayWall() {
-        bottomNavigationViewModel.setPayWallVisible(true)
-        showUiElements(true)
+        navController.navigate(R.id.subscribeFragment)
     }
 
     private fun showUiElements(isVisible: Boolean) {
@@ -176,12 +186,6 @@ class BottomNavigation : AppCompatActivity() {
         binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
     }
-
-    fun hidePaywall() {
-        bottomNavigationViewModel.setPayWallVisible(false)
-        showUiElements(false)
-    }
-
     private fun updateSnackBarMessageDisplay() {
         with(binding) {
             if (!TrackingUtility.hasCoreLocationPermissions(this@BottomNavigation)) {
@@ -273,10 +277,11 @@ class BottomNavigation : AppCompatActivity() {
     private fun showPlayerComponent() {
         binding.persistentPlayer.visibility = VISIBLE
         binding.persistentPlayer.animate().alpha(1.0f)
-            .translationYBy(-binding.persistentPlayer.height.toFloat())
-            .withEndAction {
-                binding.mainContainer.requestLayout()
-            }
+            //TODO(FIX ANIMATION )
+    // .translationYBy(-binding.persistentPlayer.height.toFloat())
+//            .withEndAction {
+//                binding.mainContainer.requestLayout()
+//            }
     }
 
     /**

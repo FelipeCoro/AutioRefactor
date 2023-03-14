@@ -86,6 +86,6 @@ class StoryClusterRenderer(
     }
 
     override fun shouldRenderAsCluster(cluster: Cluster<StoryClusterItem>): Boolean {
-        return cluster.size > 5
+        return cluster.size > 4
     }
 }

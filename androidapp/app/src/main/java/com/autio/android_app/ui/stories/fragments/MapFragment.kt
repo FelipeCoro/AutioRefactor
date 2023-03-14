@@ -157,7 +157,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        if (this::clusterManager.isInitialized) clusterManager.clearItems() //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
+        if (this::clusterManager.isInitialized) {
+            clusterManager.clearItems()
+            map.clear()
+        } //TODO(This breaks the fragment for a not initialized lateInit, but could be necessary)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -227,7 +230,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
         }
     }
-    
+
     override fun onMapReady(googleMap: GoogleMap) {
         googleMap.clear()
         with(googleMap.uiSettings) {
