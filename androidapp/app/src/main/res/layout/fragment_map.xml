@@ -85,7 +85,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_marginStart="13dp"
-                    android:src="@drawable/play__story_card__light_mode"
+                    android:src="@drawable/play__story_card__light_mode_3"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"

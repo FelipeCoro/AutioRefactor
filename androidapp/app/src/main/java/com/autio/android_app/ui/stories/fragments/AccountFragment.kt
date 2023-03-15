@@ -142,9 +142,9 @@ class AccountFragment : Fragment() {
                 }
             }
 
-            btnSendDiscount.setOnClickListener {
+           // btnSendDiscount.setOnClickListener {
                 // TODO: Create discount code from Google Play
-            }
+            //}
             seePlans.setOnClickListener {
                 bottomNavigationActivity?.showPayWall()
             }

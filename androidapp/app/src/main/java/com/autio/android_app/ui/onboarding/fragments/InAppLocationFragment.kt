@@ -3,6 +3,8 @@ package com.autio.android_app.ui.onboarding.fragments
 import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,6 +40,12 @@ class InAppLocationFragment : Fragment() {
         viewPager = requireActivity().findViewById(R.id.viewPager)
         binding.buttonLocationPermission.setOnClickListener {
             requestPermission()
+        }
+
+        with(binding) {
+            termsOfServiceLocation.setOnClickListener { openTerms() }
+            privacyPolicyLocation.setOnClickListener { openPrivacy() }
+            securityLocation.setOnClickListener { openSecurity() }
         }
     }
 
@@ -107,5 +115,19 @@ class InAppLocationFragment : Fragment() {
             ) { _, _ -> requestPermission() }
             create()
         }.show()
+    }
+    private fun openTerms() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.termsOfServiceLink)))
+        startActivity(browse)
+    }
+
+    private fun openPrivacy() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.privacy_Link)))
+        startActivity(browse)
+    }
+
+    private fun openSecurity() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.securityLink)))
+        startActivity(browse)
     }
 }

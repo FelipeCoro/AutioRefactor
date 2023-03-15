@@ -1,64 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background_notification_perm">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:background="@drawable/background_notification_perm">
+
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginTop="140dp"
             android:contentDescription="@string/notification_icon_description"
-            android:src="@drawable/notification" />
+            android:src="@drawable/notification"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView7"
             style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="24dp"
             android:text="@string/notifications"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            app:layout_constraintTop_toBottomof="imageView2" />
 
         <TextView
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="24dp"
             android:gravity="center"
             android:paddingHorizontal="15dp"
             android:text="@string/explanation_on_notifications"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView7"
+            app:layout_constraintTop_toBottomof="textView7" />
 
         <Button
             android:id="@+id/buttonNotificationPermission"
             style="@style/Button.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="35dp"
-            android:text="@string/set_notification_permissions" />
-    </LinearLayout>
+            android:layout_marginTop="95dp"
+            android:text="@string/set_notification_permissions"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView8"
+            app:layout_constraintTop_toBottomof="textView8" />
 
-    <ImageView
-        android:id="@+id/autio_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="179dp"
-        android:layout_marginBottom="100dp"
-        android:contentDescription="@string/logo_description"
-        android:src="@drawable/ic_splash_logo" />
+        <ImageView
+            android:id="@+id/autio_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="80dp"
+            android:layout_marginBottom="24dp"
+            android:contentDescription="@string/logo_description"
+            android:src="@drawable/ic_splash_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonNotificationPermission"
+            app:layout_constraintTop_toBottomof="buttonNotificationPermission" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/terms_of_service_notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/termsOfService"
+            android:textColor="@color/gray_letter"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toStartOf="@+id/privacy_policy_notifications"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/autio_logo" />
+
+        <TextView
+            android:id="@+id/privacy_policy_notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/privacyPolicy"
+            android:textColor="@color/gray_letter"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toEndOf="@+id/autio_logo"
+            app:layout_constraintEnd_toStartOf="@+id/security_notifications"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/terms_of_service_notifications"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_notifications" />
+
+        <TextView
+            android:id="@+id/security_notifications"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="0dp"
+            android:text="@string/security"
+            android:textColor="@color/gray_letter"
+            android:textSize="8sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/privacy_policy_notifications"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_notifications" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

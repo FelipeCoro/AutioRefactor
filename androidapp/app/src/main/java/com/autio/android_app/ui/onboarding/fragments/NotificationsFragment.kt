@@ -2,6 +2,8 @@ package com.autio.android_app.ui.onboarding.fragments
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,6 +39,11 @@ class NotificationsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         requestPermission()
+        with(binding) {
+            termsOfServiceNotifications.setOnClickListener { openTerms() }
+            privacyPolicyNotifications.setOnClickListener { openPrivacy() }
+            securityNotifications.setOnClickListener { openSecurity() }
+        }
     }
 
     private fun goToLocationPermission() {
@@ -72,5 +79,20 @@ class NotificationsFragment : Fragment() {
         ) { _, _ -> goToLocationPermission() }.setNegativeButton(
             getString(R.string.notification_fragment_dialog_negative_button_text)
         ) { _, _ -> requestPermission() }.create().show()
+    }
+
+    private fun openTerms() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.termsOfServiceLink)))
+        startActivity(browse)
+    }
+
+    private fun openPrivacy() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.privacy_Link)))
+        startActivity(browse)
+    }
+
+    private fun openSecurity() {
+        val browse = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.securityLink)))
+        startActivity(browse)
     }
 }
