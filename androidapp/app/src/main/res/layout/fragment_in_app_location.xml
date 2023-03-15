@@ -30,8 +30,7 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2"
-            app:layout_constraintTop_toBottomof="imageView2" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
         <TextView
             android:id="@+id/textView8"
@@ -45,8 +44,7 @@
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView7"
-            app:layout_constraintTop_toBottomof="textView7" />
+            app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
         <Button
             android:id="@+id/buttonLocationPermission"
@@ -57,8 +55,7 @@
             android:text="@string/set_in_app_location_permissions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8"
-            app:layout_constraintTop_toBottomof="textView8" />
+            app:layout_constraintTop_toBottomOf="@+id/textView8"/>
 
         <ImageView
             android:id="@+id/autio_logo"
