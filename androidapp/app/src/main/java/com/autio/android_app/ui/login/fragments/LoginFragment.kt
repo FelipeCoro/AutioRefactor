@@ -125,7 +125,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun showSuccess(user: LoginViewState?) {
-        findNavController().navigate(R.id.action_loginFragment_to_bottomNavigation)
+       findNavController().navigate(R.id.action_loginFragment_to_bottomNavigation)
     }
 
     private fun showError() {

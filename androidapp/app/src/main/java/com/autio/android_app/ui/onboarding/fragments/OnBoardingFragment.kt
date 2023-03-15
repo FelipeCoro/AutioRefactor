@@ -29,7 +29,7 @@ class OnBoardingFragment : Fragment() {
 
     @Inject
     lateinit var prefRepository: PrefRepository
-    lateinit var permissionsManager: PermissionsManager
+    private lateinit var permissionsManager: PermissionsManager
     private lateinit var binding: FragmentViewPagerBinding
     val args: OnBoardingFragmentArgs by navArgs()
 
@@ -39,12 +39,12 @@ class OnBoardingFragment : Fragment() {
             PermissionsManager(requireActivity(), requireActivity().activityResultRegistry)
         lifecycle.addObserver(permissionsManager)
 
-        if(args.goToSignUpOrIn == 0){
-            findNavController().navigate(R.id.signIn)
-        }
-        else if (args.goToSignUpOrIn == 1){
-            findNavController().navigate(R.id.signUp)
-        }
+     // if(args.goToSignUpOrIn == 0){
+     //     findNavController().navigate(R.id.signIn)
+     // }
+     // else if (args.goToSignUpOrIn == 1){
+     //     findNavController().navigate(R.id.signUp)
+     // }
 
     }
 
@@ -137,11 +137,11 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun navigateToInAppLocationPermissionFragment(backgroundLocation: Boolean) {
-        setViewPagerPage(2)
+        setViewPagerPage(1)
     }
 
     private fun navigateToBackgroundLocation() {
-        setViewPagerPage(3)
+        setViewPagerPage(2)
     }
 
     private fun setViewPagerPage(pageIndex: Int) {
@@ -149,5 +149,5 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun isUserLoggedIn() =
-        prefRepository.userApiToken.isNotEmpty() //TODO(Shouldn't this be if its NOT empty?)
+        prefRepository.userApiToken.isEmpty()
 }

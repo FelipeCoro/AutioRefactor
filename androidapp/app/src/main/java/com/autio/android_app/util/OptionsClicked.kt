@@ -69,7 +69,7 @@ fun Fragment.onOptionClicked(
             )
             StoryOption.SHARE -> {
                 shareStory(
-                    context, story.id
+                    context, //story.id
                 )
             }
             else -> Log.d(

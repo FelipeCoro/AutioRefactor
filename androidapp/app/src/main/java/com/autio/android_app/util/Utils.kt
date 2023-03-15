@@ -87,11 +87,11 @@ fun String.capitalize(): String {
     }
 }
 
-fun shareStory(context: Context, storyId: Int) {
+fun shareStory(context: Context){  //storyId: Int) {
     val intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(
-            Intent.EXTRA_TEXT, "https://app.autio.com/stories/$storyId"
+            Intent.EXTRA_TEXT, "https://app.autio.com"
         )
         type = "text/plain"
     }

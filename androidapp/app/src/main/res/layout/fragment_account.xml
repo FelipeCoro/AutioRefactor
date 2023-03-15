@@ -303,6 +303,7 @@
                         android:backgroundTint="@color/gray_letter"
                         android:clickable="false"
                         android:fontFamily="@font/sf_pro_text_regular"
+                        android:inputType="none"
                         android:paddingBottom="7dp"
                         android:textColor="@color/gray_letter"
                         android:textSize="16sp" />
@@ -456,6 +457,7 @@
                     android:layout_marginHorizontal="16dp"
                     android:layout_marginTop="16dp"
                     android:orientation="vertical"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/lyProfile"
                     tools:layout_editor_absoluteX="16dp"
                     tools:visibility="gone">

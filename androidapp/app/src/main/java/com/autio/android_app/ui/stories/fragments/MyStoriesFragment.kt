@@ -70,12 +70,12 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun goToSignIn() {
-        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        findNavController().navigate(R.id.action_my_stories_to_authentication_nav)
         (activity as BottomNavigation).finish()
     }
 
     private fun goToSignUp() {
-        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        findNavController().navigate(R.id.action_my_stories_to_authentication_nav)
         (activity as BottomNavigation).finish()
     }
 

@@ -127,9 +127,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity()) {
+                   showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity()) { //TODO(CHECK THIS AFTER PAYMENTS IS WORKING)
                     bottomNavigationViewModel.playMediaId(id)
-                }
+             }
             }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true, viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter

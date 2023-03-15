@@ -1,5 +1,6 @@
 package com.autio.android_app.ui.stories.fragments
 
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Paint
 import android.location.Address
@@ -413,7 +414,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     prefRepository, requireActivity()
                 ) {
                     shareStory(
-                        requireContext(), story.id
+                        requireContext(), //story.id can be set to be passed as a value for the autio link but story sharing is disabled atm
                     )
                 }
             }

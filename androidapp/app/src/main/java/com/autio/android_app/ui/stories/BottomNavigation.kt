@@ -1,6 +1,7 @@
 package com.autio.android_app.ui.stories
 
 import android.Manifest
+import android.app.Activity
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -108,8 +109,8 @@ class BottomNavigation : AppCompatActivity() {
                     else VISIBLE
             }
         }
-    }
 
+    }
     private fun handleViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
             is BottomNavigationViewState.FetchedStoryToPlay -> handleSuccessViewState(viewState.story)
@@ -176,13 +177,14 @@ class BottomNavigation : AppCompatActivity() {
 
 
     fun showPayWall() {
-        navController.navigate(R.id.subscribeFragment)
+       // navController.navigate(R.id.subscribeFragment) //TODO(Need to comment this back once payments is working)
+        hidePlayerComponent()
     }
 
     private fun showUiElements(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
         binding.storiesFreePlansBanner.isVisible = isVisible
-        binding.rlAllowNotifications.isVisible = isVisible
+       // binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
     }
     private fun updateSnackBarMessageDisplay() {
@@ -228,8 +230,7 @@ class BottomNavigation : AppCompatActivity() {
           //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
             if (remainingStories < 0){
                 llTickMarks.visibility = GONE
-             //   showPayWall() //TODO(UNCOMMENT)
-            } else {
+                showPayWall()
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
                         tickMark.setBackgroundColor(
@@ -274,6 +275,7 @@ class BottomNavigation : AppCompatActivity() {
        //    .withEndAction {
               //  binding.mainContainer.requestLayout()
                binding.persistentPlayer.visibility = GONE
+        binding.storiesFreePlansBanner.visibility = GONE
            // }
     }
 

@@ -171,7 +171,7 @@
                 android:paddingTop="14dp"
                 android:paddingBottom="15dp"
                 android:visibility="gone"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <TextView
                     style="@style/BottomSnackBarText"

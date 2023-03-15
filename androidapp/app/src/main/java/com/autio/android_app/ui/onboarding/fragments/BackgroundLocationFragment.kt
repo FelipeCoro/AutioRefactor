@@ -33,7 +33,6 @@ class BackgroundLocationFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        requestPermission()
         with(binding) {
             termsOfServiceBackground.setOnClickListener { openTerms() }
             privacyPolicyBackground.setOnClickListener { openPrivacy() }
