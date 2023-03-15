@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -10,8 +11,7 @@
             type="com.autio.android_app.ui.login.viewmodels.LoginViewModel" />
     </data>
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="61dp"
-                android:fontFamily="@font/lora_bold"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/create_your_account"
                 android:textColor="@color/white"
                 android:textSize="28sp"

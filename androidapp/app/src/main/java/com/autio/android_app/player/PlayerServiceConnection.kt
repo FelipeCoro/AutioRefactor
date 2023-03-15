@@ -12,17 +12,17 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.media.MediaBrowserServiceCompat
 import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
-import com.autio.android_app.extensions.flag
 import com.autio.android_app.extensions.id
 import com.autio.android_app.player.PlayerService.Companion.NETWORK_FAILURE
 import com.autio.android_app.player.PlayerServiceConnection.MediaBrowserConnectionCallback
-import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.di.coroutines.MainDispatcher
-import com.google.android.exoplayer2.ExoPlayer
+import com.autio.android_app.ui.stories.models.Story
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**

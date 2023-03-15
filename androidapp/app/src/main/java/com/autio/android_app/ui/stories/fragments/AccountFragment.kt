@@ -96,13 +96,14 @@ class AccountFragment : Fragment() {
     private fun initView() {
         accountFragmentViewModel.fetchUserData()
         prepareView()
-        initRecyclerViewInterest()
+       // initRecyclerViewInterest()
     }
 
     private fun setListeners() {
         // Updates UI based on subscription status
         purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
             it?.let { updateSubscriptionUI(it) }
+
         }
 
         // Listeners for buttons for subscription's buttons (status, gift, discount)
@@ -232,7 +233,7 @@ class AccountFragment : Fragment() {
         }
     }
     private fun updateUserData() {
-        if (checkEmptyField(binding.etName) || checkEmptyField(binding.etEmail)) {
+        if (checkEmptyField(binding.etName) ) {
             pleaseFillText(requireContext())
         } else {
             val name = "${binding.etName.text}"
@@ -294,16 +295,16 @@ class AccountFragment : Fragment() {
     }
 
     private fun updateCategories() {
-        // This was implemented as this because of a bug in backend
-        // where order in which data was passed actually mattered
-        // TODO: Update to more optimal code after bug fix reported from backend
-        accountFragmentViewModel.saveCategoriesOrder(tempCategories.mapIndexed { i, cat ->
-            Category(id = cat.id, order = i + 1, title = cat.title)
-        }.sortedBy { it.id }, onSuccess = {
-            showToast(requireContext(), "Profile has been updated")
-        }, onFailure = {
-            showError(requireContext())
-        })
+     // // This was implemented as this because of a bug in backend
+     // // where order in which data was passed actually mattered
+     // // TODO: Update to more optimal code after bug fix reported from backend
+     // accountFragmentViewModel.saveCategoriesOrder(tempCategories.mapIndexed { i, cat ->
+     //     Category(id = cat.id, order = i + 1, title = cat.title)
+     // }.sortedBy { it.id }, onSuccess = {
+     //     showToast(requireContext(), "Profile has been updated")
+     // }, onFailure = {
+     //     showError(requireContext())
+     // })
     }
 
     private fun getUserInfo() {
@@ -340,20 +341,20 @@ class AccountFragment : Fragment() {
     }
 
     private fun initRecyclerViewInterest() {
-        binding.rvInterests.layoutManager = LinearLayoutManager(context)
-        storyViewModel.userCategories.observe(viewLifecycleOwner) { roomCategories ->
-            if (originalCategories != roomCategories) {
-                binding.btnSaveCategoriesChanges.visibility = GONE
-                originalCategories.clear()
-                originalCategories.addAll(roomCategories)
-                tempCategories.clear()
-                tempCategories.addAll(originalCategories)
-                val adapter = CategoryAdapter()
-                adapter.differ.submitList(originalCategories)
-                binding.rvInterests.adapter = adapter
-                itemTouchHelper.attachToRecyclerView(binding.rvInterests)
-            }
-        }
+     //  binding.rvInterests.layoutManager = LinearLayoutManager(context)
+     //  storyViewModel.userCategories.observe(viewLifecycleOwner) { roomCategories ->
+     //      if (originalCategories != roomCategories) {
+     //          binding.btnSaveCategoriesChanges.visibility = GONE
+     //          originalCategories.clear()
+     //          originalCategories.addAll(roomCategories)
+     //          tempCategories.clear()
+     //          tempCategories.addAll(originalCategories)
+     //          val adapter = CategoryAdapter()
+     //          adapter.differ.submitList(originalCategories)
+     //          binding.rvInterests.adapter = adapter
+     //          itemTouchHelper.attachToRecyclerView(binding.rvInterests)
+     //      }
+     //  }
     }
 
     private fun logOut() {
@@ -377,29 +378,18 @@ class AccountFragment : Fragment() {
         // Clears shared preferences user's data
         prefRepository.clearData()
         gotoLoginFragment()
+
     }
 
     private fun gotoLoginFragment() {
-
-    //TODO(This is not working)
-    val request =
-         NavDeepLinkRequest.Builder
-             .fromUri("android-app://navigation.autio.app/login".toUri())
-             .build()
-     val nav = findNavController()
-     nav.navigate(request)
+        findNavController().navigate(R.id.action_account_to_authentication_nav)
+        (activity as BottomNavigation).finish()
     }
 
     private fun goToSignIn() {
 
         findNavController().navigate(R.id.action_account_to_authentication_nav)
         (activity as BottomNavigation).finish()
-
-  //  val request =
-  //      NavDeepLinkRequest.Builder.fromUri("android-app://navigation.autio.app/sign-in".toUri())
-  //          .build()
-  //  val nav = findNavController()
-  //  nav.navigate(request)
     }
 
     private fun goToSignUp() {

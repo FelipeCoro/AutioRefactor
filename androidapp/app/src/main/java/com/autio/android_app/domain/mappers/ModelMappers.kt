@@ -195,7 +195,7 @@ fun GuestResponse.toModel(): User {
 
 fun LoginResponse.toModel(): User {
     return User(
-        id, name = "", email = "", apiToken, isGuest
+        id, name, email, apiToken, isGuest
     )
 }
 

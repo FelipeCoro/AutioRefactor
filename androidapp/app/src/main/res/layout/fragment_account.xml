@@ -272,6 +272,7 @@
                     <TextView
                         android:id="@+id/tvProfileSubtitle"
                         style="@style/SFSubtitle"
+                        android:textSize="16sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tvProfileHeader"
@@ -289,7 +290,9 @@
                         android:fontFamily="@font/sf_pro_text_regular"
                         android:paddingBottom="7dp"
                         android:textColor="@color/gray_letter"
-                        android:textSize="12sp" />
+                        android:textSize="16sp"
+                        android:textCursorDrawable="@color/autio_blue"
+                        />
 
                     <EditText
                         android:id="@+id/et_email"
@@ -298,10 +301,11 @@
                         android:layout_below="@id/etName"
                         android:layout_marginHorizontal="18dp"
                         android:backgroundTint="@color/gray_letter"
+                        android:clickable="false"
                         android:fontFamily="@font/sf_pro_text_regular"
                         android:paddingBottom="7dp"
                         android:textColor="@color/gray_letter"
-                        android:textSize="12sp" />
+                        android:textSize="16sp" />
 
                     <LinearLayout
                         android:id="@+id/llUpdateProfileButtons"

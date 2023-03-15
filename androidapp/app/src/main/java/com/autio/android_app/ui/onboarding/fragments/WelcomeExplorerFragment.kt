@@ -35,7 +35,9 @@ class WelcomeExplorerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.buttonLetsGo.setOnClickListener {
-            viewPager.currentItem += 1
+            if(viewPager!= null) {
+                viewPager.currentItem += 1
+            }
         }
         initView()
     }

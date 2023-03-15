@@ -39,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="61dp"
-                android:fontFamily="@font/lora_bold"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/sign_in"
                 android:textColor="@color/white"
                 android:textSize="28sp"

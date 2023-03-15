@@ -149,5 +149,5 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun isUserLoggedIn() =
-        prefRepository.userApiToken.isEmpty() //TODO(Shouldn't this be if its NOT empty?)
+        prefRepository.userApiToken.isNotEmpty() //TODO(Shouldn't this be if its NOT empty?)
 }
