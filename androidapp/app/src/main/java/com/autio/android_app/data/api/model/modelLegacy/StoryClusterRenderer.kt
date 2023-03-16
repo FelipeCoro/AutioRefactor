@@ -19,6 +19,8 @@ class StoryClusterRenderer(
     clusterManager: ClusterManager<StoryClusterItem>
 ) : DefaultClusterRenderer<StoryClusterItem>(context, map, clusterManager) {
 
+    var nearestStory: StoryClusterItem? = null
+
     private val defaultMarkerIcon by lazy {
         ResourcesCompat.getDrawable(
             context.resources, R.drawable.ic_non_listened_pin, null
@@ -35,6 +37,18 @@ class StoryClusterRenderer(
         ResourcesCompat.getDrawable(
             context.resources, R.drawable.ic_now_listening_pin, null
         )?.toBitmap()
+    }
+
+    private val largerBitmapDefault by lazy {
+        defaultMarkerIcon?.let {
+            getLargerBitmap(it)
+        }
+    }
+
+    private val largerBitmapListened by lazy {
+        listenedMarkerIcon?.let {
+            getLargerBitmap(it)
+        }
     }
 
     override fun getColor(clusterSize: Int): Int {
@@ -55,7 +69,7 @@ class StoryClusterRenderer(
     override fun onBeforeClusterItemRendered(
         item: StoryClusterItem, markerOptions: MarkerOptions
     ) {
-        val markerBitmap: Bitmap? =
+        var markerBitmap: Bitmap? =
             if (item.story.listenedAtLeast30Secs == true) {
                 listenedMarkerIcon
             } else {
@@ -64,7 +78,17 @@ class StoryClusterRenderer(
 
         if (markerBitmap != null) {
             item.bitmap = markerBitmap
-            val pinIcon = BitmapDescriptorFactory.fromBitmap(markerBitmap)
+
+
+            nearestStory?.let {
+                if (nearestStory == item) {
+                    //TODO(HERE LOGIC HIGHLIGHT MARKER / NEAREST POINT)
+                    item.bitmap = getBitmap(item.bitmap)
+                    markerBitmap = item.bitmap
+                    println(" BINGO ! Highlight this item!")
+                }
+            }
+            val pinIcon = BitmapDescriptorFactory.fromBitmap(markerBitmap!!)
             markerOptions.icon(pinIcon)
         }
     }
@@ -77,13 +101,28 @@ class StoryClusterRenderer(
         super.onClusterItemRendered(item, marker)
         marker.tag = item
         item.marker = marker
+    }
 
-        if (item.story.listenedAtLeast30Secs == true) {
-            listenedMarkerIcon?.let {
-                marker.setIcon(BitmapDescriptorFactory.fromBitmap(it))
-            }
+    private fun getBitmap(bitmap: Bitmap?): Bitmap? {
+        return when (bitmap) {
+            defaultMarkerIcon -> largerBitmapDefault
+            listenedMarkerIcon -> largerBitmapListened
+            else -> defaultMarkerIcon
         }
     }
+
+    private fun getLargerBitmap(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width * 1.5
+        val height = bitmap.height * 1.5F
+        return Bitmap.createScaledBitmap(bitmap, width.toInt(), height.toInt(), false)
+    }
+
+    private fun getOriginalBitmap(bitmap: Bitmap): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+        return Bitmap.createScaledBitmap(bitmap, width, height, false)
+    }
+
 
     override fun shouldRenderAsCluster(cluster: Cluster<StoryClusterItem>): Boolean {
         return cluster.size > 4

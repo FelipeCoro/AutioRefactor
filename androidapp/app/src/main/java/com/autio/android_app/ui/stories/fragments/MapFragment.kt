@@ -49,7 +49,6 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MapStyleOptions
@@ -275,6 +274,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         setGoogleLogoNewPosition()
     }
 
+    /*
     private fun highlightClusterItem(storyClusterItem: StoryClusterItem?) {
         highlightedItem?.let {
             unhighlightClusterItem(it)
@@ -286,7 +286,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (marker != null && originalBitmap != null) {
                 val largerBitmap = getLargerBitmap(originalBitmap)
                 val largerBitmapDescriptor = BitmapDescriptorFactory.fromBitmap(largerBitmap)
-                marker.setIcon(largerBitmapDescriptor)
+                try {
+                    marker.setIcon(largerBitmapDescriptor)
+                } catch (_: Exception) {
+                }
             }
         }
     }
@@ -302,10 +305,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
+    */
 
+/*
     private fun getLargerBitmap(bitmap: Bitmap): Bitmap {
-        val width = bitmap.width * 1.5
-        val height = bitmap.height * 1.5F
+        val width = bitmap.width * 2.5
+        val height = bitmap.height * 2.5F
         return Bitmap.createScaledBitmap(bitmap, width.toInt(), height.toInt(), false)
     }
 
@@ -313,7 +318,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val width = bitmap.width
         val height = bitmap.height
         return Bitmap.createScaledBitmap(bitmap, width, height, false)
-    }
+    }*/
 
     private fun getTransformationBitmap(
         start: Bitmap, end: Bitmap, fraction: Float
@@ -508,15 +513,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             //}
         }
         binding.btnSelectedStoryInfo.setOnClickListener {
-            storyDisplayTimer?.pauseTimer()
             showStoryOptions(requireContext(),
                 binding.root as ViewGroup,
                 it,
                 story,
                 arrayListOf(
-                //   if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                //   if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                //   StoryOption.DOWNLOAD,
+                    //   if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                    //   if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                    //   StoryOption.DOWNLOAD,
                     StoryOption.DIRECTIONS,
                     StoryOption.SHARE
                 ),
@@ -524,13 +528,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 onDismiss = { storyDisplayTimer?.finishTimer() })
         }
         getFloatingComponentHeight()?.let { showFloatingComponent(it) }
-        highlightClusterItem(clusterItem)
-        storyDisplayTimer?.startTimer()
-        storyDisplayTimer?.isActive?.observe(this) {
-            if (it == false) {
-                hideSelectedStoryComponent()
-            }
-        }
+        // highlightClusterItem(clusterItem)
+//        storyDisplayTimer?.startTimer()
+//        storyDisplayTimer?.isActive?.observe(this) {
+//            if (it == false) {
+//                hideSelectedStoryComponent()
+//            }
+//        }
     }
 
     /**
@@ -543,6 +547,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         clusterManager.setAnimation(true)
         val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
         clusterManager.renderer = clusterRenderer
+
+        val center = map.cameraPosition.target
+        val nearestStory = stories.findNearestToCoordinates(center)
+        nearestStory?.let {
+            clusterRenderer.nearestStory = markers[it.id]
+        }
 
         val storiesMap = stories.associate { it.id to StoryClusterItem(it) }
         markers.putAll(storiesMap)//todo(eliminate take truncation)
@@ -561,22 +571,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map.setOnCameraIdleListener {
             updateMapWithStories()
         }
+
         //TODO(MOVE to a view_state return from viewModel when map updates)
-        //highLightNearestStory(clusterRenderer)
+        // highLightNearestStory(clusterRenderer, stories)
     }
 
     //TODO(MOVE to a view_state return from viewModel when map updates)
-    private fun highLightNearestStory(clusterRenderer: StoryClusterRenderer) {
-        val center = map.cameraPosition.target
-        val nearestStory =
-            mapFragmentViewModel.storiesInScreen.value?.findNearestToCoordinates(center)
-        if (nearestStory != null) {
-            moveCamera(nearestStory.lat, nearestStory.lng, zoom = map.cameraPosition.zoom)
-            markers[nearestStory.id]?.let { storyClusterItem ->
-                highlightClusterItem(storyClusterItem)
-            }
-        }
-    }
+    /* private fun highLightNearestStory(clusterRenderer: StoryClusterRenderer, stories: List<Story>) {
+         val center = map.cameraPosition.target
+         val nearestStory = stories.findNearestToCoordinates(center)
+         if (nearestStory != null) {
+             markers[nearestStory.id]?.let { storyClusterItem ->
+                 highlightClusterItem(storyClusterItem)
+             }
+         }
+     }*/
 
     private fun handleMapCameraIdle() {
         cameraPosition = map.cameraPosition

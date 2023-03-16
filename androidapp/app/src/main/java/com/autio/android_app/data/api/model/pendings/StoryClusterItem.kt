@@ -6,15 +6,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.maps.android.clustering.ClusterItem
 
-class StoryClusterItem(mStory: Story) : ClusterItem {
+data class StoryClusterItem(var story: Story, var marker: Marker? = null) : ClusterItem {
 
-    private val position: LatLng = LatLng(mStory.lat, mStory.lng)
-    private val title: String = mStory.title
+    private val position: LatLng = LatLng(story.lat, story.lng)
+    private val title: String = story.title
     private val snippet: String = ""
-
-    var story = mStory
-        private set
-    var marker: Marker? = null
     var bitmap: Bitmap? = null
 
     fun updateStory(story: Story) {
@@ -28,9 +24,20 @@ class StoryClusterItem(mStory: Story) : ClusterItem {
     override fun getTitle(): String? = title
     override fun getSnippet(): String? = snippet
     override fun getZIndex(): Float? = 0f
+
+
     override fun toString(): String {
         return "StoryClusterItem(position=$position, title='$title', snippet='$snippet', story=$story, marker=$marker, bitmap=$bitmap)"
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
+        other as StoryClusterItem
+
+        if (story.id != other.story.id) return false
+
+        return true
+    }
 }

@@ -108,12 +108,8 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         Purchases.sharedInstance.restorePurchasesWith(
             onError
         ) { customerInfo ->
-            updateUserInfo(
-                customerInfo
-            )
-            onSuccess.invoke(
-                customerInfo
-            )
+            updateUserInfo(customerInfo)
+            onSuccess.invoke(customerInfo)
         }
     }
 
@@ -150,25 +146,15 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         with(
             error
         ) {
-            print(
-                "Error: $code"
-            )
-            print(
-                "Message: $message"
-            )
-            print(
-                "Underlying Error: $underlyingErrorMessage"
-            )
+            print("Error: $code")
+            print("Message: $message")
+            print("Underlying Error: $underlyingErrorMessage")
             when (code) {
                 PurchasesErrorCode.PurchaseNotAllowedError -> {
-                    print(
-                        "Purchases not allowed on this device."
-                    )
+                    print("Purchases not allowed on this device.")
                 }
                 PurchasesErrorCode.PurchaseInvalidError -> {
-                    print(
-                        "Purchase invalid, check payment source."
-                    )
+                    print("Purchase invalid, check payment source.")
                 }
                 else -> {}
             }
@@ -176,13 +162,11 @@ class RevenueCatRepositoryImpl  @Inject constructor(
     }
 
     init {
+        //TODO(Bad initialization move to injector / use hilt)
         Purchases.debugLogsEnabled = true
         Purchases.configure(
-            PurchasesConfiguration.Builder(
-                context, "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS"
-            ).observerMode(
-                false
-            ).build()
+            PurchasesConfiguration.Builder(context, "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS")
+                .observerMode(false).build()
         )
     }
 }

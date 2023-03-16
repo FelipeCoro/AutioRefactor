@@ -46,10 +46,8 @@ class PurchaseViewModel @Inject constructor(
             val result = autioRepository.login(loginRequest)
             if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
-                    setViewState(PurchaseViewState.OnLoginSuccess(user))
                     revenueCatRepository.login(user.id.toString())
-                    revenueCatRepository.getUserInfo()
-                    saveUserInfo(user)
+                    setViewState(PurchaseViewState.OnLoginSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
             } else setViewState(PurchaseViewState.OnLoginFailed)
         }

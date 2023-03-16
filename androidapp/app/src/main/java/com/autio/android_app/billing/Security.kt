@@ -33,10 +33,7 @@ class Security {
          * @param signedData the signed JSON string (signed, not encrypted)
          * @param signature  the signature for the data, signed with the private key
          */
-        fun verifyPurchase(
-            signedData: String,
-            signature: String?
-        ): Boolean {
+        fun verifyPurchase(signedData: String, signature: String?): Boolean {
             if (TextUtils.isEmpty(
                     signedData
                 ) || TextUtils.isEmpty(
@@ -46,10 +43,7 @@ class Security {
                     signature
                 )
             ) {
-                Log.w(
-                    TAG,
-                    "Purchase verification failed: missing data."
-                )
+                Log.w(TAG, "Purchase verification failed: missing data.")
                 return false
             }
             return try {
