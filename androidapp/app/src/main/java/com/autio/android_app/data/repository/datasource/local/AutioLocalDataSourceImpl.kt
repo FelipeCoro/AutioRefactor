@@ -128,7 +128,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun bookmarkStory(id: Int): StoryEntity? {
-        storyDao.setBookmarkToStory(id)
         val checkForStory = getDownloadedStoryById(id)
         return checkForStory?.let {
             storyDao.setBookmarkToStory(id)
@@ -162,6 +161,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
 // Downloaded stories
 
     override suspend fun downloadStory(story: StoryEntity) {
+           story.isDownloaded = true
             storyDao.addStory(story)
 
     }
@@ -184,6 +184,14 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun getDownloadedStories():Result<List<StoryEntity>> {
       return  runCatching { storyDao.getDownloadedStories()
+        }.onSuccess {
+            Result.success(it)
+        }.onFailure { emptyList<StoryEntity>() }
+
+    }
+
+    override suspend fun getUserBookmarkedStories(): Result<List<StoryEntity>> {
+        return  runCatching { storyDao.getUserBookmarkedStories()
         }.onSuccess {
             Result.success(it)
         }.onFailure { emptyList<StoryEntity>() }

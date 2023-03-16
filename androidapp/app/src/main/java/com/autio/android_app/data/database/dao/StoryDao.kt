@@ -55,6 +55,9 @@ interface StoryDao {
     @Query("SELECT * FROM story WHERE isLiked = 1")//TODO(Turn this into boolean?)
     fun getFavoriteStories(): Flow<List<StoryEntity>>
 
+    @Query("SELECT * FROM story WHERE isBookmarked = 1")
+    fun getUserBookmarkedStories(): List<StoryEntity>
+
     @Query("UPDATE story SET isBookmarked = 0")
     fun removeAllBookmarks()
 

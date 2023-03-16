@@ -85,68 +85,19 @@ class BookmarksFragment : Fragment() {
         activityLayout = requireActivity().findViewById(R.id.activity_layout)
     }
 
+    private fun bindListeners() {
+        binding.btnBack.setOnClickListener {
+            findNavController().navigate(R.id.action_bookmarks_playlist_to_my_stories)
+        }
+    }
+
     private fun initView() {
         binding.tvToolbarTitle.text = resources.getString(R.string.my_stories_bookmarks)
 
     }
 
     private fun bindObservables() {
-     //   storyViewModel.bookmarkedStories.observe(viewLifecycleOwner) { stories ->
-//            val totalTime =
-//                stories.sumOf { it.duration } / 60
-//            binding.tvToolbarSubtitle.text =
-//                resources.getQuantityString(
-//                    R.plurals.toolbar_stories_with_time_subtitle,
-//                    stories.size,
-//                    stories.size,
-//                    totalTime
-//                )
-  //      binding.pbLoadingStories.visibility = View.GONE
-  //      if (stories.isEmpty()) {
-  //          binding.ivNoContentIcon.setImageResource(
-  //              R.drawable.ic_player_bookmark
-  //          )
-  //          binding.tvNoContentMessage.text = resources.getText(
-  //              R.string.empty_bookmarks_message
-  //          )
-  //          binding.rlStories.visibility = View.GONE
-  //          binding.llNoContent.visibility = View.VISIBLE
-  //      } else {
-  //          binding.btnPlaylistOptions.setOnClickListener {
-  //              showPlaylistOptions(
-  //                  requireContext(),
-  //                  binding.root as ViewGroup,
-  //                  it,
-  //                  listOf(PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE),
-  //                  onOptionClicked = ::onPlaylistOptionClicked
-  //              )
-  //          }
-  //          val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
-  //          if (storiesWithoutRecords.isNotEmpty()) {
-  //              lifecycleScope.launch {
-  //                  val ids =
-  //                      storiesWithoutRecords.map { it.id }
-  //                  val result = apiClient.getStoriesByIds(
-  //                      prefRepository.userId,
-  //                      prefRepository.userApiToken,
-  //                      ids
-  //                  )
-  //                  if (result.isSuccessful) {
-  //                      val storiesFromAPI = result.body()!!//TODO(REVIEW THIS QUICK FIX)
-  //                      for (story in storiesFromAPI) {
-  //                          storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
-  //                      }
-  //                  }
-  //              }
-  //          }
-  //      }
-  //      storyAdapter.submitList(stories)
-  //      binding.llNoContent.visibility = View.GONE
-  //      binding.rlStories.visibility = View.VISIBLE
-  //  }
-
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
-
     }
 
     private fun handleViewState(viewState: StoryViewState?) {
@@ -156,16 +107,70 @@ class BookmarksFragment : Fragment() {
             is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.FetchedBookmarkedStories -> showAllBookmarkedStories(viewState.stories)
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
 
-    private fun bindListeners() {
-        binding.btnBack.setOnClickListener {
-            findNavController().navigate(R.id.action_bookmarks_playlist_to_my_stories)
+
+    private fun showAllBookmarkedStories(stories: List<Story>) {
+        recyclerView.adapter = storyAdapter
+//                stories.sumOf { it.duration } / 60
+//            binding.tvToolbarSubtitle.text =
+//                resources.getQuantityString(
+//                    R.plurals.toolbar_stories_with_time_subtitle,
+//                    stories.size,
+//                    stories.size,
+//                    totalTime
+//                )
+        binding.pbLoadingStories.visibility = View.GONE
+        binding.btnPlaylistOptions.setOnClickListener {
+            showPlaylistOptions(
+                requireContext(),
+                binding.root as ViewGroup,
+                it,
+                listOf(PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE),
+                onOptionClicked = ::onPlaylistOptionClicked
+            )
         }
+        if (stories.isEmpty()) {
+            binding.ivNoContentIcon.setImageResource(R.drawable.ic_player_bookmark)
+            binding.tvNoContentMessage.text = resources.getText(R.string.empty_bookmarks_message)
+            binding.rlStories.visibility = View.GONE
+            binding.llNoContent.visibility = View.VISIBLE
+        } else {
+
+            storyAdapter.submitList(stories)
+            binding.llNoContent.visibility = View.GONE
+            binding.rlStories.visibility = View.VISIBLE
+
+
+            //          val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
+            //          if (storiesWithoutRecords.isNotEmpty()) {
+            //              lifecycleScope.launch {
+            //                  val ids =
+            //                      storiesWithoutRecords.map { it.id }
+            //                  val result = apiClient.getStoriesByIds(
+            //                      prefRepository.userId,
+            //                      prefRepository.userApiToken,
+            //                      ids
+            //                  )
+            //                  if (result.isSuccessful) {
+            //                      val storiesFromAPI = result.body()!!//TODO(REVIEW THIS QUICK FIX)
+            //                      for (story in storiesFromAPI) {
+            //                          storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
+            //                      }
+            //                  }
+            //              }
+            //          }
+            //      }
+
+        }
+
+
     }
+
 
     private fun onPlaylistOptionClicked(option: PlaylistOption) {
         showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity(), true) {
@@ -189,7 +194,7 @@ class BookmarksFragment : Fragment() {
         }
     }
 
-    //TODO(This is all replicated code with authorFragment need to extract this into a util funtion later)
+
     private fun optionClicked(
         option: StoryOption, story: Story
     ) {

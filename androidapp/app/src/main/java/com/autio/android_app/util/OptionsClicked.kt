@@ -23,47 +23,40 @@ fun Fragment.onOptionClicked(
         activity, true
     ) {
         when (option) {
-            StoryOption.BOOKMARK -> {
+       //   StoryOption.BOOKMARK -> {
 
-                storyViewModel.bookmarkStory(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    story.id
-                )
-            }
-            StoryOption.REMOVE_BOOKMARK -> {
+       //       storyViewModel.bookmarkStory(
+       //           prefRepository.userId,
+       //           prefRepository.userApiToken,
+       //           story.id
+       //       )
+       //   }
+       //   StoryOption.REMOVE_BOOKMARK -> {
 
-                storyViewModel.removeBookmarkFromStory(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    story.id
-                )
-            }
-            StoryOption.LIKE -> {
+       //       storyViewModel.removeBookmarkFromStory(
+       //           prefRepository.userId,
+       //           prefRepository.userApiToken,
+       //           story.id
+       //       )
+       //   }
+       //   StoryOption.LIKE -> {
 
-                storyViewModel.giveLikeToStory(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    story.id
-                )
-            }
-            StoryOption.REMOVE_LIKE -> {
-                storyViewModel.removeLikeFromStory(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    story.id
-                )
-            }
-            StoryOption.DOWNLOAD ->
-                storyViewModel.downloadStory(
-                    story
-                )
-
-            StoryOption.REMOVE_DOWNLOAD -> {
-                storyViewModel.removeDownloadedStory(
-                    story.id
-                )
-            }
+       //       storyViewModel.giveLikeToStory(
+       //           prefRepository.userId,
+       //           prefRepository.userApiToken,
+       //           story.id
+       //       )
+       //   }
+       //   StoryOption.REMOVE_LIKE -> {
+       //       storyViewModel.removeLikeFromStory(
+       //           prefRepository.userId,
+       //           prefRepository.userApiToken,
+       //           story.id
+       //       )
+       //   }
+       //   StoryOption.DOWNLOAD ->
+       //       storyViewModel.downloadStory(
+       //   }
             StoryOption.DIRECTIONS -> openLocationInMapsApp(
                 activity, story.lat, story.lng
             )

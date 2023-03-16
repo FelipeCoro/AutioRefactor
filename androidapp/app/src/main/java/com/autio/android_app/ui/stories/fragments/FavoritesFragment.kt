@@ -48,25 +48,22 @@ class FavoritesFragment : Fragment() {
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val storyViewModel: StoryViewModel by viewModels()
-
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
-
     private lateinit var storyAdapter: StoryAdapter
     private lateinit var recyclerView: RecyclerView
-
     private var stories: List<StoryEntity>? = null
-
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPlaylistBinding.inflate(
-            inflater, container, false
+        binding = FragmentPlaylistBinding.inflate(inflater, container, false)
+
+        snackBarView = layoutInflater.inflate(
+            R.layout.feedback_snackbar, binding.root as ViewGroup, false
         )
-        bindObservers()
 
         binding.tvToolbarTitle.text = resources.getString(
             R.string.my_stories_favorites
@@ -76,91 +73,30 @@ class FavoritesFragment : Fragment() {
                 R.id.action_favorites_playlist_to_my_stories
             )
         }
-
-        snackBarView = layoutInflater.inflate(
-            R.layout.feedback_snackbar, binding.root as ViewGroup, false
-        )
-
         recyclerView = binding.rvStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(
-                    prefRepository,
-                    requireActivity(), isActionExclusiveForSignedInUser = true
-                ) {
-                    bottomNavigationViewModel.playMediaId(
-                        id
-                    )
-                }
-            }, onOptionClick = ::optionClicked,lifecycleOwner = viewLifecycleOwner
+                bottomNavigationViewModel.playMediaId(
+                    id
+                )
+            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )
-        recyclerView.adapter = storyAdapter
-        recyclerView.layoutManager = LinearLayoutManager(
-            requireContext()
-        )
+        return binding.root
+    }
+
+    override fun onViewCreated(
+        view: View, savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        bindObservers()
 
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
-
-        storyViewModel.favoriteStories.observe(
-            viewLifecycleOwner
-        ) { stories ->
-            recyclerView.adapter = storyAdapter
-//            val totalTime =
-//                stories.sumOf { it.duration } / 60
-//            binding.tvToolbarSubtitle.text =
-//                resources.getQuantityString(
-//                    R.plurals.toolbar_stories_with_time_subtitle,
-//                    stories.size,
-//                    stories.size,
-//                    totalTime
-//                )
-            binding.pbLoadingStories.visibility = View.GONE
-            binding.btnPlaylistOptions.setOnClickListener { view ->
-                showPlaylistOptions(
-                    requireContext(), binding.root as ViewGroup, view, listOf(
-                        PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE
-                    ).map {
-                        it.also { option ->
-                            option.disabled = stories.isEmpty()
-                        }
-                    }, onOptionClicked = ::onPlaylistOptionClicked
-                )
-            }
-            if (stories.isEmpty()) {
-                binding.ivNoContentIcon.setImageResource(
-                    R.drawable.ic_heart
-                )
-                binding.tvNoContentMessage.text = resources.getText(
-                    R.string.empty_favorites_message
-                )
-                binding.rlStories.visibility = View.GONE
-                binding.llNoContent.visibility = View.VISIBLE
-            } else {
-                val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
-                if (storiesWithoutRecords.isNotEmpty()) {
-                    lifecycleScope.launch {
-                        //TODO(fix this service callls)
-                        val storiesFromAPI = apiClient.getStoriesByIds(prefRepository.userId,
-                            prefRepository.userApiToken,
-                            storiesWithoutRecords.map { it.toDto().id })
-                        if (storiesFromAPI.isSuccessful) {
-                            for (story in storiesFromAPI.body()!!) {
-                                storyViewModel.cacheRecordOfStory(story.id, story.recordUrl)
-                            }
-                        }
-                    }
-                }
-                storyAdapter.submitList(stories)
-                binding.llNoContent.visibility = View.GONE
-                binding.rlStories.visibility = View.VISIBLE
-            }
-        }
-        return binding.root
+        storyViewModel.getAllFavoriteStories(prefRepository.userId,prefRepository.userApiToken)
     }
-
-    fun bindObservers() {
+    private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
     }
 
@@ -171,10 +107,49 @@ class FavoritesFragment : Fragment() {
             is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
+            is StoryViewState.FetchedFavoriteStories ->showAllFavoriteStories(viewState.stories)
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
+
+    private fun showAllFavoriteStories(stories: List<Story>) {
+        recyclerView.adapter = storyAdapter
+//            val totalTime =
+//                stories.sumOf { it.duration } / 60
+//            binding.tvToolbarSubtitle.text =
+//                resources.getQuantityString(
+//                    R.plurals.toolbar_stories_with_time_subtitle,
+//                    stories.size,
+//                    stories.size,
+//                    totalTime
+//                )
+        binding.pbLoadingStories.visibility = View.GONE
+        binding.btnPlaylistOptions.setOnClickListener { view ->
+            showPlaylistOptions(
+                requireContext(), binding.root as ViewGroup, view, listOf(
+                    PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE
+                ).map {
+                    it.also { option ->
+                        option.disabled = stories.isEmpty()
+                    }
+                }, onOptionClicked = ::onPlaylistOptionClicked
+            )
+        }
+        if (stories.isEmpty()) {
+            binding.ivNoContentIcon.setImageResource(R.drawable.ic_heart)
+            binding.tvNoContentMessage.text = resources.getText(
+                R.string.empty_favorites_message
+            )
+            binding.rlStories.visibility = View.GONE
+            binding.llNoContent.visibility = View.VISIBLE
+        } else {
+            storyAdapter.submitList(stories)
+            binding.llNoContent.visibility = View.GONE
+            binding.rlStories.visibility = View.VISIBLE
+        }
+    }
+
 
     private fun onPlaylistOptionClicked(
         option: PlaylistOption

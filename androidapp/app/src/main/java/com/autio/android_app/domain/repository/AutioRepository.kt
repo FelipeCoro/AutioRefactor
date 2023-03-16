@@ -27,7 +27,12 @@ interface AutioRepository {
     suspend fun getMapPointById(id: String): Result<Story?>
     suspend fun getMapPointsByIds(ids: List<Int>): Result<List<Story>>
     suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result<Story>
-    suspend fun getStoriesByIds(userId: Int, apiToken: String, stories: List<Int>):Result<List<Story>>
+    suspend fun getStoriesByIds(
+        userId: Int,
+        apiToken: String,
+        stories: List<Int>
+    ): Result<List<Story>>
+
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng,
         neCoordinates: LatLng
@@ -42,7 +47,11 @@ interface AutioRepository {
         page: Int
     ): Result<Contributor>
 
-    suspend fun giveLikeToStory(xUserId: Int, apiToken: String, storyId: Int): Result<Pair<Boolean,Int>>
+    suspend fun giveLikeToStory(
+        xUserId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Pair<Boolean, Int>>
 
     suspend fun postStoryPlayed(
         xUserId: Int,
@@ -76,7 +85,7 @@ interface AutioRepository {
 
     suspend fun bookmarkStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
-    suspend fun getUserBookmarks(firebaseId: Int): List<String>
+    suspend fun getUserBookmarks(userId: Int): List<String>
 
     suspend fun getStoriesFromUserBookmarks(userId: Int, apiToken: String): Result<List<Story>>
 
@@ -85,13 +94,17 @@ interface AutioRepository {
 
     suspend fun giveLikeToStory(id: Int)
 
-    suspend fun getUserFavoriteStories(firebaseId: Int)
+    suspend fun getUserFavoriteStories(userId: Int, apiToken: String): Result<List<Story>>
 
-    suspend fun removeLikeFromStory(userId: Int, apiToken: String, storyId: Int): Result<Pair<Boolean,Int>>
+    suspend fun removeLikeFromStory(
+        userId: Int,
+        apiToken: String,
+        storyId: Int
+    ): Result<Pair<Boolean, Int>>
 
     suspend fun addStoryToHistory(history: History)
 
-    suspend fun getUserStoriesHistory(firebaseId: Int)
+    suspend fun getUserStoriesHistory(userId: Int, userApiToken: String):Result<List<Story>>
 
     suspend fun removeStoryFromHistory(id: Int)
 
@@ -108,14 +121,14 @@ interface AutioRepository {
 
     suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
-    suspend fun storyLikesCount(userId: Int, apiToken: String, storyId: Int):Result<Int>
+    suspend fun storyLikesCount(userId: Int, apiToken: String, storyId: Int): Result<Int>
 
-    suspend fun isStoryLiked(userId: Int, apiToken: String, storyId: Int):Result<Boolean>
+    suspend fun isStoryLiked(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
 
     suspend fun deleteCachedData()
 
     suspend fun addStories(stories: List<Story>)
 
-    suspend fun getDownloadedStories():Result<List<Story>>
+    suspend fun getDownloadedStories(): Result<List<Story>>
 
 }

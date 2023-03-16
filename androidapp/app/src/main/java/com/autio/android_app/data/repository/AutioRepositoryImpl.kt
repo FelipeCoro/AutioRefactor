@@ -178,7 +178,7 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result<Story> {
 
-        val result = autioRemoteDataSource.getStoryById(xUserId,  "Bearer $apiToken", id)
+        val result = autioRemoteDataSource.getStoryById(xUserId, "Bearer $apiToken", id)
 
         return if (result.isSuccessful) {
             val story = result.body()!!.toModel()
@@ -356,6 +356,21 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getUserFavoriteStories(
+        userId: Int,
+        apiToken: String
+    ): Result<List<Story>> {
+        val likedStories = autioRemoteDataSource.likedStoriesByUser(userId, apiToken)
+        return if (likedStories.isSuccessful) {
+            val result = likedStories.body()!!.map { it.toModel() }
+            Result.success(result)
+
+        } else {
+            val throwable = Error(likedStories.errorBody().toString())
+            Result.failure(throwable)
+        }
+    }
+
     override suspend fun removeAllDownloads() {
         autioLocalDataSource.removeAllDownloads()
     }
@@ -379,21 +394,18 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun bookmarkStory(
         userId: Int, apiToken: String, storyId: Int
     ): Result<Boolean> {
-        val bookedMarkedStory = autioLocalDataSource.bookmarkStory(storyId)
-        return bookedMarkedStory?.let {
-            val remoteBookmark =
-                autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId)
-            if (remoteBookmark.isSuccessful) {
-                Result.success(remoteBookmark.body().toString().toBoolean())
-            } else {
-                val throwable = Error(remoteBookmark.errorBody().toString())
-                Result.failure(throwable)
-            }
-        } ?: Result.failure(Error())
+        autioLocalDataSource.bookmarkStory(storyId)
+        val remoteBookmark = autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId)
+        return if (remoteBookmark.isSuccessful) {
+            Result.success(remoteBookmark.body().toString().toBoolean())
+        } else {
+            val throwable = Error(remoteBookmark.errorBody().toString())
+            Result.failure(throwable)
+        }
     }
 
-    override suspend fun getUserBookmarks(firebaseId: Int): List<String> {
-        TODO("Not yet implemented")
+    override suspend fun getUserBookmarks(userId: Int): List<String> {
+        return emptyList<String>()
     }
 
     override suspend fun getStoriesFromUserBookmarks(
@@ -417,10 +429,6 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun removeAllBookmarks() {
         autioLocalDataSource.removeAllBookmarks()
 
-    }
-
-    override suspend fun getUserFavoriteStories(firebaseId: Int) {
-        TODO("Not yet implemented")
     }
 
     override suspend fun giveLikeToStory(id: Int) {
@@ -464,8 +472,17 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.addStoryToHistory(history.toMapPointEntity())
     }
 
-    override suspend fun getUserStoriesHistory(firebaseId: Int) {
-        TODO("Not yet implemented")
+    override suspend fun getUserStoriesHistory(
+        userId: Int,
+        userApiToken: String
+    ): Result<List<Story>> {
+        val storyHistory = autioRemoteDataSource.getUserHistory(userId, userApiToken)
+        return if (storyHistory.isSuccessful) {
+            Result.success(storyHistory.body()!!.map { it.toModel() })
+        } else {
+            val throwable = Error(storyHistory.errorBody().toString())
+            Result.failure(throwable)
+        }
     }
 
     override suspend fun removeStoryFromHistory(id: Int) {
@@ -538,7 +555,7 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun getDownloadedStories(): Result<List<Story>> {
 
         val result = autioLocalDataSource.getDownloadedStories()
-       return if (result.isSuccess) {
+        return if (result.isSuccess) {
             val stories = result.getOrNull()?.let { downloadedStories ->
                 downloadedStories.map { it.toModel() }
             } ?: listOf()

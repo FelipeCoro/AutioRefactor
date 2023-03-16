@@ -85,7 +85,9 @@
                             android:layout_gravity="center"
                             android:layout_weight="1"
                             android:scaleType="centerInside"
-                            android:src="@drawable/ic_baseline_cast" />
+                            android:src="@drawable/ic_baseline_cast"
+                            android:visibility="gone"
+                            tools:visibility="gone" />
 
                         <ImageView
                             android:id="@+id/btnFeedback"

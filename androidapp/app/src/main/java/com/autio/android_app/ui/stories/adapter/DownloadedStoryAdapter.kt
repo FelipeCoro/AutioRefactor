@@ -59,17 +59,15 @@ class DownloadedStoryAdapter(
             )
 
         fun bind(model: Story) {
+            val options = RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.maps_placeholder)
+                .error(R.drawable.maps_placeholder)
             Glide.with(itemView)
-                .load(model.imageUrl.let { path ->
-                    Uri.parse(path).path?.let {
-                        File(it)
-                    }
-                })
-                .apply(
-                    RequestOptions().placeholder(R.drawable.maps_placeholder)
-                        .error(R.drawable.maps_placeholder)
-                )
+                .load(model.imageUrl)
+                .apply(options)
                 .into(ivStoryImage)
+
             ivStoryCard.setOnClickListener {
                 onStoryPlay?.invoke(model.id)
             }
@@ -84,9 +82,9 @@ class DownloadedStoryAdapter(
                     model,
                     arrayListOf(
                         StoryOption.DELETE,
-                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else com.autio.android_app.data.api.model.StoryOption.BOOKMARK,
-                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else com.autio.android_app.data.api.model.StoryOption.LIKE,
-                        StoryOption.REMOVE_DOWNLOAD,
+                 //       if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                 //       if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                 //       StoryOption.REMOVE_DOWNLOAD,
                         StoryOption.DIRECTIONS,
                         StoryOption.SHARE
                     ),

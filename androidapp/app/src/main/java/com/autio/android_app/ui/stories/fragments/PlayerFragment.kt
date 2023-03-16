@@ -127,16 +127,15 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         )
 
 
-       val story = playerFragmentViewModel.currentStory
+        val story = playerFragmentViewModel.currentStory
 
         story.value?.let {
             storyId = it.id
         }
 
+
         storyViewModel.isStoryLiked(
-            prefRepository.userId,
-            prefRepository.userApiToken,
-            storyId
+            prefRepository.userId, prefRepository.userApiToken, storyId
         )
 
         binding.btnHeart.setOnClickListener {
@@ -144,65 +143,44 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 prefRepository, requireActivity(), true
             ) {
                 storyViewModel.getStoriesByIds(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    listOf(storyId)
+                    prefRepository.userId, prefRepository.userApiToken, listOf(storyId)
                 )
             }
         }
 
 
+        binding.btnBookmark.setOnClickListener {
+            // showPaywallOrProceedWithNormalProcess(
+            //  prefRepository, requireActivity(), true
+            //  ) {
+            story.value?.isBookmarked?.let { bookmarked -> isStoryBookmarked(bookmarked) }
+            //   }
 
-        playerFragmentViewModel.isStoryBookmarked.observe(
-            viewLifecycleOwner
-        ) { isBookmarked ->
-            if (isBookmarked) {
-                binding.btnBookmark.setImageResource(
-                    R.drawable.ic_player_bookmark_filled
-                )
-            } else {
-                binding.btnBookmark.setImageResource(
-                    R.drawable.ic_player_bookmark
-                )
-            }
-            playerFragmentViewModel.currentStory.value?.let { story ->
-                binding.btnBookmark.setOnClickListener {
-                    showPaywallOrProceedWithNormalProcess(
-                        prefRepository, requireActivity()
-                    ) {
-                        if (isBookmarked) {
-                            storyViewModel.removeBookmarkFromStory(
-                                prefRepository.userId, prefRepository.userApiToken, story.id
-                            )
-                        } else {
-                            storyViewModel.bookmarkStory(
-                                prefRepository.userId, prefRepository.userApiToken, story.id
-                            )
-                        }
-                    }
-                }
-            }
         }
-        playerFragmentViewModel.currentStory.observe(viewLifecycleOwner)
-        { mediaItem ->
-            updateUI(
-                view,
-                mediaItem
-            )
+
+
+        storyViewModel.getBookmarkedStoriesByIds(
+            prefRepository.userId,
+            prefRepository.userApiToken,
+        )
+
+
+
+
+
+        playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
+            updateUI(view, mediaItem)
             if (mediaItem != null) {
                 storyId = mediaItem.id
             }
         }
-        playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner)
-        { res ->
+        playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner) { res ->
             binding.btnChangeSpeed.setImageResource(res)
         }
-        playerFragmentViewModel.mediaButtonRes.observe(viewLifecycleOwner)
-        { res ->
+        playerFragmentViewModel.mediaButtonRes.observe(viewLifecycleOwner) { res ->
             binding.btnPlay.setImageResource(res)
         }
-        playerFragmentViewModel.mediaPosition.observe(viewLifecycleOwner)
-        { pos ->
+        playerFragmentViewModel.mediaPosition.observe(viewLifecycleOwner) { pos ->
             binding.tvNowPlayingSeek.text = NowPlayingMetadata.timestampToMSS(context, pos)
             binding.sBTrack.progress = (pos / 1000).toInt()
         }
@@ -213,7 +191,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnRewind.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity()
+                prefRepository, requireActivity(), true
             ) {
                 bottomNavigationViewModel.rewindFifteenSeconds()
             }
@@ -229,7 +207,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
         binding.btnNext.setOnClickListener {
             showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(),
+                prefRepository, requireActivity(), true
             ) {
                 bottomNavigationViewModel.skipToNextStory()
             }
@@ -252,6 +230,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         when (viewState) {
             is StoryViewState.StoryLikesCount -> handleStoryLikesCount(viewState.storyLikesCount)
             is StoryViewState.FetchedStoriesByIds -> handleFetchedStory(viewState.stories.first())
+            is StoryViewState.FetchedBookmarkedStories -> handleBookmarkedStories(viewState.stories)
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
             is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
             is StoryViewState.StoryLiked -> handleLIsLikedState(viewState.likeCount)
@@ -263,7 +242,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
     }
 
-    private fun isStoryLiked(isLiked:Boolean) {
+    private fun isStoryLiked(isLiked: Boolean) {
         if (isLiked) {
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
         }
@@ -285,6 +264,28 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 prefRepository.userId, prefRepository.userApiToken, story.id
             )
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
+        }
+    }
+
+    private fun isStoryBookmarked(isBookmarked: Boolean) {
+        if (isBookmarked) {
+            binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark)
+            storyViewModel.removeBookmarkFromStory(prefRepository.userId,prefRepository.userApiToken,storyId)
+        }
+        else
+            binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
+            storyViewModel.bookmarkStory(prefRepository.userId,prefRepository.userApiToken,storyId)
+    }
+
+    private fun handleBookmarkedStories(stories: List<Story>) {
+        for (story in stories) {
+            if (story.id == storyId) {
+                binding.btnBookmark.setImageResource(
+                    R.drawable.ic_player_bookmark_filled
+                )
+            } else binding.btnBookmark.setImageResource(
+                R.drawable.ic_player_bookmark
+            )
         }
     }
 
@@ -345,7 +346,9 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     }
                 }
             })
-            storyViewModel.isStoryLiked(prefRepository.userId,prefRepository.userApiToken,storyId)
+            storyViewModel.isStoryLiked(
+                prefRepository.userId, prefRepository.userApiToken, storyId
+            )
             tvStoryTitle.text = story.title
             tvStoryAuthor.apply {
                 text = story.author
@@ -424,12 +427,20 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 )
             }
             btnOptions.setOnClickListener {
-                showStoryOptions(
-                    requireContext(), binding.root as ViewGroup, it, story, arrayListOf(
-                        if (story.isDownloaded == true) StoryOption.REMOVE_DOWNLOAD else StoryOption.DOWNLOAD,
-                        StoryOption.DIRECTIONS
-                    ), onOptionClick = ::optionClicked
-                )
+                if (story.isDownloaded == false) {
+                    storyViewModel.downloadStory(story)
+                } else (context?.let {
+                    showToast(it, "Story has already been downloaded")
+                })
+
+
+                //        showStoryOptions(  //TODO(THIS IS FOR WHEN DIRECTIONS IS IMPLEMENTED)
+                //            requireContext(), binding.root as ViewGroup, it, story, arrayListOf(
+                //                if (story.isDownloaded == true)
+                //                    StoryOption.REMOVE_DOWNLOAD else StoryOption.DOWNLOAD,
+                //             //   StoryOption.DIRECTIONS
+                //            ), onOptionClick = ::optionClicked
+                //        )
             }
             mapCard.visibility = View.VISIBLE
         } else {
@@ -481,16 +492,10 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             story.lat, story.lng
         )
         val marker = MarkerOptions().apply {
-            position(
-                latLng
-            )
-            title(
-                story.title
-            )
+            position(latLng)
+            title(story.title)
             if (customIcon != null) {
-                icon(
-                    customIcon
-                )
+                icon(customIcon)
             }
         }
         this.map?.apply {
@@ -538,12 +543,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(
-                    option,
-                    story,
-                    storyViewModel,
-                    prefRepository,
-                    verifiedActivity,
-                    verifiedContext
+                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
                 )
             }
         }

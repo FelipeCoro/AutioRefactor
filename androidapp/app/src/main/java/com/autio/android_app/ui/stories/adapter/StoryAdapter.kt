@@ -102,9 +102,9 @@ class StoryAdapter(
             ivStoryItemOptions.setOnClickListener {
                 showStoryOptions(
                     itemView.context, itemView.parent as ViewGroup, it, model, arrayListOf(
-                        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                        if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                        StoryOption.DOWNLOAD,
+                //        if (model.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                //        if (model.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                //        StoryOption.DOWNLOAD,
                         StoryOption.DIRECTIONS,
                         StoryOption.SHARE
                     ), onOptionClick = onOptionClick

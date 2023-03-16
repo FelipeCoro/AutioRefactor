@@ -27,8 +27,8 @@ data class StoryEntity(
     val countryCode: String = "",
     val privateId: String = "",
     val isLiked: Boolean? = false,
-    val isBookmarked: Boolean? = false,
-    val isDownloaded: Boolean? = false,
+    var isBookmarked: Boolean? = false,
+    var isDownloaded: Boolean? = false,
     val listenedAt: String? = null,
     val listenedAtLeast30Secs: Boolean? = false,
 )

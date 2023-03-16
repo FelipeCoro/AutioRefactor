@@ -106,8 +106,6 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
 
-
-
     private fun checkPlaybackPosition(): Boolean = handler.postDelayed(
         {
             val currPosition = playbackState.currentPlayBackPosition.toInt()
@@ -358,26 +356,25 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     private suspend fun setLikesToStories() {
-        withContext(coroutineDispatcher) {
-            val userFavoriteStories = autioRepository.getUserFavoriteStories(
-                prefRepository.userId
-            )
-            //TODO(Finish this)
-            // autioRepository.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
-            //   .map { it.storyId }
-            //)
-        }
+        //withContext(coroutineDispatcher) {
+        //    val userFavoriteStories = autioRepository.getUserFavoriteStories(
+        //        prefRepository.userId
+        //    )
+        //    //TODO(Finish this)
+        // autioRepository.setLikesDataToLocalStories(userFavoriteStories.filter { it.isGiven == true }
+        //   .map { it.storyId }
+        //)
     }
 
     private suspend fun setListenedAtToStories() {
-        withContext(coroutineDispatcher) {
-            val userHistory = autioRepository.getUserStoriesHistory(
-                prefRepository.userId
-            )
-            //TODO(Finish this)
-            //  autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
-        }
+        //  withContext(coroutineDispatcher) {
+        //      val userHistory = autioRepository.getUserStoriesHistory(
+        //          prefRepository.userId
+        //      )
+        //TODO(Finish this)
+        //  autioRepository.setListenedAtToLocalStories(userHistory.map{it.toEntity()})
     }
+
 
     fun clearRoomCache() {
         viewModelScope.launch(coroutineDispatcher) {

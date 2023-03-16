@@ -32,9 +32,7 @@ class StoryViewModel @Inject constructor(
     private val _storyViewState = MutableLiveData<StoryViewState>()
 
     val storyViewState: LiveData<StoryViewState> = _storyViewState
-    val userCategories = autioRepository.userCategories.asLiveData()
-    val storiesHistory = autioRepository.history.asLiveData()
-    val favoriteStories = autioRepository.favoriteStories.asLiveData()
+
 
     private fun setViewState(newState: StoryViewState) {
         _storyViewState.postValue(newState)
@@ -59,6 +57,21 @@ class StoryViewModel @Inject constructor(
                 }
             }.onFailure {
                 setViewState(StoryViewState.FetchedStoriesByIdsFailed)
+            }
+        }
+    }
+
+    fun getBookmarkedStoriesByIds(userId: Int, apiToken: String) {
+        viewModelScope.launch(coroutineDispatcher) {
+            runCatching {
+                val result = autioRepository.getStoriesFromUserBookmarks(userId, apiToken)
+                result.getOrNull()
+            }.onSuccess { stories ->
+                stories?.let {if (it.isNotEmpty()){
+                    setViewState(StoryViewState.FetchedBookmarkedStories(it))}
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FetchedBookmarkedStoriesFailed)
             }
         }
     }
@@ -167,13 +180,6 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-//TODO(Check with BackEnd for erase allBookmarks method)
-// fun removeAllBookmarks() {
-//     viewModelScope.launch(coroutineDispatcher) {
-//         autioRepository.removeAllBookmarks()
-//     }
-// }
-
     fun giveLikeToStory(userId: Int, apiToken: String, storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
@@ -224,20 +230,19 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun addStoryToHistory(history: History) {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.addStoryToHistory(history)
-        }
-    }
-
-    fun removeStoryFromHistory(id: Int) {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeStoryFromHistory(id)
-        }
-    }
-
-    fun clearStoryHistory() = viewModelScope.launch(coroutineDispatcher) {
-        autioRepository.clearStoryHistory()
+    fun getAllFavoriteStories(userId: Int, apiToken: String){
+            viewModelScope.launch(coroutineDispatcher) {
+                runCatching {
+                    autioRepository.getUserFavoriteStories(userId, apiToken)
+                }.onSuccess { result ->
+                    val likedStories = result.getOrNull()
+                    likedStories?.let {
+                        setViewState(StoryViewState.FetchedFavoriteStories(it))
+                    }
+                }.onFailure {
+                    setViewState(StoryViewState.FetchedFavoriteStoriesFailed)
+                }
+            }
     }
 
     fun isStoryLiked(userId: Int, apiToken: String, storyId: Int) {
@@ -299,6 +304,37 @@ class StoryViewModel @Inject constructor(
             }
         }
     }
+
+    fun getHistory(userId: Int, userApiToken:String) {
+        viewModelScope.launch(coroutineDispatcher) {
+            runCatching {
+                autioRepository.getUserStoriesHistory(userId, userApiToken)
+            }.onSuccess { result ->
+                val stories = result.getOrNull()
+                stories?.let {
+                    setViewState(StoryViewState.FetchedStoriesHistory(it))
+                }
+            }.onFailure {
+                setViewState(StoryViewState.FetchedStoriesHistoryFailed)
+            }
+        }
+    }
+    fun addStoryToHistory(history: History) {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.addStoryToHistory(history)
+        }
+    }
+
+    fun removeStoryFromHistory(id: Int) {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.removeStoryFromHistory(id)
+        }
+    }
+
+    fun clearStoryHistory() = viewModelScope.launch(coroutineDispatcher) {
+        autioRepository.clearStoryHistory()
+    }
+
 }
 
 

@@ -201,7 +201,8 @@ interface ApiClient {
     // FAVORITE CALLS
     @GET("/api/v1/likes")
     suspend fun likedStoriesByUser(
-        @Header("X-User-Id") xUserId: Int, @Header("Authorization") apiToken: String
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String
     ): Response<List<StoryDto>>
 
     @GET("/api/v1/likes/{story_id}/is-liked")
@@ -233,9 +234,14 @@ interface ApiClient {
     ): Response<LikeResponse>
 
     // HISTORY CALLS
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
     @GET("/api/v1/playedHistory")
     suspend fun getUserHistory(
-        @Header("X-User-Id") xUserId: Int, @Header("Authorization") apiToken: String
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String
     ): Response<List<StoryDto>>
 
     @PUT("/api/v1/playedHistory/{story_id}")
@@ -247,7 +253,8 @@ interface ApiClient {
 
     @DELETE("/api/v1/playedHistory/all")
     suspend fun clearHistory(
-        @Header("X-User-Id") xUserId: Int, @Header("Authorization") apiToken: String
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String
     ): Response<ClearHistoryResponse>
 
     @DELETE("/api/v1/playedHistory/{story_id}")
@@ -258,7 +265,6 @@ interface ApiClient {
     ): Response<RemoveHistoryResponse>
 
     // BOOKMARK CALLS
-
     @GET("/api/v1/library")
     suspend fun getStoriesFromUserBookmarks(
         @Header("X-User-Id") xUserId: Int,

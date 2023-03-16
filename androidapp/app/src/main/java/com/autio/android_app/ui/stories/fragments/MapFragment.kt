@@ -514,9 +514,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 it,
                 story,
                 arrayListOf(
-                    if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
-                    if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
-                    StoryOption.DOWNLOAD,
+                //   if (story.isBookmarked == true) StoryOption.REMOVE_BOOKMARK else StoryOption.BOOKMARK,
+                //   if (story.isLiked == true) StoryOption.REMOVE_LIKE else StoryOption.LIKE,
+                //   StoryOption.DOWNLOAD,
                     StoryOption.DIRECTIONS,
                     StoryOption.SHARE
                 ),

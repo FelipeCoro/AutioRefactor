@@ -38,6 +38,7 @@ interface AutioLocalDataSource {
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
     suspend fun getDownloadedStories():Result<List<StoryEntity>>
+    suspend fun getUserBookmarkedStories(): Result<List<StoryEntity>>
     suspend fun clearUserData()
     suspend fun deleteCachedData()
 }
