@@ -21,15 +21,13 @@ import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
+import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showPlaylistOptions
+import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -42,7 +40,7 @@ class BookmarksFragment : Fragment() {
     private val storyViewModel: StoryViewModel by viewModels()
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
-    private lateinit var storyAdapter: StoryAdapter
+    private lateinit var storyAdapter: DownloadedStoryAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
@@ -72,14 +70,15 @@ class BookmarksFragment : Fragment() {
         )
 
         recyclerView = binding.rvStories
-
-        storyAdapter = StoryAdapter(
-            bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity(), true) {
-                    bottomNavigationViewModel.playMediaId(id)
-                }
-            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
+        storyAdapter = DownloadedStoryAdapter(
+            onStoryPlay = { id ->
+                bottomNavigationViewModel.playMediaId(
+                    id
+                )
+            }, ::optionClicked
         )
+        storyViewModel.getBookmarkedStoriesByIds(prefRepository.userId, prefRepository.userApiToken)
+
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         activityLayout = requireActivity().findViewById(R.id.activity_layout)
@@ -125,13 +124,16 @@ class BookmarksFragment : Fragment() {
 //                    totalTime
 //                )
         binding.pbLoadingStories.visibility = View.GONE
-        binding.btnPlaylistOptions.setOnClickListener {
+        binding.btnPlaylistOptions.setOnClickListener { view ->
             showPlaylistOptions(
                 requireContext(),
                 binding.root as ViewGroup,
-                it,
-                listOf(PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE),
-                onOptionClicked = ::onPlaylistOptionClicked
+                view,
+                listOf(PlaylistOption.REMOVE).map {
+                    it.also { option ->
+                        option.disabled = stories.isEmpty()
+                    }
+                }, onOptionClicked = ::onPlaylistOptionClicked
             )
         }
         if (stories.isEmpty()) {
@@ -167,50 +169,60 @@ class BookmarksFragment : Fragment() {
             //      }
 
         }
-
-
-    }
-
-
-    private fun onPlaylistOptionClicked(option: PlaylistOption) {
-        showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity(), true) {
-            binding.pbLoadingProcess.visibility = View.VISIBLE
-            when (option) {
-                PlaylistOption.DOWNLOAD -> {}
-                PlaylistOption.REMOVE -> {
-                    // FirebaseStoryRepository.removeAllBookmarks(prefRepository.firebaseKey,
-                    //   onSuccessListener = {
-                    //       //         storyViewModel.removeAllBookmarks() //TODO(We need a backend method for online removal)
-                    //       binding.pbLoadingProcess.visibility = View.GONE
-                    //       showFeedbackSnackBar("Removed All Bookmarks")
-                    //   },
-                    //   onFailureListener = {
-                    //       binding.pbLoadingProcess.visibility = View.GONE
-                    //       showFeedbackSnackBar("Connection Failure")
-                    //   })
-                }
-                else -> Log.d("BookmarksFragment", "option not available for this playlist")
-            }
-        }
     }
 
 
     private fun optionClicked(
         option: StoryOption, story: Story
     ) {
-        activity?.let { verifiedActivity ->
-            context?.let { verifiedContext ->
-                onOptionClicked(
-                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
-                )
+        when (option) {
+            StoryOption.DELETE -> {
+                storyViewModel.removeBookmarkFromStory(prefRepository.userId,prefRepository.userApiToken,story.id)
+                binding.pbLoadingProcess.visibility = View.GONE
+                showFeedbackSnackBar("Removed Bookmark")
+                navController.navigate(R.id.action_bookmarks_playlist_to_my_stories)
+            }
+            else -> {
+                activity?.let { verifiedActivity ->
+                    context?.let { verifiedContext ->
+                        onOptionClicked(
+                            option,
+                            story,
+                            storyViewModel,
+                            prefRepository,
+                            verifiedActivity,
+                            verifiedContext
+                        )
+                    }
+                }
             }
         }
     }
 
-    private fun cancelJob() {
-        if (activityLayout.contains(snackBarView)) {
-            activityLayout.removeView(snackBarView)
+
+        private fun onPlaylistOptionClicked(option: PlaylistOption) {
+            showPaywallOrProceedWithNormalProcess(
+                prefRepository,
+                requireActivity(), true
+            ) {
+                binding.pbLoadingProcess.visibility = View.VISIBLE
+                when (option) {
+                    PlaylistOption.REMOVE -> {
+                        storyViewModel.removeAllBookmarks()
+                        binding.pbLoadingProcess.visibility = View.GONE
+                        showFeedbackSnackBar("Removed Bookmarks")
+                        navController.navigate(R.id.action_bookmarks_playlist_to_my_stories)
+                    }
+                    else -> Log.d("BookmarksFragment", "option not available for this playlist")
+                }
+            }
         }
-        feedbackJob?.cancel()
+
+
+        private fun cancelJob() {
+            if (activityLayout.contains(snackBarView)) {
+                activityLayout.removeView(snackBarView)
+            }
+            feedbackJob?.cancel()
+        }
     }
-}

@@ -81,13 +81,13 @@ interface AutioRepository {
         userId: Int,
         apiToken: String,
         storyId: Int
-    ): Result<Boolean>
+    )
 
-    suspend fun bookmarkStory(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
+    suspend fun bookmarkStory(userId: Int, apiToken: String, storyId: Int)
 
-    suspend fun getUserBookmarks(userId: Int): List<String>
+  //  suspend fun getUserBookmarks(userId: Int): List<String>
 
-    suspend fun getStoriesFromUserBookmarks(userId: Int, apiToken: String): Result<List<Story>>
+    suspend fun getUserBookmarkedStories(userId: Int, apiToken: String): List<Story>
 
     //TODO(Same as with storyViewModel we need to have parallel methods to avoid contradictions)
     suspend fun removeAllBookmarks()
@@ -119,12 +119,12 @@ interface AutioRepository {
 
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
 
-    suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
+   // suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
     suspend fun storyLikesCount(userId: Int, apiToken: String, storyId: Int): Result<Int>
 
     suspend fun isStoryLiked(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
-
+    suspend fun removeAllLikedStories(userId: Int, apiToken: String,stories:List<StoryEntity>)
     suspend fun deleteCachedData()
 
     suspend fun addStories(stories: List<Story>)

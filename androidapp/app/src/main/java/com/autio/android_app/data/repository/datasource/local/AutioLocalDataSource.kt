@@ -19,14 +19,14 @@ interface AutioLocalDataSource {
     suspend fun getMapPointsByIds(ids: List<Int>): Result<List<MapPointEntity>>
     suspend fun getLastModifiedStory(): Result<StoryEntity?>
     suspend fun addStories(stories: List<MapPointEntity>)
-    suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
+    //suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
     suspend fun addStoryToHistory(history: HistoryEntity)
     suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int)
     suspend fun removeStoryFromHistory(id: Int)
     suspend fun clearStoryHistory()
-    suspend fun bookmarkStory(id: Int): StoryEntity?
+    suspend fun bookmarkStory(id: Int)
     suspend fun removeBookmarkFromStory(id: Int): StoryEntity?
     suspend fun removeAllBookmarks()
     suspend fun giveLikeToStory(id: Int)
@@ -38,7 +38,7 @@ interface AutioLocalDataSource {
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
     suspend fun getDownloadedStories():Result<List<StoryEntity>>
-    suspend fun getUserBookmarkedStories(): Result<List<StoryEntity>>
+    suspend fun getUserBookmarkedStories(): List<StoryEntity>
     suspend fun clearUserData()
     suspend fun deleteCachedData()
 }

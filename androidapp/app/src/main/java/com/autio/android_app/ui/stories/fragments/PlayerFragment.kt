@@ -134,18 +134,17 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
 
-        storyViewModel.isStoryLiked(
-            prefRepository.userId, prefRepository.userApiToken, storyId
-        )
+        storyViewModel.isStoryLiked(prefRepository.userId, prefRepository.userApiToken, storyId)
+
 
         binding.btnHeart.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(), true
-            ) {
-                storyViewModel.getStoriesByIds(
-                    prefRepository.userId, prefRepository.userApiToken, listOf(storyId)
-                )
-            }
+            // showPaywallOrProceedWithNormalProcess(
+            //     prefRepository, requireActivity(), true
+            // ) {
+            storyViewModel.getStoriesByIds(
+                prefRepository.userId, prefRepository.userApiToken, listOf(storyId)
+            )
+            //  }
         }
 
 
@@ -153,18 +152,13 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             // showPaywallOrProceedWithNormalProcess(
             //  prefRepository, requireActivity(), true
             //  ) {
-            story.value?.isBookmarked?.let { bookmarked -> isStoryBookmarked(bookmarked) }
+            storyViewModel.getBookmarkedStoriesByIds(
+                prefRepository.userId,
+                prefRepository.userApiToken,
+            )
             //   }
 
         }
-
-
-        storyViewModel.getBookmarkedStoriesByIds(
-            prefRepository.userId,
-            prefRepository.userApiToken,
-        )
-
-
 
 
 
@@ -172,6 +166,11 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             updateUI(view, mediaItem)
             if (mediaItem != null) {
                 storyId = mediaItem.id
+                storyViewModel.isStoryBookmarked(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    mediaItem.id
+                )
             }
         }
         playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner) { res ->
@@ -238,14 +237,19 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
+            is StoryViewState.StoryIsBookmarked -> isStoryBookmarked(viewState.status)
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
 
     private fun isStoryLiked(isLiked: Boolean) {
-        if (isLiked) {
+        if (!isLiked) {
+            binding.btnHeart.setImageResource(R.drawable.ic_heart)
+            storyViewModel.storyLikesCount(
+                prefRepository.userId, prefRepository.userApiToken, storyId
+            )
+        } else
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
-        }
         storyViewModel.storyLikesCount(
             prefRepository.userId, prefRepository.userApiToken, storyId
         )
@@ -268,24 +272,49 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
     }
 
     private fun isStoryBookmarked(isBookmarked: Boolean) {
-        if (isBookmarked) {
+        if (!isBookmarked) {
             binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark)
-            storyViewModel.removeBookmarkFromStory(prefRepository.userId,prefRepository.userApiToken,storyId)
-        }
-        else
+
+        } else
             binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
-            storyViewModel.bookmarkStory(prefRepository.userId,prefRepository.userApiToken,storyId)
+
     }
 
     private fun handleBookmarkedStories(stories: List<Story>) {
+
         for (story in stories) {
             if (story.id == storyId) {
-                binding.btnBookmark.setImageResource(
-                    R.drawable.ic_player_bookmark_filled
+                binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark)
+                storyViewModel.removeBookmarkFromStory(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    story.id
                 )
-            } else binding.btnBookmark.setImageResource(
-                R.drawable.ic_player_bookmark
-            )
+            } else
+                binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
+            playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
+                if (mediaItem != null) {
+                    storyViewModel.downloadStory(mediaItem)
+                    storyViewModel.bookmarkStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        mediaItem.id
+                    )
+                }
+            }
+        }
+        if (stories.isEmpty()) {
+            binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
+            playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
+                if (mediaItem != null) {
+                    storyViewModel.downloadStory(mediaItem)
+                    storyViewModel.bookmarkStory(
+                        prefRepository.userId,
+                        prefRepository.userApiToken,
+                        mediaItem.id
+                    )
+                }
+            }
         }
     }
 
@@ -303,9 +332,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         binding.tvNumberOfLikes.text = storyLikesInt.toString()
     }
 
-    private fun updateUI(
-        view: View, story: Story?
-    ) = with(
+    private fun updateUI(view: View, story: Story?) = with(
         binding
     ) {
         if (story != null) {

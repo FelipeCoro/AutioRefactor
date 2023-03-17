@@ -69,11 +69,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
         executor.execute { mapPointDao.addStories(stories) }
     }
 
-    override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
-        executor.execute {
-            storyDao.setBookmarksData(storiesIds)
-        }
-    }
 
     override suspend fun setLikesDataToLocalStories(storiesIds: List<String>) {
         executor.execute {
@@ -127,12 +122,14 @@ class AutioLocalDataSourceImpl @Inject constructor(
         storyDao.clearStoryHistory()
     }
 
-    override suspend fun bookmarkStory(id: Int): StoryEntity? {
-        val checkForStory = getDownloadedStoryById(id)
-        return checkForStory?.let {
-            storyDao.setBookmarkToStory(id)
-            checkForStory
-        }
+
+    override suspend fun getUserBookmarkedStories(): List<StoryEntity>{
+        return   storyDao.getUserBookmarkedStories()
+
+    }
+
+    override suspend fun bookmarkStory(id: Int) {
+      storyDao.setBookmarkToStory(id)
 
     }
 
@@ -146,7 +143,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun removeAllBookmarks() {
-        storyDao.removeAllBookmarks()
         storyDao.removeAllBookmarks()
     }
 
@@ -190,13 +186,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     }
 
-    override suspend fun getUserBookmarkedStories(): Result<List<StoryEntity>> {
-        return  runCatching { storyDao.getUserBookmarkedStories()
-        }.onSuccess {
-            Result.success(it)
-        }.onFailure { emptyList<StoryEntity>() }
 
-    }
 
     override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
         executor.execute {

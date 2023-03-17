@@ -316,9 +316,9 @@ class BottomNavigation : AppCompatActivity() {
 
     private lateinit var snackBarJob: Job
     fun showFeedbackSnackBar(feedback: String) {
-        if (::snackBarJob.isInitialized && snackBarJob.isActive) {
-            snackBarJob.cancel()
-        }
+     // if (::snackBarJob.isInitialized && snackBarJob.isActive) {
+     //     snackBarJob.cancel()
+     // }
         snackBarView.alpha = 1F
         snackBarView.findViewById<TextView>(R.id.snack_bar_text).text = feedback
         binding.activityLayout.removeView(snackBarView)

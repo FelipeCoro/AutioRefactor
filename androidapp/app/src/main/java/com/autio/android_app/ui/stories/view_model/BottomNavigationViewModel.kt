@@ -303,27 +303,27 @@ class BottomNavigationViewModel @Inject constructor(
 
 // Backend calls
 
-    private suspend fun getInitialData() {
-        viewModelScope.launch {
-            val storiesFetch = async(
-                start = CoroutineStart.LAZY
-            ) { getRemoteStories() }
-            val favoritesFetch = async(
-                start = CoroutineStart.LAZY
-            ) { setLikesToStories() }
-            val bookmarksFetch = async(
-                start = CoroutineStart.LAZY
-            ) { setBookmarksToStories() }
-            val historyFetch = async(
-                start = CoroutineStart.LAZY
-            ) { setListenedAtToStories() }
-            storiesFetch.await()
-            favoritesFetch.await()
-            bookmarksFetch.await()
-            historyFetch.await()
-            postPlay()
-        }
-    }
+//  private suspend fun getInitialData() {
+//      viewModelScope.launch {
+//          val storiesFetch = async(
+//              start = CoroutineStart.LAZY
+//          ) { getRemoteStories() }
+//          val favoritesFetch = async(
+//              start = CoroutineStart.LAZY
+//          ) { setLikesToStories() }
+//          val bookmarksFetch = async(
+//              start = CoroutineStart.LAZY
+//          ) { setBookmarksToStories() }
+//          val historyFetch = async(
+//              start = CoroutineStart.LAZY
+//          ) { setListenedAtToStories() }
+//          storiesFetch.await()
+//          favoritesFetch.await()
+//          bookmarksFetch.await()
+//          historyFetch.await()
+//          postPlay()
+//      }
+//  }
 
 
     private suspend fun getRemoteStories() {
@@ -344,16 +344,16 @@ class BottomNavigationViewModel @Inject constructor(
         }
     }
 
-    private suspend fun setBookmarksToStories() {
-        withContext(coroutineDispatcher) {
+ // private suspend fun setBookmarksToStories() {
+ //     withContext(coroutineDispatcher) {
 
-            val userBookmarkedStories = autioRepository.getUserBookmarks(
-                prefRepository.userId
-            )
-            //TODO(CHECK THIS)
-            autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it })
-        }
-    }
+ //         val userBookmarkedStories = autioRepository.getUserBookmarks(
+ //             prefRepository.userId
+ //         )
+ //         //TODO(CHECK THIS)
+ //         autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it })
+ //     }
+ // }
 
     private suspend fun setLikesToStories() {
         //withContext(coroutineDispatcher) {

@@ -3,6 +3,7 @@ package com.autio.android_app.data.repository.prefs
 import android.content.Context
 import android.content.SharedPreferences
 import com.autio.android_app.util.Constants.REMAINING_STORIES
+import com.autio.android_app.util.Constants.USER_API_TOKEN
 import com.autio.android_app.util.Constants.USER_EMAIL
 import com.autio.android_app.util.Constants.USER_ID
 import com.autio.android_app.util.Constants.USER_IS_GUEST
@@ -51,10 +52,10 @@ class PrefRepositoryImpl @Inject constructor(
     override var userEmail: String = USER_EMAIL.getString()
         set(email) = USER_EMAIL.put(email)
 
-//   override var userApiToken: String = USER_API_TOKEN.getString()
-//     set(apiToken) = USER_API_TOKEN.put(apiToken)
+    override var userApiToken: String = "Bearer " + USER_API_TOKEN.getString()
+      set(apiToken) =  USER_API_TOKEN.put(apiToken)
 
-   override var userApiToken: String = ""
+   //override var userApiToken: String = ""
     //get()="Bearer $userApiToken"
 
     override var isUserGuest: Boolean = USER_IS_GUEST.getBoolean()

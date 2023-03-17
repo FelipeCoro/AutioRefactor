@@ -47,6 +47,7 @@ class PurchaseViewModel @Inject constructor(
             if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
                     revenueCatRepository.login(user.id.toString())
+                    saveUserInfo(user)
                     setViewState(PurchaseViewState.OnLoginSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
             } else setViewState(PurchaseViewState.OnLoginFailed)

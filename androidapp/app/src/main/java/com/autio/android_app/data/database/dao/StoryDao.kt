@@ -8,12 +8,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface StoryDao {
 
-    //TODO(Check this)
-    @Transaction
-    fun setBookmarksData(storiesIds: List<String>) {
-        setBookmarksToStories(storiesIds)
-        removeBookmarksFromStories(storiesIds)
-    }
 
     @Transaction
     fun setLikesData(storiesIds: List<String>) {

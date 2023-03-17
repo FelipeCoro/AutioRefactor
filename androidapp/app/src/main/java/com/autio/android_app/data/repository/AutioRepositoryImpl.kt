@@ -377,52 +377,40 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun removeBookmarkFromStory(
         userId: Int, apiToken: String, storyId: Int
-    ): Result<Boolean> {
-        val bookedMarkedStory = autioLocalDataSource.removeBookmarkFromStory(storyId)
-        return bookedMarkedStory?.let {
-            val remoteBookmark =
-                autioRemoteDataSource.removeBookmarkFromStory(userId, apiToken, storyId)
-            if (remoteBookmark.isSuccessful) {
-                Result.success(remoteBookmark.body().toString().toBoolean())
-            } else {
-                val throwable = Error(remoteBookmark.errorBody().toString())
-                Result.failure(throwable)
-            }
-        } ?: Result.failure(Error())
+    ) {
+         autioLocalDataSource.removeBookmarkFromStory(storyId)
+      // return bookedMarkedStory?.let {
+      //     val remoteBookmark =
+      //         autioRemoteDataSource.removeBookmarkFromStory(userId, apiToken, storyId)
+      //     if (remoteBookmark.isSuccessful) {
+       //   //     Result.success(remoteBookmark.body().toString().toBoolean())
+       //    } else {
+       //        val throwable = Error(remoteBookmark.errorBody().toString())
+       //        Result.failure(throwable)
+       //    }
+       //} ?: Result.failure(Error())
     }
 
     override suspend fun bookmarkStory(
         userId: Int, apiToken: String, storyId: Int
-    ): Result<Boolean> {
-        autioLocalDataSource.bookmarkStory(storyId)
-        val remoteBookmark = autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId)
-        return if (remoteBookmark.isSuccessful) {
-            Result.success(remoteBookmark.body().toString().toBoolean())
-        } else {
-            val throwable = Error(remoteBookmark.errorBody().toString())
-            Result.failure(throwable)
-        }
+    ) {
+       autioLocalDataSource.bookmarkStory(storyId)
+        // val remoteBookmark = //autioRemoteDataSource.bookmarkStory(userId, apiToken, storyId) //TODO(FOR REMOTE CACHING)
+      //  return if (remoteBookmark) {
+      //      Result.success(remoteBookmark.body().toString().toBoolean())
+      //  } else {
+      //      val throwable = Error(remoteBookmark.errorBody().toString())
+      //      Result.failure(throwable)
+      //  }
     }
 
-    override suspend fun getUserBookmarks(userId: Int): List<String> {
-        return emptyList<String>()
-    }
 
-    override suspend fun getStoriesFromUserBookmarks(
-        userId: Int, apiToken: String
-    ): Result<List<Story>> {
 
-        val result = autioRemoteDataSource.getStoriesFromUserBookmarks(userId, apiToken)
+    override suspend fun getUserBookmarkedStories(userId: Int, apiToken: String ): List<Story> {
 
-        return if (result.isSuccessful) {
-            val stories = result.body()?.let { storiesResponse ->
-                storiesResponse.map { it.toModel() }
-            } ?: listOf()
-            Result.success(stories)
-        } else {
-            val throwable = Error(result.errorBody().toString())
-            Result.failure(throwable)
-        }
+        //val result = autioRemoteDataSource.getStoriesFromUserBookmarks(userId, apiToken)(TODO(FOR REMOTE CACHING))
+        return  autioLocalDataSource.getUserBookmarkedStories().map { it.toModel() }
+
     }
 
 
@@ -525,9 +513,9 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.setLikesDataToLocalStories(storiesHistory.map { it.toString() }) //TODO(Check this mapping)
     }
 
-    override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
-        autioLocalDataSource.setBookmarksDataToLocalStories(storiesIds)
-    }
+  // override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
+  //     autioLocalDataSource.setBookmarksDataToLocalStories(storiesIds)
+  // }
 
     override suspend fun getNarratorOfStory(
         userId: Int,
@@ -547,6 +535,14 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun deleteCachedData() {
         autioLocalDataSource.deleteCachedData()
     }
+
+    override suspend fun removeAllLikedStories(userId: Int, apiToken: String,stories:List<StoryEntity>) {
+        for(story in stories) {
+            val storyId = story.id
+            autioLocalDataSource.removeLikeFromStory(storyId)
+            autioRemoteDataSource.removeLikeFromStory(userId, apiToken, storyId)
+            autioRemoteDataSource.storyLikesCount(userId, apiToken, storyId)
+        }}
 
     override suspend fun addStories(stories: List<Story>) {
         autioLocalDataSource.addStories(stories.map { it.toMapPointEntity() }) //TODO(check this method usage, user should not be able to "add/make" stories)
