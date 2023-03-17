@@ -1,6 +1,10 @@
 package com.autio.android_app.data.repository.datasource.local
 
-import com.autio.android_app.data.database.entities.*
+import com.autio.android_app.data.database.entities.CategoryEntity
+import com.autio.android_app.data.database.entities.HistoryEntity
+import com.autio.android_app.data.database.entities.MapPointEntity
+import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.UserEntity
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
@@ -41,4 +45,5 @@ interface AutioLocalDataSource {
     suspend fun getUserBookmarkedStories(): List<StoryEntity>
     suspend fun clearUserData()
     suspend fun deleteCachedData()
+    suspend fun getUserAccount(): UserEntity?
 }

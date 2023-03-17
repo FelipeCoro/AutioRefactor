@@ -54,9 +54,7 @@ interface RevenueCatRepository {
      * The latest CustomerInfo from RevenueCat.
      */
     fun getUserInfo()
-    fun updateUserInfo(
-        customerInfo: CustomerInfo
-    )
+    fun updateUserInfo(customerInfo: CustomerInfo)
 
     /** Error occurred during a RC process and a custom display is
      * shown (either showing a SnackBar, a popup, etc).
@@ -68,7 +66,5 @@ interface RevenueCatRepository {
      * For better understanding on Android-specific errors, follow next link:
      * https://www.revenuecat.com/docs/errors#android-errors
      */
-    fun displayError(
-        error: PurchasesError
-    )
+    fun displayError(error: PurchasesError)
 }

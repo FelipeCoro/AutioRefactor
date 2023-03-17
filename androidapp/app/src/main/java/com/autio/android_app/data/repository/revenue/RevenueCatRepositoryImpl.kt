@@ -1,14 +1,12 @@
 package com.autio.android_app.data.repository.revenue
 
 import android.app.Activity
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
 import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.PurchasesConfiguration
 import com.revenuecat.purchases.PurchasesError
 import com.revenuecat.purchases.PurchasesErrorCode
 import com.revenuecat.purchases.getCustomerInfoWith
@@ -17,12 +15,11 @@ import com.revenuecat.purchases.logInWith
 import com.revenuecat.purchases.models.StoreTransaction
 import com.revenuecat.purchases.purchasePackageWith
 import com.revenuecat.purchases.restorePurchasesWith
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 
 class RevenueCatRepositoryImpl  @Inject constructor(
-    @ApplicationContext private val context: Context,
+    val purchases: Purchases
 ) : RevenueCatRepository {
     private val _customerInfo = MutableLiveData<CustomerInfo>().apply {
         value = null
@@ -43,28 +40,36 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         onError: ((PurchasesError) -> Unit)?,
         onSuccess: ((CustomerInfo, Boolean) -> Unit)?
     ) {
-        with(Purchases.sharedInstance) {
-            logInWith(userId, { error ->
+        purchases.logInWith(
+            userId,
+            { error ->
                 onError?.invoke(error)
                 displayError(error)
-            }) { customerInfo, created ->
-
-                // Set user's data in RevenueCat
-                setDisplayName(name)
-                setEmail(email)
-
-                // Update status of this user for subscription details
-                updateUserInfo(
-                    customerInfo
-                )
-
-                // created variable checks whether the user is new to RC
-                onSuccess?.invoke(
-                    customerInfo, created
-                )
-            }
-        }
+            },
+            handleSuccessLogin(name, email, onSuccess)
+        )
     }
+
+    private fun handleSuccessLogin(
+        name: String?,
+        email: String?,
+        onSuccess: ((CustomerInfo, Boolean) -> Unit)?
+    ): (customerInfo: CustomerInfo, created: Boolean) -> Unit =
+        { customerInfo, created ->
+            // Set user's data in RevenueCat
+            purchases.setDisplayName(name)
+            purchases.setEmail(email)
+
+            // Update status of this user for subscription details
+            updateUserInfo(
+                customerInfo
+            )
+
+            // created variable checks whether the user is new to RC
+            onSuccess?.invoke(
+                customerInfo, created
+            )
+        }
 
     /**
      * Log out from RevenueCat
@@ -73,13 +78,13 @@ class RevenueCatRepositoryImpl  @Inject constructor(
      * hurt to keep this line of code
      */
     override fun logOut() {
-        Purchases.sharedInstance.logOut()
+        purchases.logOut()
     }
 
     override fun getOfferings(
         onError: ((PurchasesError) -> Unit), onSuccess: (Offerings) -> Unit
     ) {
-        Purchases.sharedInstance.getOfferingsWith(
+        purchases.getOfferingsWith(
             onError = onError, onSuccess = onSuccess
         )
     }
@@ -90,7 +95,7 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         onError: ((PurchasesError, Boolean) -> Unit),
         onSuccess: ((StoreTransaction, CustomerInfo) -> Unit)
     ) {
-        Purchases.sharedInstance.purchasePackageWith(
+        purchases.purchasePackageWith(
             activity,
             packageToPurchase,
             onError = onError,
@@ -105,7 +110,7 @@ class RevenueCatRepositoryImpl  @Inject constructor(
     override fun restorePurchase(
         onError: ((PurchasesError) -> Unit), onSuccess: ((CustomerInfo) -> Unit)
     ) {
-        Purchases.sharedInstance.restorePurchasesWith(
+        purchases.restorePurchasesWith(
             onError
         ) { customerInfo ->
             updateUserInfo(customerInfo)
@@ -117,17 +122,13 @@ class RevenueCatRepositoryImpl  @Inject constructor(
      * The latest CustomerInfo from RevenueCat.
      */
     override fun getUserInfo() {
-        Purchases.sharedInstance.getCustomerInfoWith {
+        purchases.getCustomerInfoWith {
             _customerInfo.postValue(it)
         }
     }
 
-    override fun updateUserInfo(
-        customerInfo: CustomerInfo
-    ) {
-        _customerInfo.postValue(
-            customerInfo
-        )
+    override fun updateUserInfo(customerInfo: CustomerInfo) {
+        _customerInfo.postValue(customerInfo)
     }
 
     /** Error occurred during a RC process and a custom display is
@@ -161,12 +162,12 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         }
     }
 
-    init {
-        //TODO(Bad initialization move to injector / use hilt)
-        Purchases.debugLogsEnabled = true
-        Purchases.configure(
-            PurchasesConfiguration.Builder(context, "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS")
-                .observerMode(false).build()
-        )
-    }
+//init {
+//TODO(Bad initialization move to injector / use hilt)
+//        Purchases.debugLogsEnabled = true
+//        Purchases.configure(
+//            PurchasesConfiguration.Builder(context, "goog_nHYcykYaWBQiHNHuZEzjVkdxLaS")
+//                .observerMode(false).build()
+//        )
+//}
 }

@@ -8,7 +8,6 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -63,9 +62,7 @@ class StoryAdapter(
             R.id.ivPlayIcon
         )
 
-        fun bind(
-            model: Story
-        ) {
+        fun bind(model: Story) {
             val wasStoryListenedAtLeast30Seconds = model.listenedAtLeast30Secs == true
             Glide.with(
                 itemView

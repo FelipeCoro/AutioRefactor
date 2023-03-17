@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.provider.ContactsContract.Data
 import android.service.media.MediaBrowserService.BrowserRoot.EXTRA_RECENT
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -17,11 +16,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
-import androidx.room.Database
 import com.autio.android_app.R
 import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.album
 import com.autio.android_app.extensions.flag
@@ -61,8 +58,6 @@ import com.google.android.exoplayer2.ext.mediasession.TimelineQueueNavigator
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.util.Util.constrainValue
 import com.google.android.gms.cast.framework.CastContext
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -103,9 +98,7 @@ class PlayerService() : MediaBrowserServiceCompat() {
     private lateinit var currentPlayer: Player
 
     private val serviceJob = SupervisorJob()
-    private val serviceScope = CoroutineScope(
-        Dispatchers.Main + serviceJob
-    )
+    private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
     private lateinit var mediaSession: MediaSessionCompat
     private lateinit var mediaSessionConnector: MediaSessionConnector
@@ -120,32 +113,23 @@ class PlayerService() : MediaBrowserServiceCompat() {
      * constructed).
      */
     private val browseTree: BrowseTree by lazy {
-        BrowseTree(
-            applicationContext, mediaSource
-        )
+        BrowseTree(applicationContext, mediaSource)
     }
 
     private var isForegroundService = false
 
-    private val autioAttributes = AudioAttributes.Builder().setContentType(
-        C.AUDIO_CONTENT_TYPE_MUSIC
-    ).setUsage(
-        C.USAGE_MEDIA
-    ).build()
+    private val autioAttributes =
+        AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA)
+            .build()
 
     private val playerListener = PlayerEventListener()
 
     // Configure ExoPlayer to handle audio focus
     private val exoPlayer: ExoPlayer by lazy {
-        ExoPlayer.Builder(
-            this
-        ).build().apply {
+        ExoPlayer.Builder(this).build().apply {
             setAudioAttributes(autioAttributes, true)
-
             setHandleAudioBecomingNoisy(true)
-
             addListener(playerListener)
-
             addAnalyticsListener(
                 PlaybackStatsListener(true, null)
             )
@@ -157,9 +141,7 @@ class PlayerService() : MediaBrowserServiceCompat() {
      */
     private val castPlayer: CastPlayer? by lazy {
         try {
-            val castContext = CastContext.getSharedInstance(
-                this
-            )
+            val castContext = CastContext.getSharedInstance(this)
             CastPlayer(
                 castContext, CastMediaItemConverter()
             ).apply {
@@ -555,10 +537,7 @@ class PlayerService() : MediaBrowserServiceCompat() {
             mediaId: String, playWhenReady: Boolean, extras: Bundle?
         ) {
             serviceScope.launch {
-                val itemToPlay = autioRepository.getStoryById(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    mediaId.toInt()
+                val itemToPlay = autioRepository.getStoryById(mediaId.toInt()
                 )
                 if (itemToPlay == null) {
                     Log.w(TAG, "Content not found: MediaID=$mediaId")
