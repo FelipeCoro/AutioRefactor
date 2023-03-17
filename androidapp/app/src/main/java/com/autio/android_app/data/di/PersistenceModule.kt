@@ -8,6 +8,7 @@ import com.autio.android_app.data.database.DataBase
 import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.MapPointDao
 import com.autio.android_app.data.database.dao.StoryDao
+import com.autio.android_app.data.database.dao.UserDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,4 +68,9 @@ object PersistenceModule {
     @Singleton
     @Provides
     fun providesStoryDao(database: DataBase): StoryDao = database.storyDao()
+
+    @Singleton
+    @Provides
+    fun providesUserDao(database: DataBase): UserDao = database.userDao()
+
 }

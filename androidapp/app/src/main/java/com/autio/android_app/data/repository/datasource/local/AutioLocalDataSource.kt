@@ -5,6 +5,7 @@ import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.database.entities.UserEntity
+import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
@@ -17,7 +18,6 @@ interface AutioLocalDataSource {
     suspend fun getStoriesInLatLngBoundaries(
         swCoordinates: LatLng, neCoordinates: LatLng
     ): List<MapPointEntity>
-
     suspend fun getAllStories(): Flow<List<MapPointEntity>?>
     suspend fun getMapPointById(id: String): Result<MapPointEntity?>
     suspend fun getMapPointsByIds(ids: List<Int>): Result<List<MapPointEntity>>
@@ -45,5 +45,5 @@ interface AutioLocalDataSource {
     suspend fun getUserBookmarkedStories(): List<StoryEntity>
     suspend fun clearUserData()
     suspend fun deleteCachedData()
-    suspend fun getUserAccount(): UserEntity?
+    suspend fun getUserAccount(): Result<User>
 }

@@ -95,7 +95,7 @@ class AutioRepositoryImpl @Inject constructor(
             val user = result.let { guestResponse ->
                 guestResponse.body()!!.toModel()
             }
-            prefRepository.userApiToken = user.apiToken
+            user.apiToken
             Result.success(user)
 
         } else {
