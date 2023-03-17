@@ -4,7 +4,15 @@ import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
-import com.autio.android_app.ui.stories.models.*
+import com.autio.android_app.ui.stories.models.AccountRequest
+import com.autio.android_app.ui.stories.models.Author
+import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.Contributor
+import com.autio.android_app.ui.stories.models.History
+import com.autio.android_app.ui.stories.models.LoginRequest
+import com.autio.android_app.ui.stories.models.Narrator
+import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
@@ -120,15 +128,17 @@ interface AutioRepository {
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
 
    // suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
-    suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
+   suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
     suspend fun storyLikesCount(userId: Int, apiToken: String, storyId: Int): Result<Int>
 
     suspend fun isStoryLiked(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
-    suspend fun removeAllLikedStories(userId: Int, apiToken: String,stories:List<StoryEntity>)
+    suspend fun removeAllLikedStories(userId: Int, apiToken: String, stories: List<StoryEntity>)
     suspend fun deleteCachedData()
 
     suspend fun addStories(stories: List<Story>)
 
     suspend fun getDownloadedStories(): Result<List<Story>>
+    suspend fun getUserAccount(): User?
+    suspend fun updateUserProfile(profile: ProfileDto)
 
 }

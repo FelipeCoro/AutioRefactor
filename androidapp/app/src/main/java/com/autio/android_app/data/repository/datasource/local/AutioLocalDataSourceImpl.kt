@@ -4,12 +4,14 @@ import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.MapPointDao
 import com.autio.android_app.data.database.dao.StoryDao
 import com.autio.android_app.data.database.dao.UserDao
-import com.autio.android_app.data.database.entities.*
+import com.autio.android_app.data.database.entities.CategoryEntity
+import com.autio.android_app.data.database.entities.HistoryEntity
+import com.autio.android_app.data.database.entities.MapPointEntity
+import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.UserEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
@@ -44,13 +46,27 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
     override suspend fun getUserAccount(): Result<User?> {
-        return runCatching {
+        runCatching {
             userDao.getCurrentUser()
         }.onSuccess { userEntity ->
-            val user = userEntity?.let { it.toModel() }
-            Result.success(user)
+            val user = userEntity?.toModel()
+            return Result.success(user)
         }.onFailure {
-            Result.failure(it)
+            return Result.failure(it)
+        }
+        return Result.failure(Error())
+    }
+
+    override suspend fun updateUserInformation(user: User) {
+
+    }
+
+    override suspend fun createUserAccount(userEntity: UserEntity): Result<UserEntity?> {
+        return try {
+            val user = userDao.createNewUser(userEntity)
+            Result.success(user)
+        } catch (ex: java.lang.Exception) {
+            Result.failure(Error())
         }
     }
 

@@ -8,13 +8,11 @@ import com.autio.android_app.data.database.entities.UserEntity
 
 @Dao
 interface UserDao {
-    @Query("SELECT remainingStories FROM UserEntity")
+    @Query("SELECT u.remainingStories FROM UserEntity u LIMIT 1")
     fun getRemainingStories(): Int
 
     @Insert(onConflict = REPLACE)
-    fun createNewUser(newUser: UserEntity)
-
-
+    fun createNewUser(newUser: UserEntity): UserEntity
 
     @Query("UPDATE UserEntity SET remainingStories = remainingStories+1")
     fun addListenedStory()

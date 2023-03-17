@@ -41,9 +41,11 @@ interface AutioLocalDataSource {
     suspend fun getDownloadedStoryById(id: Int): StoryEntity?
     suspend fun cacheRecordOfStory(storyId: String, recordUrl: String)
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
-    suspend fun getDownloadedStories():Result<List<StoryEntity>>
+    suspend fun getDownloadedStories(): Result<List<StoryEntity>>
     suspend fun getUserBookmarkedStories(): List<StoryEntity>
     suspend fun clearUserData()
     suspend fun deleteCachedData()
-    suspend fun getUserAccount(): Result<User>
+    suspend fun getUserAccount(): Result<User?>
+    suspend fun updateUserInformation(user: User)
+    suspend fun createUserAccount(UserEntity: UserEntity): Result<UserEntity?>
 }
