@@ -66,7 +66,7 @@ enum class StoryOption {
  //      override var onClickListener: (() -> Unit)? =
  //          null
  //  },
-   DIRECTIONS { //TODO(When we implement directions)
+   DIRECTIONS {
        override val option: MenuOption
            get() = MenuOption(
                "Directions",
@@ -75,7 +75,7 @@ enum class StoryOption {
        override var onClickListener: (() -> Unit)? =
            null
    },
-   SHARE { //TODO(ONCE WE HAVE SHARING STORIES)
+   SHARE {
        override val option: MenuOption
            get() = MenuOption(
                "Share",

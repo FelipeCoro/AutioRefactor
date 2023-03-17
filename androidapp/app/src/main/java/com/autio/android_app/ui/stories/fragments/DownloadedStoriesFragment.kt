@@ -67,6 +67,17 @@ class DownloadedStoriesFragment : Fragment() {
             )
         }
 
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        bindObservers()
+
+        activityLayout = requireActivity().findViewById(
+            R.id.activity_layout
+        )
+
         recyclerView = binding.rvStories
         storyAdapter = DownloadedStoryAdapter(
             onStoryPlay = { id ->
@@ -75,21 +86,6 @@ class DownloadedStoriesFragment : Fragment() {
                 )
             }, ::optionClicked
         )
-        return binding.root
-    }
-
-    override fun onViewCreated(
-        view: View, savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        bindObservers()
-
-        activityLayout = requireActivity().findViewById(
-            R.id.activity_layout
-        )
-
-
         storyViewModel.getDownloadedStories()
 
     }
@@ -111,21 +107,22 @@ class DownloadedStoriesFragment : Fragment() {
         }
     }
 
-    private fun showAllDownloadedStories(stories:List<Story>){
+    private fun showAllDownloadedStories(stories: List<Story>) {
 
         recyclerView.adapter = storyAdapter
-              //binding.tvToolbarSubtitle.text =
-              //    resources.getQuantityString(
-              //        R.plurals.toolbar_stories_subtitle,
-              //        stories.size,
-              //        stories.size
-              //    )
+        //binding.tvToolbarSubtitle.text =
+        //    resources.getQuantityString(
+        //        R.plurals.toolbar_stories_subtitle,
+        //        stories.size,
+        //        stories.size
+        //    )
         binding.pbLoadingStories.visibility = View.GONE
         binding.btnPlaylistOptions.setOnClickListener { view ->
             showPlaylistOptions(
-                requireContext(), binding.root as ViewGroup, view, listOf(
-                    PlaylistOption.REMOVE
-                ).map {
+                requireContext(),
+                binding.root as ViewGroup,
+                view,
+                listOf(PlaylistOption.REMOVE).map {
                     it.also { option ->
                         option.disabled = stories.isEmpty()
                     }
@@ -149,11 +146,25 @@ class DownloadedStoriesFragment : Fragment() {
     private fun optionClicked(
         option: StoryOption, story: Story
     ) {
-        activity?.let { verifiedActivity ->
-            context?.let { verifiedContext ->
-                onOptionClicked(
-                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
-                )
+        when (option) {
+            StoryOption.DELETE -> {
+                storyViewModel.removeDownloadedStory(story.id)
+                binding.pbLoadingProcess.visibility = View.GONE
+                navController.navigate(R.id.action_downloaded_playlist_to_my_stories)
+            }
+            else -> {
+                activity?.let { verifiedActivity ->
+                    context?.let { verifiedContext ->
+                        onOptionClicked(
+                            option,
+                            story,
+                            storyViewModel,
+                            prefRepository,
+                            verifiedActivity,
+                            verifiedContext
+                        )
+                    }
+                }
             }
         }
     }
@@ -171,6 +182,7 @@ class DownloadedStoriesFragment : Fragment() {
                     storyViewModel.removeAllDownloads()
                     binding.pbLoadingProcess.visibility = View.GONE
                     showFeedbackSnackBar("Removed Downloads")
+                    navController.navigate(R.id.action_downloaded_playlist_to_my_stories)
                 }
                 else -> Log.d(
                     "DownloadedStoriesFragment", "option not available for this playlist"

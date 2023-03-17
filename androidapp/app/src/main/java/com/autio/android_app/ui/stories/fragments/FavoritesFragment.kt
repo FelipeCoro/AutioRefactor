@@ -22,15 +22,13 @@ import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.domain.mappers.toDto
+import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showPlaylistOptions
+import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -50,7 +48,7 @@ class FavoritesFragment : Fragment() {
     private val storyViewModel: StoryViewModel by viewModels()
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
-    private lateinit var storyAdapter: StoryAdapter
+    private lateinit var storyAdapter: DownloadedStoryAdapter
     private lateinit var recyclerView: RecyclerView
     private var stories: List<StoryEntity>? = null
     private lateinit var snackBarView: View
@@ -74,12 +72,12 @@ class FavoritesFragment : Fragment() {
             )
         }
         recyclerView = binding.rvStories
-        storyAdapter = StoryAdapter(
-            bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
+        storyAdapter = DownloadedStoryAdapter(
+            onStoryPlay = { id ->
                 bottomNavigationViewModel.playMediaId(
                     id
                 )
-            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
+            }, ::optionClicked
         )
         return binding.root
     }
@@ -94,8 +92,9 @@ class FavoritesFragment : Fragment() {
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
-        storyViewModel.getAllFavoriteStories(prefRepository.userId,prefRepository.userApiToken)
+        storyViewModel.getAllFavoriteStories(prefRepository.userId, prefRepository.userApiToken)
     }
+
     private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
     }
@@ -107,7 +106,7 @@ class FavoritesFragment : Fragment() {
             is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
-            is StoryViewState.FetchedFavoriteStories ->showAllFavoriteStories(viewState.stories)
+            is StoryViewState.FetchedFavoriteStories -> showAllFavoriteStories(viewState.stories)
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
@@ -127,9 +126,10 @@ class FavoritesFragment : Fragment() {
         binding.pbLoadingStories.visibility = View.GONE
         binding.btnPlaylistOptions.setOnClickListener { view ->
             showPlaylistOptions(
-                requireContext(), binding.root as ViewGroup, view, listOf(
-                    PlaylistOption.DOWNLOAD, PlaylistOption.REMOVE
-                ).map {
+                requireContext(),
+                binding.root as ViewGroup,
+                view,
+                listOf(PlaylistOption.REMOVE).map {
                     it.also { option ->
                         option.disabled = stories.isEmpty()
                     }
@@ -150,6 +150,36 @@ class FavoritesFragment : Fragment() {
         }
     }
 
+    private fun optionClicked(
+        option: StoryOption, story: Story
+    ) {
+        when (option) {
+            StoryOption.DELETE -> {
+                storyViewModel.removeLikeFromStory(
+                    prefRepository.userId,
+                    prefRepository.userApiToken,
+                    story.id
+                )
+                binding.pbLoadingProcess.visibility = View.GONE
+                showFeedbackSnackBar("Removed From Favorites")
+                navController.navigate(R.id.action_favorites_playlist_to_my_stories)
+            }
+            else -> {
+                activity?.let { verifiedActivity ->
+                    context?.let { verifiedContext ->
+                        onOptionClicked(
+                            option,
+                            story,
+                            storyViewModel,
+                            prefRepository,
+                            verifiedActivity,
+                            verifiedContext
+                        )
+                    }
+                }
+            }
+        }
+    }
 
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
@@ -160,27 +190,17 @@ class FavoritesFragment : Fragment() {
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
-                PlaylistOption.DOWNLOAD -> {
-                    //TODO(Add Method)
-
-                }
                 PlaylistOption.REMOVE -> {
-                    //TODO(LOCAL METHOD)
-                    //  FirebaseStoryRepository.removeAllLikes(prefRepository.firebaseKey,
-                    //    stories!!.map { it.id },
-                    //    onSuccessListener = {
-                    //        storyViewModel.removeAllBookmarks() TODO(Need online BACKEND method)
-                    //        binding.pbLoadingProcess.visibility = View.GONE
-                    //        showFeedbackSnackBar(
-                    //            "Removed All Bookmarks"
-                    //        )
-                    //    },
-                    //    onFailureListener = {
-                    //        binding.pbLoadingProcess.visibility = View.GONE
-                    //        showFeedbackSnackBar(
-                    //            "Connection Failure"
-                    //        )
-                    //    })
+                    stories?.let {
+                        storyViewModel.removeAllLikedStories(
+                            prefRepository.userId,
+                            prefRepository.userApiToken,
+                            it
+                        )
+                    }
+                    showFeedbackSnackBar("Removed Favorites")
+                    binding.pbLoadingProcess.visibility = View.GONE
+                    navController.navigate(R.id.action_favorites_playlist_to_my_stories)
                 }
                 else -> Log.d(
                     "FavoritesFragment", "option not available for this playlist"
@@ -189,17 +209,6 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-    private fun optionClicked(
-        option: StoryOption, story: Story
-    ) {
-        activity?.let { verifiedActivity ->
-            context?.let { verifiedContext ->
-                onOptionClicked(
-                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
-                )
-            }
-        }
-    }
 
     private fun cancelJob() {
         if (activityLayout.contains(
