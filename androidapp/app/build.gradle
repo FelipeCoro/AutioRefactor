@@ -107,12 +107,8 @@ dependencies {
 
     //FIREBASE - CRASHLYTICS
     implementation platform('com.google.firebase:firebase-bom:31.2.3')
-    /*implementation 'com.google.firebase:firebase-messaging-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
-    implementation 'com.google.firebase:firebase-perf-ktx'*/
-    implementation 'com.google.firebase:firebase-database-ktx'
-    implementation 'com.google.firebase:firebase-firestore-ktx'
 
     // dependency for loading image from url
     implementation 'com.github.bumptech.glide:glide:4.15.0'
@@ -190,3 +186,7 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
 
 }
+
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
