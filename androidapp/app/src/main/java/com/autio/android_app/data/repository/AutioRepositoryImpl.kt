@@ -6,23 +6,32 @@ import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
-import com.autio.android_app.data.repository.prefs.PrefRepository
-import com.autio.android_app.domain.mappers.*
+import com.autio.android_app.domain.mappers.toDTO
+import com.autio.android_app.domain.mappers.toMapPointEntity
+import com.autio.android_app.domain.mappers.toModel
+import com.autio.android_app.domain.mappers.toPlaysDto
+import com.autio.android_app.domain.mappers.toStoryEntity
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
-import com.autio.android_app.ui.stories.models.*
+import com.autio.android_app.ui.stories.models.AccountRequest
+import com.autio.android_app.ui.stories.models.Author
+import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.Contributor
+import com.autio.android_app.ui.stories.models.History
+import com.autio.android_app.ui.stories.models.LoginRequest
+import com.autio.android_app.ui.stories.models.Narrator
+import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.transform
 import javax.inject.Inject
 
 class AutioRepositoryImpl @Inject constructor(
     private val autioRemoteDataSource: AutioRemoteDataSource,
     private val autioLocalDataSource: AutioLocalDataSource,
-    private val prefRepository: PrefRepository,
+    //private val prefRepository: PrefRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : AutioRepository {
 
@@ -61,9 +70,11 @@ class AutioRepositoryImpl @Inject constructor(
 
         val loginDto = loginRequest.toDTO()
         val result = autioRemoteDataSource.login(loginDto)
-
+        val userAccount = autioLocalDataSource.getUserAccount()
+        //TODO(is not exist create a user and set token)
         return if (result.isSuccessful) {
             val user = result.let { loginResponse ->
+                userAccount?.userApiToken = loginResponse.body()?.apiToken ?: ""
                 loginResponse.body()!!.toModel()
             }
             Result.success(user)
@@ -78,7 +89,8 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun loginAsGuest(): Result<User> {
         val result = autioRemoteDataSource.createGuestAccount()
-
+        val userAccount = autioLocalDataSource.getUserAccount()
+        //TODO(verify current listened stories/ if null call to create account and set token)
         return if (result.isSuccessful) {
             val user = result.let { guestResponse ->
                 guestResponse.body()!!.toModel()
@@ -95,53 +107,62 @@ class AutioRepositoryImpl @Inject constructor(
 
 
     override suspend fun fetchUserData() {
-        kotlin.runCatching {
-            autioRemoteDataSource.getProfileDataV2(
-                prefRepository.userId, prefRepository.userApiToken
-            )
-        }.onSuccess {
-            val profile = it.body()
-            if (profile?.categories != null) {
-                autioLocalDataSource.addUserCategories(
-                    profile.categories
+        val userAccount = autioLocalDataSource.getUserAccount()
+        userAccount?.let {
+            kotlin.runCatching {
+                autioRemoteDataSource.getProfileDataV2(
+                    userAccount.userId, userAccount.userApiToken
                 )
-            }
-        }.onFailure { }
+            }.onSuccess {
+                val profile = it.body()
+                if (profile?.categories != null) {
+                    autioLocalDataSource.addUserCategories(
+                        profile.categories
+                    )
+                }
+            }.onFailure { }
+        }
     }
 
     override suspend fun updateProfile(
         infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     ) {
-        runCatching {
-            autioRemoteDataSource.updateProfileV2(
-                prefRepository.userId, prefRepository.userApiToken, infoUser
-            )
-        }.onSuccess {
-            val profile = it.body()
-            if (profile != null) {
-                prefRepository.userName = profile.name
-                prefRepository.userEmail = profile.email
-                onSuccess.invoke()
-            } else onFailure.invoke()
-        }.onFailure { onFailure.invoke() }
+        val userAccount = autioLocalDataSource.getUserAccount()
+        userAccount?.let {
+            runCatching {
+                autioRemoteDataSource.updateProfileV2(
+                    userAccount.userId, userAccount.userApiToken, infoUser
+                )
+            }.onSuccess {
+                val profile = it.body()
+                if (profile != null) {
+                    userAccount.userName = profile.name
+                    userAccount.userEmail = profile.email
+                    onSuccess.invoke()
+                } else onFailure.invoke()
+            }.onFailure { onFailure.invoke() }
+        }
     }
 
     override suspend fun updateCategoriesOrder(
         infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit
     ) {
-        runCatching {
-            autioRemoteDataSource.updateProfileV2(
-                prefRepository.userId, prefRepository.userApiToken, infoUser
-            )
-        }.onSuccess {
-            val profile = it.body()
-            if (profile != null) {
-                autioLocalDataSource.updateCategories(infoUser.categories)
-                onSuccess.invoke()
-            } else {
-                onFailure.invoke()
-            }
-        }.onFailure { onFailure.invoke() }
+        val userAccount = autioLocalDataSource.getUserAccount()
+        userAccount?.let {
+            runCatching {
+                autioRemoteDataSource.updateProfileV2(
+                    userAccount.userId, userAccount.userApiToken, infoUser
+                )
+            }.onSuccess {
+                val profile = it.body()
+                if (profile != null) {
+                    autioLocalDataSource.updateCategories(infoUser.categories)
+                    onSuccess.invoke()
+                } else {
+                    onFailure.invoke()
+                }
+            }.onFailure { onFailure.invoke() }
+        } ?: onFailure.invoke()
     }
 
     override suspend fun getMapPointById(id: String): Result<Story?> {
@@ -176,9 +197,15 @@ class AutioRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStoryById(xUserId: Int, apiToken: String, id: Int): Result<Story> {
+    override suspend fun getStoryById(storyId: Int): Result<Story> {
 
-        val result = autioRemoteDataSource.getStoryById(xUserId, "Bearer $apiToken", id)
+        val userAccount = autioLocalDataSource.getUserAccount()
+
+        val result = autioRemoteDataSource.getStoryById(
+            userAccount?.userId ?: 0,
+            "Bearer ${userAccount?.userApiToken}",
+            storyId
+        )
 
         return if (result.isSuccessful) {
             val story = result.body()!!.toModel()
@@ -305,21 +332,27 @@ class AutioRepositoryImpl @Inject constructor(
         isDownloaded: Boolean,
         network: String
     ) {
-        runCatching {
-            autioRemoteDataSource.postStoryPlayed(
-                prefRepository.userId, prefRepository.userApiToken, story.toPlaysDto(
-                    wasPresent = wasPresent,
-                    autoPlay = autoPlay,
-                    isDownloaded = isDownloaded,
-                    connection = network
+        val userAccount = autioLocalDataSource.getUserAccount()
+        userAccount?.let { account ->
+            runCatching {
+
+                autioRemoteDataSource.postStoryPlayed(
+                    account.userId, account.userApiToken, story.toPlaysDto(
+                        wasPresent = wasPresent,
+                        autoPlay = autoPlay,
+                        isDownloaded = isDownloaded,
+                        connection = network
+                    )
                 )
-            )
-        }.onSuccess { response ->
-            if (response.isSuccessful) {
-                autioLocalDataSource.markStoryAsListenedAtLeast30Secs(story.id)
-                prefRepository.remainingStories = response.body()?.playsRemaining!!
-            }
-        }.onFailure { }
+            }.onSuccess {
+                it?.let { response ->
+                    if (response.isSuccessful) {
+                        autioLocalDataSource.markStoryAsListenedAtLeast30Secs(story.id)
+                        userAccount.remainingStories = response.body()?.playsRemaining!!
+                    }
+                }
+            }.onFailure { }
+        }
     }
 
     override suspend fun giveLikeToStory(
