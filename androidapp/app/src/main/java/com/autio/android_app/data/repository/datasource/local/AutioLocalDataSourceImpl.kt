@@ -63,8 +63,8 @@ class AutioLocalDataSourceImpl @Inject constructor(
 
     override suspend fun createUserAccount(userEntity: UserEntity): Result<UserEntity?> {
         return try {
-            val user = userDao.createNewUser(userEntity)
-            Result.success(user)
+            userDao.createNewUser(userEntity)
+            Result.success(userEntity)
         } catch (ex: java.lang.Exception) {
             Result.failure(Error())
         }

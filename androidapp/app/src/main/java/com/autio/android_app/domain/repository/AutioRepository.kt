@@ -34,7 +34,7 @@ interface AutioRepository {
 
     suspend fun getMapPointById(id: String): Result<Story?>
     suspend fun getMapPointsByIds(ids: List<Int>): Result<List<Story>>
-    suspend fun getStoryById(id: Int): Result<Story>
+    suspend fun getStoryById(storyId: Int): Result<Story>
     suspend fun getStoriesByIds(
         userId: Int,
         apiToken: String,

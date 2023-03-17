@@ -45,13 +45,16 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun saveGuestInfo(guestResponse: User) {
-        prefRepository.userApiToken = guestResponse.apiToken
-        with(prefRepository) {
-            isUserGuest = true
-            userId = guestResponse.id
-            userApiToken = guestResponse.apiToken
-            remainingStories = 5
-        }
+        User(
+            guestResponse.id,
+            guestResponse.name,
+            guestResponse.email,
+            guestResponse.apiToken,
+            isGuest = true,
+            remainingStories = 5,
+            userSubIsActive = false,
+            isPremiumUser = false
+        )
     }
 
     private fun setViewState(loginViewState: LoginViewState) {

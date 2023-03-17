@@ -79,14 +79,16 @@ class PurchaseViewModel @Inject constructor(
      * Saves user's data in the shared preferences
      */
     private fun saveUserInfo(loginResponse: User) {
-        prefRepository.isUserGuest = false
-        prefRepository.userId = loginResponse.id
-        prefRepository.userApiToken = loginResponse.apiToken
-        prefRepository.userName = loginResponse.name
-        prefRepository.userEmail = loginResponse.email
-        prefRepository.remainingStories = -1
-        if (customerInfo.value?.activeSubscriptions?.isNotEmpty() == true){//TODO(SHOULD BE SOMETHING LIKE THIS BUT IS NOT WORKING)
-        prefRepository.userSubIsActive = true}
+        User(
+            loginResponse.id,
+            loginResponse.name,
+            loginResponse.email,
+            loginResponse.apiToken,
+            isGuest = false,
+            remainingStories = -1,
+            userSubIsActive = false,
+            isPremiumUser = false
+        )
     }
 
     fun logOut() {

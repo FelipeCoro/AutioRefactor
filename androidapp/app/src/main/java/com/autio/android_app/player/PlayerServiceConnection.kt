@@ -144,8 +144,6 @@ class PlayerServiceConnection @Inject constructor(
                         val currentStory =
                             metadata?.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)?.let {
                                 autioRepository.getStoryById(
-                                    prefRepository.userId,
-                                    prefRepository.userApiToken,
                                     it.toInt()
                                 )
                             }

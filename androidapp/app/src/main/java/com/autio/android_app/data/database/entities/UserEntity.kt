@@ -1,7 +1,9 @@
 package com.autio.android_app.data.database.entities
 
+import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Entity(tableName = "user_entity")
 data class UserEntity(
     @PrimaryKey
     var userId: Int = 0,
