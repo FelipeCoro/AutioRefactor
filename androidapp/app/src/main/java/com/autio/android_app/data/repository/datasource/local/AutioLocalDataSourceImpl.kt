@@ -3,7 +3,10 @@ package com.autio.android_app.data.repository.datasource.local
 import com.autio.android_app.data.database.dao.CategoryDao
 import com.autio.android_app.data.database.dao.MapPointDao
 import com.autio.android_app.data.database.dao.StoryDao
+import com.autio.android_app.data.database.dao.UserDao
 import com.autio.android_app.data.database.entities.*
+import com.autio.android_app.domain.mappers.toModel
+import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -13,7 +16,8 @@ import javax.inject.Inject
 class AutioLocalDataSourceImpl @Inject constructor(
     private val mapPointDao: MapPointDao,
     private val categoryDao: CategoryDao,
-    private val storyDao: StoryDao
+    private val storyDao: StoryDao,
+    private val userDao: UserDao
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
@@ -39,6 +43,18 @@ class AutioLocalDataSourceImpl @Inject constructor(
         )
     }
 
+    override suspend fun getUserAccount(): Result<User?> {
+        return runCatching {
+            userDao.getCurrentUser()
+        }.onSuccess { userEntity ->
+            val user = userEntity?.let { it.toModel() }
+            Result.success(user)
+        }.onFailure {
+            Result.failure(it)
+        }
+    }
+
+
     override suspend fun getAllStories() = mapPointDao.readLiveStories()
 
 
@@ -55,7 +71,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
                 listMapPointEntities.add(it)
             }
         }
-        return Result.success (listMapPointEntities)
+        return Result.success(listMapPointEntities)
     }
 
     override suspend fun getLastModifiedStory(): Result<StoryEntity?> {
@@ -123,13 +139,13 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
 
-    override suspend fun getUserBookmarkedStories(): List<StoryEntity>{
-        return   storyDao.getUserBookmarkedStories()
+    override suspend fun getUserBookmarkedStories(): List<StoryEntity> {
+        return storyDao.getUserBookmarkedStories()
 
     }
 
     override suspend fun bookmarkStory(id: Int) {
-      storyDao.setBookmarkToStory(id)
+        storyDao.setBookmarkToStory(id)
 
     }
 
@@ -157,8 +173,8 @@ class AutioLocalDataSourceImpl @Inject constructor(
 // Downloaded stories
 
     override suspend fun downloadStory(story: StoryEntity) {
-           story.isDownloaded = true
-            storyDao.addStory(story)
+        story.isDownloaded = true
+        storyDao.addStory(story)
 
     }
 
@@ -178,14 +194,14 @@ class AutioLocalDataSourceImpl @Inject constructor(
         return storyDao.getStoryById(id)
     }
 
-    override suspend fun getDownloadedStories():Result<List<StoryEntity>> {
-      return  runCatching { storyDao.getDownloadedStories()
+    override suspend fun getDownloadedStories(): Result<List<StoryEntity>> {
+        return runCatching {
+            storyDao.getDownloadedStories()
         }.onSuccess {
             Result.success(it)
         }.onFailure { emptyList<StoryEntity>() }
 
     }
-
 
 
     override suspend fun cacheRecordOfStory(storyId: String, recordUrl: String) {
@@ -212,4 +228,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
             storyDao.deleteRecordUrls()
         }
     }
+
+
 }

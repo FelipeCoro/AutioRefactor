@@ -5,10 +5,7 @@ import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
 import com.autio.android_app.data.api.model.story.*
-import com.autio.android_app.data.database.entities.CategoryEntity
-import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.MapPointEntity
-import com.autio.android_app.data.database.entities.StoryEntity
+import com.autio.android_app.data.database.entities.*
 import com.autio.android_app.ui.stories.models.*
 
 //TODO(need to break this up for readability)
@@ -166,6 +163,19 @@ fun Story.toDto(): StoryDto {
         isDownloaded,
         listenedAt,
         listenedAtLeast30Secs,
+    )
+}
+
+fun UserEntity.toModel(): User {
+    return User(
+        userId,
+        userName,
+        userEmail,
+        userApiToken,
+        isGuestUser,
+        remainingStories,
+        userSubIsActive,
+        isPremiumUser
     )
 }
 

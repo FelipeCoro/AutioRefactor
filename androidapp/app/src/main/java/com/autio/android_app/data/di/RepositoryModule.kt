@@ -33,6 +33,7 @@ abstract class RepositoryModule {
     ): RevenueCatRepository
 
     @Binds
+    @Singleton
     abstract fun bindsPrefRepository(
         prefRepository: PrefRepositoryImpl
     ): PrefRepository
