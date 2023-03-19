@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/account"
-        android:name="com.autio.android_app.ui.stories.fragments.AccountFragment"
+        android:name="com.autio.android_app.ui.account.fragments.AccountFragment"
         android:label="fragment_account"
         tools:layout="@layout/fragment_account">
         <action

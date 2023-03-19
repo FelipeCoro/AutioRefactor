@@ -12,13 +12,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
-import androidx.navigation.navArgs
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentViewPagerBinding
 import com.autio.android_app.ui.onboarding.adapters.ViewPagerAdapter
+import com.autio.android_app.ui.onboarding.view_models.OnBoardingViewModel
+import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState
+import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState.NavigateToAllowNotifications
+import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState.NavigateToBackgroundLocation
+import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState.NavigateToHome
+import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState.NavigateToInAppLocationPermission
+import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState.NavigateToLogin
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.util.PermissionsManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,24 +33,15 @@ import javax.inject.Inject
 class OnBoardingFragment : Fragment() {
 
     @Inject
-    lateinit var prefRepository: PrefRepository
-    private lateinit var permissionsManager: PermissionsManager
+    lateinit var permissionsManager: PermissionsManager
     private lateinit var binding: FragmentViewPagerBinding
-    val args: OnBoardingFragmentArgs by navArgs()
+    private val viewModel: OnBoardingViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         permissionsManager =
             PermissionsManager(requireActivity(), requireActivity().activityResultRegistry)
         lifecycle.addObserver(permissionsManager)
-
-     // if(args.goToSignUpOrIn == 0){
-     //     findNavController().navigate(R.id.signIn)
-     // }
-     // else if (args.goToSignUpOrIn == 1){
-     //     findNavController().navigate(R.id.signUp)
-     // }
-
     }
 
     override fun onCreateView(
@@ -58,6 +54,12 @@ class OnBoardingFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initOnBoardingViewPager()
+        bindObservables()
+        initView()
+    }
+
+    private fun initOnBoardingViewPager() {
         val adapter = ViewPagerAdapter(
             listOf(
                 WelcomeExplorerFragment(),
@@ -66,45 +68,46 @@ class OnBoardingFragment : Fragment() {
                 BackgroundLocationFragment()
             ), requireActivity().supportFragmentManager, lifecycle
         )
-
         binding.viewPager.adapter = adapter
         binding.viewPager.isUserInputEnabled = false
-
-        validateViewPagerStartingPoint()
     }
 
-    private fun validateViewPagerStartingPoint() {
-        val notifications = validateNotificationsPermission()
-        val inAppPermissions = validateInAppLocationPermission()
-        val backgroundLocation = validateBackgroundLocation()
-
-        if (!notifications) {
-            navigateToNotificationsFragment(inAppPermissions, backgroundLocation)
-            return
-        }
-        if (!inAppPermissions) {
-            navigateToInAppLocationPermissionFragment(backgroundLocation)
-            return
-        }
-        if (!backgroundLocation) {
-            navigateToBackgroundLocation()
-            return
-        }
-        navigateToAuthentication()
+    private fun bindObservables() {
+        viewModel.viewState.observe(viewLifecycleOwner, ::handleViewModel)
     }
 
-    private fun navigateToAuthentication() {
-        if (isOnBoardingFinished()) {
-            if (isUserLoggedIn()) {
-                startActivity(Intent(activity, BottomNavigation::class.java))
-                activity?.finish()
-            } else findNavController().navigate(R.id.loginFragment)
+    private fun handleViewModel(onBoardingViewState: OnBoardingViewState?) {
+        onBoardingViewState?.let { viewState ->
+            when (viewState) {
+                is NavigateToAllowNotifications -> navigateToNotificationsFragment()
+                is NavigateToInAppLocationPermission -> navigateToInAppLocationPermissionFragment()
+                is NavigateToBackgroundLocation -> navigateToBackgroundLocation()
+                is NavigateToHome -> navigateToHome()
+                is NavigateToLogin -> navigateToLogin()
+            }
         }
+    }
+
+    private fun navigateToLogin() {
+        findNavController().navigate(R.id.loginFragment)
+    }
+
+    private fun navigateToHome() {
+        startActivity(Intent(activity, BottomNavigation::class.java))
+        activity?.finish()
+    }
+
+    private fun initView() {
+        val notifyPermission = validateNotificationsPermission()
+        val inAppPermission = validateInAppLocationPermission()
+        val backgroundPermission = validateBackgroundLocation()
+        viewModel.initView(
+            isOnBoardingFinished(), notifyPermission, inAppPermission, backgroundPermission
+        )
     }
 
     private fun isOnBoardingFinished(): Boolean {
-        val sharedPreferences =
-            activity?.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
+        val sharedPreferences = activity?.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
         return sharedPreferences?.getBoolean("Finished", false) ?: false
     }
 
@@ -112,13 +115,11 @@ class OnBoardingFragment : Fragment() {
         return permissionsManager.checkPermission(ACCESS_BACKGROUND_LOCATION)
     }
 
-
     private fun validateInAppLocationPermission(): Boolean {
         return permissionsManager.checkPermissions(
             listOf(ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION)
         )
     }
-
 
     private fun validateNotificationsPermission(): Boolean {
         return requireContext().let {
@@ -127,16 +128,14 @@ class OnBoardingFragment : Fragment() {
             } else {
                 permissionsManager.checkPermission(Manifest.permission.POST_NOTIFICATIONS)
             }
-        } ?: false
+        }
     }
 
-    private fun navigateToNotificationsFragment(
-        inAppPermission: Boolean, backgroundLocation: Boolean
-    ) {
+    private fun navigateToNotificationsFragment() {
         setViewPagerPage(0)
     }
 
-    private fun navigateToInAppLocationPermissionFragment(backgroundLocation: Boolean) {
+    private fun navigateToInAppLocationPermissionFragment() {
         setViewPagerPage(1)
     }
 
@@ -147,7 +146,4 @@ class OnBoardingFragment : Fragment() {
     private fun setViewPagerPage(pageIndex: Int) {
         binding.viewPager.currentItem = pageIndex
     }
-
-    private fun isUserLoggedIn() =
-        prefRepository.userApiToken.isEmpty()
 }

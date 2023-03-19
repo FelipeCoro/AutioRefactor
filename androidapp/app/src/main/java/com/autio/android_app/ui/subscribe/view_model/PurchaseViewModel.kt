@@ -31,6 +31,7 @@ class PurchaseViewModel @Inject constructor(
     private val prefRepository: PrefRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
+
     val isLoading = ObservableBoolean(false)
     private val _viewState = MutableLiveData<PurchaseViewState>()
     val viewState: LiveData<PurchaseViewState> = _viewState

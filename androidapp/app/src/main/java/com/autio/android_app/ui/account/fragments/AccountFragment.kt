@@ -1,4 +1,4 @@
-package com.autio.android_app.ui.stories.fragments
+package com.autio.android_app.ui.account.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,15 +6,12 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
@@ -23,19 +20,17 @@ import androidx.recyclerview.widget.ItemTouchHelper.END
 import androidx.recyclerview.widget.ItemTouchHelper.START
 import androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback
 import androidx.recyclerview.widget.ItemTouchHelper.UP
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.api.ApiClient
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentAccountBinding
 import com.autio.android_app.extensions.makeLinks
+import com.autio.android_app.ui.account.view_models.AccountFragmentViewModel
+import com.autio.android_app.ui.account.view_states.AccountViewState
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
-import com.autio.android_app.ui.viewmodel.AccountFragmentViewModel
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.autio.android_app.util.bottomNavigationActivity
 import com.autio.android_app.util.checkEmptyField
@@ -48,20 +43,11 @@ import com.autio.android_app.util.writeEmailToCustomerSupport
 import com.bumptech.glide.Glide
 import com.revenuecat.purchases.CustomerInfo
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class AccountFragment : Fragment() {
-
-    @Inject
-    lateinit var prefRepository: PrefRepository
-
-    //TODO(Move service calls)
-    @Inject
-    lateinit var apiClient:ApiClient
 
     private val accountFragmentViewModel: AccountFragmentViewModel by viewModels()
     private val storyViewModel: StoryViewModel by viewModels()
@@ -88,24 +74,53 @@ class AccountFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bindObservables()
         bindListeners()
         setListeners()
         initView()
     }
 
-    private fun initView() {
-        accountFragmentViewModel.fetchUserData()
-        prepareView()
-       // initRecyclerViewInterest()
-    }
-
-    private fun setListeners() {
+    private fun bindObservables() {
         // Updates UI based on subscription status
         purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
             it?.let { updateSubscriptionUI(it) }
-
         }
+        accountFragmentViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
+    }
 
+    private fun handleViewState(accountViewState: AccountViewState?) {
+        accountViewState?.let { viewState ->
+            when (viewState) {
+                is AccountViewState.OnSuccessPasswordChanged -> handleSuccessPasswordChanged()
+                is AccountViewState.OnFailedPasswordChanged -> handleFailedPasswordChanged()
+            }
+        }
+    }
+
+    private fun handleFailedPasswordChanged() {
+        binding.llChangePasswordForm.visibility = GONE
+        binding.llChangePasswordButtons.visibility = GONE
+        binding.btnChangePassword.visibility = VISIBLE
+        showToast(
+            requireContext(),
+            getString(R.string.account_fragment_password_has_been_updated)
+        )
+    }
+
+    private fun handleSuccessPasswordChanged() {
+
+    }
+
+    private fun initView() {
+        Glide.with(binding.ivAccount).load(R.drawable.account_header).fitCenter()
+            .into(binding.ivAccount)
+
+        accountFragmentViewModel.fetchUserData()
+
+        // initRecyclerViewInterest()
+    }
+
+    private fun setListeners() {
         // Listeners for buttons for subscription's buttons (status, gift, discount)
         setSubscriptionRelatedListeners()
 
@@ -134,7 +149,7 @@ class AccountFragment : Fragment() {
     private fun setSubscriptionRelatedListeners() {
         with(binding) {
             btnGift.setOnClickListener {
-                openUrl(requireContext(), "https://app.autio.com/give")
+                openUrl(requireContext(), getString(R.string.account_fragment_give_autio_url))
             }
 
             tvManageSubscription.setOnClickListener {
@@ -265,32 +280,17 @@ class AccountFragment : Fragment() {
     }
 
     private fun changeUserPassword() {
-        if (checkEmptyField(binding.etCurrentPassword) || checkEmptyField(binding.etNewPassword) || checkEmptyField(
-                binding.etConfirmPassword
-            )
+        if (checkEmptyField(binding.etCurrentPassword)
+            || checkEmptyField(binding.etNewPassword)
+            || checkEmptyField(binding.etConfirmPassword)
         ) {
             pleaseFillText(requireContext())
         } else {
             val currentPassword = binding.etCurrentPassword.text.toString()
             val newPassword = binding.etNewPassword.text.toString()
             val confirmPassword = binding.etConfirmPassword.text.toString()
-            val passwordInfo = com.autio.android_app.data.api.model.account.ChangePasswordDto(
-                currentPassword, newPassword, confirmPassword
-            )
-            if (newPassword == confirmPassword) {
-                //TODO (move to VM -> repo)
-                lifecycleScope.launch {
-                    val result = apiClient.changePassword(
-                        prefRepository.userId, prefRepository.userApiToken, passwordInfo
-                    )
-                    if (result.isSuccessful) {
-                        binding.llChangePasswordForm.visibility = GONE
-                        binding.llChangePasswordButtons.visibility = GONE
-                        binding.btnChangePassword.visibility = VISIBLE
-                        showToast(requireContext(), "Password has been updated")
-                    }
-                }
-            }
+
+            accountFragmentViewModel.changePassword(currentPassword, newPassword, confirmPassword)
         }
     }
 
@@ -316,8 +316,7 @@ class AccountFragment : Fragment() {
     }
 
     private fun prepareView() {
-        Glide.with(binding.ivAccount).load(R.drawable.account_header).fitCenter()
-            .into(binding.ivAccount)
+
 
         val isGuest = prefRepository.isUserGuest
         binding.scrollViewAccount.isGone = isGuest

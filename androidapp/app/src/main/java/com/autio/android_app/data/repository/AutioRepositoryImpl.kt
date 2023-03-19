@@ -1,6 +1,7 @@
 package com.autio.android_app.data.repository
 
 import android.util.Log
+import com.autio.android_app.data.api.model.account.ChangePasswordDto
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
@@ -603,6 +604,34 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun updateUserProfile(profile: ProfileDto) {
         TODO("update user profile Not yet implemented")
+    }
+
+    override suspend fun isUserLoggedIn(): Boolean {
+        val result = autioLocalDataSource.getUserAccount()
+        return if (result.isSuccess) {
+            result.getOrNull()?.isPremiumUser ?: false
+        } else false
+    }
+
+    override suspend fun changePassword(
+        currentPassword: String, newPassword: String, confirmPassword: String
+    ): Result<Boolean> {
+        val userAccount = getUserAccount()
+        userAccount?.let {
+            val passwordInfo = ChangePasswordDto(
+                currentPassword, newPassword, confirmPassword
+            )
+            val result = autioRemoteDataSource.changePassword(
+                userAccount.id, userAccount.apiToken, passwordInfo
+            )
+            return if (result.isSuccessful) {
+                val dtoResponse = result.body().toString()
+                Result.success(true)
+            } else {
+                Result.failure(Error())
+            }
+        }
+        return Result.failure(Error())
     }
 }
 

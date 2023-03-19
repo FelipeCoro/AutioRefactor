@@ -1,18 +1,15 @@
 package com.autio.android_app.ui.onboarding.fragments
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentWelcomeExplorerBinding
-import com.autio.android_app.ui.stories.BottomNavigation
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -35,23 +32,24 @@ class WelcomeExplorerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.buttonLetsGo.setOnClickListener {
-            if(viewPager!= null) {
+            if (viewPager != null) {
                 viewPager.currentItem += 1
             }
         }
-        initView()
+        //initView()
     }
 
-    private fun initView() {
-        if (isOnBoardingFinished()) {
-            if (isUserLoggedIn()) {
-                startActivity(Intent(activity, BottomNavigation::class.java))
-                activity?.finish()
-            } else findNavController().navigate(R.id.action_onBoardingFragment_to_loginFragment)
+    /*
+        private fun initView() {
+            if (isOnBoardingFinished()) {
+                if (isUserLoggedIn()) {
+                    startActivity(Intent(activity, BottomNavigation::class.java))
+                    activity?.finish()
+                } else findNavController().navigate(R.id.action_onBoardingFragment_to_loginFragment)
+            }
+            startAnimation()
         }
-        startAnimation()
-    }
-
+    */
     private fun startAnimation() {
         binding.tvWelcome.apply {
             alpha = 0f
@@ -82,7 +80,8 @@ class WelcomeExplorerFragment : Fragment() {
             activity?.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
         return sharedPreferences?.getBoolean("Finished", false) ?: false
     }
-
+/*
     private fun isUserLoggedIn() =
         prefRepository.userApiToken.isEmpty() //TODO(Shouldn't this be if its NOT empty?)
+*/
 }

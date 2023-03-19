@@ -24,7 +24,7 @@ interface AutioRepository {
     suspend fun createAccount(accountRequest: AccountRequest): Result<User>
     suspend fun login(loginRequest: LoginRequest): Result<User>
     suspend fun loginAsGuest(): Result<User>
-    suspend fun fetchUserData()
+    suspend fun fetchUserData() : Result<>
     suspend fun updateProfile(infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit)
     suspend fun updateCategoriesOrder(
         infoUser: ProfileDto,
@@ -111,34 +111,29 @@ interface AutioRepository {
     ): Result<Pair<Boolean, Int>>
 
     suspend fun addStoryToHistory(history: History)
-
-    suspend fun getUserStoriesHistory(userId: Int, userApiToken: String):Result<List<Story>>
-
+    suspend fun getUserStoriesHistory(userId: Int, userApiToken: String): Result<List<Story>>
     suspend fun removeStoryFromHistory(id: Int)
-
     suspend fun clearStoryHistory()
-
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
-
     suspend fun clearUserData()
     suspend fun getLastModifiedStory(): Result<Story?>
-
     suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
-
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
 
-   // suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
-   suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
+    // suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
+    suspend fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int): Result<Narrator>
     suspend fun storyLikesCount(userId: Int, apiToken: String, storyId: Int): Result<Int>
-
     suspend fun isStoryLiked(userId: Int, apiToken: String, storyId: Int): Result<Boolean>
     suspend fun removeAllLikedStories(userId: Int, apiToken: String, stories: List<StoryEntity>)
     suspend fun deleteCachedData()
-
     suspend fun addStories(stories: List<Story>)
-
     suspend fun getDownloadedStories(): Result<List<Story>>
     suspend fun getUserAccount(): User?
     suspend fun updateUserProfile(profile: ProfileDto)
-
+    suspend fun isUserLoggedIn(): Boolean
+    suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String,
+        confirmPassword: String
+    ): Result<Boolean>
 }

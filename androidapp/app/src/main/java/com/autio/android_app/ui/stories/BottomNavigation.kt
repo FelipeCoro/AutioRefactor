@@ -99,7 +99,7 @@ class BottomNavigation : AppCompatActivity() {
         bottomNavigationViewModel.playingStory.observe(this) {
             bottomNavigationViewModel.postPlay()
         }
-        bottomNavigationViewModel.remainingStoriesLiveData.observe(this) {
+        bottomNavigationViewModel.remainingStoriesLiveData.observe() {
             updateAvailableStoriesUI(it)
         }
         purchaseViewModel.customerInfo.observe(this) {
@@ -220,13 +220,9 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun updateAvailableStoriesUI(remainingStories: Int) {
         with(binding) {
-
-
             val tickMarks = arrayOf(
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )
-
-
           //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
             if (remainingStories < 0){
                 llTickMarks.visibility = GONE

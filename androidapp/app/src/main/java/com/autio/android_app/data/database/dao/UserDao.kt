@@ -2,7 +2,6 @@ package com.autio.android_app.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import com.autio.android_app.data.database.entities.UserEntity

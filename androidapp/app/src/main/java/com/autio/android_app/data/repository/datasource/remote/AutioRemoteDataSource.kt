@@ -6,12 +6,22 @@ import com.autio.android_app.data.api.model.account.CreateAccountDto
 import com.autio.android_app.data.api.model.account.GuestResponse
 import com.autio.android_app.data.api.model.account.LoginDto
 import com.autio.android_app.data.api.model.account.LoginResponse
+import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
 import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
 import com.autio.android_app.data.api.model.history.ClearHistoryResponse
 import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
-import com.autio.android_app.data.api.model.story.*
+import com.autio.android_app.data.api.model.story.AuthorDto
+import com.autio.android_app.data.api.model.story.ContributorResponse
+import com.autio.android_app.data.api.model.story.LikeResponse
+import com.autio.android_app.data.api.model.story.NarratorDto
+import com.autio.android_app.data.api.model.story.PlaysDto
+import com.autio.android_app.data.api.model.story.PlaysResponse
+import com.autio.android_app.data.api.model.story.StoryCategoryDto
+import com.autio.android_app.data.api.model.story.StoryDto
+import com.autio.android_app.data.api.model.story.StoryLikedResponse
+import com.autio.android_app.data.api.model.story.StoryLikesResponse
 import retrofit2.Response
 
 interface AutioRemoteDataSource {
@@ -45,21 +55,18 @@ interface AutioRemoteDataSource {
         xUserId: Int,
         apiToken: String,
         userId: Int = xUserId,
-    ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
+    ): Response<ProfileDto>
 
     suspend fun updateProfile(
-        xUserId: Int,
-        apiToken: String,
-        userId: Int,
-        profileDto: com.autio.android_app.data.api.model.account.ProfileDto
-    ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
+        xUserId: Int, apiToken: String, userId: Int, profileDto: ProfileDto
+    ): Response<ProfileDto>
 
     suspend fun updateProfileV2(
         xUserId: Int,
         apiToken: String,
-        profileDto: com.autio.android_app.data.api.model.account.ProfileDto,
+        profileDto: ProfileDto,
         userId: Int = xUserId,
-    ): Response<com.autio.android_app.data.api.model.account.ProfileDto>
+    ): Response<ProfileDto>
 
     suspend fun getStoriesByIds(
         xUserId: Int,
