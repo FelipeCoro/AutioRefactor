@@ -9,7 +9,9 @@ import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
+import androidx.fragment.app.viewModels
 import com.autio.android_app.ui.stories.BottomNavigation
+import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
 import java.util.*
@@ -114,6 +116,7 @@ fun showPaywallOrProceedWithNormalProcess(
     isActionExclusiveForSignedInUser: Boolean = false,
     normalProcess: () -> Unit
 ) {
+
     Purchases.sharedInstance.getCustomerInfoWith {
         if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
             normalProcess.invoke()

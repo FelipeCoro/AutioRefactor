@@ -28,10 +28,10 @@ class NarratorViewModel @Inject constructor(
         _narratorViewState.postValue(newState)
     }
 
-    fun getNarratorOfStory(userId: Int, apiToken: String, storyId: Int) {
+    fun getNarratorOfStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.getNarratorOfStory(userId, apiToken, storyId)
+                autioRepository.getNarratorOfStory(storyId)
             }.onSuccess { result ->
                 val narrator = result.getOrNull()
                 if (narrator != null) {
@@ -44,12 +44,10 @@ class NarratorViewModel @Inject constructor(
         }
     }
 
-    fun getStoriesByContributor(userId: Int, apiToken: String, narrator: Narrator, page: Int) {
+    fun getStoriesByContributor(narrator: Narrator, page: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.getStoriesByContributor(
-                    userId, apiToken, narrator.id, 1
-                )
+                autioRepository.getStoriesByContributor(narrator.id, 1)
             }.onSuccess { result ->
                 val storiesByContributor = result.getOrNull()
                 if (storiesByContributor != null) {

@@ -20,8 +20,10 @@ import com.autio.android_app.databinding.FragmentSubscribeBinding
 import com.autio.android_app.databinding.MothPopupBinding
 import com.autio.android_app.extensions.makeLinks
 import com.autio.android_app.ui.stories.BottomNavigation
+import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.subscribe.adapters.SliderAdapter
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.autio.android_app.util.openUrl
 import com.autio.android_app.util.resources.DeepLinkingActions
@@ -39,6 +41,8 @@ class SubscribeFragment : Fragment() {
     lateinit var prefRepository: PrefRepository
     private val purchaseViewModel: PurchaseViewModel by viewModels()
     private lateinit var binding: FragmentSubscribeBinding
+    private lateinit var currentUser: User
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -55,6 +59,8 @@ class SubscribeFragment : Fragment() {
 
     private fun bindObservers() {
         //TODO("Bind Observers for state view on purchase flows")
+        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handlePurchaseViewState)
+
     }
 
     private fun initView() {
@@ -88,6 +94,16 @@ class SubscribeFragment : Fragment() {
         purchaseViewModel.getOfferings()
     }
 
+    private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
+        when (viewState) {
+            is PurchaseViewState.FetchedUserSuccess -> handlePurchaseSuccessViewState(viewState.data)
+            else -> {}
+        }
+    }
+
+    private fun handlePurchaseSuccessViewState(user: User) {
+        currentUser = user
+    }
     private fun learnMoreLinkClicked(view: View) {
         //TODO(bad practice, refactor implement fragment dialog)
         val dialogBinding = MothPopupBinding.inflate(layoutInflater)
@@ -164,7 +180,7 @@ class SubscribeFragment : Fragment() {
     }
 
     private fun updateSubscriptionUI(customerInfo: CustomerInfo?) {
-        val isUserLogged = prefRepository.userApiToken.isNotEmpty()
+        val isUserLogged = currentUser.apiToken.isNotEmpty()
         val isSubscriptionActive =
             customerInfo?.entitlements?.get(REVENUE_CAT_ENTITLEMENT)?.isActive == true
 
@@ -208,7 +224,7 @@ class SubscribeFragment : Fragment() {
     }
 
     private fun isSessionAlive() {
-        val isSessionAlive = prefRepository.userApiToken
+        val isSessionAlive = currentUser.apiToken
         if (isSessionAlive.isEmpty()) {
             goToLoginActivity()
         } else {

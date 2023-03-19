@@ -92,7 +92,7 @@ class FavoritesFragment : Fragment() {
         activityLayout = requireActivity().findViewById(
             R.id.activity_layout
         )
-        storyViewModel.getAllFavoriteStories(prefRepository.userId, prefRepository.userApiToken)
+        storyViewModel.getAllFavoriteStories()
     }
 
     private fun bindObservers() {
@@ -155,11 +155,7 @@ class FavoritesFragment : Fragment() {
     ) {
         when (option) {
             StoryOption.DELETE -> {
-                storyViewModel.removeLikeFromStory(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    story.id
-                )
+                storyViewModel.removeLikeFromStory(story.id)
                 binding.pbLoadingProcess.visibility = View.GONE
                 showFeedbackSnackBar("Removed From Favorites")
                 navController.navigate(R.id.action_favorites_playlist_to_my_stories)
@@ -181,22 +177,15 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-    private fun onPlaylistOptionClicked(
-        option: PlaylistOption
-    ) {
-        showPaywallOrProceedWithNormalProcess(
-            prefRepository,
+    private fun onPlaylistOptionClicked(option: PlaylistOption) {
+        ShowPaywallOrProceedWithNormalProcess(
             requireActivity(), true
         ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 PlaylistOption.REMOVE -> {
                     stories?.let {
-                        storyViewModel.removeAllLikedStories(
-                            prefRepository.userId,
-                            prefRepository.userApiToken,
-                            it
-                        )
+                        storyViewModel.removeAllLikedStories(it)
                     }
                     showFeedbackSnackBar("Removed Favorites")
                     binding.pbLoadingProcess.visibility = View.GONE

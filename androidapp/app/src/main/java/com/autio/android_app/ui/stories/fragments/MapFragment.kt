@@ -35,14 +35,7 @@ import com.autio.android_app.ui.stories.view_model.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.viewmodel.MapFragmentViewModel
-import com.autio.android_app.util.DEFAULT_LOCATION_LAT
-import com.autio.android_app.util.DEFAULT_LOCATION_LNG
-import com.autio.android_app.util.Timer
-import com.autio.android_app.util.getFloatingComponentHeight
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
-import com.autio.android_app.util.showStoryOptions
+import com.autio.android_app.util.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -126,7 +119,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                   showPaywallOrProceedWithNormalProcess(prefRepository, requireActivity()) { //TODO(CHECK THIS AFTER PAYMENTS IS WORKING)
+                   ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) { //TODO(CHECK THIS AFTER PAYMENTS IS WORKING)
                     bottomNavigationViewModel.playMediaId(id)
              }
             }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true, viewLifecycleOwner
@@ -594,10 +587,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         clusterManager.onCameraIdle()
         updateMapBounds(map)
 
-        mapFragmentViewModel.fetchRecordsOfStories(
-            prefRepository.userId,
-            prefRepository.userApiToken //TODO(No userID or Apitoken are being fetched)
-        )
+        mapFragmentViewModel.fetchRecordsOfStories()
     }
 
     private fun updateMarker(story: Story, item: StoryClusterItem?) {

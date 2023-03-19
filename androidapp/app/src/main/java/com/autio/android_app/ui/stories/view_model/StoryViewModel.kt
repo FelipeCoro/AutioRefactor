@@ -47,10 +47,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun getStoriesByIds(userId: Int, apiToken: String, storyIds: List<Int>) {
+    fun getStoriesByIds(storyIds: List<Int>) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                val result = autioRepository.getStoriesByIds(userId, apiToken, storyIds)
+                val result = autioRepository.getStoriesByIds(storyIds)
                 result.getOrNull()
             }.onSuccess { stories ->
                 stories?.let {
@@ -64,9 +64,9 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun getBookmarkedStoriesByIds(userId: Int, apiToken: String) {
+    fun getBookmarkedStoriesByIds() {
         viewModelScope.launch(coroutineDispatcher) {
-            val result = autioRepository.getUserBookmarkedStories(userId, apiToken)
+            val result = autioRepository.getUserBookmarkedStories()
             setViewState(StoryViewState.FetchedBookmarkedStories(result))
         }
     }
@@ -83,10 +83,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun getAuthorOfStory(xUserId: Int, apiToken: String, storyId: Int) {
+    fun getAuthorOfStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.getAuthorOfStory(xUserId, apiToken, storyId)
+                autioRepository.getAuthorOfStory(storyId)
             }.onSuccess { result ->
                 val author = result.getOrNull()
                 if (author != null) {
@@ -103,7 +103,7 @@ class StoryViewModel @Inject constructor(
     private fun callContributor(author: Author) {
         viewModelScope.launch(coroutineDispatcher) {
             val contributorApiResponse = autioRepository.getStoriesByContributor(
-                prefRepository.userId, prefRepository.userApiToken, author.id, 1
+               author.id, 1
             )
             contributorApiResponse.let { response ->
                 val contributor = response.getOrNull()
@@ -114,8 +114,6 @@ class StoryViewModel @Inject constructor(
                         )
                     }
                     getStoriesByIds(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
                         contributor.data.map { it.id })
                 }
             }
@@ -141,10 +139,10 @@ class StoryViewModel @Inject constructor(
     }
 
 
-    fun bookmarkStory(userId: Int, apiToken: String, storyId: Int) {
+    fun bookmarkStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
 
-            autioRepository.bookmarkStory(userId, apiToken, storyId)
+            autioRepository.bookmarkStory(storyId)
             // }.onSuccess { result ->
             //  val bookmarked = result.getOrNull()
             //  bookmarked.let {
@@ -158,10 +156,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun removeBookmarkFromStory(userId: Int, apiToken: String, storyId: Int) {
+    fun removeBookmarkFromStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             // runCatching {
-            autioRepository.removeBookmarkFromStory(userId, apiToken, storyId)
+            autioRepository.removeBookmarkFromStory(storyId)
             //  }.onSuccess { result ->
             //      //val bookmarked = result.getOrNull()
             //      //bookmarked.let {
@@ -182,10 +180,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun giveLikeToStory(userId: Int, apiToken: String, storyId: Int) {
+    fun giveLikeToStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.giveLikeToStory(userId, apiToken, storyId)
+                autioRepository.giveLikeToStory(storyId)
             }.onSuccess { result ->
                 val likedStory = result.getOrNull()
                 likedStory?.let { isItLiked ->
@@ -199,10 +197,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun removeLikeFromStory(userId: Int, apiToken: String, storyId: Int) {
+    fun removeLikeFromStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.removeLikeFromStory(userId, apiToken, storyId)
+                autioRepository.removeLikeFromStory(storyId)
             }.onSuccess { result ->
                 val removedLike = result.getOrNull()
                 removedLike?.let { isItLiked ->
@@ -216,10 +214,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun storyLikesCount(userId: Int, apiToken: String, storyId: Int) {
+    fun storyLikesCount(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.storyLikesCount(userId, apiToken, storyId)
+                autioRepository.storyLikesCount(storyId)
             }.onSuccess { result ->
                 val storyLikes = result.getOrNull()
                 storyLikes?.let {
@@ -232,10 +230,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun getAllFavoriteStories(userId: Int, apiToken: String) {
+    fun getAllFavoriteStories() {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.getUserFavoriteStories(userId, apiToken)
+                autioRepository.getUserFavoriteStories()
             }.onSuccess { result ->
                 val likedStories = result.getOrNull()
                 likedStories?.let {
@@ -247,10 +245,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun isStoryLiked(userId: Int, apiToken: String, storyId: Int) {
+    fun isStoryLiked(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.isStoryLiked(userId, apiToken, storyId)
+                autioRepository.isStoryLiked(storyId)
             }.onSuccess { result ->
                 val isLiked = result.getOrNull()
                 isLiked?.let {
@@ -262,15 +260,15 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun removeAllLikedStories(userId: Int, userApiToken: String, stories: List<StoryEntity>) {
+    fun removeAllLikedStories(stories: List<StoryEntity>) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeAllLikedStories(userId, userApiToken, stories)
+            autioRepository.removeAllLikedStories(stories)
         }
     }
 
-    fun isStoryBookmarked(userId: Int, userApiToken: String, storyId: Int) {
+    fun isStoryBookmarked(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            val stories = autioRepository.getUserBookmarkedStories(userId, userApiToken)
+            val stories = autioRepository.getUserBookmarkedStories()
             for (story in stories) {
                 if (story.id == storyId) {
                     setViewState(StoryViewState.StoryIsBookmarked(true))
@@ -330,10 +328,10 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun getHistory(userId: Int, userApiToken: String) {
+    fun getHistory() {
         viewModelScope.launch(coroutineDispatcher) {
             runCatching {
-                autioRepository.getUserStoriesHistory(userId, userApiToken)
+                autioRepository.getUserStoriesHistory()
             }.onSuccess { result ->
                 val stories = result.getOrNull()
                 stories?.let {

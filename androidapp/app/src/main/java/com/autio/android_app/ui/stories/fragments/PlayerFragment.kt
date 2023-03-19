@@ -134,16 +134,14 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
 
-        storyViewModel.isStoryLiked(prefRepository.userId, prefRepository.userApiToken, storyId)
+        storyViewModel.isStoryLiked(storyId)
 
 
         binding.btnHeart.setOnClickListener {
             // showPaywallOrProceedWithNormalProcess(
             //     prefRepository, requireActivity(), true
             // ) {
-            storyViewModel.getStoriesByIds(
-                prefRepository.userId, prefRepository.userApiToken, listOf(storyId)
-            )
+            storyViewModel.getStoriesByIds(listOf(storyId))
             //  }
         }
 
@@ -152,10 +150,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             // showPaywallOrProceedWithNormalProcess(
             //  prefRepository, requireActivity(), true
             //  ) {
-            storyViewModel.getBookmarkedStoriesByIds(
-                prefRepository.userId,
-                prefRepository.userApiToken,
-            )
+            storyViewModel.getBookmarkedStoriesByIds()
             //   }
 
         }
@@ -166,11 +161,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             updateUI(view, mediaItem)
             if (mediaItem != null) {
                 storyId = mediaItem.id
-                storyViewModel.isStoryBookmarked(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    mediaItem.id
-                )
+                storyViewModel.isStoryBookmarked(mediaItem.id)
             }
         }
         playerFragmentViewModel.speedButtonRes.observe(viewLifecycleOwner) { res ->
@@ -189,9 +180,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnRewind.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(), true
-            ) {
+            ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
                 bottomNavigationViewModel.rewindFifteenSeconds()
             }
         }
@@ -205,9 +194,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnNext.setOnClickListener {
-            showPaywallOrProceedWithNormalProcess(
-                prefRepository, requireActivity(), true
-            ) {
+            ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
                 bottomNavigationViewModel.skipToNextStory()
             }
         }
@@ -245,28 +232,20 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
     private fun isStoryLiked(isLiked: Boolean) {
         if (!isLiked) {
             binding.btnHeart.setImageResource(R.drawable.ic_heart)
-            storyViewModel.storyLikesCount(
-                prefRepository.userId, prefRepository.userApiToken, storyId
-            )
+            storyViewModel.storyLikesCount(storyId)
         } else
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
-        storyViewModel.storyLikesCount(
-            prefRepository.userId, prefRepository.userApiToken, storyId
-        )
+        storyViewModel.storyLikesCount(storyId)
     }
 
     private fun handleFetchedStory(story: Story) {
 
         if (story.isLiked == true) {
-            storyViewModel.removeLikeFromStory(
-                prefRepository.userId, prefRepository.userApiToken, story.id
-            )
+            storyViewModel.removeLikeFromStory(story.id)
             binding.btnHeart.setImageResource(R.drawable.ic_heart)
 
         } else {
-            storyViewModel.giveLikeToStory(
-                prefRepository.userId, prefRepository.userApiToken, story.id
-            )
+            storyViewModel.giveLikeToStory(story.id)
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
         }
     }
@@ -285,21 +264,13 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         for (story in stories) {
             if (story.id == storyId) {
                 binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark)
-                storyViewModel.removeBookmarkFromStory(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
-                    story.id
-                )
+                storyViewModel.removeBookmarkFromStory(story.id)
             } else
                 binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
             playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
                 if (mediaItem != null) {
                     storyViewModel.downloadStory(mediaItem)
-                    storyViewModel.bookmarkStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        mediaItem.id
-                    )
+                    storyViewModel.bookmarkStory(mediaItem.id)
                 }
             }
         }
@@ -308,11 +279,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
                 if (mediaItem != null) {
                     storyViewModel.downloadStory(mediaItem)
-                    storyViewModel.bookmarkStory(
-                        prefRepository.userId,
-                        prefRepository.userApiToken,
-                        mediaItem.id
-                    )
+                    storyViewModel.bookmarkStory(mediaItem.id)
                 }
             }
         }
@@ -363,9 +330,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     seekBar: SeekBar?, progress: Int, fromUser: Boolean
                 ) {
                     if (fromUser) {
-                        showPaywallOrProceedWithNormalProcess(
-                            prefRepository, requireActivity()
-                        ) {
+                        ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
                             bottomNavigationViewModel.setPlaybackPosition(
                                 progress
                             )
@@ -373,9 +338,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                     }
                 }
             })
-            storyViewModel.isStoryLiked(
-                prefRepository.userId, prefRepository.userApiToken, storyId
-            )
+            storyViewModel.isStoryLiked(storyId)
             tvStoryTitle.text = story.title
             tvStoryAuthor.apply {
                 text = story.author
@@ -440,9 +403,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 text = story.description
             }
             btnShare.setOnClickListener {
-                showPaywallOrProceedWithNormalProcess(
-                    prefRepository, requireActivity()
-                ) {
+                ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
                     shareStory(
                         requireContext(), //story.id can be set to be passed as a value for the autio link but story sharing is disabled atm
                     )

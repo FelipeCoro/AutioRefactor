@@ -54,10 +54,8 @@ class AccountFragmentViewModel @Inject constructor(
         categories: List<Category>, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {}
     ) {
         viewModelScope.launch(coroutineDispatcher) {
-            val infoUser = ProfileDto(prefRepository.userEmail,
-                prefRepository.userName,
-                categories.map { it.toMapPointEntity() })
-            autioRepository.updateCategoriesOrder(infoUser, onSuccess, onFailure)
+          //  val infoUser = ProfileDto( categories.map { it.toMapPointEntity() }) //TODO(This is not used right now but should be changed to UserDao impl. later on)
+         //   autioRepository.updateCategoriesOrder(infoUser, onSuccess, onFailure)
         }
     }
 

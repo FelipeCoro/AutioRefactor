@@ -26,10 +26,7 @@ import com.autio.android_app.ui.stories.view_model.NarratorViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.NarratorViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.openUrl
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showPaywallOrProceedWithNormalProcess
+import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,9 +81,7 @@ class NarratorFragment : Fragment() {
         recyclerView = binding.rvNarratorStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                showPaywallOrProceedWithNormalProcess(
-                    prefRepository, requireActivity(), true
-                ) {
+                ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
                     bottomNavigationViewModel.playMediaId(
                         id
                     )
@@ -107,9 +102,7 @@ class NarratorFragment : Fragment() {
         )
 
         if (storyId != null) {
-            narratorViewModel.getNarratorOfStory(
-                prefRepository.userId, prefRepository.userApiToken, storyId
-            )
+            narratorViewModel.getNarratorOfStory(storyId)
 
         }
 
@@ -178,8 +171,6 @@ class NarratorFragment : Fragment() {
                 }
 
                 narratorViewModel.getStoriesByContributor(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
                     narrator,
                     1
                 )
@@ -194,10 +185,7 @@ class NarratorFragment : Fragment() {
                 story.id, story.narrationUrl ?: ""
             )
         }
-        storyViewModel.getStoriesByIds(
-            prefRepository.userId,
-            prefRepository.userApiToken,
-            contributor.data.map { it.id })
+        storyViewModel.getStoriesByIds(contributor.data.map { it.id })
 
     }
 

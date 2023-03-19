@@ -28,9 +28,13 @@ import com.autio.android_app.databinding.ActivityBottomNavigationBinding
 import com.autio.android_app.ui.network_monitor.NetworkManager
 import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
+import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
+import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
@@ -86,12 +90,11 @@ class BottomNavigation : AppCompatActivity() {
         volumeControlStream = AudioManager.STREAM_MUSIC
         purchaseViewModel.getUserInfo()
         updateSnackBarMessageDisplay()
-        updateAvailableStoriesUI(bottomNavigationViewModel.initialRemainingStories)
         showPlayerComponent()
     }
 
     private fun bindObservables() {
-        bottomNavigationViewModel.bottomNavigationViewState.observe(this, ::handleViewState)
+        bottomNavigationViewModel.bottomNavigationViewState.observe(this, ::handleBottomNavViewState)
 
         bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
             binding.btnFloatingPlayerPlay.setImageResource(res)
@@ -99,9 +102,9 @@ class BottomNavigation : AppCompatActivity() {
         bottomNavigationViewModel.playingStory.observe(this) {
             bottomNavigationViewModel.postPlay()
         }
-        bottomNavigationViewModel.remainingStoriesLiveData.observe() {
-            updateAvailableStoriesUI(it)
-        }
+
+        purchaseViewModel.viewState.observe(this, ::handlePurchaseViewState)
+
         purchaseViewModel.customerInfo.observe(this) {
             it?.let {
                 binding.storiesFreePlansBanner.visibility =
@@ -111,15 +114,27 @@ class BottomNavigation : AppCompatActivity() {
         }
 
     }
-    private fun handleViewState(viewState: BottomNavigationViewState?) {
+    private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
-            is BottomNavigationViewState.FetchedStoryToPlay -> handleSuccessViewState(viewState.story)
+            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(viewState.story)
+            else -> {}
+        }
+    }
+    private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
+        when (viewState) {
+            is PurchaseViewState.FetchedUserSuccess -> handlePurchaseSuccessViewState(viewState.data)
             else -> {}
         }
     }
 
-    private fun handleSuccessViewState(mediaItem: Story) {
+
+    private fun handleBottomNavSuccessViewState(mediaItem: Story) {
         updatePlayer(mediaItem)
+
+    }
+
+    private fun handlePurchaseSuccessViewState(user: User) {
+        updateAvailableStoriesUI(user.remainingStories)
     }
 
     override fun onStart() {

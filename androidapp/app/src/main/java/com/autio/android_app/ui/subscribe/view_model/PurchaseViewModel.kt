@@ -38,7 +38,14 @@ class PurchaseViewModel @Inject constructor(
     val customerInfo = revenueCatRepository.customerInfo
 
     fun getUserInfo() {
-        revenueCatRepository.getUserInfo()
+        viewModelScope.launch(coroutineDispatcher) {
+            val reveCatInfo = revenueCatRepository.getUserInfo()
+            val result = autioRepository.getUserAccount()
+            if (result != null) {
+                //TODO(map revenue cat user and our domain user with both results?, is this done on login?)
+                setViewState(PurchaseViewState.FetchedUserSuccess(result))
+            }
+        }
     }
 
     fun login(loginRequest: LoginRequest) {

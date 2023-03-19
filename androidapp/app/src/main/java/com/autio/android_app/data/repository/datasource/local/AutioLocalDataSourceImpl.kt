@@ -236,6 +236,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
         executor.execute {
             storyDao.clearUserData()
             storyDao.clearTable()
+            //TODO(should we have this method? userDao.clearUserData())
         }
     }
 

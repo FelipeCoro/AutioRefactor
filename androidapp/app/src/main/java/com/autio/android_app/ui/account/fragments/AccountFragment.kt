@@ -183,7 +183,7 @@ class AccountFragment : Fragment() {
 
             btnCancelUpdate.setOnClickListener {
                 llUpdateProfileButtons.visibility = GONE
-                getUserInfo()
+                //TODO(Understand why this was here) getUserInfo()
             }
         }
     }
@@ -307,25 +307,25 @@ class AccountFragment : Fragment() {
      // })
     }
 
-    private fun getUserInfo() {
-        name = prefRepository.userName.trim()
-        email = prefRepository.userEmail
-        val email = prefRepository.userEmail
-        binding.etName.setText(name)
-        binding.etEmail.setText(email)
-    }
+//  private fun getUserInfo() {
+//      name = prefRepository.userName.trim()
+//      email = prefRepository.userEmail
+//      val email = prefRepository.userEmail
+//      binding.etName.setText(name)
+//      binding.etEmail.setText(email)
+//  }
 
-    private fun prepareView() {
+//  private fun prepareView() {
 
 
-        val isGuest = prefRepository.isUserGuest
-        binding.scrollViewAccount.isGone = isGuest
-        binding.linearLayoutSignIn.isVisible = isGuest
+//      val isGuest = prefRepository.isUserGuest
+//      binding.scrollViewAccount.isGone = isGuest
+//      binding.linearLayoutSignIn.isVisible = isGuest
 
-        if (!isGuest) {
-            getUserInfo()
-        }
-    }
+//      if (!isGuest) {
+//          getUserInfo()
+//      }
+//  }
 
     private fun bindListeners() {
         binding.btnSignIn.setOnClickListener {
@@ -375,7 +375,7 @@ class AccountFragment : Fragment() {
         purchaseViewModel.logOut()
 
         // Clears shared preferences user's data
-        prefRepository.clearData()
+       // prefRepository.clearData()
         gotoLoginFragment()
 
     }

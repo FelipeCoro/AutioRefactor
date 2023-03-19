@@ -172,10 +172,7 @@ class DownloadedStoriesFragment : Fragment() {
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            prefRepository,
-            requireActivity(), true
-        ) {
+        ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 PlaylistOption.REMOVE -> {

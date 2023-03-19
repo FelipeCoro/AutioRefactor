@@ -107,15 +107,13 @@ class MapFragmentViewModel @Inject constructor(
         }
     }
 
-    fun fetchRecordsOfStories(userId: Int, apiToken: String) {
+    fun fetchRecordsOfStories() {
         viewModelScope.launch(coroutineDispatcher) {
             _storiesInScreen.value?.let { stories ->
                 if (stories.isEmpty()) return@launch
                 val storiesWithoutRecords = stories.filter { it.recordUrl.isEmpty() }
                 if (storiesWithoutRecords.isNotEmpty()) {
                     autioRepository.getStoriesByIds(
-                        userId,
-                        apiToken,
                         storiesWithoutRecords.map { it.id })
                 }
             }

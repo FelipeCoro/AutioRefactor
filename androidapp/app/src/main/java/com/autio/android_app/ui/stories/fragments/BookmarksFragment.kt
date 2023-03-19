@@ -77,7 +77,7 @@ class BookmarksFragment : Fragment() {
                 )
             }, ::optionClicked
         )
-        storyViewModel.getBookmarkedStoriesByIds(prefRepository.userId, prefRepository.userApiToken)
+        storyViewModel.getBookmarkedStoriesByIds()
 
         recyclerView.adapter = storyAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -177,7 +177,7 @@ class BookmarksFragment : Fragment() {
     ) {
         when (option) {
             StoryOption.DELETE -> {
-                storyViewModel.removeBookmarkFromStory(prefRepository.userId,prefRepository.userApiToken,story.id)
+                storyViewModel.removeBookmarkFromStory(story.id)
                 binding.pbLoadingProcess.visibility = View.GONE
                 showFeedbackSnackBar("Removed Bookmark")
                 navController.navigate(R.id.action_bookmarks_playlist_to_my_stories)
@@ -201,8 +201,7 @@ class BookmarksFragment : Fragment() {
 
 
         private fun onPlaylistOptionClicked(option: PlaylistOption) {
-            showPaywallOrProceedWithNormalProcess(
-                prefRepository,
+            ShowPaywallOrProceedWithNormalProcess(
                 requireActivity(), true
             ) {
                 binding.pbLoadingProcess.visibility = View.VISIBLE

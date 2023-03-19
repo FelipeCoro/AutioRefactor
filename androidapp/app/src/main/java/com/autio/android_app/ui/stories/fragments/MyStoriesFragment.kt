@@ -78,6 +78,4 @@ class MyStoriesFragment : Fragment() {
         findNavController().navigate(R.id.action_my_stories_to_authentication_nav)
         (activity as BottomNavigation).finish()
     }
-
-    private fun isUserGuest(): Boolean = prefRepository.isUserGuest
 }

@@ -61,9 +61,6 @@ class BottomNavigationViewModel @Inject constructor(
     private val _bottomNavigationViewState = MutableLiveData<BottomNavigationViewState>()
     val bottomNavigationViewState: LiveData<BottomNavigationViewState> = _bottomNavigationViewState
 
-    val initialRemainingStories = prefRepository.remainingStories
-    val remainingStoriesLiveData = prefRepository.remainingStoriesLiveData
-
     private val storiesJob = SupervisorJob()
     fun setPayWallVisible(isVisible: Boolean) {
         isPayWallVisible.set(isVisible)
@@ -131,8 +128,6 @@ class BottomNavigationViewModel @Inject constructor(
                 val networkInfo = connectivityManager.activeNetwork
                 val network = getNetworkStatus(networkInfo, connectivityManager)
                 autioRepository.postStoryPlayed(
-                    prefRepository.userId,
-                    prefRepository.userApiToken,
                     storyToPost,
                     wasPresent = true,
                     autoPlay = true,

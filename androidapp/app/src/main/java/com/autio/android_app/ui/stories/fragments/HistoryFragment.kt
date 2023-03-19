@@ -95,7 +95,7 @@ class HistoryFragment : Fragment() {
             R.id.activity_layout
         )
 
-        storyViewModel.getHistory(prefRepository.userId,prefRepository.userApiToken)
+        storyViewModel.getHistory()
     }
 
     private fun bindObservers() {
@@ -174,9 +174,7 @@ class HistoryFragment : Fragment() {
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
     ) {
-        showPaywallOrProceedWithNormalProcess(
-            prefRepository, requireActivity(), isActionExclusiveForSignedInUser = true
-        ) {
+        ShowPaywallOrProceedWithNormalProcess(requireActivity(), isActionExclusiveForSignedInUser = true) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 PlaylistOption.DOWNLOAD -> {
