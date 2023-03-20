@@ -26,7 +26,7 @@
     <string name="autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"><![CDATA[Autio offers 30 Day & 3 Year\nplans that don’t automatically renew,\nas well as an annual subscription.]]></string>
     <string name="see_plans">See Plans</string>
     <string name="up_next">Up Next</string>
-    <string name="my_stories_user_not_logged_message">You’ll need a subscription to create playlists, as well as bookmark, favorite, or download stories.</string>
+    <string name="my_stories_user_not_logged_message">You’ll need a subscription to create playlists, as well as bookmark, favorites, or download stories.</string>
     <string name="coming_soon_message">Very soon you’ll be able to create playlists, as well as bookmark, favorite, or download stories!</string>
     <string name="search">Search</string>
     <string name="most_popular">MOST POPULAR</string>
@@ -209,6 +209,9 @@
     <string name="emailOnAnotherAccount">The mail is already used by another account</string>
     <string name="account_fragment_password_has_been_updated">Password has been updated</string>
     <string name="account_fragment_give_autio_url">https://app.autio.com/give</string>
+    <string name="autio_app_url">https://app.autio.com</string>
+    <string name="autio_support_email" translatable="false">support@autio.com</string>
+    <string name="autio_email_subject_customer_support">Autio Android Customer Support</string>
     /string>
 
 

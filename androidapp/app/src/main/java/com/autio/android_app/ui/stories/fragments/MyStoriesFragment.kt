@@ -4,20 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
-import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.NavDeepLinkRequest
 import androidx.navigation.fragment.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentMyStoriesBinding
-import com.autio.android_app.ui.stories.BottomNavigation
-import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
-import com.autio.android_app.util.Constants
+import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.stories.view_model.MyStoriesViewModel
+import com.autio.android_app.ui.stories.view_states.MyStoriesViewState
+import com.autio.android_app.util.bottomNavigationActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,55 +26,68 @@ class MyStoriesFragment : Fragment() {
     @Inject
     lateinit var prefRepository: PrefRepository
     private lateinit var binding: FragmentMyStoriesBinding
-    private val purchaseViewModel: PurchaseViewModel by viewModels()
+    private val viewModel: MyStoriesViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMyStoriesBinding.inflate(inflater, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_stories, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        bindObservables()
         bindListeners()
-        initView()
+        viewModel.initView()
     }
 
-    private fun initView() {
-       val isUser = isUserGuest()//TODO(tHIS SHOULD ACTUALLY BE isUserSubcribed [From RevenueCAT])
-      //  val isUser = purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true
+    private fun bindObservables() {
+        viewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
+    }
 
-        binding.lySignIn.isVisible = isUser
-        binding.lyStoriesList.isGone = isUser
-
-        if (!isUser) {
-            val navController = findNavController()
-            binding.llBookmarksPlaylist.setOnClickListener {
-                navController.navigate(R.id.action_my_stories_to_bookmarks_playlist)
-            }
-            binding.llFavoritesPlaylist.setOnClickListener {
-                navController.navigate(R.id.action_my_stories_to_favorites_playlist)
-            }
-            binding.llHistoryPlaylist.setOnClickListener {
-                navController.navigate(R.id.action_my_stories_to_history_playlist)
-            }
-            binding.llDownloadedPlaylist.setOnClickListener {
-                navController.navigate(R.id.action_my_stories_to_downloaded_playlist)
+    private fun handleViewState(myStoriesViewState: MyStoriesViewState?) {
+        myStoriesViewState?.let { viewState ->
+            when (viewState) {
+                is MyStoriesViewState.OnGetUser -> handleGetUser(viewState.user)
+                is MyStoriesViewState.OnGetUserFailed -> handleGetUserFailed()
             }
         }
     }
 
+    private fun handleGetUser(user: User) {
+        binding.signInLayout.root.isVisible = user.isGuest && !user.isPremiumUser
+        binding.myStoriesList.root.isGone = user.isPremiumUser
+    }
+
+    private fun handleGetUserFailed() {
+        binding.signInLayout.root.isVisible = false
+        binding.myStoriesList.root.isVisible = false
+    }
+
     private fun bindListeners() {
-        binding.btnSignIn.setOnClickListener { goToSignIn() }
-        binding.btnSignup.setOnClickListener { goToSignUp() }
+        val navController = findNavController()
+        binding.myStoriesList.bookmarks.setOnClickListener {
+            navController.navigate(R.id.action_my_stories_to_bookmarks_playlist)
+        }
+        binding.myStoriesList.favorites.setOnClickListener {
+            navController.navigate(R.id.action_my_stories_to_favorites_playlist)
+        }
+        binding.myStoriesList.history.setOnClickListener {
+            navController.navigate(R.id.action_my_stories_to_history_playlist)
+        }
+        binding.myStoriesList.downloadedFavorites.setOnClickListener {
+            navController.navigate(R.id.action_my_stories_to_downloaded_playlist)
+        }
+        binding.signInLayout.btnSignIn.setOnClickListener { goToSignIn() }
+        binding.signInLayout.btnSignup.setOnClickListener { goToSignUp() }
     }
 
     private fun goToSignIn() {
         findNavController().navigate(R.id.action_my_stories_to_authentication_nav)
-        (activity as BottomNavigation).finish()
+        bottomNavigationActivity?.finish()
     }
 
     private fun goToSignUp() {
         findNavController().navigate(R.id.action_my_stories_to_authentication_nav)
-        (activity as BottomNavigation).finish()
+        bottomNavigationActivity?.finish()
     }
 }

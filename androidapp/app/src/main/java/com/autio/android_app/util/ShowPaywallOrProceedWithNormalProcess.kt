@@ -3,12 +3,8 @@ package com.autio.android_app.util
 import android.app.Activity
 import android.util.Log
 import com.autio.android_app.domain.repository.AutioRepository
-import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class ShowPaywallOrProceedWithNormalProcess(
@@ -30,7 +26,7 @@ class ShowPaywallOrProceedWithNormalProcess(
                 } else {
                     try {
                         if (user != null) {
-                            if ((isActionExclusiveForSignedInUser && user.isGuest) || user.remainingStories <= 0) {
+                            if ((isActionExclusiveForSignedInUser && user.isGuest) || (user.remainingStories <= 0)) {
                                 showPaywall(activity)
                             } else {
                                 normalProcess.invoke()

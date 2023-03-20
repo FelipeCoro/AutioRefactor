@@ -9,9 +9,8 @@ import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
-import androidx.fragment.app.viewModels
+import com.autio.android_app.R
 import com.autio.android_app.ui.stories.BottomNavigation
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.getCustomerInfoWith
 import java.util.*
@@ -65,8 +64,11 @@ fun writeEmailToCustomerSupport(context: Context) {
     val intent = Intent(Intent.ACTION_SENDTO)
     intent.apply {
         data = Uri.parse("mailto:")
-        putExtra(Intent.EXTRA_EMAIL, arrayOf("support@autio.com"))
-        putExtra(Intent.EXTRA_SUBJECT, "Autio Android Customer Support")
+        putExtra(Intent.EXTRA_EMAIL, arrayOf(context.getString(R.string.autio_support_email)))
+        putExtra(
+            Intent.EXTRA_SUBJECT,
+            context.getString(R.string.autio_email_subject_customer_support)
+        )
         putExtra(
             Intent.EXTRA_TEXT, """                    Device: ${getDeviceData()}
                     Android Version: ${Build.VERSION.SDK_INT}
@@ -81,7 +83,7 @@ fun writeEmailToCustomerSupport(context: Context) {
 fun String.capitalize(): String {
     return replaceFirstChar {
         if (it.isLowerCase()) it.titlecase(Locale.getDefault())
-        else this.toString()
+        else this
     }
 }
 
@@ -89,7 +91,7 @@ fun shareStory(context: Context){  //storyId: Int) {
     val intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(
-            Intent.EXTRA_TEXT, "https://app.autio.com"
+            Intent.EXTRA_TEXT, context.getString(R.string.autio_app_url)
         )
         type = "text/plain"
     }
