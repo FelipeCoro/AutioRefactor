@@ -74,9 +74,7 @@ interface AutioRepository {
 
     suspend fun removeAllDownloads()
 
-    suspend fun removeBookmarkFromStory(
-        storyId: Int
-    )
+    suspend fun removeBookmarkFromStory(storyId: Int)
 
     suspend fun bookmarkStory(storyId: Int)
 
@@ -119,4 +117,6 @@ interface AutioRepository {
         newPassword: String,
         confirmPassword: String
     ): Result<Boolean>
+
+    suspend fun isUserAllowedToPlayStories(): Boolean
 }

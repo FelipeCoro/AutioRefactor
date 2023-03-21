@@ -206,8 +206,8 @@ class PlayerFragmentViewModel @Inject constructor(
 
     fun shareStory() {
         viewModelScope.launch(coroutineDispatcher) {
-            val isPremiumUser = autioRepository.isPremiumUser()
-            if (isPremiumUser) {
+            val userAllowed = autioRepository.isUserAllowedToPlayStories()
+            if (userAllowed) {
                 setViewState(PlayerViewState.OnShareStoriesSuccess)
             } else setViewState(PlayerViewState.OnNotPremiumUser)
         }
@@ -215,8 +215,8 @@ class PlayerFragmentViewModel @Inject constructor(
 
     fun onProgressChanged(progress: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            val isPremiumUser = autioRepository.isPremiumUser()
-            if (isPremiumUser) {
+            val userAllowed = autioRepository.isUserAllowedToPlayStories()
+            if (userAllowed) {
                 setViewState(PlayerViewState.OnChangeProgressSuccess(progress))
             } else setViewState(PlayerViewState.OnNotPremiumUser)
         }
@@ -224,8 +224,8 @@ class PlayerFragmentViewModel @Inject constructor(
 
     fun handleRewindClick() {
         viewModelScope.launch(coroutineDispatcher) {
-            val isPremiumUser = autioRepository.isPremiumUser()
-            if (isPremiumUser) {
+            val userAllowed = autioRepository.isUserAllowedToPlayStories()
+            if (userAllowed) {
                 setViewState(PlayerViewState.OnHandleRewindClickSuccess)
             } else setViewState(PlayerViewState.OnNotPremiumUser)
         }
@@ -235,6 +235,11 @@ class PlayerFragmentViewModel @Inject constructor(
     private fun setViewState(newViewState: PlayerViewState) {
         _playerViewState.postValue(newViewState)
     }
+
+
+
+
+
 }
 
 

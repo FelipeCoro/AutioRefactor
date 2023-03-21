@@ -27,12 +27,10 @@ import com.autio.android_app.ui.onboarding.view_states.OnBoardingViewState.Navig
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.util.PermissionsManager
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class OnBoardingFragment : Fragment() {
 
-    @Inject
     lateinit var permissionsManager: PermissionsManager
     private lateinit var binding: FragmentViewPagerBinding
     private val viewModel: OnBoardingViewModel by viewModels()

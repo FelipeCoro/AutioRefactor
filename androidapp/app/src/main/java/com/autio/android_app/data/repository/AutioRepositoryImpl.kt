@@ -652,6 +652,11 @@ class AutioRepositoryImpl @Inject constructor(
         }
         return Result.failure(Error())
     }
+
+    override suspend fun isUserAllowedToPlayStories(): Boolean {
+        val user = getUserAccount()
+        return user != null && (user.isPremiumUser || (user.isGuest && user.remainingStories > 0))
+    }
 }
 
 

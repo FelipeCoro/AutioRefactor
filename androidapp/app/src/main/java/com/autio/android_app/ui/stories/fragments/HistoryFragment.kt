@@ -163,7 +163,6 @@ class HistoryFragment : Fragment() {
                     option,
                     story,
                     storyViewModel,
-                    prefRepository,
                     verifiedActivity,
                     verifiedContext
                 )

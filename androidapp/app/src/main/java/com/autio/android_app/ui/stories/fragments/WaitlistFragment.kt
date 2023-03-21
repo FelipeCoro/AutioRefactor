@@ -21,7 +21,6 @@ import com.autio.android_app.util.PermissionsManager
 
 class WaitlistFragment : Fragment() {
 
-
     private lateinit var binding: WaitlistWallBinding
     lateinit var permissionsManager: PermissionsManager
 

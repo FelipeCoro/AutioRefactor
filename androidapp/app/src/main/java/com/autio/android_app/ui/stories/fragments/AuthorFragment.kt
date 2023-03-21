@@ -170,7 +170,7 @@ class AuthorFragment : Fragment() {
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(
-                    option, story, storyViewModel, prefRepository, verifiedActivity, verifiedContext
+                    option, story, storyViewModel, verifiedActivity, verifiedContext
                 )
             }
         }

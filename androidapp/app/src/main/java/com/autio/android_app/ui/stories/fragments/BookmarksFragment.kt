@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.contains
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -23,7 +22,10 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.navController
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 
@@ -74,7 +76,6 @@ class BookmarksFragment : Fragment() {
 
     private fun initView() {
         binding.tvToolbarTitle.text = resources.getString(R.string.my_stories_bookmarks)
-
     }
 
     private fun bindObservables() {
@@ -85,12 +86,8 @@ class BookmarksFragment : Fragment() {
         when (viewState) {
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
             is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
-            is StoryViewState.StoryLiked -> showFeedbackSnackBar("Added To Favorites")
-            is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
-            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.FetchedBookmarkedStories -> showAllBookmarkedStories(viewState.stories)
-            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
-            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
+            else -> {}
         }
     }
 
@@ -169,7 +166,6 @@ class BookmarksFragment : Fragment() {
                             option,
                             story,
                             storyViewModel,
-                            prefRepository,
                             verifiedActivity,
                             verifiedContext
                         )
@@ -192,14 +188,5 @@ class BookmarksFragment : Fragment() {
                 }
                 else -> Log.d("BookmarksFragment", "option not available for this playlist")
             }
-        }
-        }
-
-
-        private fun cancelJob() {
-            if (activityLayout.contains(snackBarView)) {
-                activityLayout.removeView(snackBarView)
-            }
-            feedbackJob?.cancel()
         }
     }

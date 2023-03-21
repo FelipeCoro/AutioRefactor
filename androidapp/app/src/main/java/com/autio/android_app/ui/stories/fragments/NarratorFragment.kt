@@ -219,7 +219,6 @@ class NarratorFragment : Fragment() {
                     option,
                     story,
                     storyViewModel,
-                    prefRepository,
                     verifiedActivity,
                     verifiedContext
                 )

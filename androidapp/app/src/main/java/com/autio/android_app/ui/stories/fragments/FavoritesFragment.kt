@@ -10,9 +10,7 @@ import androidx.core.view.contains
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.api.ApiClient
@@ -21,17 +19,17 @@ import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
-import com.autio.android_app.domain.mappers.toDto
 import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
-import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.navController
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -167,7 +165,6 @@ class FavoritesFragment : Fragment() {
                             option,
                             story,
                             storyViewModel,
-                            prefRepository,
                             verifiedActivity,
                             verifiedContext
                         )
@@ -178,9 +175,6 @@ class FavoritesFragment : Fragment() {
     }
 
     private fun onPlaylistOptionClicked(option: PlaylistOption) {
-        ShowPaywallOrProceedWithNormalProcess(
-            requireActivity(), true
-        ) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {
                 PlaylistOption.REMOVE -> {
@@ -195,7 +189,6 @@ class FavoritesFragment : Fragment() {
                     "FavoritesFragment", "option not available for this playlist"
                 )
             }
-        }
     }
 
 

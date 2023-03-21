@@ -22,7 +22,10 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.navController
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showPlaylistOptions
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import javax.inject.Inject
@@ -154,7 +157,6 @@ class DownloadedStoriesFragment : Fragment() {
                             option,
                             story,
                             storyViewModel,
-                            prefRepository,
                             verifiedActivity,
                             verifiedContext
                         )
@@ -165,19 +167,17 @@ class DownloadedStoriesFragment : Fragment() {
     }
 
     private fun onPlaylistOptionClicked(option: PlaylistOption) {
-        ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-            binding.pbLoadingProcess.visibility = View.VISIBLE
-            when (option) {
-                PlaylistOption.REMOVE -> {
-                    storyViewModel.removeAllDownloads()
-                    binding.pbLoadingProcess.visibility = View.GONE
-                    showFeedbackSnackBar("Removed Downloads")
-                    navController.navigate(R.id.action_downloaded_playlist_to_my_stories)
-                }
-                else -> Log.d(
-                    "DownloadedStoriesFragment", "option not available for this playlist"
-                )
+        binding.pbLoadingProcess.visibility = View.VISIBLE
+        when (option) {
+            PlaylistOption.REMOVE -> {
+                storyViewModel.removeAllDownloads()
+                binding.pbLoadingProcess.visibility = View.GONE
+                showFeedbackSnackBar("Removed Downloads")
+                navController.navigate(R.id.action_downloaded_playlist_to_my_stories)
             }
+            else -> Log.d(
+                "DownloadedStoriesFragment", "option not available for this playlist"
+            )
         }
     }
 

@@ -3,7 +3,6 @@ package com.autio.android_app.ui.stories.view_model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
@@ -13,6 +12,7 @@ import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.google.android.gms.maps.model.LatLngBounds
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -134,10 +134,14 @@ class StoryViewModel @Inject constructor(
 
     fun removeAllDownloads() {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeAllDownloads()
+            val userAllowed = autioRepository.isUserAllowedToPlayStories()
+            if (userAllowed) {
+                autioRepository.removeAllDownloads()
+            } else {
+                setViewState(StoryViewState.OnNotPremiumUser)
+            }
         }
     }
-
 
     fun bookmarkStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {

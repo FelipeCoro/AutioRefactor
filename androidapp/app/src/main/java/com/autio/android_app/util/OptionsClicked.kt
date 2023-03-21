@@ -14,13 +14,11 @@ fun Fragment.onOptionClicked(
     option: StoryOption,
     story: Story,
     storyViewModel: StoryViewModel,
-    prefRepository: PrefRepository,
     activity: Activity,
     context: Context
 ) {
     when (option) {
         //   StoryOption.BOOKMARK -> {
-
         //       storyViewModel.bookmarkStory(
         //           prefRepository.userId,
         //           prefRepository.userApiToken,
@@ -28,13 +26,13 @@ fun Fragment.onOptionClicked(
         //       )
         //   }
         //   StoryOption.REMOVE_BOOKMARK -> {
-
         //       storyViewModel.removeBookmarkFromStory(
         //           prefRepository.userId,
         //           prefRepository.userApiToken,
         //           story.id
         //       )
         //   }
+
         //   StoryOption.LIKE -> {
 
         //       storyViewModel.giveLikeToStory(

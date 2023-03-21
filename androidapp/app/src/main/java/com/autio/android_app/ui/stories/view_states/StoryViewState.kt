@@ -38,6 +38,7 @@ sealed interface StoryViewState {
     object FailedStoryRemoved : StoryViewState
     data class StoryLikesCount(val storyLikesCount: Int) : StoryViewState
     object FailedStoryLikesCount : StoryViewState
+    object OnNotPremiumUser : StoryViewState
 
     data class IsStoryLiked(val isLiked: Boolean) : StoryViewState
 

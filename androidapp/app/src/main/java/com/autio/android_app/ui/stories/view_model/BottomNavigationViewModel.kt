@@ -30,7 +30,6 @@ import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
-import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -281,17 +280,15 @@ class BottomNavigationViewModel @Inject constructor(
         val transportControls = playerServiceConnection.transportControls
         mediaPosition.value?.let {
             transportControls.seekTo(
-                0L.coerceAtLeast(
-                    it.toLong() - 15000
-                )
+                0L.coerceAtLeast(it.toLong() - 15000)
             )
         }
     }
 
     fun skipToNextStory() {
         viewModelScope.launch(coroutineDispatcher) {
-            val isPremiumUser = autioRepository.isPremiumUser()
-            if (!isPremiumUser) {
+            val user = autioRepository.getUserAccount()
+            if (user != null && !isUserAllowedToPlayStories(user)) {
                 setViewState(BottomNavigationViewState.OnNotPremiumUser)
             } else {
                 val transportControls = playerServiceConnection.transportControls
@@ -312,8 +309,8 @@ class BottomNavigationViewModel @Inject constructor(
 
     fun shouldPlayMedia(id: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            val isPremiumUser = autioRepository.isPremiumUser()
-            if (isPremiumUser) {
+            val isUserAllowed = autioRepository.isUserAllowedToPlayStories()
+            if (isUserAllowed) {
                 setViewState(BottomNavigationViewState.OnPlayMediaSuccess(id))
             } else setViewState(BottomNavigationViewState.OnNotPremiumUser)
         }
