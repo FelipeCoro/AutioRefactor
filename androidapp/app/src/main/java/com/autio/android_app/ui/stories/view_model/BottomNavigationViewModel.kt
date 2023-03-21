@@ -30,6 +30,7 @@ import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
+import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -290,9 +291,9 @@ class BottomNavigationViewModel @Inject constructor(
     fun skipToNextStory() {
         viewModelScope.launch(coroutineDispatcher) {
             val isPremiumUser = autioRepository.isPremiumUser()
-            if (!isPremiumUser){
-                setViewState(BottomNavigationViewState.OnUserNotPremium)
-            }else {
+            if (!isPremiumUser) {
+                setViewState(BottomNavigationViewState.OnNotPremiumUser)
+            } else {
                 val transportControls = playerServiceConnection.transportControls
                 transportControls.skipToNext()
             }
@@ -307,6 +308,15 @@ class BottomNavigationViewModel @Inject constructor(
     // TODO: Add items to queue
     fun addMediaToQueue() {
         val transportControls = playerServiceConnection.transportControls
+    }
+
+    fun shouldPlayMedia(id: Int) {
+        viewModelScope.launch(coroutineDispatcher) {
+            val isPremiumUser = autioRepository.isPremiumUser()
+            if (isPremiumUser) {
+                setViewState(BottomNavigationViewState.OnPlayMediaSuccess(id))
+            } else setViewState(BottomNavigationViewState.OnNotPremiumUser)
+        }
     }
 
 // Backend calls
@@ -352,16 +362,16 @@ class BottomNavigationViewModel @Inject constructor(
         }
     }
 
- // private suspend fun setBookmarksToStories() {
- //     withContext(coroutineDispatcher) {
+    // private suspend fun setBookmarksToStories() {
+    //     withContext(coroutineDispatcher) {
 
- //         val userBookmarkedStories = autioRepository.getUserBookmarks(
- //             prefRepository.userId
- //         )
- //         //TODO(CHECK THIS)
- //         autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it })
- //     }
- // }
+    //         val userBookmarkedStories = autioRepository.getUserBookmarks(
+    //             prefRepository.userId
+    //         )
+    //         //TODO(CHECK THIS)
+    //         autioRepository.setBookmarksDataToLocalStories(userBookmarkedStories.map { it })
+    //     }
+    // }
 
     private suspend fun setLikesToStories() {
         //withContext(coroutineDispatcher) {

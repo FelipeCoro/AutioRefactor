@@ -174,37 +174,37 @@ class HistoryFragment : Fragment() {
     private fun onPlaylistOptionClicked(
         option: PlaylistOption
     ) {
-        ShowPaywallOrProceedWithNormalProcess(requireActivity(), isActionExclusiveForSignedInUser = true) {
-            binding.pbLoadingProcess.visibility = View.VISIBLE
-            when (option) {
-                PlaylistOption.DOWNLOAD -> {
-
-                    //TODO(Add Method)
-
-                }
-                PlaylistOption.CLEAR_HISTORY -> { //TODO(LOCAL METHOD)
-                    //      FirebaseStoryRepository.removeWholeUserHistory(prefRepository.firebaseKey,
-                    //          onSuccessListener = {
-                    //              storyViewModel.clearStoryHistory()
-                    //              binding.pbLoadingProcess.visibility = View.GONE
-                    //              showFeedbackSnackBar(
-                    //                  "Cleared History"
-                    //              )
-                    //          },
-                    //          onFailureListener = {
-                    //              binding.pbLoadingProcess.visibility = View.GONE
-                    //              showFeedbackSnackBar(
-                    //                  "Connection Failure"
-                    //              )
-                    //          })
-                }
-                else -> Log.d(
-                    "HistoryFragment", "option not available for this playlist"
-                )
+        binding.pbLoadingProcess.visibility = View.VISIBLE
+        when (option) {
+            PlaylistOption.DOWNLOAD -> {
+                //TODO(Add Method)
             }
+            PlaylistOption.CLEAR_HISTORY -> { //TODO(LOCAL METHOD)
+                //      FirebaseStoryRepository.removeWholeUserHistory(prefRepository.firebaseKey,
+                //          onSuccessListener = {
+                //              storyViewModel.clearStoryHistory()
+                //              binding.pbLoadingProcess.visibility = View.GONE
+                //              showFeedbackSnackBar(
+                //                  "Cleared History"
+                //              )
+                //          },
+                //          onFailureListener = {
+                //              binding.pbLoadingProcess.visibility = View.GONE
+                //              showFeedbackSnackBar(
+                //                  "Connection Failure"
+                //              )
+                //          })
+            }
+            else -> Log.d(
+                "HistoryFragment", "option not available for this playlist"
+            )
         }
     }
 
+
+    private fun handlePlaylistOptionsSuccess() {
+
+    }
 
     private fun cancelJob() {
         if (activityLayout.contains(
