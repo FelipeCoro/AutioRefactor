@@ -12,7 +12,7 @@ interface UserDao {
     fun getRemainingStories(): Int
 
     @Insert(onConflict = REPLACE)
-    fun createNewUser(newUser: UserEntity): Long
+    fun createNewUser(newUser: UserEntity)
 
     @Query("UPDATE user_entity SET remainingStories = remainingStories+1")
     fun addListenedStory()

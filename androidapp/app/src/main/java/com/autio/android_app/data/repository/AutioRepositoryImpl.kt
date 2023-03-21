@@ -101,7 +101,9 @@ class AutioRepositoryImpl @Inject constructor(
         val userAccount = getUserAccount()
         kotlin.runCatching {
             val result = autioRemoteDataSource.createGuestAccount()
-            if (result.isSuccessful) result.body() else {
+            if (result.isSuccessful) {
+                result.body()
+            } else {
                 val throwable = Error(result.errorBody().toString())
                 return Result.failure(throwable)
             }

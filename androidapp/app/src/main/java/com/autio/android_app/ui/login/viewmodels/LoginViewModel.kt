@@ -38,8 +38,7 @@ class LoginViewModel @Inject constructor(
                     saveGuestInfo(user)
                     setViewState(LoginViewState.GuestLoginSuccess(user))
                 } ?: setViewState(LoginViewState.LoginError)
-            }
-                .onFailure { setViewState(LoginViewState.LoginError) }
+            }.onFailure { setViewState(LoginViewState.LoginError) }
 
         }
     }
