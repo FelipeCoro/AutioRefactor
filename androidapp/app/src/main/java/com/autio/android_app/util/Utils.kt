@@ -5,14 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import android.widget.EditText
 import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import com.autio.android_app.R
-import com.autio.android_app.ui.stories.BottomNavigation
-import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.getCustomerInfoWith
 import java.util.*
 
 
@@ -87,7 +83,7 @@ fun String.capitalize(): String {
     }
 }
 
-fun shareStory(context: Context){  //storyId: Int) {
+fun shareStory(context: Context) {
     val intent = Intent().apply {
         action = Intent.ACTION_SEND
         putExtra(
@@ -104,38 +100,6 @@ fun openLocationInMapsApp(activity: Activity, latitude: Double, longitude: Doubl
     val mapIntent = Intent(Intent.ACTION_VIEW, intentUri)
     if (mapIntent.resolveActivity(activity.packageManager) != null) {
         activity.startActivity(mapIntent)
-    }
-}
-
-fun showPaywall(activity: Activity) {
-    (activity as BottomNavigation).showPayWall()
-}
-
-fun showPaywallOrProceedWithNormalProcess(
-    isUserGuest: Boolean,
-    remainingStories: Int,
-    activity: Activity,
-    isActionExclusiveForSignedInUser: Boolean = false,
-    normalProcess: () -> Unit
-) {
-
-    Purchases.sharedInstance.getCustomerInfoWith {
-        if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
-            normalProcess.invoke()
-        } else {
-            try {
-                if ((isActionExclusiveForSignedInUser && isUserGuest) || remainingStories <= 0) {
-                    showPaywall(activity)
-                } else {
-                    normalProcess.invoke()
-                }
-            } catch (exception: java.lang.ClassCastException) {
-                Log.e(
-                    "CastException",
-                    "Activity is not a subtype of BottomNavigation"
-                )
-            }
-        }
     }
 }
 

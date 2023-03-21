@@ -58,9 +58,7 @@ fun Fragment.onOptionClicked(
                 activity, story.lat, story.lng
             )
             StoryOption.SHARE -> {
-                shareStory(
-                    context, //story.id
-                )
+                shareStory(context)
             }
             else -> Log.d(
                 "AuthorFragment", "no option available"

@@ -1,7 +1,6 @@
 package com.autio.android_app.ui.stories
 
 import android.Manifest
-import android.app.Activity
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
@@ -30,9 +29,7 @@ import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
-import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.Constants
@@ -116,7 +113,10 @@ class BottomNavigation : AppCompatActivity() {
     }
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
-            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(viewState.story)
+            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(
+                viewState.story
+            )
+            is BottomNavigationViewState.OnUserNotPremium -> showPayWall()
             else -> {}
         }
     }
@@ -192,7 +192,7 @@ class BottomNavigation : AppCompatActivity() {
 
 
     fun showPayWall() {
-       // navController.navigate(R.id.subscribeFragment) //TODO(Need to comment this back once payments is working)
+        navController.navigate(R.id.subscribeFragment)
         hidePlayerComponent()
     }
 
@@ -291,7 +291,6 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun showPlayerComponent() {
-
         binding.persistentPlayer.visibility = VISIBLE
         binding.persistentPlayer.animate().alpha(1.0f)
             //TODO(FIX ANIMATION )

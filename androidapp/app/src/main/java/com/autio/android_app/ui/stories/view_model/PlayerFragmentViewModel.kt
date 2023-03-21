@@ -11,10 +11,13 @@ import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.extensions.*
 import com.autio.android_app.player.EMPTY_PLAYBACK_STATE
 import com.autio.android_app.player.PlayerServiceConnection
+import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -22,7 +25,9 @@ import javax.inject.Inject
 class PlayerFragmentViewModel @Inject constructor(
     private val prefRepository: PrefRepository,
     private val autioRepository: AutioRepository,
-    playerServiceConnection: PlayerServiceConnection
+    playerServiceConnection: PlayerServiceConnection,
+    @IoDispatcher
+    private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
 
@@ -197,6 +202,19 @@ class PlayerFragmentViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun shareStory() {
+        viewModelScope.launch(coroutineDispatcher) {
+            val isPremiumUser = autioRepository.isPremiumUser()
+            if (isPremiumUser) {
+                setViewState(PlayerViewState.OnShareStoriesSuccess)
+            } else setViewState(PlayerViewState.OnShareStoryFailedNotPremiumUser)
+        }
+    }
+
+    private fun setViewState(newViewState: PlayerViewState) {
+        _playerViewState.postValue(newViewState)
     }
 }
 

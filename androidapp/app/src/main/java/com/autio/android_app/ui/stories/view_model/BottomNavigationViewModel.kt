@@ -32,11 +32,8 @@ import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -282,8 +279,15 @@ class BottomNavigationViewModel @Inject constructor(
     }
 
     fun skipToNextStory() {
-        val transportControls = playerServiceConnection.transportControls
-        transportControls.skipToNext()
+        viewModelScope.launch(coroutineDispatcher) {
+            val isPremiumUser = autioRepository.isPremiumUser()
+            if (!isPremiumUser){
+                setViewState(BottomNavigationViewState.OnUserNotPremium)
+            }else {
+                val transportControls = playerServiceConnection.transportControls
+                transportControls.skipToNext()
+            }
+        }
     }
 
     fun setPlaybackPosition(progress: Int) {

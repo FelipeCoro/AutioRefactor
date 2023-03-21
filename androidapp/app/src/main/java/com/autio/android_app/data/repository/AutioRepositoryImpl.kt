@@ -35,8 +35,12 @@ class AutioRepositoryImpl @Inject constructor(
     private val autioRemoteDataSource: AutioRemoteDataSource,
     private val autioLocalDataSource: AutioLocalDataSource,
     //private val prefRepository: PrefRepository,
-    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher,
 ) : AutioRepository {
+
+    override suspend fun isPremiumUser(): Boolean {
+        return getUserAccount()?.isPremiumUser ?: false
+    }
 
     override val userCategories: Flow<List<Category>> =
         autioLocalDataSource.userCategories.transform { entities ->

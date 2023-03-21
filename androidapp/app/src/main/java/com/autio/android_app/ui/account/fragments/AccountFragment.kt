@@ -7,7 +7,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.ViewGroup
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -37,7 +36,6 @@ import com.autio.android_app.util.checkEmptyField
 import com.autio.android_app.util.openUrl
 import com.autio.android_app.util.pleaseFillText
 import com.autio.android_app.util.showError
-import com.autio.android_app.util.showPaywall
 import com.autio.android_app.util.showToast
 import com.autio.android_app.util.writeEmailToCustomerSupport
 import com.bumptech.glide.Glide
@@ -153,9 +151,7 @@ class AccountFragment : Fragment() {
             }
 
             tvManageSubscription.setOnClickListener {
-                if (activity != null) {
-                    showPaywall(requireActivity())
-                }
+                bottomNavigationActivity?.showPayWall()
             }
 
            // btnSendDiscount.setOnClickListener {

@@ -1,6 +1,5 @@
 package com.autio.android_app.ui.stories.fragments
 
-import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Paint
 import android.location.Address
@@ -31,8 +30,15 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.Constants
+import com.autio.android_app.util.bottomNavigationActivity
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.shareStory
+import com.autio.android_app.util.showFeedbackSnackBar
+import com.autio.android_app.util.showToast
+import com.autio.android_app.util.writeEmailToCustomerSupport
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -111,9 +117,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         return binding.root
     }
 
-    override fun onViewCreated(
-        view: View, savedInstanceState: Bundle?
-    ) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(
             view, savedInstanceState
         )
@@ -194,9 +198,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnNext.setOnClickListener {
-            ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-                bottomNavigationViewModel.skipToNextStory()
-            }
+            bottomNavigationViewModel.skipToNextStory()
         }
 
         binding.tvNowPlayingDuration.text = NowPlayingMetadata.timestampToMSS(
@@ -210,6 +212,24 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
     private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleStoryViewState)
+        playerFragmentViewModel.playerViewState.observe(viewLifecycleOwner, ::handlePlayerViewState)
+    }
+
+    private fun handlePlayerViewState(playerViewState: PlayerViewState?) {
+        playerViewState?.let { viewState ->
+            when (viewState) {
+                is PlayerViewState.OnNotPremiumUser -> handleNotPremiumUser()
+                is PlayerViewState.OnShareStoriesSuccess -> handleShareStory()
+            }
+        }
+    }
+
+    private fun handleShareStory() {
+        shareStory(requireContext())
+    }
+
+    private fun handleNotPremiumUser() {
+        bottomNavigationActivity?.showPayWall()
     }
 
     private fun handleStoryViewState(viewState: StoryViewState?) {
@@ -403,11 +423,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 text = story.description
             }
             btnShare.setOnClickListener {
-                ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-                    shareStory(
-                        requireContext(), //story.id can be set to be passed as a value for the autio link but story sharing is disabled atm
-                    )
-                }
+                playerFragmentViewModel.shareStory()
             }
             btnFeedback.setOnClickListener {
                 writeEmailToCustomerSupport(
@@ -525,9 +541,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         return stateCode ?: ""
     }
 
-    private fun optionClicked(
-        option: StoryOption, story: Story
-    ) {
+    private fun optionClicked(option: StoryOption, story: Story) {
         activity?.let { verifiedActivity ->
             context?.let { verifiedContext ->
                 onOptionClicked(

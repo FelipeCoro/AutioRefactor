@@ -5,19 +5,16 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.contains
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
-import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
@@ -28,8 +25,6 @@ import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -169,9 +164,7 @@ class DownloadedStoriesFragment : Fragment() {
         }
     }
 
-    private fun onPlaylistOptionClicked(
-        option: PlaylistOption
-    ) {
+    private fun onPlaylistOptionClicked(option: PlaylistOption) {
         ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
             binding.pbLoadingProcess.visibility = View.VISIBLE
             when (option) {

@@ -20,6 +20,7 @@ interface AutioRepository {
     val userCategories: Flow<List<Category>>
     val favoriteStories: Flow<List<Story>>
     val history: Flow<List<Story>>
+    suspend fun isPremiumUser(): Boolean
 
     suspend fun createAccount(accountRequest: AccountRequest): Result<User>
     suspend fun login(loginRequest: LoginRequest): Result<User>
