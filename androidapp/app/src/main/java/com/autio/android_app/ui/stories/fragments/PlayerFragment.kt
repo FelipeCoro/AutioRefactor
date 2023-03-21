@@ -184,9 +184,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnRewind.setOnClickListener {
-            ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-                bottomNavigationViewModel.rewindFifteenSeconds()
-            }
+           playerFragmentViewModel.handleRewindClick()
         }
 
         binding.btnPlay.setOnClickListener {
@@ -220,12 +218,17 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             when (viewState) {
                 is PlayerViewState.OnNotPremiumUser -> handleNotPremiumUser()
                 is PlayerViewState.OnShareStoriesSuccess -> handleShareStory()
+                is PlayerViewState.OnChangeProgressSuccess -> handleProgressChange(viewState.progress)
+                is PlayerViewState.OnHandleRewindClickSuccess -> handleRewindClickSuccess()
             }
         }
     }
 
     private fun handleShareStory() {
         shareStory(requireContext())
+    }
+    private fun handleRewindClickSuccess(){
+        bottomNavigationViewModel.rewindFifteenSeconds()
     }
 
     private fun handleNotPremiumUser() {
@@ -346,18 +349,13 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 ) {
                 }
 
-                override fun onProgressChanged(
-                    seekBar: SeekBar?, progress: Int, fromUser: Boolean
-                ) {
+                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                     if (fromUser) {
-                        ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-                            bottomNavigationViewModel.setPlaybackPosition(
-                                progress
-                            )
-                        }
+                        playerFragmentViewModel.onProgressChanged(progress)
                     }
                 }
             })
+
             storyViewModel.isStoryLiked(storyId)
             tvStoryTitle.text = story.title
             tvStoryAuthor.apply {
@@ -462,6 +460,10 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             tvStoryDescription.visibility = View.GONE
             mapCard.visibility = View.GONE
         }
+    }
+
+    private fun handleProgressChange(progress : Int){
+        bottomNavigationViewModel.setPlaybackPosition(progress)
     }
 
     override fun onMapReady(

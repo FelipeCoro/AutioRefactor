@@ -116,7 +116,7 @@ class BottomNavigation : AppCompatActivity() {
             is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(
                 viewState.story
             )
-            is BottomNavigationViewState.OnUserNotPremium -> showPayWall()
+            is BottomNavigationViewState.OnNotPremiumUser -> showPayWall()
             else -> {}
         }
     }

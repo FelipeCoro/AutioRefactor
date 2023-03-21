@@ -24,6 +24,7 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.NarratorViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
+import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import com.autio.android_app.ui.stories.view_states.NarratorViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.*
@@ -81,11 +82,7 @@ class NarratorFragment : Fragment() {
         recyclerView = binding.rvNarratorStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                ShowPaywallOrProceedWithNormalProcess(requireActivity(), true) {
-                    bottomNavigationViewModel.playMediaId(
-                        id
-                    )
-                }
+                bottomNavigationViewModel.shouldPlayMedia(id)
             }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
@@ -114,6 +111,7 @@ class NarratorFragment : Fragment() {
     private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleStoryViewState)
         narratorViewModel.narratorViewState.observe(viewLifecycleOwner, ::handleNarratorViewState)
+        bottomNavigationViewModel.bottomNavigationViewState.observe(viewLifecycleOwner, ::handleBottomNavViewState)
     }
 
     private fun handleStoryViewState(viewState: StoryViewState?) {
@@ -127,6 +125,17 @@ class NarratorFragment : Fragment() {
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
+    }
+
+    private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
+        when (viewState) {
+            is BottomNavigationViewState.OnPlayMediaSuccess -> handlePLayMediaSuccess(viewState.id)
+            else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
+        }
+    }
+
+    private fun handlePLayMediaSuccess(id:Int){
+        bottomNavigationViewModel.playMediaId(id)
     }
 
     private fun handleNarratorViewState(viewState: NarratorViewState?) {
@@ -217,6 +226,7 @@ class NarratorFragment : Fragment() {
             }
         }
     }
+
     private fun cancelJob() {
         if (activityLayout.contains(
                 snackBarView
