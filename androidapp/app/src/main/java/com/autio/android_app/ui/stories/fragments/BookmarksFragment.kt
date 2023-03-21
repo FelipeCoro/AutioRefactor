@@ -11,18 +11,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
-import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.PlaylistOption
 import com.autio.android_app.data.api.model.StoryOption
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
-import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
@@ -30,8 +26,6 @@ import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class BookmarksFragment : Fragment() {
@@ -44,14 +38,6 @@ class BookmarksFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
-
-    //TODO(Remove rep calls)
-    @Inject
-    lateinit var prefRepository: PrefRepository
-
-    //TODO(Move service calls)
-    @Inject
-    lateinit var apiClient: ApiClient
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -71,11 +57,7 @@ class BookmarksFragment : Fragment() {
 
         recyclerView = binding.rvStories
         storyAdapter = DownloadedStoryAdapter(
-            onStoryPlay = { id ->
-                bottomNavigationViewModel.playMediaId(
-                    id
-                )
-            }, ::optionClicked
+            { id -> bottomNavigationViewModel.playMediaId(id) }, ::optionClicked
         )
         storyViewModel.getBookmarkedStoriesByIds()
 
@@ -172,9 +154,7 @@ class BookmarksFragment : Fragment() {
     }
 
 
-    private fun optionClicked(
-        option: StoryOption, story: Story
-    ) {
+    private fun optionClicked(option: StoryOption, story: Story) {
         when (option) {
             StoryOption.DELETE -> {
                 storyViewModel.removeBookmarkFromStory(story.id)
@@ -201,20 +181,18 @@ class BookmarksFragment : Fragment() {
 
 
         private fun onPlaylistOptionClicked(option: PlaylistOption) {
-            ShowPaywallOrProceedWithNormalProcess(
-                requireActivity(), true
-            ) {
-                binding.pbLoadingProcess.visibility = View.VISIBLE
-                when (option) {
-                    PlaylistOption.REMOVE -> {
-                        storyViewModel.removeAllBookmarks()
-                        binding.pbLoadingProcess.visibility = View.GONE
-                        showFeedbackSnackBar("Removed Bookmarks")
-                        navController.navigate(R.id.action_bookmarks_playlist_to_my_stories)
-                    }
-                    else -> Log.d("BookmarksFragment", "option not available for this playlist")
+
+            binding.pbLoadingProcess.visibility = View.VISIBLE
+            when (option) {
+                PlaylistOption.REMOVE -> {
+                    storyViewModel.removeAllBookmarks()
+                    binding.pbLoadingProcess.visibility = View.GONE
+                    showFeedbackSnackBar("Removed Bookmarks")
+                    navController.navigate(R.id.action_bookmarks_playlist_to_my_stories)
                 }
+                else -> Log.d("BookmarksFragment", "option not available for this playlist")
             }
+        }
         }
 
 

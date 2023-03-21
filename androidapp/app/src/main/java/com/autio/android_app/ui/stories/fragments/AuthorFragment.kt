@@ -22,7 +22,9 @@ import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.*
+import com.autio.android_app.util.onOptionClicked
+import com.autio.android_app.util.openUrl
+import com.autio.android_app.util.showFeedbackSnackBar
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import dagger.hilt.android.AndroidEntryPoint
@@ -83,11 +85,7 @@ class AuthorFragment : Fragment() {
         recyclerView = binding.rvAuthorStories
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                ShowPaywallOrProceedWithNormalProcess(
-                    requireActivity(), true
-                ) {
                     bottomNavigationViewModel.playMediaId(id)
-                }
             }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
@@ -95,9 +93,7 @@ class AuthorFragment : Fragment() {
             requireContext()
         )
 
-        val storyId = arguments?.getInt(
-            STORY_ID_ARG
-        )
+        val storyId = arguments?.getInt(STORY_ID_ARG)
 
         activityLayout = requireActivity().findViewById(R.id.activity_layout)
 

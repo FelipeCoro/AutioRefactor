@@ -28,6 +28,7 @@ import com.autio.android_app.player.MediaItemData
 import com.autio.android_app.player.PlayerServiceConnection
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import com.autio.android_app.util.POSITION_UPDATE_INTERVAL_MILLIS
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -233,39 +234,47 @@ class BottomNavigationViewModel @Inject constructor(
 
 
     fun playMediaId(mediaId: Int) {
-        val nowPlaying = playerServiceConnection.nowPlaying.value
-        val transportControls = playerServiceConnection.transportControls
-        val isPrepared = playerServiceConnection.playbackState.value?.isPrepared ?: false
-        if (isPrepared && mediaId == nowPlaying?.id) {
-            playerServiceConnection.playbackState.value?.let { playbackState ->
-                when {
-                    playbackState.isPlaying -> transportControls.pause()
-                    playbackState.isPlayEnabled -> transportControls.play()
-                    else -> {
-                        Log.w(
-                            "BottomNavigationViewModel",
-                            "Playable item clicked but neither play nor pause are enabled! (mediaId=$mediaId)"
-                        )
+        viewModelScope.launch {
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserAllowedToPlayStories(user)) {
+                val nowPlaying = playerServiceConnection.nowPlaying.value
+                val transportControls = playerServiceConnection.transportControls
+                val isPrepared = playerServiceConnection.playbackState.value?.isPrepared ?: false
+                if (isPrepared && mediaId == nowPlaying?.id) {
+                    playerServiceConnection.playbackState.value?.let { playbackState ->
+                        when {
+                            playbackState.isPlaying -> transportControls.pause()
+                            playbackState.isPlayEnabled -> transportControls.play()
+                            else -> {
+                                Log.w(
+                                    "BottomNavigationViewModel",
+                                    "Playable item clicked but neither play nor pause are enabled! (mediaId=$mediaId)"
+                                )
+                            }
+                        }
                     }
+                } else {
+                    postedPlay = false
+                    transportControls.playFromMediaId(
+                        mediaId.toString(), null
+                    )
+                    //TODO(Use ourRepo)
+                    //FirebaseStoryRepository
+                    //    .addStoryToUserHistory(
+                    //        prefRepository.firebaseKey,
+                    //        mediaId,
+                    //        onSuccessListener = { timestamp ->
+                    //            viewModelScope.launch(coroutineDispatcher) {
+                    //                autioRepository.addStoryToHistory(History(mediaId, timestamp))
+                    //            }
+                    //        })
                 }
             }
-        } else {
-            postedPlay = false
-            transportControls.playFromMediaId(
-                mediaId.toString(), null
-            )
-            //TODO(Use ourRepo)
-            //FirebaseStoryRepository
-            //    .addStoryToUserHistory(
-            //        prefRepository.firebaseKey,
-            //        mediaId,
-            //        onSuccessListener = { timestamp ->
-            //            viewModelScope.launch(coroutineDispatcher) {
-            //                autioRepository.addStoryToHistory(History(mediaId, timestamp))
-            //            }
-            //        })
         }
     }
+
+    private fun isUserAllowedToPlayStories(user: User) =
+        user.isPremiumUser || (user.isGuest && user.remainingStories > 0)
 
     fun rewindFifteenSeconds() {
         val transportControls = playerServiceConnection.transportControls
