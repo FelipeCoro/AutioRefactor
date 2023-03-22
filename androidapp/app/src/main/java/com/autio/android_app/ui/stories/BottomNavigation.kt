@@ -192,8 +192,9 @@ class BottomNavigation : AppCompatActivity() {
 
 
     fun showPayWall() {
-        navController.navigate(R.id.subscribeFragment)
         hidePlayerComponent()
+        navController.navigate(R.id.subscribeFragment)
+
     }
 
     private fun showUiElements(isVisible: Boolean) {

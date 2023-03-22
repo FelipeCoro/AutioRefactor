@@ -142,21 +142,12 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
 
         binding.btnHeart.setOnClickListener {
-            // showPaywallOrProceedWithNormalProcess(
-            //     prefRepository, requireActivity(), true
-            // ) {
             storyViewModel.getStoriesByIds(listOf(storyId))
-            //  }
         }
 
 
         binding.btnBookmark.setOnClickListener {
-            // showPaywallOrProceedWithNormalProcess(
-            //  prefRepository, requireActivity(), true
-            //  ) {
             storyViewModel.getBookmarkedStoriesByIds()
-            //   }
-
         }
 
 
@@ -240,14 +231,12 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             is StoryViewState.StoryLikesCount -> handleStoryLikesCount(viewState.storyLikesCount)
             is StoryViewState.FetchedStoriesByIds -> handleFetchedStory(viewState.stories.first())
             is StoryViewState.FetchedBookmarkedStories -> handleBookmarkedStories(viewState.stories)
-            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added To Bookmarks")
-            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed From Bookmarks")
             is StoryViewState.StoryLiked -> handleLIsLikedState(viewState.likeCount)
             is StoryViewState.LikedRemoved -> handleLIsNotLikedState(viewState.likeCount)
-            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
-            is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
             is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             is StoryViewState.StoryIsBookmarked -> isStoryBookmarked(viewState.status)
+            is StoryViewState.OnNotPremiumUser -> handleNotPremiumUser()
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added Bookmark") //TODO(Use common method later)
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
@@ -258,11 +247,10 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             storyViewModel.storyLikesCount(storyId)
         } else
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
-        storyViewModel.storyLikesCount(storyId)
+            storyViewModel.storyLikesCount(storyId)
     }
 
     private fun handleFetchedStory(story: Story) {
-
         if (story.isLiked == true) {
             storyViewModel.removeLikeFromStory(story.id)
             binding.btnHeart.setImageResource(R.drawable.ic_heart)

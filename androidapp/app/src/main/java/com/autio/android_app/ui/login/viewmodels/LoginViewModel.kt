@@ -35,25 +35,11 @@ class LoginViewModel @Inject constructor(
                 result.getOrNull()
             }.onSuccess { user ->
                 user?.let {
-                    saveGuestInfo(user)
                     setViewState(LoginViewState.GuestLoginSuccess(user))
                 } ?: setViewState(LoginViewState.LoginError)
             }.onFailure { setViewState(LoginViewState.LoginError) }
 
         }
-    }
-
-    private fun saveGuestInfo(guestResponse: User) {
-        User(
-            guestResponse.id,
-            guestResponse.name,
-            guestResponse.email,
-            guestResponse.apiToken,
-            isGuest = true,
-            remainingStories = 5,
-            userSubIsActive = false,
-            isPremiumUser = false
-        )
     }
 
     private fun setViewState(loginViewState: LoginViewState) {

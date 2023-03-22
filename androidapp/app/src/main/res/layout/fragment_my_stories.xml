@@ -43,14 +43,14 @@
 
         <include
             android:id="@+id/my_stories_list"
-            layout="@layout/my_stories_list"
-            android:visibility="visible" />
+            layout="@layout/my_stories_list" />
 
         <include
             android:id="@+id/sign_in_layout"
             layout="@layout/sign_in_layout"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </layout>

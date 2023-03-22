@@ -127,7 +127,7 @@ class SubscribeFragment : Fragment() {
 
     private fun bindListeners() {
         purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
-            updateSubscriptionUI(it)
+           // updateSubscriptionUI(it)
         }
 
         binding.slider.lyYoutubeLink.root.setOnClickListener {
@@ -158,17 +158,11 @@ class SubscribeFragment : Fragment() {
         }
 */
 
-        binding.commentSection.btnChoosePlan.setOnClickListener {
-            scrollToSubscribeSection()
-        }
+        binding.commentSection.btnChoosePlan.setOnClickListener { scrollToSubscribeSection() }
 
-        binding.subscriptionPathUi.btnStoriesFree1.setOnClickListener {
-            isSessionAlive()
-        }
+        binding.subscriptionPathUi.btnStoriesFree1.setOnClickListener { isSessionAlive() }
 
-        binding.commentSection.btnStoriesFree2.setOnClickListener {
-            isSessionAlive()
-        }
+        binding.commentSection.btnStoriesFree2.setOnClickListener { isSessionAlive() }
     }
 
     private fun scrollToSubscribeSection() {

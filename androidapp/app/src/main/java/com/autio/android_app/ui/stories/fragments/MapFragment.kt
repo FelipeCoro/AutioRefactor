@@ -243,6 +243,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
             is BottomNavigationViewState.OnPlayMediaSuccess -> handlePLayMediaSuccess(viewState.id)
+            is BottomNavigationViewState.FetchedStoryToPlay ->{}
             else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
         }
     }

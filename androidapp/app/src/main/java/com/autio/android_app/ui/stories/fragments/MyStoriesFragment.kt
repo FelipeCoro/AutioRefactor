@@ -54,8 +54,14 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun handleGetUser(user: User) {
-        binding.signInLayout.root.isVisible = user.isGuest && !user.isPremiumUser
-        binding.myStoriesList.root.isGone = user.isPremiumUser
+        if (user.isGuest && !user.isPremiumUser) {
+            binding.signInLayout.root.isGone = false
+            binding.myStoriesList.root.isGone = true
+        }
+        if (user.isPremiumUser) {
+            binding.myStoriesList.root.isGone = false
+            binding.signInLayout.root.isGone = true
+        }
     }
 
     private fun handleGetUserFailed() {

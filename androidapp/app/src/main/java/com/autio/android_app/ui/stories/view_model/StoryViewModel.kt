@@ -12,6 +12,8 @@ import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.Story
+import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
 import com.google.android.gms.maps.model.LatLngBounds
@@ -66,19 +68,29 @@ class StoryViewModel @Inject constructor(
 
     fun getBookmarkedStoriesByIds() {
         viewModelScope.launch(coroutineDispatcher) {
-            val result = autioRepository.getUserBookmarkedStories()
-            setViewState(StoryViewState.FetchedBookmarkedStories(result))
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                val result = autioRepository.getUserBookmarkedStories()
+                setViewState(StoryViewState.FetchedBookmarkedStories(result))
+            } else {
+                setViewState((StoryViewState.OnNotPremiumUser))
+            }
         }
     }
 
     fun downloadStory(story: Story) {
         viewModelScope.launch(coroutineDispatcher) {
-            runCatching {
-                autioRepository.downloadStory(story)
-            }.onSuccess {
-                setViewState(StoryViewState.StoryDownloaded)
-            }.onFailure {
-                setViewState(StoryViewState.FailedStoryDownloaded)
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                runCatching {
+                    autioRepository.downloadStory(story)
+                }.onSuccess {
+                    setViewState(StoryViewState.StoryDownloaded)
+                }.onFailure {
+                    setViewState(StoryViewState.FailedStoryDownloaded)
+                }
+            } else {
+                setViewState((StoryViewState.OnNotPremiumUser))
             }
         }
     }
@@ -103,7 +115,7 @@ class StoryViewModel @Inject constructor(
     private fun callContributor(author: Author) {
         viewModelScope.launch(coroutineDispatcher) {
             val contributorApiResponse = autioRepository.getStoriesByContributor(
-               author.id, 1
+                author.id, 1
             )
             contributorApiResponse.let { response ->
                 val contributor = response.getOrNull()
@@ -145,36 +157,45 @@ class StoryViewModel @Inject constructor(
 
     fun bookmarkStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-
-            autioRepository.bookmarkStory(storyId)
-            // }.onSuccess { result ->
-            //  val bookmarked = result.getOrNull()
-            //  bookmarked.let {
-            //      if (it == true) {
-            setViewState(StoryViewState.AddedBookmark)
-            // } else setViewState(StoryViewState.FailedBookmark)
-            // }
-            // }.onFailure {
-            //     setViewState(StoryViewState.FailedBookmark)
-            // }
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                autioRepository.bookmarkStory(storyId)
+                // }.onSuccess { result ->
+                //  val bookmarked = result.getOrNull()
+                //  bookmarked.let {
+                //      if (it == true) {
+                setViewState(StoryViewState.AddedBookmark)
+                // } else setViewState(StoryViewState.FailedBookmark)
+                // }
+                // }.onFailure {
+                //     setViewState(StoryViewState.FailedBookmark)
+                // }
+            } else {
+                setViewState((StoryViewState.OnNotPremiumUser))
+            }
         }
     }
 
     fun removeBookmarkFromStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            // runCatching {
-            autioRepository.removeBookmarkFromStory(storyId)
-            //  }.onSuccess { result ->
-            //      //val bookmarked = result.getOrNull()
-            //      //bookmarked.let {
-            //    if (it == true) {
-            setViewState(StoryViewState.RemovedBookmark)
-            //      } else setViewState(StoryViewState.FailedBookmark)
-            //  }
-            // }.onFailure {
-            //     setViewState(StoryViewState.RemovedBookmark)
-            //     //setViewState(StoryViewState.FailedBookmark)
-            // }
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                // runCatching {
+                autioRepository.removeBookmarkFromStory(storyId)
+                //  }.onSuccess { result ->
+                //      //val bookmarked = result.getOrNull()
+                //      //bookmarked.let {
+                //    if (it == true) {
+                setViewState(StoryViewState.RemovedBookmark)
+                //      } else setViewState(StoryViewState.FailedBookmark)
+                //  }
+                // }.onFailure {
+                //     setViewState(StoryViewState.RemovedBookmark)
+                //     //setViewState(StoryViewState.FailedBookmark)
+                // }
+            } else {
+                setViewState((StoryViewState.OnNotPremiumUser))
+            }
         }
     }
 
@@ -186,34 +207,44 @@ class StoryViewModel @Inject constructor(
 
     fun giveLikeToStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            runCatching {
-                autioRepository.giveLikeToStory(storyId)
-            }.onSuccess { result ->
-                val likedStory = result.getOrNull()
-                likedStory?.let { isItLiked ->
-                    if (isItLiked.first) {
-                        setViewState(StoryViewState.StoryLiked(isItLiked.second))
-                    } else setViewState(StoryViewState.FailedLikedStory)
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                runCatching {
+                    autioRepository.giveLikeToStory(storyId)
+                }.onSuccess { result ->
+                    val likedStory = result.getOrNull()
+                    likedStory?.let { isItLiked ->
+                        if (isItLiked.first) {
+                            setViewState(StoryViewState.StoryLiked(isItLiked.second))
+                        } else setViewState(StoryViewState.FailedLikedStory)
+                    }
+                }.onFailure {
+                    setViewState(StoryViewState.FailedLikedStory)
                 }
-            }.onFailure {
-                setViewState(StoryViewState.FailedLikedStory)
+            } else {
+                setViewState((StoryViewState.OnNotPremiumUser))
             }
         }
     }
 
     fun removeLikeFromStory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            runCatching {
-                autioRepository.removeLikeFromStory(storyId)
-            }.onSuccess { result ->
-                val removedLike = result.getOrNull()
-                removedLike?.let { isItLiked ->
-                    if (!isItLiked.first) {
-                        setViewState(StoryViewState.LikedRemoved(isItLiked.second))
-                    } else setViewState(StoryViewState.FailedLikedRemoved)
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                runCatching {
+                    autioRepository.removeLikeFromStory(storyId)
+                }.onSuccess { result ->
+                    val removedLike = result.getOrNull()
+                    removedLike?.let { isItLiked ->
+                        if (!isItLiked.first) {
+                            setViewState(StoryViewState.LikedRemoved(isItLiked.second))
+                        } else setViewState(StoryViewState.FailedLikedRemoved)
+                    }
+                }.onFailure {
+                    setViewState(StoryViewState.FailedLikedRemoved)
                 }
-            }.onFailure {
-                setViewState(StoryViewState.FailedLikedRemoved)
+            } else {
+                setViewState((StoryViewState.OnNotPremiumUser))
             }
         }
     }
@@ -251,15 +282,18 @@ class StoryViewModel @Inject constructor(
 
     fun isStoryLiked(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            runCatching {
-                autioRepository.isStoryLiked(storyId)
-            }.onSuccess { result ->
-                val isLiked = result.getOrNull()
-                isLiked?.let {
-                    setViewState(StoryViewState.IsStoryLiked(it))
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                runCatching {
+                    autioRepository.isStoryLiked(storyId)
+                }.onSuccess { result ->
+                    val isLiked = result.getOrNull()
+                    isLiked?.let {
+                        setViewState(StoryViewState.IsStoryLiked(it))
+                    }
+                }.onFailure {
+                    setViewState(StoryViewState.FailedStoryLikesCount)
                 }
-            }.onFailure {
-                setViewState(StoryViewState.FailedStoryLikesCount)
             }
         }
     }
@@ -272,15 +306,17 @@ class StoryViewModel @Inject constructor(
 
     fun isStoryBookmarked(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            val stories = autioRepository.getUserBookmarkedStories()
-            for (story in stories) {
-                if (story.id == storyId) {
-                    setViewState(StoryViewState.StoryIsBookmarked(true))
-                } else {
-                    setViewState(StoryViewState.StoryIsBookmarked(false))
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                val stories = autioRepository.getUserBookmarkedStories()
+                for (story in stories) {
+                    if (story.id == storyId) {
+                        setViewState(StoryViewState.StoryIsBookmarked(true))
+                    } else {
+                        setViewState(StoryViewState.StoryIsBookmarked(false))
+                    }
                 }
             }
-
         }
     }
 
@@ -362,6 +398,12 @@ class StoryViewModel @Inject constructor(
     fun clearStoryHistory() = viewModelScope.launch(coroutineDispatcher) {
         autioRepository.clearStoryHistory()
     }
+
+    private fun isUserAllowedToPlayStories(user: User) =
+        user.isPremiumUser || (user.isGuest && user.remainingStories > 0)
+
+    private fun isUserPremium(user: User) =
+        user.isPremiumUser  //Done this way so that we can set this to true globally for many functions at once whentesting
 
 }
 

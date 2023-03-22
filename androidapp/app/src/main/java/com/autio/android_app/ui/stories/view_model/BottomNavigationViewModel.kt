@@ -269,7 +269,7 @@ class BottomNavigationViewModel @Inject constructor(
                     //            }
                     //        })
                 }
-            }
+            } else {setViewState(BottomNavigationViewState.OnNotPremiumUser)}
         }
     }
 

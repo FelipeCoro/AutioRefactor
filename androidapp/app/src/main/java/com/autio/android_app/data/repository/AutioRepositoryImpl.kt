@@ -98,7 +98,6 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun loginAsGuest(): Result<User> {
         //TODO(check if the user account from db is not guest otherwise return failure)
         //TODO(verify current listened stories/ if null call to create account and set token)
-        val userAccount = getUserAccount()
         kotlin.runCatching {
             val result = autioRemoteDataSource.createGuestAccount()
             if (result.isSuccessful) {
@@ -110,7 +109,9 @@ class AutioRepositoryImpl @Inject constructor(
         }.onSuccess { guestResponse ->
             guestResponse?.let {
                 val user = createUserAccount(it.toModel())
-                Result.success(user)
+                if (user != null) {
+                    return Result.success(user)
+                }
             }
         }.onFailure {
             return Result.failure(Error())
@@ -242,7 +243,7 @@ class AutioRepositoryImpl @Inject constructor(
         val userAccount = getUserAccount()
 
         userAccount?.let { user ->
-            val result = autioRemoteDataSource.getStoriesByIds(user.id, user.apiToken, stories)
+            val result = autioRemoteDataSource.getStoriesByIds(user.id, user.bearerToken, stories)
             //TODO(refactor this, simplify, re-accommodate logic)
             return if (result.isSuccessful) {
                 val storiesFromService = result.body()!!.map { it.toModel() }
