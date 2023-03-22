@@ -54,10 +54,20 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun handleGetUser(user: User) {
+
         if (user.isGuest && !user.isPremiumUser) {
             binding.signInLayout.root.isGone = false
             binding.myStoriesList.root.isGone = true
         }
+
+        if (!user.isGuest && !user.isPremiumUser) {
+            binding.signInLayout.root.isGone = false
+            binding.myStoriesList.root.isGone = true
+            binding.signInLayout.btnSignIn.visibility = View.GONE
+            binding.signInLayout.btnSignup.visibility = View.GONE
+            binding.signInLayout.btnChoosePlanStories.visibility = View.VISIBLE
+        }
+
         if (user.isPremiumUser) {
             binding.myStoriesList.root.isGone = false
             binding.signInLayout.root.isGone = true
@@ -85,6 +95,7 @@ class MyStoriesFragment : Fragment() {
         }
         binding.signInLayout.btnSignIn.setOnClickListener { goToSignIn() }
         binding.signInLayout.btnSignup.setOnClickListener { goToSignUp() }
+        binding.signInLayout.btnChoosePlanStories.setOnClickListener { goToPlans() }
     }
 
     private fun goToSignIn() {
@@ -94,6 +105,11 @@ class MyStoriesFragment : Fragment() {
 
     private fun goToSignUp() {
         findNavController().navigate(R.id.action_my_stories_to_authentication_nav)
+        bottomNavigationActivity?.finish()
+    }
+
+    private fun goToPlans() {
+        findNavController().navigate(R.id.action_my_stories_to_subscribeFragment)
         bottomNavigationActivity?.finish()
     }
 }

@@ -55,7 +55,6 @@ class PurchaseViewModel @Inject constructor(
             if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
                     revenueCatRepository.login(user.id.toString())
-                    saveUserInfo(user)
                     setViewState(PurchaseViewState.OnLoginSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
             } else setViewState(PurchaseViewState.OnLoginFailed)
@@ -70,7 +69,6 @@ class PurchaseViewModel @Inject constructor(
             if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
                     revenueCatRepository.login(user.id.toString())
-                    saveUserInfo(user)
                     setViewState(PurchaseViewState.OnCreatedAccountSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnCreatedAccountFailed)
             } else setViewState(PurchaseViewState.OnCreatedAccountFailed)
@@ -81,22 +79,6 @@ class PurchaseViewModel @Inject constructor(
     private fun setViewState(purchaseViewState: PurchaseViewState) {
         _viewState.postValue(purchaseViewState)
         isLoading.set(false)
-    }
-
-    /**
-     * Saves user's data in the shared preferences
-     */
-    private fun saveUserInfo(loginResponse: User) {
-        User(
-            loginResponse.id,
-            loginResponse.name,
-            loginResponse.email,
-            loginResponse.apiToken,
-            isGuest = false,
-            remainingStories = -1,
-            userSubIsActive = false,
-            isPremiumUser = false
-        )
     }
 
     fun logOut() {

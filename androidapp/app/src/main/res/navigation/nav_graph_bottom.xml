@@ -56,6 +56,9 @@
                 android:defaultValue="-1"
                 app:argType="integer" />
         </action>
+        <action
+            android:id="@+id/action_my_stories_to_subscribeFragment"
+            app:destination="@id/subscribeFragment" />
     </fragment>
     <fragment
         android:id="@+id/player"

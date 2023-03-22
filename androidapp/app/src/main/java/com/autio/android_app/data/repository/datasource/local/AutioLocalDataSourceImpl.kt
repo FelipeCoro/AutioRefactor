@@ -9,6 +9,7 @@ import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.database.entities.UserEntity
+import com.autio.android_app.domain.mappers.toEntity
 import com.autio.android_app.domain.mappers.toModel
 import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
@@ -57,8 +58,15 @@ class AutioLocalDataSourceImpl @Inject constructor(
         return Result.failure(Error())
     }
 
-    override suspend fun updateUserInformation(user: User) {
+    override suspend fun updateUserInformation(user: User): Result<User> {
 
+        val userEntity = user.toEntity()
+        return try {
+            userDao.createNewUser(userEntity)
+            Result.success(userEntity.toModel())
+        } catch (ex: java.lang.Exception) {
+            Result.failure(Error())
+        }
     }
 
     override suspend fun createUserAccount(userEntity: UserEntity): Result<UserEntity?> {

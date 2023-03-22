@@ -79,15 +79,14 @@ class AutioRepositoryImpl @Inject constructor(
             autioRemoteDataSource.login(loginDto)
         }.onSuccess { response ->
             if (response.isSuccessful) {
-                val userAccount = getUserAccount()
-                userAccount?.let {
                     response.body()?.let {
                         val user = it.toModel()
+                        user.isGuest = false
+                        //Here we would want to update stories, isPremiun and isSubscribed?
                         autioLocalDataSource.updateUserInformation(user)
                         return Result.success(user)
                     }
                 }
-            }
         }.onFailure {
             Result.failure<User>(it)
         }

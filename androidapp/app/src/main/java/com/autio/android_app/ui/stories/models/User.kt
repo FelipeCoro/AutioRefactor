@@ -11,7 +11,7 @@ data class User(
     val name: String = "",
     val email: String = "",
     val apiToken: String,
-    val isGuest: Boolean,
+    var isGuest: Boolean,
     var remainingStories: Int = 5,
     var userSubIsActive: Boolean = false,
     var isPremiumUser: Boolean = false
