@@ -59,19 +59,25 @@ class AutioRepositoryImpl @Inject constructor(
 
     override suspend fun createAccount(accountRequest: AccountRequest): Result<User> {
         val accountDto = accountRequest.toDTO()
-        val result = autioRemoteDataSource.createAccount(accountDto)
-
-        return if (result.isSuccessful) {
-            val user = result.let { accountCreateResponse ->
-                accountCreateResponse.body()!!.toModel()
+        kotlin.runCatching {
+            autioRemoteDataSource.createAccount(accountDto)
+        }.onSuccess { response ->
+            if (response.isSuccessful) {
+                response.body()?.let {
+                    val user = createUserAccount(it.toModel())
+                    if (user != null) {
+                        return Result.success(user)
+                    }
+                }
             }
-            Result.success(user)
-
-        } else {
-            val throwable = Error(result.errorBody().toString())
-            Result.failure(throwable)
+        }.onFailure {
+            Result.failure<User>(it)
         }
+
+        return Result.failure(Error())
+
     }
+
 
     override suspend fun login(loginRequest: LoginRequest): Result<User> {
         kotlin.runCatching {
@@ -79,14 +85,13 @@ class AutioRepositoryImpl @Inject constructor(
             autioRemoteDataSource.login(loginDto)
         }.onSuccess { response ->
             if (response.isSuccessful) {
-                    response.body()?.let {
-                        val user = it.toModel()
-                        user.isGuest = false
-                        //Here we would want to update stories, isPremiun and isSubscribed?
-                        autioLocalDataSource.updateUserInformation(user)
-                        return Result.success(user)
-                    }
+                response.body()?.let {
+                    val user = it.toModel()
+                    //Here we would want to update stories, isPremiun and isSubscribed?
+                    autioLocalDataSource.updateUserInformation(user)
+                    return Result.success(user)
                 }
+            }
         }.onFailure {
             Result.failure<User>(it)
         }
@@ -242,7 +247,8 @@ class AutioRepositoryImpl @Inject constructor(
         val userAccount = getUserAccount()
 
         userAccount?.let { user ->
-            val result = autioRemoteDataSource.getStoriesByIds(user.id, user.bearerToken, stories)
+            val result =
+                autioRemoteDataSource.getStoriesByIds(user.id, user.bearerToken, stories)
             //TODO(refactor this, simplify, re-accommodate logic)
             return if (result.isSuccessful) {
                 val storiesFromService = result.body()!!.map { it.toModel() }
@@ -312,7 +318,12 @@ class AutioRepositoryImpl @Inject constructor(
 
         userAccount?.let { user ->
             val result =
-                autioRemoteDataSource.getStoriesByContributor(user.id, user.apiToken, storyId, page)
+                autioRemoteDataSource.getStoriesByContributor(
+                    user.id,
+                    user.apiToken,
+                    storyId,
+                    page
+                )
 
             if (result.isSuccessful) {
                 val contributor = result.let { contributorResponse ->
@@ -378,11 +389,16 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.giveLikeToStory(storyId)
         val userAccount = getUserAccount()
         userAccount?.let { user ->
-            val remoteLike = autioRemoteDataSource.giveLikeToStory(user.id, user.apiToken, storyId)
-            val likeCount = autioRemoteDataSource.storyLikesCount(user.id, user.apiToken, storyId)
+            val remoteLike =
+                autioRemoteDataSource.giveLikeToStory(user.id, user.apiToken, storyId)
+            val likeCount =
+                autioRemoteDataSource.storyLikesCount(user.id, user.apiToken, storyId)
             if (remoteLike.isSuccessful) {
                 val result =
-                    Pair(remoteLike.body()!!.liked.toString().toBoolean(), likeCount.body()!!.likes)
+                    Pair(
+                        remoteLike.body()!!.liked.toString().toBoolean(),
+                        likeCount.body()!!.likes
+                    )
                 return@let Result.success(result)
             } else {
                 val throwable = Error(remoteLike.errorBody().toString())
@@ -398,7 +414,8 @@ class AutioRepositoryImpl @Inject constructor(
             autioLocalDataSource.removeLikeFromStory(storyId)
             val remoteRemovedLike =
                 autioRemoteDataSource.removeLikeFromStory(user.id, user.apiToken, storyId)
-            val likeCount = autioRemoteDataSource.storyLikesCount(user.id, user.apiToken, storyId)
+            val likeCount =
+                autioRemoteDataSource.storyLikesCount(user.id, user.apiToken, storyId)
             return if (remoteRemovedLike.isSuccessful) {
                 val result = Pair(
                     remoteRemovedLike.body()!!.liked.toString().toBoolean(),
@@ -563,9 +580,9 @@ class AutioRepositoryImpl @Inject constructor(
         autioLocalDataSource.setLikesDataToLocalStories(storiesHistory.map { it.toString() }) //TODO(Check this mapping)
     }
 
-    // override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
-    //     autioLocalDataSource.setBookmarksDataToLocalStories(storiesIds)
-    // }
+// override suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>) {
+//     autioLocalDataSource.setBookmarksDataToLocalStories(storiesIds)
+// }
 
     override suspend fun getNarratorOfStory(
         storyId: Int
