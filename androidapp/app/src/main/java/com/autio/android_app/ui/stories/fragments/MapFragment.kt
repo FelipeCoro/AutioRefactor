@@ -116,7 +116,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun initView() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.maps) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
-
+        //TODO(Implement showpaywall logic where if the 5 stories are out, showPaywall())
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
