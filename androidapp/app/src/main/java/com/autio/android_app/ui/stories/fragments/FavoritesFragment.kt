@@ -19,6 +19,7 @@ import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
+import com.autio.android_app.domain.mappers.toStoryEntity
 import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
@@ -110,7 +111,8 @@ class FavoritesFragment : Fragment() {
         }
     }
 
-    private fun showAllFavoriteStories(stories: List<Story>) {
+    private fun showAllFavoriteStories(favoriteStories: List<Story>) {
+        stories =favoriteStories.map { it.toStoryEntity() }
         recyclerView.adapter = storyAdapter
 //            val totalTime =
 //                stories.sumOf { it.duration } / 60
@@ -129,12 +131,12 @@ class FavoritesFragment : Fragment() {
                 view,
                 listOf(PlaylistOption.REMOVE).map {
                     it.also { option ->
-                        option.disabled = stories.isEmpty()
+                        option.disabled = favoriteStories.isEmpty()
                     }
                 }, onOptionClicked = ::onPlaylistOptionClicked
             )
         }
-        if (stories.isEmpty()) {
+        if (favoriteStories.isEmpty()) {
             binding.ivNoContentIcon.setImageResource(R.drawable.ic_heart)
             binding.tvNoContentMessage.text = resources.getText(
                 R.string.empty_favorites_message
@@ -142,7 +144,7 @@ class FavoritesFragment : Fragment() {
             binding.rlStories.visibility = View.GONE
             binding.llNoContent.visibility = View.VISIBLE
         } else {
-            storyAdapter.submitList(stories)
+            storyAdapter.submitList(favoriteStories)
             binding.llNoContent.visibility = View.GONE
             binding.rlStories.visibility = View.VISIBLE
         }

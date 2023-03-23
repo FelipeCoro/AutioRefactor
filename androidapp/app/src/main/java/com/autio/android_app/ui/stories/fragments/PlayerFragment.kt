@@ -236,7 +236,9 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             is StoryViewState.StoryIsBookmarked -> isStoryBookmarked(viewState.status)
             is StoryViewState.OnNotPremiumUser -> handleNotPremiumUser()
-            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added Bookmark") //TODO(Use common method later)
+            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added Bookmark")
+            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed Bookmark")
+            is StoryViewState.StoryDownloaded ->showFeedbackSnackBar("Story Downloaded")//TODO(Use common method later)
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
