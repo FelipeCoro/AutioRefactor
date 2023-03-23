@@ -7,6 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,11 +26,12 @@ import com.autio.android_app.ui.subscribe.adapters.SliderAdapter
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
+import com.autio.android_app.util.bottomNavigationActivity
+import com.autio.android_app.util.navController
 import com.autio.android_app.util.openUrl
 import com.autio.android_app.util.resources.DeepLinkingActions
 import com.autio.android_app.util.resources.getDeepLinkingNavigationRequest
-import com.revenuecat.purchases.CustomerInfo
-import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.*
 import com.smarteist.autoimageslider.SliderView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,6 +44,8 @@ class SubscribeFragment : Fragment() {
     private val purchaseViewModel: PurchaseViewModel by viewModels()
     private lateinit var binding: FragmentSubscribeBinding
     private lateinit var currentUser: User
+    private lateinit var yearlySub: Package
+    private lateinit var singleTripSub: Package
 
 
     override fun onCreateView(
@@ -52,6 +56,16 @@ class SubscribeFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+        Purchases.sharedInstance.getOfferingsWith({ error ->
+            // An error occurred
+        }) { offerings ->
+            offerings.current?.availablePackages?.takeUnless { it.isEmpty() }?.let {
+                yearlySub = offerings["standard"]?.availablePackages?.get(0)!!
+                singleTripSub = offerings["standard"]?.availablePackages?.get(1)!!
+            }
+        }
+
         bindObservers()
         bindListeners()
         initView()
@@ -91,7 +105,7 @@ class SubscribeFragment : Fragment() {
             learnMoreLinkClicked(v)
         })
 
-        purchaseViewModel.getOfferings()
+
     }
 
     private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
@@ -104,6 +118,7 @@ class SubscribeFragment : Fragment() {
     private fun handlePurchaseSuccessViewState(user: User) {
         currentUser = user
     }
+
     private fun learnMoreLinkClicked(view: View) {
         //TODO(bad practice, refactor implement fragment dialog)
         val dialogBinding = MothPopupBinding.inflate(layoutInflater)
@@ -127,7 +142,7 @@ class SubscribeFragment : Fragment() {
 
     private fun bindListeners() {
         purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
-           // updateSubscriptionUI(it)
+            // updateSubscriptionUI(it)
         }
 
         binding.slider.lyYoutubeLink.root.setOnClickListener {
@@ -136,6 +151,33 @@ class SubscribeFragment : Fragment() {
             }
         }
 
+
+        if (::yearlySub.isInitialized && ::singleTripSub.isInitialized) {
+
+            binding.cvTraveler.setOnClickListener {
+                Purchases.sharedInstance.purchasePackageWith(
+                    requireActivity(),
+                    yearlySub,
+                    onError = { error, userCancelled -> /* No purchase */ },
+                    onSuccess = { product, customerInfo ->
+                        if (customerInfo.entitlements["my_entitlement_identifier"]?.isActive == true) {
+                            Log.WARN
+                        }
+                    })
+            }
+
+            binding.subscriptionPathUi.cvSingleTrip.setOnClickListener {
+                Purchases.sharedInstance.purchasePackageWith(
+                    requireActivity(),
+                    singleTripSub,
+                    onError = { error, userCancelled -> error.message },
+                    onSuccess = { product, customerInfo ->
+                        if (customerInfo.entitlements["Unlimited Stories"]?.isActive == true) {
+                            Log.WARN
+                        }
+                    })
+            }
+        }
 
         /*{ offerings -> //TODO (Make purchase handle viewStates for offerings)
             offerings.current?.availablePackages?.takeUnless { it.isEmpty() }?.let { packages ->
@@ -218,20 +260,22 @@ class SubscribeFragment : Fragment() {
     }
 
     private fun isSessionAlive() {
-        val isSessionAlive = currentUser.apiToken
-        if (isSessionAlive.isEmpty()) {
-            goToLoginActivity()
-        } else {
-            getToMainMenu()
-        }
+        //  if (isSessionAlive.isEmpty()) {
+        //      goToLoginActivity()
+        //  } else {
+        getToMainMenu()
+
     }
 
     private fun getToMainMenu() {
-        val intent = Intent(context, BottomNavigation::class.java)
-        intent.addFlags(
-            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        )
-        startActivity(intent)
+     //   val intent = Intent(context, BottomNavigation::class.java)
+     //   intent.addFlags(
+     //       Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+     //   )
+     //   startActivity(intent)
+
+       if(bottomNavigationActivity?.tempCount!! >0){
+        navController.navigate(R.id.action_subscribeFragment_to_map_fragment)}
     }
 
     private fun goToLoginActivity() {

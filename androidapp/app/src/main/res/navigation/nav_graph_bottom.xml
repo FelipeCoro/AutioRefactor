@@ -147,6 +147,10 @@
         android:id="@+id/subscribeFragment"
         android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
         android:label="SubscribeFragment"
-        tools:layout="@layout/fragment_subscribe" />
+        tools:layout="@layout/fragment_subscribe" >
+        <action
+            android:id="@+id/action_subscribeFragment_to_map_fragment"
+            app:destination="@id/map_fragment" />
+    </fragment>
     <include app:graph="@navigation/nav_authentication" />
 </navigation>

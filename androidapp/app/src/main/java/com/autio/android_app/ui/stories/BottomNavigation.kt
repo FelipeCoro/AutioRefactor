@@ -58,6 +58,8 @@ class BottomNavigation : AppCompatActivity() {
     private var castContext: CastContext? = null
     private var isNetworkAvailable = false
 
+    var tempCount = 5
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -91,7 +93,10 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun bindObservables() {
-        bottomNavigationViewModel.bottomNavigationViewState.observe(this, ::handleBottomNavViewState)
+        bottomNavigationViewModel.bottomNavigationViewState.observe(
+            this,
+            ::handleBottomNavViewState
+        )
 
         bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
             binding.btnFloatingPlayerPlay.setImageResource(res)
@@ -111,6 +116,7 @@ class BottomNavigation : AppCompatActivity() {
         }
 
     }
+
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
             is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(
@@ -120,6 +126,7 @@ class BottomNavigation : AppCompatActivity() {
             else -> {}
         }
     }
+
     private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
         when (viewState) {
             is PurchaseViewState.FetchedUserSuccess -> handlePurchaseSuccessViewState(viewState.data)
@@ -134,7 +141,7 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun handlePurchaseSuccessViewState(user: User) {
-        updateAvailableStoriesUI(user.remainingStories)
+        updateAvailableStoriesUI(tempCount)//user.remainingStories)
     }
 
     override fun onStart() {
@@ -170,6 +177,10 @@ class BottomNavigation : AppCompatActivity() {
                 bottomNavigationViewModel.playMediaId(it.id)
             }
         }
+        binding.btnKillSwitch.setOnClickListener {
+            tempCount -= 1
+            updateAvailableStoriesUI(tempCount)
+        }
     }
 
     private fun setupNavigationListener() {
@@ -179,14 +190,13 @@ class BottomNavigation : AppCompatActivity() {
         setupWithNavController(binding.bottomNavigationView, navController)
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             val subscribeFragmentDestination = controller.graph[R.id.subscribeFragment].label
-            if (destination.label ==  controller.graph[R.id.player].label ) {
+            if (destination.label == controller.graph[R.id.player].label) {
                 hidePlayerComponent()
+            } else if (destination.label == subscribeFragmentDestination) {
+                hidePlayerComponent()
+            } else {
+                showUiElements(true)
             }
-            else if (destination == subscribeFragmentDestination){
-                showUiElements(false)}
-                else  {
-                    showUiElements(true)
-                }
         }
     }
 
@@ -194,15 +204,15 @@ class BottomNavigation : AppCompatActivity() {
     fun showPayWall() {
         hidePlayerComponent()
         navController.navigate(R.id.subscribeFragment)
-
     }
 
     private fun showUiElements(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
         binding.storiesFreePlansBanner.isVisible = isVisible
-       // binding.rlAllowNotifications.isVisible = isVisible
+        // binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
     }
+
     private fun updateSnackBarMessageDisplay() {
         with(binding) {
             if (!TrackingUtility.hasCoreLocationPermissions(this@BottomNavigation)) {
@@ -239,10 +249,11 @@ class BottomNavigation : AppCompatActivity() {
             val tickMarks = arrayOf(
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )
-          //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
-            if (remainingStories < 0){
+            //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
+            if (remainingStories <= 0) {
                 llTickMarks.visibility = GONE
                 showPayWall()
+            }else{
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
                         tickMark.setBackgroundColor(
@@ -282,23 +293,23 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun hidePlayerComponent() {
-       //binding.persistentPlayer.animate().alpha(0.0f)
-       //    .translationY(binding.persistentPlayer.height.toFloat())
-       //    .withEndAction {
-              //  binding.mainContainer.requestLayout()
-               binding.persistentPlayer.visibility = GONE
+        //binding.persistentPlayer.animate().alpha(0.0f)
+        //    .translationY(binding.persistentPlayer.height.toFloat())
+        //    .withEndAction {
+        //  binding.mainContainer.requestLayout()
+        binding.persistentPlayer.visibility = GONE
         binding.storiesFreePlansBanner.visibility = GONE
-           // }
+        // }
     }
 
     private fun showPlayerComponent() {
         binding.persistentPlayer.visibility = VISIBLE
         binding.persistentPlayer.animate().alpha(1.0f)
             //TODO(FIX ANIMATION )
-             .translationYBy(-binding.persistentPlayer.height.toFloat())
-                    .withEndAction {
-                        binding.mainContainer.requestLayout()
-                    }
+            .translationYBy(-binding.persistentPlayer.height.toFloat())
+            .withEndAction {
+                binding.mainContainer.requestLayout()
+            }
     }
 
     /**
@@ -327,9 +338,9 @@ class BottomNavigation : AppCompatActivity() {
 
     private lateinit var snackBarJob: Job
     fun showFeedbackSnackBar(feedback: String) {
-     // if (::snackBarJob.isInitialized && snackBarJob.isActive) {
-     //     snackBarJob.cancel()
-     // }
+        // if (::snackBarJob.isInitialized && snackBarJob.isActive) {
+        //     snackBarJob.cancel()
+        // }
         snackBarView.alpha = 1F
         snackBarView.findViewById<TextView>(R.id.snack_bar_text).text = feedback
         binding.activityLayout.removeView(snackBarView)

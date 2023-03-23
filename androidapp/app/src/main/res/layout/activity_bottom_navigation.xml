@@ -18,6 +18,8 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true">
 
+
+
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/main_container"
                 android:name="androidx.navigation.fragment.NavHostFragment"
@@ -28,6 +30,18 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:navGraph="@navigation/nav_graph_bottom" />
+
+        <ImageView
+            android:id="@+id/btnKillSwitch"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginVertical="16dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_account_selected_light"
+            android:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/normal_text" />
 
             <LinearLayout
                 android:id="@+id/persistentPlayer"
@@ -54,6 +68,7 @@
                         android:src="@drawable/ic_player_play"
                         app:tint="@color/normal_text" />
 
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -68,6 +83,7 @@
                             android:text="@string/no_story_loaded"
                             tools:text="San Francisco from the Beginning" />
 
+
                         <TextView
                             android:id="@+id/tvFloatingPlayerNarrator"
                             style="@style/StoryNarrator"
@@ -75,8 +91,14 @@
                             android:layout_height="wrap_content"
                             android:visibility="gone"
                             tools:text="Kevin Costner" />
+
+
                     </LinearLayout>
-            </LinearLayout>
+
+
+
+
+                </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/llNextStoryLabel"

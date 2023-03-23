@@ -130,15 +130,15 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun navigateToNotificationsFragment() {
-        setViewPagerPage(1)
+        setViewPagerPage(0)
     }
 
     private fun navigateToInAppLocationPermissionFragment() {
-        setViewPagerPage(2)
+        setViewPagerPage(1)
     }
 
     private fun navigateToBackgroundLocation() {
-        setViewPagerPage(3)
+        setViewPagerPage(2)
     }
 
     private fun setViewPagerPage(pageIndex: Int) {

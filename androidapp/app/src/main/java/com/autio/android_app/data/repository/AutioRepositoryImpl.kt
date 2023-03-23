@@ -87,7 +87,7 @@ class AutioRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 response.body()?.let {
                     val user = it.toModel()
-                    user.isPremiumUser = true
+                   // user.isPremiumUser = true
                     //Here we would want to update stories, isPremiun and isSubscribed?
                     autioLocalDataSource.updateUserInformation(user)
                     return Result.success(user)

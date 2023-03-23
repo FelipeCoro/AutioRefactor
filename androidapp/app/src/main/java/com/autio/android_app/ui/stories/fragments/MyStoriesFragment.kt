@@ -109,7 +109,7 @@ class MyStoriesFragment : Fragment() {
     }
 
     private fun goToPlans() {
-        findNavController().navigate(R.id.action_my_stories_to_subscribeFragment)
-        bottomNavigationActivity?.finish()
+        bottomNavigationActivity?.showPayWall()
+      //  bottomNavigationActivity?.finish()
     }
 }
