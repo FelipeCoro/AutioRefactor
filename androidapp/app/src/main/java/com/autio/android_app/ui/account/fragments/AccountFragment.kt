@@ -28,6 +28,7 @@ import com.autio.android_app.ui.account.view_states.AccountViewState
 import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
+import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
@@ -76,6 +77,7 @@ class AccountFragment : Fragment() {
         bindListeners()
         setListeners()
         initView()
+        getUserInfo()
     }
 
     private fun bindObservables() {
@@ -91,6 +93,7 @@ class AccountFragment : Fragment() {
             when (viewState) {
                 is AccountViewState.OnSuccessPasswordChanged -> handleSuccessPasswordChanged()
                 is AccountViewState.OnFailedPasswordChanged -> handleFailedPasswordChanged()
+                is AccountViewState.OnUserDataFetched -> handleUserinfo(viewState.data)
             }
         }
     }
@@ -140,7 +143,8 @@ class AccountFragment : Fragment() {
         setCustomerSupportListeners()
 
         binding.btnDeleteAccount.setOnClickListener {
-//            apiService.deleteAccount() /TODO()
+            accountFragmentViewModel.deleteAccount()
+            logOut()
         }
     }
 
@@ -303,13 +307,17 @@ class AccountFragment : Fragment() {
      // })
     }
 
-//  private fun getUserInfo() {
-//      name = prefRepository.userName.trim()
-//      email = prefRepository.userEmail
-//      val email = prefRepository.userEmail
-//      binding.etName.setText(name)
-//      binding.etEmail.setText(email)
-//  }
+    private fun getUserInfo() {
+        accountFragmentViewModel.fetchUserData()
+    }
+
+    private fun handleUserinfo(user: User){
+        name = user.name.trim()
+        email = user.email
+        binding.etName.setText(name)
+        binding.etEmail.setText(email)
+    }
+
 
 //  private fun prepareView() {
 

@@ -32,8 +32,10 @@ class AccountFragmentViewModel @Inject constructor(
     fun fetchUserData() {
         viewModelScope.launch(coroutineDispatcher) {
 
-            autioRepository.fetchUserData()
-
+          val data =  autioRepository.fetchUserData()
+            val result = data.getOrNull()
+            if(result!=null)
+            setViewState(AccountViewState.OnUserDataFetched(result))
         }
     }
 
@@ -70,6 +72,12 @@ class AccountFragmentViewModel @Inject constructor(
                     setViewState(AccountViewState.OnFailedPasswordChanged)
                 }
             }
+        }
+    }
+
+    fun deleteAccount(){
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.deleteAccount()
         }
     }
 

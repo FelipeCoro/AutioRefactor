@@ -1,6 +1,7 @@
 package com.autio.android_app.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
@@ -28,4 +29,7 @@ interface UserDao {
 
     @Query("SELECT CASE WHEN remainingStories < 0 THEN true ELSE false END FROM user_entity LIMIT 1")
     suspend fun requiresPayment(): Boolean
+
+    @Query("DELETE FROM user_entity ")
+    fun clearUserData()
 }

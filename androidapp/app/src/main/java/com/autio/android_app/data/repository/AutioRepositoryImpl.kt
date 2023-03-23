@@ -659,6 +659,13 @@ class AutioRepositoryImpl @Inject constructor(
         } else false
     }
 
+    override suspend fun deleteAccount() {
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            autioRemoteDataSource.deleteAccount(user.id, user.bearerToken)
+        }
+    }
+
     override suspend fun changePassword(
         currentPassword: String, newPassword: String, confirmPassword: String
     ): Result<Boolean> {

@@ -112,6 +112,8 @@ interface AutioRepository {
     suspend fun updateUserProfile(profile: ProfileDto)
     suspend fun isUserLoggedIn(): Boolean
 
+    suspend fun deleteAccount()
+
     suspend fun changePassword(
         currentPassword: String,
         newPassword: String,
