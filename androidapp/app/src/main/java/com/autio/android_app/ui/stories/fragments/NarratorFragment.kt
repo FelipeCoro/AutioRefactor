@@ -123,14 +123,14 @@ class NarratorFragment : Fragment() {
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar("Removed From Favorites")
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
-            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
+            else -> {}//TODO(Ideally have error handling for each error)
         }
     }
 
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
             is BottomNavigationViewState.OnPlayMediaSuccess -> handlePLayMediaSuccess(viewState.id)
-            else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
+            else -> {}//TODO(Ideally have error handling for each error)
         }
     }
 

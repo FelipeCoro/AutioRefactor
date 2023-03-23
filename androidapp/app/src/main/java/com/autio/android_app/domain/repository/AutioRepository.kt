@@ -92,7 +92,7 @@ interface AutioRepository {
     suspend fun removeLikeFromStory(storyId: Int): Result<Pair<Boolean, Int>>
     suspend fun addStoryToHistory(storyId: Int)
     suspend fun getUserStoriesHistory(): Result<List<Story>>
-    suspend fun removeStoryFromHistory(id: Int)
+    suspend fun removeStoryFromHistory(storyId: Int)
     suspend fun clearStoryHistory()
     suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String)
     suspend fun clearUserData()

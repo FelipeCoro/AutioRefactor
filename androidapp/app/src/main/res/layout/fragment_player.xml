@@ -257,11 +257,12 @@
                     app:layout_constraintTop_toBottomOf="@id/llCategory">
 
                     <ImageView
-                        android:id="@+id/btnChangeSpeed"
+                        android:id="@+id/btnNext"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_speed_audio_1x"
+                        android:src="@drawable/ic_forward"
+                        android:visibility="invisible"
                         app:tint="@color/button_background" />
 
                     <ImageView
@@ -269,6 +270,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_marginBottom="3dp"
                         android:src="@drawable/ic_rollback"
                         app:tint="@color/button_background" />
 
@@ -281,11 +283,11 @@
                         app:tint="@color/button_background" />
 
                     <ImageView
-                        android:id="@+id/btnNext"
+                        android:id="@+id/btnChangeSpeed"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_forward"
+                        android:src="@drawable/ic_speed_audio_1x"
                         app:tint="@color/button_background" />
 
                     <ImageView

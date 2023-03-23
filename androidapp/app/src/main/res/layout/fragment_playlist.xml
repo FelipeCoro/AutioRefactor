@@ -155,6 +155,7 @@
             android:indeterminate="true"
             android:indeterminateTint="@color/white"
             android:indeterminateTintMode="src_atop"
+            android:visibility="invisible"
             tools:visibility="gone" />
     </FrameLayout>
 </RelativeLayout>

@@ -286,17 +286,14 @@ class AutioRepositoryImpl @Inject constructor(
         val userAccount = getUserAccount()
         userAccount?.let { user ->
             val result = autioRemoteDataSource.getAuthorOfStory(user.id, user.bearerToken, storyId)
-            if (result.isSuccessful) {
-                val author = result.let { authorResponse ->
-                    authorResponse.body()!!.toModel()
-                }
-                return@let Result.success(author)
+            return if (result.isSuccessful) {
+                Result.success(result.body()!!.toModel())
             } else {
                 val throwable = Error(result.errorBody().toString())
-                return@let Result.failure(throwable)
+                Result.failure(throwable)
             }
         }
-        return Result.failure(Error(""))//TODO(COMPLETE THIS ERROR)
+        return Result.failure(Error(""))//TODO(Fill this error)
     }
 
     override suspend fun getStoriesInLatLngBoundaries(
@@ -545,12 +542,18 @@ class AutioRepositoryImpl @Inject constructor(
         return Result.failure(Error(""))//TODO(Fill this error)
     }
 
-    override suspend fun removeStoryFromHistory(id: Int) {
-        autioLocalDataSource.removeStoryFromHistory(id)
+    override suspend fun removeStoryFromHistory(storyId: Int) {
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            autioRemoteDataSource.removeStoryFromHistory(user.id, user.bearerToken, storyId)
+        }
     }
 
     override suspend fun clearStoryHistory() {
-        autioLocalDataSource.clearStoryHistory()
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            autioRemoteDataSource.clearHistory(user.id, user.bearerToken)
+        }
     }
 
     override suspend fun cacheRecordOfStory(storyId: Int, recordUrl: String) {

@@ -65,6 +65,7 @@ class FavoritesFragment : Fragment() {
         binding.tvToolbarTitle.text = resources.getString(
             R.string.my_stories_favorites
         )
+        binding.pbLoadingStories.visibility = View.VISIBLE
         binding.btnBack.setOnClickListener {
             findNavController().navigate(
                 R.id.action_favorites_playlist_to_my_stories
@@ -92,6 +93,9 @@ class FavoritesFragment : Fragment() {
             R.id.activity_layout
         )
         storyViewModel.getAllFavoriteStories()
+
+
+
     }
 
     private fun bindObservers() {
