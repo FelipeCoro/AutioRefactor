@@ -383,9 +383,9 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun addStoryToHistory(history: History) {
+    fun addStoryToHistory(storyId:Int) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.addStoryToHistory(history)
+            autioRepository.addStoryToHistory(storyId)
         }
     }
 

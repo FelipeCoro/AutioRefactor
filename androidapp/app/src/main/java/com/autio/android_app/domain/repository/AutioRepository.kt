@@ -90,7 +90,7 @@ interface AutioRepository {
     suspend fun getUserFavoriteStories(): Result<List<Story>>
 
     suspend fun removeLikeFromStory(storyId: Int): Result<Pair<Boolean, Int>>
-    suspend fun addStoryToHistory(history: History)
+    suspend fun addStoryToHistory(storyId: Int)
     suspend fun getUserStoriesHistory(): Result<List<Story>>
     suspend fun removeStoryFromHistory(id: Int)
     suspend fun clearStoryHistory()

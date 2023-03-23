@@ -121,7 +121,6 @@ class BookmarksFragment : Fragment() {
             binding.rlStories.visibility = View.GONE
             binding.llNoContent.visibility = View.VISIBLE
         } else {
-
             storyAdapter.submitList(stories)
             binding.llNoContent.visibility = View.GONE
             binding.rlStories.visibility = View.VISIBLE

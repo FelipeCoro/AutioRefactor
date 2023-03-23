@@ -26,7 +26,6 @@ interface AutioLocalDataSource {
     //suspend fun setBookmarksDataToLocalStories(storiesIds: List<String>)
     suspend fun setLikesDataToLocalStories(storiesIds: List<String>)
     suspend fun setListenedAtToLocalStories(storiesHistory: List<HistoryEntity>)
-    suspend fun addStoryToHistory(history: HistoryEntity)
     suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int)
     suspend fun removeStoryFromHistory(id: Int)
     suspend fun clearStoryHistory()

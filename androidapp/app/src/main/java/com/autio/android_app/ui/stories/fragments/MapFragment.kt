@@ -560,7 +560,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
         val storiesMap = stories.associate { it.id to StoryClusterItem(it) }
-        markers.putAll(storiesMap)//todo(eliminate take truncation)
+        markers.putAll(storiesMap)
 
         clusterManager.addItems(markers.values)
         clusterManager.cluster()

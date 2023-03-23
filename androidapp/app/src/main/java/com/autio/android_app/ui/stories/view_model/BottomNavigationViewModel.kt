@@ -258,16 +258,7 @@ class BottomNavigationViewModel @Inject constructor(
                     transportControls.playFromMediaId(
                         mediaId.toString(), null
                     )
-                    //TODO(Use ourRepo)
-                    //FirebaseStoryRepository
-                    //    .addStoryToUserHistory(
-                    //        prefRepository.firebaseKey,
-                    //        mediaId,
-                    //        onSuccessListener = { timestamp ->
-                    //            viewModelScope.launch(coroutineDispatcher) {
-                    //                autioRepository.addStoryToHistory(History(mediaId, timestamp))
-                    //            }
-                    //        })
+                    nowPlaying?.id?.let { autioRepository.addStoryToHistory(it) }
                 }
             } else {setViewState(BottomNavigationViewState.OnNotPremiumUser)}
         }

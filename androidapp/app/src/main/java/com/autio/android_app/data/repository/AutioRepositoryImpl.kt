@@ -389,10 +389,12 @@ class AutioRepositoryImpl @Inject constructor(
     ): Result<Pair<Boolean, Int>> {
         autioLocalDataSource.giveLikeToStory(storyId)
         val userAccount = getUserAccount()
-        var result = Pair(false,-1)
+        var result = Pair(false, -1)
         userAccount?.let { user ->
-            val remoteLike = autioRemoteDataSource.giveLikeToStory(user.id, user.bearerToken, storyId)
-            val likeCount = autioRemoteDataSource.storyLikesCount(user.id, user.bearerToken, storyId)
+            val remoteLike =
+                autioRemoteDataSource.giveLikeToStory(user.id, user.bearerToken, storyId)
+            val likeCount =
+                autioRemoteDataSource.storyLikesCount(user.id, user.bearerToken, storyId)
             if (remoteLike.isSuccessful) {
                 result =
                     Pair(
@@ -522,8 +524,11 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun addStoryToHistory(history: History) {
-        autioLocalDataSource.addStoryToHistory(history.toMapPointEntity())
+    override suspend fun addStoryToHistory(storyId: Int) {
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            autioRemoteDataSource.addStoryToHistory(user.id, user.bearerToken, storyId)
+        }
     }
 
     override suspend fun getUserStoriesHistory(): Result<List<Story>> {

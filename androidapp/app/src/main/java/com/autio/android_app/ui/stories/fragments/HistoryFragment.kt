@@ -22,6 +22,7 @@ import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlaylistBinding
 import com.autio.android_app.domain.mappers.toDto
+import com.autio.android_app.ui.stories.adapter.DownloadedStoryAdapter
 import com.autio.android_app.ui.stories.adapter.StoryAdapter
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
@@ -48,7 +49,7 @@ class HistoryFragment : Fragment() {
     private val storyViewModel: StoryViewModel by viewModels()
     private lateinit var binding: FragmentPlaylistBinding
     private lateinit var activityLayout: ConstraintLayout
-    private lateinit var storyAdapter: StoryAdapter
+    private lateinit var storyAdapter: DownloadedStoryAdapter
     private lateinit var recyclerView: RecyclerView
     private lateinit var snackBarView: View
     private var feedbackJob: Job? = null
@@ -74,12 +75,8 @@ class HistoryFragment : Fragment() {
         }
 
         recyclerView = binding.rvStories
-        storyAdapter = StoryAdapter(
-            bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-                bottomNavigationViewModel.playMediaId(
-                    id
-                )
-            }, onOptionClick = ::optionClicked, lifecycleOwner = viewLifecycleOwner
+        storyAdapter = DownloadedStoryAdapter(
+            { id -> bottomNavigationViewModel.playMediaId(id) }, ::optionClicked
         )
         return binding.root
     }
@@ -117,10 +114,6 @@ class HistoryFragment : Fragment() {
 
     private fun showStoryHistory(stories: List<Story>) {
         recyclerView.adapter = storyAdapter
-        recyclerView.layoutManager = LinearLayoutManager(
-            requireContext()
-        )
-        recyclerView.adapter = storyAdapter
 //            binding.tvToolbarSubtitle.text =
 //                resources.getQuantityString(
 //                    R.plurals.toolbar_stories_subtitle,
@@ -130,9 +123,10 @@ class HistoryFragment : Fragment() {
         binding.pbLoadingStories.visibility = View.GONE
         binding.btnPlaylistOptions.setOnClickListener { view ->
             showPlaylistOptions(
-                requireContext(), binding.root as ViewGroup, view, listOf(
-                    PlaylistOption.DOWNLOAD, PlaylistOption.CLEAR_HISTORY
-                ).map {
+                requireContext(),
+                binding.root as ViewGroup,
+                view,
+                listOf(PlaylistOption.DOWNLOAD, PlaylistOption.CLEAR_HISTORY).map {
                     it.also { option ->
                         option.disabled = stories.isEmpty()
                     }
@@ -141,9 +135,7 @@ class HistoryFragment : Fragment() {
         }
         if (stories.isEmpty()) {
             binding.ivNoContentIcon.setImageResource(R.drawable.ic_history)
-            binding.tvNoContentMessage.text = resources.getText(
-                R.string.empty_history_message
-            )
+            binding.tvNoContentMessage.text = resources.getText(R.string.empty_history_message)
             binding.rlStories.visibility = View.GONE
             binding.llNoContent.visibility = View.VISIBLE
         } else {
@@ -154,45 +146,39 @@ class HistoryFragment : Fragment() {
     }
 
 
-    private fun optionClicked(
-        option: StoryOption, story: Story
-    ) {
-        activity?.let { verifiedActivity ->
-            context?.let { verifiedContext ->
-                onOptionClicked(
-                    option,
-                    story,
-                    storyViewModel,
-                    verifiedActivity,
-                    verifiedContext
-                )
+    private fun optionClicked(option: StoryOption, story: Story) {
+        when (option) {
+            StoryOption.DELETE -> {
+                storyViewModel.removeStoryFromHistory(story.id)
+                binding.pbLoadingProcess.visibility = View.GONE
+                showFeedbackSnackBar("Removed Story")
+                navController.navigate(R.id.action_history_playlist_to_my_stories)
+            }
+            else -> {
+                activity?.let { verifiedActivity ->
+                    context?.let { verifiedContext ->
+                        onOptionClicked(
+                            option,
+                            story,
+                            storyViewModel,
+                            verifiedActivity,
+                            verifiedContext
+                        )
+                    }
+                }
             }
         }
     }
 
-    private fun onPlaylistOptionClicked(
-        option: PlaylistOption
-    ) {
+    private fun onPlaylistOptionClicked(option: PlaylistOption) {
         binding.pbLoadingProcess.visibility = View.VISIBLE
         when (option) {
-            PlaylistOption.DOWNLOAD -> {
-                //TODO(Add Method)
-            }
-            PlaylistOption.CLEAR_HISTORY -> { //TODO(LOCAL METHOD)
-                //      FirebaseStoryRepository.removeWholeUserHistory(prefRepository.firebaseKey,
-                //          onSuccessListener = {
-                //              storyViewModel.clearStoryHistory()
-                //              binding.pbLoadingProcess.visibility = View.GONE
-                //              showFeedbackSnackBar(
-                //                  "Cleared History"
-                //              )
-                //          },
-                //          onFailureListener = {
-                //              binding.pbLoadingProcess.visibility = View.GONE
-                //              showFeedbackSnackBar(
-                //                  "Connection Failure"
-                //              )
-                //          })
+            PlaylistOption.CLEAR_HISTORY -> {
+                storyViewModel.clearStoryHistory()
+                binding.pbLoadingProcess.visibility = View.GONE
+                showFeedbackSnackBar("Cleared History")
+                navController.navigate(R.id.action_history_playlist_to_my_stories)
+
             }
             else -> Log.d(
                 "HistoryFragment", "option not available for this playlist"
@@ -200,10 +186,6 @@ class HistoryFragment : Fragment() {
         }
     }
 
-
-    private fun handlePlaylistOptionsSuccess() {
-
-    }
 
     private fun cancelJob() {
         if (activityLayout.contains(

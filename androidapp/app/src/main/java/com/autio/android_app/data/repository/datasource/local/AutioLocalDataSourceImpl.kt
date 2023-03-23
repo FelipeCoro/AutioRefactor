@@ -129,17 +129,7 @@ class AutioLocalDataSourceImpl @Inject constructor(
     }
 
 
-    override suspend fun addStoryToHistory(history: HistoryEntity) {
-        storyDao.setListenedAtData(
-            history.storyId, history.playedAt
-        )
 
-        if (getDownloadedStoryById(history.storyId) != null) {
-            storyDao.setListenedAtData(
-                history.storyId, history.playedAt
-            )
-        }
-    }
 
     override suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int) {
         storyDao.markStoryAsListenedAtLeast30Secs(storyId)
