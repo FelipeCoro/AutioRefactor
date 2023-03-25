@@ -66,7 +66,8 @@
                         android:layout_marginVertical="16dp"
                         android:layout_marginEnd="11.5dp"
                         android:src="@drawable/ic_player_play"
-                        app:tint="@color/normal_text" />
+                        app:tint="@color/normal_text"
+                        tools:visibility="visible" />
 
 
                     <LinearLayout
@@ -246,6 +247,7 @@
             android:background="@color/normal_text"
             android:gravity="center"
             android:padding="8dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">

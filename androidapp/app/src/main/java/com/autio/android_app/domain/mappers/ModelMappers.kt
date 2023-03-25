@@ -190,7 +190,6 @@ fun UserEntity.toModel(): User {
         userApiToken,
         isGuestUser,
         remainingStories,
-        userSubIsActive,
         isPremiumUser
     )
 }
@@ -227,7 +226,7 @@ fun LoginResponse.toModel(): User {
 
 fun User.toEntity(): UserEntity {
     return UserEntity(
-        id, name, email, apiToken, isGuest, remainingStories, userSubIsActive, isPremiumUser
+        id, name, email, apiToken, isGuest, remainingStories, isPremiumUser
     )
 }
 

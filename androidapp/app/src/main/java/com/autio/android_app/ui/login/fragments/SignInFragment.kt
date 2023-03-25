@@ -22,10 +22,7 @@ import com.autio.android_app.ui.stories.models.LoginRequest
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
-import com.autio.android_app.util.checkEmptyField
-import com.autio.android_app.util.pleaseFillText
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showToast
+import com.autio.android_app.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -62,6 +59,9 @@ class SignInFragment : Fragment() {
     private fun bindObservables() {
         purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handlePurchaseViewState)
         loginViewModel.viewState.observe(viewLifecycleOwner, ::handleLoginViewState)
+        purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
+            it?.let { updateUserSub(it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) }
+        }
     }
 
     private fun setListeners() {
@@ -123,6 +123,10 @@ class SignInFragment : Fragment() {
         val nav = findNavController()
         nav.navigate(request)
 
+    }
+
+    private fun updateUserSub(isPremium:Boolean){
+        purchaseViewModel.updateUserInfo(isPremium)
     }
 }
 

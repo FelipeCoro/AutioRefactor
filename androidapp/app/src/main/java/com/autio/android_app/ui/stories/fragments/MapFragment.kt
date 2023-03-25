@@ -505,13 +505,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         binding.tvSelectedStoryTitle.text = story.title
         binding.tvSelectedStoryNarrator.text = story.narrator
         playerViewModel.setCurrentStory(story)
-       bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
-      //     if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
-      //         binding.btnSelectedStoryPlay.setImageResource(res)
-      //     } else {
-      //         binding.btnSelectedStoryPlay.setImageResource(R.drawable.ic_player_play)
-      //     }
-        }
+        //bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
+      //   if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
+      //       binding.btnSelectedStoryPlay.setImageResource(res)
+      //   } else {
+      //       binding.btnSelectedStoryPlay.setImageResource(R.drawable.ic_player_play)
+      //   }
+       // }
         binding.btnSelectedStoryPlay.setOnClickListener {
             //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
             bottomNavigationViewModel.playMediaId(story.id)

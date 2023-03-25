@@ -13,13 +13,12 @@ data class User(
     val apiToken: String,
     var isGuest: Boolean,
     var remainingStories: Int = 5,
-    var userSubIsActive: Boolean = false,
     var isPremiumUser: Boolean = false
 ) : Parcelable {
     @IgnoredOnParcel
     val bearerToken = "Bearer $apiToken"
     override fun toString(): String {
-        return "User(id=$id, name='$name', email='$email', apiToken='$apiToken', isGuest=$isGuest, remainingStories=$remainingStories, userSubIsActive=$userSubIsActive, isPremiumUser=$isPremiumUser, bearerToken='$bearerToken')"
+        return "User(id=$id, name='$name', email='$email', apiToken='$apiToken', isGuest=$isGuest, remainingStories=$remainingStories, isPremiumUser=$isPremiumUser, bearerToken='$bearerToken')"
     }
 
 

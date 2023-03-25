@@ -14,6 +14,7 @@ import com.autio.android_app.ui.stories.models.Narrator
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.models.User
 import com.google.android.gms.maps.model.LatLng
+import com.revenuecat.purchases.CustomerInfo
 import kotlinx.coroutines.flow.Flow
 
 interface AutioRepository {
@@ -23,7 +24,10 @@ interface AutioRepository {
     suspend fun isPremiumUser(): Boolean
 
     suspend fun createAccount(accountRequest: AccountRequest): Result<User>
-    suspend fun login(loginRequest: LoginRequest): Result<User>
+    suspend fun login(loginRequest: LoginRequest, ): Result<User>
+
+    //TODO(URGENT. This one will disappear with correct back end call)
+    suspend fun updateSubStatus(isPremium:Boolean)
     suspend fun loginAsGuest(): Result<User>
     suspend fun fetchUserData() : Result<User?>
     suspend fun updateProfile(infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit)

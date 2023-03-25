@@ -48,7 +48,6 @@ class BottomNavigationViewModel @Inject constructor(
     private val app: Application,
     private val playerServiceConnection: PlayerServiceConnection,
     private val autioRepository: AutioRepository,
-    private val prefRepository: PrefRepository,
     @IoDispatcher
     private val coroutineDispatcher: CoroutineDispatcher
 ) : AndroidViewModel(app) {
@@ -258,14 +257,14 @@ class BottomNavigationViewModel @Inject constructor(
                     transportControls.playFromMediaId(
                         mediaId.toString(), null
                     )
-                    nowPlaying?.id?.let { autioRepository.addStoryToHistory(it) }
+                    nowPlaying?.id?.let { autioRepository.addStoryToHistory(it) } //TODO(URGENT. this could help with story count))
                 }
             } else {setViewState(BottomNavigationViewState.OnNotPremiumUser)}
         }
     }
 
     private fun isUserAllowedToPlayStories(user: User) =
-        user.isPremiumUser || (user.isGuest && user.remainingStories > 0)
+        user.isPremiumUser || user.remainingStories > 0
 
     fun rewindFifteenSeconds() {
         val transportControls = playerServiceConnection.transportControls

@@ -41,7 +41,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/tvUnassignedMessage">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSignIn"
+                    android:id="@+id/btnSignInOld"
                     style="@style/Button.Shape"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -238,7 +238,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
                         android:text="@string/manage_subscription"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:visibility="invisible" />
                 </LinearLayout>
 
                 <View
@@ -559,7 +560,19 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="7dp"
                         android:layout_weight="1"
-                        android:text="@string/log_out" />
+                        android:text="@string/log_out"
+                        android:visibility="gone" />
+
+                    <Button
+                        android:id="@+id/btn_sign_in"
+                        style="@style/Button.Active.Filled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:layout_weight="1"
+                        android:text="@string/sign_in"
+                        android:visibility="gone" />
+
                 </LinearLayout>
 
                 <TextView
@@ -586,6 +599,20 @@
                     app:layout_constraintEnd_toEndOf="@+id/tvRestorePurchase"
                     app:layout_constraintStart_toStartOf="@+id/tvRestorePurchase"
                     app:layout_constraintTop_toBottomOf="@+id/tvRestorePurchase" />
+
+                <ProgressBar
+                    android:id="@+id/pbLoadingAccount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/white"
+                    android:indeterminateTintMode="src_atop"
+                    app:layout_constraintBottom_toTopOf="@+id/lyProfile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.59" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </ScrollView>

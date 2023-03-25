@@ -35,7 +35,7 @@ class AccountFragmentViewModel @Inject constructor(
           val data =  autioRepository.fetchUserData()
             val result = data.getOrNull()
             if(result!=null)
-            setViewState(AccountViewState.OnUserDataFetched(result))
+                setViewState(AccountViewState.OnUserDataFetched(result))
         }
     }
 

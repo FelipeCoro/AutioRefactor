@@ -1,25 +1,29 @@
 package com.autio.android_app.ui.onboarding.fragments
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentWelcomeExplorerBinding
+import com.autio.android_app.ui.stories.BottomNavigation
+import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class WelcomeExplorerFragment : Fragment() {
 
-    @Inject
-    lateinit var prefRepository: PrefRepository
     private lateinit var binding: FragmentWelcomeExplorerBinding
     private lateinit var viewPager: ViewPager2
+    private val purchaseViewModel: PurchaseViewModel by viewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -36,20 +40,21 @@ class WelcomeExplorerFragment : Fragment() {
                 viewPager.currentItem += 1
             }
         }
-        //initView()
+        bindObservables()
+        initView()
     }
 
-    /*
-        private fun initView() {
-            if (isOnBoardingFinished()) {
-                if (isUserLoggedIn()) {
-                    startActivity(Intent(activity, BottomNavigation::class.java))
-                    activity?.finish()
-                } else findNavController().navigate(R.id.action_onBoardingFragment_to_loginFragment)
-            }
-            startAnimation()
+    private fun bindObservables() {
+        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handlePurchaseViewState)
+    }
+
+    private fun initView() {
+        if (isOnBoardingFinished()) {
+            isUserLoggedIn()
         }
-    */
+        startAnimation()
+    }
+
     private fun startAnimation() {
         binding.tvWelcome.apply {
             alpha = 0f
@@ -75,13 +80,30 @@ class WelcomeExplorerFragment : Fragment() {
         }
     }
 
+    private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
+        when (viewState) {
+            is PurchaseViewState.FetchedUserSuccess -> handleHandleActiveUserSuccess(viewState.data)
+            else -> {}
+        }
+    }
+
+
     private fun isOnBoardingFinished(): Boolean {
         val sharedPreferences =
             activity?.getSharedPreferences("onBoarding", Context.MODE_PRIVATE)
         return sharedPreferences?.getBoolean("Finished", false) ?: false
     }
-/*
-    private fun isUserLoggedIn() =
-        prefRepository.userApiToken.isEmpty() //TODO(Shouldn't this be if its NOT empty?)
-*/
+
+    private fun isUserLoggedIn() {
+        purchaseViewModel.getUserInfo()
+    }
+
+    private fun handleHandleActiveUserSuccess(user: User) {
+        if (!user.isGuest) {
+            startActivity(Intent(activity, BottomNavigation::class.java))
+            activity?.finish()
+        } else if (viewPager != null) {
+            viewPager.currentItem += 1
+        }
+    }
 }

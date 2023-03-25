@@ -151,6 +151,9 @@
         <action
             android:id="@+id/action_subscribeFragment_to_map_fragment"
             app:destination="@id/map_fragment" />
+        <action
+            android:id="@+id/action_subscribeFragment_to_authentication_nav"
+            app:destination="@id/authentication_nav" />
     </fragment>
     <include app:graph="@navigation/nav_authentication" />
 </navigation>

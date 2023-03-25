@@ -330,11 +330,6 @@ class StoryViewModel @Inject constructor(
      * Clears columns to be specific for a user
      * i. e. listened at story column
      */
-    fun clearUserData() {
-        viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.clearUserData()
-        }
-    }
 
     fun getStoriesInBounds(bounds: LatLngBounds) {
         if (::getStoriesJob.isInitialized && getStoriesJob.isActive) {

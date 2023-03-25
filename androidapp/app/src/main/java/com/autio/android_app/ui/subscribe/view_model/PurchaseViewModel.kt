@@ -1,6 +1,7 @@
 package com.autio.android_app.ui.subscribe.view_model
 
 import android.app.Activity
+import android.view.View
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +15,7 @@ import com.autio.android_app.ui.stories.models.AccountRequest
 import com.autio.android_app.ui.stories.models.LoginRequest
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
+import com.autio.android_app.util.Constants
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
@@ -28,7 +30,6 @@ import javax.inject.Inject
 class PurchaseViewModel @Inject constructor(
     private val autioRepository: AutioRepository,
     private val revenueCatRepository: RevenueCatRepository,
-    private val prefRepository: PrefRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
@@ -37,15 +38,30 @@ class PurchaseViewModel @Inject constructor(
     val viewState: LiveData<PurchaseViewState> = _viewState
     val customerInfo = revenueCatRepository.customerInfo
 
+    fun updateUserInfo(isPremium: Boolean) {
+        viewModelScope.launch(coroutineDispatcher) { //TODO(URGENT. THIS MUST GO WITH API CALL)
+            autioRepository.updateSubStatus(isPremium)
+        }
+    }
+
     fun getUserInfo() {
         viewModelScope.launch(coroutineDispatcher) {
             val reveCatInfo = revenueCatRepository.getUserInfo()
             val result = autioRepository.getUserAccount()
             if (result != null) {
-                //TODO(map revenue cat user and our domain user with both results?, is this done on login?)
                 setViewState(PurchaseViewState.FetchedUserSuccess(result))
             }
         }
+    }
+
+    fun getUserStories() {
+        viewModelScope.launch(coroutineDispatcher) {
+            val result = autioRepository.getUserAccount()
+            if (result != null) {
+                setViewState(PurchaseViewState.FetchedUserStoriesSuccess(result))
+            }
+        }
+
     }
 
     fun login(loginRequest: LoginRequest) {
@@ -54,7 +70,7 @@ class PurchaseViewModel @Inject constructor(
             val result = autioRepository.login(loginRequest)
             if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
-                    revenueCatRepository.login(user.id.toString())
+                    revenueCatRepository.login(user.id.toString())//TODO(URGENT.UPDATE ISPREMIUM THROUGH API SERVICE)
                     setViewState(PurchaseViewState.OnLoginSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
             } else setViewState(PurchaseViewState.OnLoginFailed)
@@ -82,7 +98,11 @@ class PurchaseViewModel @Inject constructor(
     }
 
     fun logOut() {
-        revenueCatRepository.logOut()
+        viewModelScope.launch(coroutineDispatcher) {
+            revenueCatRepository.logOut()
+            autioRepository.clearUserData()
+            setViewState(PurchaseViewState.OnSuccessLogOut)
+        }
     }
 
     fun getOfferings() {
@@ -104,21 +124,34 @@ class PurchaseViewModel @Inject constructor(
 
     fun purchasePackage(activity: Activity, packageToPurchase: Package) {
         viewModelScope.launch(coroutineDispatcher) {
-            revenueCatRepository.purchasePackage(
-                activity,
-                packageToPurchase, ::handlePurchaseError, ::handleSuccessTransaction
-            )
+            val result = autioRepository.getUserAccount()
+            if (result != null) {
+                if (!result.isGuest) {
+                    revenueCatRepository.purchasePackage(
+                        activity,
+                        packageToPurchase, ::handlePurchaseError, ::handleSuccessTransaction
+                    )
+                } else {
+                    setViewState(PurchaseViewState.UserNotLoggedIn)
+                }
+            }
         }
     }
 
     private fun handleSuccessTransaction(
         storeTransaction: StoreTransaction, customerInfo: CustomerInfo
     ) {
-        TODO("handleSuccessTransaction Purchase")
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.updateSubStatus(true)
+            setViewState(PurchaseViewState.SuccessfulPurchase) //TODO URGENT. API CALL WILL HAPPEN HERE)
+        }
     }
 
-    private fun handlePurchaseError(error: PurchasesError, isTrue: Boolean) {
-        TODO("handlePurchaseError Purchase")
+    private fun handlePurchaseError(error: PurchasesError, userCancelled: Boolean) {
+
+        if (userCancelled)
+            setViewState(PurchaseViewState.CancelledPurchase)
+        else setViewState(PurchaseViewState.PurchaseError(error.message))
     }
 
     fun restorePurchase(

@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -46,6 +47,7 @@ class SubscribeFragment : Fragment() {
     private lateinit var currentUser: User
     private lateinit var yearlySub: Package
     private lateinit var singleTripSub: Package
+    private lateinit var threeYearSub: Package
 
 
     override fun onCreateView(
@@ -63,6 +65,7 @@ class SubscribeFragment : Fragment() {
             offerings.current?.availablePackages?.takeUnless { it.isEmpty() }?.let {
                 yearlySub = offerings["standard"]?.availablePackages?.get(0)!!
                 singleTripSub = offerings["standard"]?.availablePackages?.get(1)!!
+                threeYearSub = offerings["standard"]?.availablePackages?.get(2)!!
             }
         }
 
@@ -110,13 +113,13 @@ class SubscribeFragment : Fragment() {
 
     private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
         when (viewState) {
-            is PurchaseViewState.FetchedUserSuccess -> handlePurchaseSuccessViewState(viewState.data)
+            is PurchaseViewState.FetchedUserSuccess -> handleFetchUserSuccessViewState(viewState.data)
+            is PurchaseViewState.UserNotLoggedIn -> handleUserNotLoggedIn()
+            is PurchaseViewState.SuccessfulPurchase -> handleSuccessfulPurchase()
+            is PurchaseViewState.PurchaseError -> handlePurchaseError(viewState.error)
+            is PurchaseViewState.CancelledPurchase -> handleCancelledPurchase()
             else -> {}
         }
-    }
-
-    private fun handlePurchaseSuccessViewState(user: User) {
-        currentUser = user
     }
 
     private fun learnMoreLinkClicked(view: View) {
@@ -152,32 +155,22 @@ class SubscribeFragment : Fragment() {
         }
 
 
-        if (::yearlySub.isInitialized && ::singleTripSub.isInitialized) {
-
+        if (::yearlySub.isInitialized && ::singleTripSub.isInitialized && ::threeYearSub.isInitialized) {
             binding.cvTraveler.setOnClickListener {
-                Purchases.sharedInstance.purchasePackageWith(
-                    requireActivity(),
-                    yearlySub,
-                    onError = { error, userCancelled -> /* No purchase */ },
-                    onSuccess = { product, customerInfo ->
-                        if (customerInfo.entitlements["my_entitlement_identifier"]?.isActive == true) {
-                            Log.WARN
-                        }
-                    })
+                makePurchase(yearlySub)
             }
 
             binding.subscriptionPathUi.cvSingleTrip.setOnClickListener {
-                Purchases.sharedInstance.purchasePackageWith(
-                    requireActivity(),
-                    singleTripSub,
-                    onError = { error, userCancelled -> error.message },
-                    onSuccess = { product, customerInfo ->
-                        if (customerInfo.entitlements["Unlimited Stories"]?.isActive == true) {
-                            Log.WARN
-                        }
-                    })
+                makePurchase(singleTripSub)
+            }
+
+            binding.subscriptionPathUi.cvAdventurer.setOnClickListener {
+                makePurchase(threeYearSub)
             }
         }
+
+
+        //On handle success, travel to map fragment
 
         /*{ offerings -> //TODO (Make purchase handle viewStates for offerings)
             offerings.current?.availablePackages?.takeUnless { it.isEmpty() }?.let { packages ->
@@ -199,7 +192,6 @@ class SubscribeFragment : Fragment() {
             }
         }
 */
-
         binding.commentSection.btnChoosePlan.setOnClickListener { scrollToSubscribeSection() }
 
         binding.subscriptionPathUi.btnStoriesFree1.setOnClickListener { isSessionAlive() }
@@ -215,47 +207,35 @@ class SubscribeFragment : Fragment() {
         }
     }
 
-    private fun updateSubscriptionUI(customerInfo: CustomerInfo?) {
-        val isUserLogged = currentUser.apiToken.isNotEmpty()
-        val isSubscriptionActive =
-            customerInfo?.entitlements?.get(REVENUE_CAT_ENTITLEMENT)?.isActive == true
 
-        with(binding.slider.signInOrRestore) {
-            if (!isUserLogged) {
-                // Sign in or restore purchase
-                text = resources.getText(R.string.sign_in_or_restore_purchase)
-                makeLinks(
-                    context.getString(R.string.subscribe_fragment_sign_in_link) to { goToLoginActivity() },
-                    context.getString(R.string.subscribe_fragment_restore_purchase_link) to { purchaseViewModel.restorePurchase() },
-                    shouldUnderline = false
-                )
+    /*  private fun updateSubscriptionUI(customerInfo: CustomerInfo?) {
+          val isUserLogged = currentUser.apiToken.isNotEmpty()
+          val isSubscriptionActive =
+              customerInfo?.entitlements?.get(REVENUE_CAT_ENTITLEMENT)?.isActive == true
 
-            } else if (!isSubscriptionActive) {
-                // Restore purchase
-                text = resources.getText(R.string.restore_purchase)
-                setOnClickListener { purchaseViewModel.restorePurchase() }
-            } else {
-                visibility = View.GONE
-            }
-        }
-    }
+          with(binding.slider.signInOrRestore) {
+              if (!isUserLogged) {
+                  // Sign in or restore purchase
+                  text = resources.getText(R.string.sign_in_or_restore_purchase)
+                  makeLinks(
+                      context.getString(R.string.subscribe_fragment_sign_in_link) to { goToLoginActivity() },
+                      context.getString(R.string.subscribe_fragment_restore_purchase_link) to { purchaseViewModel.restorePurchase() },
+                      shouldUnderline = false
+                  )
+
+              } else if (!isSubscriptionActive) {
+                  // Restore purchase
+                  text = resources.getText(R.string.restore_purchase)
+                  setOnClickListener { purchaseViewModel.restorePurchase() }
+              } else {
+                  visibility = View.GONE
+              }
+          }
+      }*/
 
     private fun makePurchase(mPackage: Package) {
         activity?.let {
-
-            /*
-            purchaseViewModel.purchasePackage(
-                it,
-                mPackage,
-                onError = { _, _ -> }, { _, _ ->
-                    // Check if paywall was invoked from a logged in account (either verified
-                    // or guest user) so it pops to the main screen once the purchase is done
-                    if (intent.getStringExtra("ACTIVITY_NAME") == BottomNavigation::class.simpleName) {
-                        // Go to account page
-                        it.finish()
-                    }
-                }
-                */ //TODO (Make purchase handle viewStates)
+            purchaseViewModel.purchasePackage(it, mPackage)
         }
     }
 
@@ -263,19 +243,47 @@ class SubscribeFragment : Fragment() {
         //  if (isSessionAlive.isEmpty()) {
         //      goToLoginActivity()
         //  } else {
-        getToMainMenu()
+        purchaseViewModel.getUserInfo()
 
     }
 
-    private fun getToMainMenu() {
-     //   val intent = Intent(context, BottomNavigation::class.java)
-     //   intent.addFlags(
-     //       Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-     //   )
-     //   startActivity(intent)
+    private fun handleUserNotLoggedIn() {
+        Toast.makeText(
+            context,
+            "Please create or log into an account before making a purchase",
+            Toast.LENGTH_LONG
+        ).show()
+        navController.navigate(R.id.action_subscribeFragment_to_authentication_nav)
+        bottomNavigationActivity?.finish()
+    }
 
-       if(bottomNavigationActivity?.tempCount!! >0){
-        navController.navigate(R.id.action_subscribeFragment_to_map_fragment)}
+    private fun handleFetchUserSuccessViewState(user: User) {
+        if (bottomNavigationActivity?.tempCount!! > 0 || user.isPremiumUser) {
+            navController.navigate(R.id.action_subscribeFragment_to_map_fragment)
+        }
+    }
+
+    private fun handleSuccessfulPurchase(){
+        Toast.makeText(
+            context,
+            "Purchase made successfully, Enjoy!",
+            Toast.LENGTH_LONG
+        ).show()
+        navController.navigate(R.id.action_subscribeFragment_to_map_fragment)
+    }
+    private fun handlePurchaseError(errorMessage:String){
+        Toast.makeText(
+            context,
+            errorMessage,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+    private fun handleCancelledPurchase(){
+        Toast.makeText(
+            context,
+            "Your purchase was not made",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun goToLoginActivity() {

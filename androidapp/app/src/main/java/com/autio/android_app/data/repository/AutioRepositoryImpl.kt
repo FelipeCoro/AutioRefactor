@@ -20,12 +20,13 @@ import com.autio.android_app.ui.stories.models.AccountRequest
 import com.autio.android_app.ui.stories.models.Author
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.Contributor
-import com.autio.android_app.ui.stories.models.History
 import com.autio.android_app.ui.stories.models.LoginRequest
 import com.autio.android_app.ui.stories.models.Narrator
 import com.autio.android_app.ui.stories.models.Story
 import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.util.Constants
 import com.google.android.gms.maps.model.LatLng
+import com.revenuecat.purchases.CustomerInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
@@ -87,8 +88,6 @@ class AutioRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 response.body()?.let {
                     val user = it.toModel()
-                   // user.isPremiumUser = true
-                    //Here we would want to update stories, isPremiun and isSubscribed?
                     autioLocalDataSource.updateUserInformation(user)
                     return Result.success(user)
                 }
@@ -98,6 +97,15 @@ class AutioRepositoryImpl @Inject constructor(
         }
 
         return Result.failure(Error())
+    }
+    override suspend fun updateSubStatus(isPremium: Boolean) {
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            kotlin.runCatching {
+                user.isPremiumUser = isPremium
+                autioLocalDataSource.updateUserInformation(user)
+            }
+        }
     }
 
     override suspend fun loginAsGuest(): Result<User> {

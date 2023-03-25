@@ -119,8 +119,8 @@ class LoginFragment : Fragment() {
 
     private fun handleViewState(viewState: LoginViewState?) {
         when (viewState) {
-            is LoginViewState.LoginError -> showError()
-            else -> showSuccess(viewState)
+            is LoginViewState.GuestLoginSuccess -> showSuccess(viewState)
+            else -> showError()
         }
     }
 

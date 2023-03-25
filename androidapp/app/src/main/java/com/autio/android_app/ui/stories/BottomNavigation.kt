@@ -55,6 +55,7 @@ class BottomNavigation : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var snackBarView: View
 
+
     private var castContext: CastContext? = null
     private var isNetworkAvailable = false
 
@@ -87,7 +88,7 @@ class BottomNavigation : AppCompatActivity() {
     private fun initView() {
         // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
         volumeControlStream = AudioManager.STREAM_MUSIC
-        purchaseViewModel.getUserInfo()
+        purchaseViewModel.getUserStories()
         updateSnackBarMessageDisplay()
         showPlayerComponent()
     }
@@ -109,7 +110,7 @@ class BottomNavigation : AppCompatActivity() {
 
         purchaseViewModel.customerInfo.observe(this) {
             it?.let {
-                binding.storiesFreePlansBanner.visibility =
+                binding.storiesFreePlansBanner.visibility = //TODO(URGENT. CHANGE FOR API VALIDATION TRUE VIEWSTATE)
                     if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) GONE
                     else VISIBLE
             }
@@ -129,7 +130,8 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
         when (viewState) {
-            is PurchaseViewState.FetchedUserSuccess -> handlePurchaseSuccessViewState(viewState.data)
+            is PurchaseViewState.FetchedUserSuccess -> handleFetchUserSuccessViewState(viewState.data)
+            is PurchaseViewState.FetchedUserStoriesSuccess ->handleFetchUserStoriesSuccessViewState(viewState.user)
             else -> {}
         }
     }
@@ -138,10 +140,6 @@ class BottomNavigation : AppCompatActivity() {
     private fun handleBottomNavSuccessViewState(mediaItem: Story) {
         updatePlayer(mediaItem)
 
-    }
-
-    private fun handlePurchaseSuccessViewState(user: User) {
-        updateAvailableStoriesUI(tempCount)//user.remainingStories)
     }
 
     override fun onStart() {
@@ -189,12 +187,14 @@ class BottomNavigation : AppCompatActivity() {
         navController = navHostFragment.navController
         setupWithNavController(binding.bottomNavigationView, navController)
         navController.addOnDestinationChangedListener { controller, destination, _ ->
-            val subscribeFragmentDestination = controller.graph[R.id.subscribeFragment].label
             if (destination.label == controller.graph[R.id.player].label) {
                 hidePlayerComponent()
-            } else if (destination.label == subscribeFragmentDestination) {
+            } else if (destination.label == controller.graph[R.id.subscribeFragment].label) {
                 hidePlayerComponent()
-            } else {
+            } else if (destination.label == controller.graph[R.id.account].label){
+                showUiElementsNoPaywall(true)
+            }
+            else {
                 showUiElements(true)
             }
         }
@@ -202,16 +202,34 @@ class BottomNavigation : AppCompatActivity() {
 
 
     fun showPayWall() {
-        hidePlayerComponent()
-        navController.navigate(R.id.subscribeFragment)
+           purchaseViewModel.getUserInfo()
     }
 
+    private fun handleFetchUserSuccessViewState(user: User) {
+
+       if (!user.isPremiumUser) {
+           hidePlayerComponent()
+           navController.navigate(R.id.subscribeFragment)
+       }
+    }
+
+    private fun handleFetchUserStoriesSuccessViewState(user: User) {
+        if(!user.isPremiumUser){
+            updateAvailableStoriesUI(tempCount)//user.remainingStories)
+        }
+    }
     private fun showUiElements(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
-        binding.storiesFreePlansBanner.isVisible = isVisible
+        // binding.rlAllowNotifications.isVisible = isVisible
+        binding.bottomNavigationView.isVisible = isVisible
+        purchaseViewModel.getUserStories()
+    }
+    private fun showUiElementsNoPaywall(isVisible: Boolean) {
+        binding.persistentPlayer.isVisible = isVisible
         // binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
     }
+
 
     private fun updateSnackBarMessageDisplay() {
         with(binding) {
@@ -252,6 +270,7 @@ class BottomNavigation : AppCompatActivity() {
             //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
             if (remainingStories <= 0) {
                 llTickMarks.visibility = GONE
+                storiesFreePlansBanner.visibility = GONE
                 showPayWall()
             }else{
                 for ((i, tickMark) in tickMarks.withIndex()) {
@@ -270,6 +289,7 @@ class BottomNavigation : AppCompatActivity() {
                     }
                 }
                 llTickMarks.visibility = VISIBLE
+                storiesFreePlansBanner.visibility = VISIBLE
             }
         }
     }

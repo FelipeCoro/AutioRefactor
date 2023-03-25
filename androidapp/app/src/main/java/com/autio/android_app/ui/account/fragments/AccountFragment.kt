@@ -31,6 +31,7 @@ import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
+import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
 import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.autio.android_app.util.bottomNavigationActivity
 import com.autio.android_app.util.checkEmptyField
@@ -49,7 +50,6 @@ import java.io.File
 class AccountFragment : Fragment() {
 
     private val accountFragmentViewModel: AccountFragmentViewModel by viewModels()
-    private val storyViewModel: StoryViewModel by viewModels()
     private val purchaseViewModel: PurchaseViewModel by viewModels()
 
     private lateinit var binding: FragmentAccountBinding
@@ -81,11 +81,8 @@ class AccountFragment : Fragment() {
     }
 
     private fun bindObservables() {
-        // Updates UI based on subscription status
-        purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
-            it?.let { updateSubscriptionUI(it) }
-        }
         accountFragmentViewModel.viewState.observe(viewLifecycleOwner, ::handleViewState)
+        purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handlePurchaseViewState)
     }
 
     private fun handleViewState(accountViewState: AccountViewState?) {
@@ -94,6 +91,15 @@ class AccountFragment : Fragment() {
                 is AccountViewState.OnSuccessPasswordChanged -> handleSuccessPasswordChanged()
                 is AccountViewState.OnFailedPasswordChanged -> handleFailedPasswordChanged()
                 is AccountViewState.OnUserDataFetched -> handleUserinfo(viewState.data)
+            }
+        }
+    }
+
+    private fun handlePurchaseViewState(purchaseViewState: PurchaseViewState?) {
+        purchaseViewState?.let { viewState ->
+            when (viewState) {
+                is PurchaseViewState.OnSuccessLogOut -> handleSuccessLogOut()
+                else -> {}
             }
         }
     }
@@ -155,11 +161,11 @@ class AccountFragment : Fragment() {
             }
 
             tvManageSubscription.setOnClickListener {
-                bottomNavigationActivity?.showPayWall()
+                bottomNavigationActivity?.showPayWall() //TODO(URGENT special paywall that check if user has a subscription and shows them the 3 year?)
             }
 
-           // btnSendDiscount.setOnClickListener {
-                // TODO: Create discount code from Google Play
+            // btnSendDiscount.setOnClickListener {
+            // TODO: Create discount code from Google Play
             //}
             seePlans.setOnClickListener {
                 bottomNavigationActivity?.showPayWall()
@@ -247,8 +253,9 @@ class AccountFragment : Fragment() {
             })
         }
     }
+
     private fun updateUserData() {
-        if (checkEmptyField(binding.etName) ) {
+        if (checkEmptyField(binding.etName)) {
             pleaseFillText(requireContext())
         } else {
             val name = "${binding.etName.text}"
@@ -262,9 +269,9 @@ class AccountFragment : Fragment() {
         }
     }
 
-    private fun updateSubscriptionUI(customerInfo: CustomerInfo) {
+    private fun updateSubscriptionUI(isPremiun: Boolean) {
         with(binding) {
-            if (customerInfo.entitlements[REVENUE_CAT_ENTITLEMENT]?.isActive == true) {
+            if (isPremiun) {
                 tvPlanStatus.text = resources.getText(R.string.status_subscribed)
                 tvRestorePurchase.visibility = GONE
             } else {
@@ -276,6 +283,7 @@ class AccountFragment : Fragment() {
                     visibility = VISIBLE
                 }
             }
+            pbLoadingAccount.visibility = GONE
         }
     }
 
@@ -295,27 +303,37 @@ class AccountFragment : Fragment() {
     }
 
     private fun updateCategories() {
-     // // This was implemented as this because of a bug in backend
-     // // where order in which data was passed actually mattered
-     // // TODO: Update to more optimal code after bug fix reported from backend
-     // accountFragmentViewModel.saveCategoriesOrder(tempCategories.mapIndexed { i, cat ->
-     //     Category(id = cat.id, order = i + 1, title = cat.title)
-     // }.sortedBy { it.id }, onSuccess = {
-     //     showToast(requireContext(), "Profile has been updated")
-     // }, onFailure = {
-     //     showError(requireContext())
-     // })
+        // // This was implemented as this because of a bug in backend
+        // // where order in which data was passed actually mattered
+        // // TODO: Update to more optimal code after bug fix reported from backend
+        // accountFragmentViewModel.saveCategoriesOrder(tempCategories.mapIndexed { i, cat ->
+        //     Category(id = cat.id, order = i + 1, title = cat.title)
+        // }.sortedBy { it.id }, onSuccess = {
+        //     showToast(requireContext(), "Profile has been updated")
+        // }, onFailure = {
+        //     showError(requireContext())
+        // })
     }
 
     private fun getUserInfo() {
         accountFragmentViewModel.fetchUserData()
     }
 
-    private fun handleUserinfo(user: User){
+    private fun handleUserinfo(user: User) {
         name = user.name.trim()
         email = user.email
         binding.etName.setText(name)
         binding.etEmail.setText(email)
+
+        if (user.isGuest) {
+            binding.btnLogOut.visibility = GONE
+            binding.btnSignIn.visibility = VISIBLE
+        } else {
+            binding.btnSignIn.visibility = GONE
+            binding.btnLogOut.visibility = VISIBLE
+        }
+
+        updateSubscriptionUI(user.isPremiumUser)
     }
 
 
@@ -344,20 +362,20 @@ class AccountFragment : Fragment() {
     }
 
     private fun initRecyclerViewInterest() {
-     //  binding.rvInterests.layoutManager = LinearLayoutManager(context)
-     //  storyViewModel.userCategories.observe(viewLifecycleOwner) { roomCategories ->
-     //      if (originalCategories != roomCategories) {
-     //          binding.btnSaveCategoriesChanges.visibility = GONE
-     //          originalCategories.clear()
-     //          originalCategories.addAll(roomCategories)
-     //          tempCategories.clear()
-     //          tempCategories.addAll(originalCategories)
-     //          val adapter = CategoryAdapter()
-     //          adapter.differ.submitList(originalCategories)
-     //          binding.rvInterests.adapter = adapter
-     //          itemTouchHelper.attachToRecyclerView(binding.rvInterests)
-     //      }
-     //  }
+        //  binding.rvInterests.layoutManager = LinearLayoutManager(context)
+        //  storyViewModel.userCategories.observe(viewLifecycleOwner) { roomCategories ->
+        //      if (originalCategories != roomCategories) {
+        //          binding.btnSaveCategoriesChanges.visibility = GONE
+        //          originalCategories.clear()
+        //          originalCategories.addAll(roomCategories)
+        //          tempCategories.clear()
+        //          tempCategories.addAll(originalCategories)
+        //          val adapter = CategoryAdapter()
+        //          adapter.differ.submitList(originalCategories)
+        //          binding.rvInterests.adapter = adapter
+        //          itemTouchHelper.attachToRecyclerView(binding.rvInterests)
+        //      }
+        //  }
     }
 
     private fun logOut() {
@@ -374,14 +392,12 @@ class AccountFragment : Fragment() {
                 file.deleteRecursively()
             }
         }
-        storyViewModel.clearUserData()
-
         purchaseViewModel.logOut()
+    }
 
-        // Clears shared preferences user's data
-       // prefRepository.clearData()
+
+    private fun handleSuccessLogOut() {
         gotoLoginFragment()
-
     }
 
     private fun gotoLoginFragment() {
@@ -390,13 +406,12 @@ class AccountFragment : Fragment() {
     }
 
     private fun goToSignIn() {
-
         findNavController().navigate(R.id.action_account_to_authentication_nav)
         (activity as BottomNavigation).finish()
     }
 
     private fun goToSignUp() {
-      // val action = AccountFragmentDirections.actionAccountToAuthenticationNav(1)
+        // val action = AccountFragmentDirections.actionAccountToAuthenticationNav(1)
         findNavController().navigate(R.id.action_account_to_authentication_nav)
         (activity as BottomNavigation).finish()
 

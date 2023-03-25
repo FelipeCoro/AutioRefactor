@@ -18,7 +18,7 @@ import com.revenuecat.purchases.restorePurchasesWith
 import javax.inject.Inject
 
 
-class RevenueCatRepositoryImpl  @Inject constructor(
+class RevenueCatRepositoryImpl @Inject constructor(
     val purchases: Purchases
 ) : RevenueCatRepository {
     private val _customerInfo = MutableLiveData<CustomerInfo>().apply {
@@ -41,35 +41,26 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         onSuccess: ((CustomerInfo, Boolean) -> Unit)?
     ) {
         purchases.logInWith(
-            userId,
-            { error ->
+            userId, { error ->
                 onError?.invoke(error)
                 displayError(error)
-            },
-            handleSuccessLogin(name, email, onSuccess)
+            }, handleSuccessLogin(name, email, onSuccess)
         )
     }
 
     private fun handleSuccessLogin(
-        name: String?,
-        email: String?,
-        onSuccess: ((CustomerInfo, Boolean) -> Unit)?
-    ): (customerInfo: CustomerInfo, created: Boolean) -> Unit =
-        { customerInfo, created ->
-            // Set user's data in RevenueCat
-            purchases.setDisplayName(name)
-            purchases.setEmail(email)
+        name: String?, email: String?, onSuccess: ((CustomerInfo, Boolean) -> Unit)?
+    ): (customerInfo: CustomerInfo, created: Boolean) -> Unit = { customerInfo, created ->
+        // Set user's data in RevenueCat
+        purchases.setDisplayName(name)
+        purchases.setEmail(email)
 
-            // Update status of this user for subscription details
-            updateUserInfo(
-                customerInfo
-            )
+        // Update status of this user for subscription details
+        updateUserInfo(customerInfo)
 
-            // created variable checks whether the user is new to RC
-            onSuccess?.invoke(
-                customerInfo, created
-            )
-        }
+        // created variable checks whether the user is new to RC
+        onSuccess?.invoke(customerInfo, created)
+    }
 
     /**
      * Log out from RevenueCat
@@ -95,8 +86,7 @@ class RevenueCatRepositoryImpl  @Inject constructor(
         onError: ((PurchasesError, Boolean) -> Unit),
         onSuccess: ((StoreTransaction, CustomerInfo) -> Unit)
     ) {
-        purchases.purchasePackageWith(
-            activity,
+        purchases.purchasePackageWith(activity,
             packageToPurchase,
             onError = onError,
             onSuccess = { transaction, customerInfo ->
