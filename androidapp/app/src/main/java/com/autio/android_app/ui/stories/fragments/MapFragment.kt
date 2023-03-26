@@ -120,7 +120,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
-            bottomNavigationViewModel.shouldPlayMedia(id)
+                bottomNavigationViewModel.shouldPlayMedia(id)
             }, onOptionClick = ::optionClicked, shouldPinLocationBeShown = true, viewLifecycleOwner
         )
         recyclerView.adapter = storyAdapter
@@ -179,11 +179,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun bindObservers() {
         storyViewModel.storyViewState.observe(viewLifecycleOwner, ::handleViewState)
-        bottomNavigationViewModel.bottomNavigationViewState.observe(viewLifecycleOwner, ::handleBottomNavViewState)
+        bottomNavigationViewModel.bottomNavigationViewState.observe(
+            viewLifecycleOwner,
+            ::handleBottomNavViewState
+        )
 
-        bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) {
-            it?.let {
-                markers[it.id]?.let { it1 -> updateMarker(it, it1) }
+        bottomNavigationViewModel.playingStory.observe(viewLifecycleOwner) { story ->
+            story?.let {
+                markers[story.id]?.let { it -> updateMarker(story, it) }
             }
         }
 
@@ -243,12 +246,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
             is BottomNavigationViewState.OnPlayMediaSuccess -> handlePLayMediaSuccess(viewState.id)
-            is BottomNavigationViewState.FetchedStoryToPlay ->{}
+            is BottomNavigationViewState.FetchedStoryToPlay -> {}
             else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
         }
     }
 
-    private fun handlePLayMediaSuccess(id:Int){
+    private fun handlePLayMediaSuccess(id: Int) {
         bottomNavigationViewModel.playMediaId(id)
     }
 
@@ -498,7 +501,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * Tapping on the play/pause icon will make the story
      * call playMediaId
      */
-    private fun tapClusterItem(clusterItem: StoryClusterItem) {
+     fun tapClusterItem(clusterItem: StoryClusterItem) {
         storyDisplayTimer?.cancelTimer()
         storyDisplayTimer = Timer()
         val story = clusterItem.story
@@ -506,12 +509,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         binding.tvSelectedStoryNarrator.text = story.narrator
         playerViewModel.setCurrentStory(story)
         //bottomNavigationViewModel.mediaButtonRes.observe(this) { res ->
-      //   if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
-      //       binding.btnSelectedStoryPlay.setImageResource(res)
-      //   } else {
-      //       binding.btnSelectedStoryPlay.setImageResource(R.drawable.ic_player_play)
-      //   }
-       // }
+        //   if (story.id == bottomNavigationViewModel.playingStory.value?.id) {
+        //       binding.btnSelectedStoryPlay.setImageResource(res)
+        //   } else {
+        //       binding.btnSelectedStoryPlay.setImageResource(R.drawable.ic_player_play)
+        //   }
+        // }
         binding.btnSelectedStoryPlay.setOnClickListener {
             //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
             bottomNavigationViewModel.playMediaId(story.id)
@@ -550,7 +553,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         map.clear()
         clusterManager = ClusterManager<StoryClusterItem>(requireContext(), map)
         clusterManager.setAnimation(true)
-        val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager)
+        val clusterRenderer = StoryClusterRenderer(requireContext(), map, clusterManager, this)
         clusterManager.renderer = clusterRenderer
 
         val center = map.cameraPosition.target

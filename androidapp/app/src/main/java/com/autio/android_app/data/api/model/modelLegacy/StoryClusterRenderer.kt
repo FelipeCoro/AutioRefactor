@@ -6,6 +6,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.pendings.StoryClusterItem
+import com.autio.android_app.ui.stories.fragments.MapFragment
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.Marker
@@ -14,12 +15,15 @@ import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.view.DefaultClusterRenderer
 
+
 class StoryClusterRenderer(
     private val context: Context, map: GoogleMap,
-    clusterManager: ClusterManager<StoryClusterItem>
+    clusterManager: ClusterManager<StoryClusterItem>,
+    private val mapFragment: MapFragment
 ) : DefaultClusterRenderer<StoryClusterItem>(context, map, clusterManager) {
 
     var nearestStory: StoryClusterItem? = null
+
 
     private val defaultMarkerIcon by lazy {
         ResourcesCompat.getDrawable(
@@ -67,7 +71,7 @@ class StoryClusterRenderer(
      * options should be set
      */
     override fun onBeforeClusterItemRendered(
-        item: StoryClusterItem, markerOptions: MarkerOptions
+        item: StoryClusterItem, markerOptions: MarkerOptions,
     ) {
         var markerBitmap: Bitmap? =
             if (item.story.listenedAtLeast30Secs == true) {
@@ -85,7 +89,7 @@ class StoryClusterRenderer(
                     //TODO(HERE LOGIC HIGHLIGHT MARKER / NEAREST POINT)
                     item.bitmap = getBitmap(item.bitmap)
                     markerBitmap = item.bitmap
-                    println(" BINGO ! Highlight this item!")
+                    mapFragment.tapClusterItem(it)
                 }
             }
             val pinIcon = BitmapDescriptorFactory.fromBitmap(markerBitmap!!)
