@@ -21,7 +21,6 @@ import androidx.navigation.findNavController
 import com.autio.android_app.R
 import com.autio.android_app.data.api.model.StoryOption
 import com.autio.android_app.data.api.model.modelLegacy.NowPlayingMetadata
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentPlayerBinding
 import com.autio.android_app.extensions.getAddress
 import com.autio.android_app.extensions.timestampToMSS
@@ -32,13 +31,7 @@ import com.autio.android_app.ui.stories.view_model.PlayerFragmentViewModel
 import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.stories.view_states.PlayerViewState
 import com.autio.android_app.ui.stories.view_states.StoryViewState
-import com.autio.android_app.util.Constants
-import com.autio.android_app.util.bottomNavigationActivity
-import com.autio.android_app.util.onOptionClicked
-import com.autio.android_app.util.shareStory
-import com.autio.android_app.util.showFeedbackSnackBar
-import com.autio.android_app.util.showToast
-import com.autio.android_app.util.writeEmailToCustomerSupport
+import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -55,13 +48,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.regex.Pattern
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackStackChangedListener {
 
-    @Inject
-    lateinit var prefRepository: PrefRepository
 
     private val bottomNavigationViewModel: BottomNavigationViewModel by activityViewModels()
     private val playerFragmentViewModel: PlayerFragmentViewModel by viewModels()
@@ -239,7 +229,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added Bookmark")
             is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed Bookmark")
             is StoryViewState.StoryDownloaded ->showFeedbackSnackBar("Story Downloaded")//TODO(Use common method later)
-            else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
+            else -> {} //TODO(Ideally have error handling for each error)
         }
     }
 
@@ -282,7 +272,6 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
             playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
                 if (mediaItem != null) {
-                    storyViewModel.downloadStory(mediaItem)
                     storyViewModel.bookmarkStory(mediaItem.id)
                 }
             }
@@ -291,7 +280,6 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
             playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
                 if (mediaItem != null) {
-                    storyViewModel.downloadStory(mediaItem)
                     storyViewModel.bookmarkStory(mediaItem.id)
                 }
             }

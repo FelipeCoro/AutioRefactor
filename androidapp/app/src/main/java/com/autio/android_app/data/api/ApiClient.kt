@@ -271,14 +271,14 @@ interface ApiClient {
         @Header("Authorization") apiToken: String
     ): Response<List<StoryDto>>
 
-    @POST("/api/v1/library/{user_id}")
+    @POST("/api/v1/library/{story_id}")
     suspend fun bookmarkStory(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,
         @Path("story_id") storyId: Int
     ): Response<AddBookmarkResponse>
 
-    @DELETE("/api/v1/library/{user_id}")
+    @DELETE("/api/v1/library/{story_id}")
     suspend fun removeBookmarkFromStory(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,

@@ -98,6 +98,7 @@ class AutioRepositoryImpl @Inject constructor(
 
         return Result.failure(Error())
     }
+
     override suspend fun updateSubStatus(isPremium: Boolean) {
         val userAccount = getUserAccount()
         userAccount?.let { user ->
@@ -458,36 +459,48 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeBookmarkFromStory(storyId: Int) {
-        autioLocalDataSource.removeBookmarkFromStory(storyId)
-        // return bookedMarkedStory?.let {
-        //     val remoteBookmark =
-        //         autioRemoteDataSource.removeBookmarkFromStory(userId, bearerToken, storyId)
-        //     if (remoteBookmark.isSuccessful) {
-        //   //     Result.success(remoteBookmark.body().toString().toBoolean())
-        //    } else {
-        //        val throwable = Error(remoteBookmark.errorBody().toString())
-        //        Result.failure(throwable)
-        //    }
-        //} ?: Result.failure(Error())
+
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            val remoteBookmark =
+                autioRemoteDataSource.removeBookmarkFromStory(user.id, user.bearerToken, storyId)
+            if (remoteBookmark.isSuccessful) {
+                Result.success(remoteBookmark.body().toString().toBoolean())
+            } else {
+                val throwable = Error(remoteBookmark.errorBody().toString())
+                Result.failure(throwable)
+            }
+        }
     }
 
     override suspend fun bookmarkStory(storyId: Int) {
-        autioLocalDataSource.bookmarkStory(storyId)
-        // val remoteBookmark = //autioRemoteDataSource.bookmarkStory(userId, bearerToken, storyId) //TODO(FOR REMOTE CACHING)
-        //  return if (remoteBookmark) {
-        //      Result.success(remoteBookmark.body().toString().toBoolean())
-        //  } else {
-        //      val throwable = Error(remoteBookmark.errorBody().toString())
-        //      Result.failure(throwable)
-        //  }
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            //autioLocalDataSource.bookmarkStory(storyId)
+            val result = autioRemoteDataSource.bookmarkStory(user.id, user.bearerToken, storyId)
+            if (result.isSuccessful)
+                Result.success(result.body().toString().toBoolean())
+            else {
+                val throwable = Error(result.errorBody().toString())
+                Result.failure(throwable)
+            }
+        }
     }
 
 
     override suspend fun getUserBookmarkedStories(): List<Story> {
-
-        //val result = autioRemoteDataSource.getStoriesFromUserBookmarks(userId, bearerToken)(TODO(FOR REMOTE CACHING))
-        return autioLocalDataSource.getUserBookmarkedStories().map { it.toModel() }
-
+        var bookmarkedStories = emptyList<Story>()
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            val result =
+                autioRemoteDataSource.getStoriesFromUserBookmarks(user.id, user.bearerToken)
+            result.let { response ->
+                response.body()?.let { stories ->
+                    bookmarkedStories = stories.map { it.toModel() }
+                } ?: emptyList<Story>()
+            }
+        }
+        return bookmarkedStories
     }
 
 

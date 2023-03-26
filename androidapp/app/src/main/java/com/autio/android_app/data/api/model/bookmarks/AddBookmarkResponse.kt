@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AddBookmarkResponse(
-    val success: Boolean
+    val success: Boolean? = null
 )

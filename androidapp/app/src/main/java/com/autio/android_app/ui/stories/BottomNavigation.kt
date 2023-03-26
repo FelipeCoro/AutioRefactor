@@ -192,7 +192,7 @@ class BottomNavigation : AppCompatActivity() {
             } else if (destination.label == controller.graph[R.id.subscribeFragment].label) {
                 hidePlayerComponent()
             } else if (destination.label == controller.graph[R.id.account].label){
-                showUiElementsNoPaywall(true)
+                hidePlayerComponent()
             }
             else {
                 showUiElements(true)
@@ -358,15 +358,15 @@ class BottomNavigation : AppCompatActivity() {
 
     private lateinit var snackBarJob: Job
     fun showFeedbackSnackBar(feedback: String) {
-        // if (::snackBarJob.isInitialized && snackBarJob.isActive) {
-        //     snackBarJob.cancel()
-        // }
+        if (::snackBarJob.isInitialized && snackBarJob.isActive) {
+            snackBarJob.cancel()
+        }
         snackBarView.alpha = 1F
         snackBarView.findViewById<TextView>(R.id.snack_bar_text).text = feedback
         binding.activityLayout.removeView(snackBarView)
         binding.activityLayout.addView(snackBarView)
         snackBarJob = lifecycleScope.launch {
-            delay(1500)
+            delay(1000)
             snackBarView.animate().alpha(0F).withEndAction {
                 binding.activityLayout.removeView(snackBarView)
             }
