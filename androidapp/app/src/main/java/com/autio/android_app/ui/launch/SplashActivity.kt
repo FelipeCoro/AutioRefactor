@@ -1,25 +1,20 @@
 package com.autio.android_app.ui.launch
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import com.autio.android_app.R
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.ui.login.fragments.LoginFragment
 import com.autio.android_app.ui.onboarding.activities.OnBoardingActivity
 import com.autio.android_app.ui.stories.BottomNavigation
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var prefRepository: PrefRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

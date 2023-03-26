@@ -328,6 +328,7 @@ class AccountFragment : Fragment() {
         if (user.isGuest) {
             binding.btnLogOut.visibility = GONE
             binding.btnSignIn.visibility = VISIBLE
+            binding.btnDeleteAccount.visibility = GONE
         } else {
             binding.btnSignIn.visibility = GONE
             binding.btnLogOut.visibility = VISIBLE
