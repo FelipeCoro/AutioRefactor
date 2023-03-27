@@ -201,7 +201,8 @@ class StoryViewModel @Inject constructor(
 
     fun removeAllBookmarks() {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.removeAllBookmarks()
+            val stories = autioRepository.getUserBookmarkedStories()
+            autioRepository.removeAllBookmarks(stories)
         }
     }
 
@@ -308,14 +309,30 @@ class StoryViewModel @Inject constructor(
         viewModelScope.launch(coroutineDispatcher) {
             val user = autioRepository.getUserAccount() ?: return@launch
             if (isUserPremium(user)) {
+                var isBookmarked = false
                 val stories = autioRepository.getUserBookmarkedStories()
                 for (story in stories) {
                     if (story.id == storyId) {
-                        setViewState(StoryViewState.StoryIsBookmarked(true))
-                    } else {
-                        setViewState(StoryViewState.StoryIsBookmarked(false))
+                        isBookmarked = true
                     }
                 }
+                setViewState(StoryViewState.StoryIsBookmarked(isBookmarked))
+            }
+        }
+    }
+
+    fun toggleStoryBookmarked(storyId: Int) {
+        viewModelScope.launch(coroutineDispatcher) {
+            val user = autioRepository.getUserAccount() ?: return@launch
+            if (isUserPremium(user)) {
+                var isBookmarked = false
+                val stories = autioRepository.getUserBookmarkedStories()
+                for (story in stories) {
+                    if (story.id == storyId) {
+                        isBookmarked = true
+                    }
+                }
+                    setViewState(StoryViewState.ToggleStoryBookmark(isBookmarked, storyId))
             }
         }
     }
@@ -378,7 +395,7 @@ class StoryViewModel @Inject constructor(
         }
     }
 
-    fun addStoryToHistory(storyId:Int) {
+    fun addStoryToHistory(storyId: Int) {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.addStoryToHistory(storyId)
         }

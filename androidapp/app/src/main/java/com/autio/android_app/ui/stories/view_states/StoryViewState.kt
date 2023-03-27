@@ -15,7 +15,7 @@ sealed interface StoryViewState {
     data class FetchedBookmarkedStories(val stories: List<Story>) : StoryViewState
     object FetchedBookmarkedStoriesFailed : StoryViewState
 
-    data class StoryIsBookmarked (val status:Boolean):StoryViewState
+    data class StoryIsBookmarked(val status: Boolean) : StoryViewState
 
     data class FetchedFavoriteStories(val stories: List<Story>) : StoryViewState
     object FetchedFavoriteStoriesFailed : StoryViewState
@@ -26,6 +26,8 @@ sealed interface StoryViewState {
     data class FetchedAuthor(val author: Author) : StoryViewState
     object FetchedAuthorFailed : StoryViewState
     object AddedBookmark : StoryViewState
+
+    data class ToggleStoryBookmark(val isBookmarked: Boolean, val storyId: Int) : StoryViewState
     object RemovedBookmark : StoryViewState
     object FailedBookmark : StoryViewState
     class StoryLiked(val likeCount: Int) : StoryViewState

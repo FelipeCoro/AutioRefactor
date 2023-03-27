@@ -137,7 +137,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
 
         binding.btnBookmark.setOnClickListener {
-            storyViewModel.getBookmarkedStoriesByIds()
+            storyViewModel.toggleStoryBookmarked(storyId)
         }
 
 
@@ -165,7 +165,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
 
         binding.btnRewind.setOnClickListener {
-           playerFragmentViewModel.handleRewindClick()
+            playerFragmentViewModel.handleRewindClick()
         }
 
         binding.btnPlay.setOnClickListener {
@@ -208,7 +208,8 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
     private fun handleShareStory() {
         shareStory(requireContext())
     }
-    private fun handleRewindClickSuccess(){
+
+    private fun handleRewindClickSuccess() {
         bottomNavigationViewModel.rewindFifteenSeconds()
     }
 
@@ -220,15 +221,16 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         when (viewState) {
             is StoryViewState.StoryLikesCount -> handleStoryLikesCount(viewState.storyLikesCount)
             is StoryViewState.FetchedStoriesByIds -> handleFetchedStory(viewState.stories.first())
-            is StoryViewState.FetchedBookmarkedStories -> handleBookmarkedStories(viewState.stories)
+            is StoryViewState.ToggleStoryBookmark -> toggleStoryBookmarked(
+                viewState.isBookmarked,
+                viewState.storyId
+            )
             is StoryViewState.StoryLiked -> handleLIsLikedState(viewState.likeCount)
             is StoryViewState.LikedRemoved -> handleLIsNotLikedState(viewState.likeCount)
             is StoryViewState.IsStoryLiked -> isStoryLiked(viewState.isLiked)
             is StoryViewState.StoryIsBookmarked -> isStoryBookmarked(viewState.status)
             is StoryViewState.OnNotPremiumUser -> handleNotPremiumUser()
-            is StoryViewState.AddedBookmark -> showFeedbackSnackBar("Added Bookmark")
-            is StoryViewState.RemovedBookmark -> showFeedbackSnackBar("Removed Bookmark")
-            is StoryViewState.StoryDownloaded ->showFeedbackSnackBar("Story Downloaded")//TODO(Use common method later)
+            is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Downloaded")//TODO(Use common method later)
             else -> {} //TODO(Ideally have error handling for each error)
         }
     }
@@ -239,7 +241,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
             storyViewModel.storyLikesCount(storyId)
         } else
             binding.btnHeart.setImageResource(R.drawable.ic_heart_filled)
-            storyViewModel.storyLikesCount(storyId)
+        storyViewModel.storyLikesCount(storyId)
     }
 
     private fun handleFetchedStory(story: Story) {
@@ -262,27 +264,15 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
 
     }
 
-    private fun handleBookmarkedStories(stories: List<Story>) {
-
-        for (story in stories) {
-            if (story.id == storyId) {
-                binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark)
-                storyViewModel.removeBookmarkFromStory(story.id)
-            } else
-                binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
-            playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
-                if (mediaItem != null) {
-                    storyViewModel.bookmarkStory(mediaItem.id)
-                }
-            }
-        }
-        if (stories.isEmpty()) {
+    private fun toggleStoryBookmarked(isBookmarked: Boolean, storyId: Int) {
+        if (isBookmarked) {
+            binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark)
+            storyViewModel.removeBookmarkFromStory(storyId)
+            showFeedbackSnackBar("Removed Bookmark")
+        } else {
             binding.btnBookmark.setImageResource(R.drawable.ic_player_bookmark_filled)
-            playerFragmentViewModel.currentStory.observe(viewLifecycleOwner) { mediaItem ->
-                if (mediaItem != null) {
-                    storyViewModel.bookmarkStory(mediaItem.id)
-                }
-            }
+            storyViewModel.bookmarkStory(storyId)
+            showFeedbackSnackBar("Added Bookmark")
         }
     }
 
@@ -327,7 +317,11 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
                 ) {
                 }
 
-                override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
                     if (fromUser) {
                         playerFragmentViewModel.onProgressChanged(progress)
                     }
@@ -440,7 +434,7 @@ class PlayerFragment : Fragment(), OnMapReadyCallback, FragmentManager.OnBackSta
         }
     }
 
-    private fun handleProgressChange(progress : Int){
+    private fun handleProgressChange(progress: Int) {
         bottomNavigationViewModel.setPlaybackPosition(progress)
     }
 

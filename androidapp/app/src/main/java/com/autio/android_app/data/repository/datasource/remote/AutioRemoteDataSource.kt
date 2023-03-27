@@ -191,4 +191,5 @@ interface AutioRemoteDataSource {
         storyId: Int
     ): Response<RemoveBookmarkResponse>
 
+    suspend fun removeAllBookmarks(xUserId: Int, apiToken: String, stories:List<StoryDto>)
 }

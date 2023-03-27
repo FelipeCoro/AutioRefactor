@@ -8,12 +8,7 @@ import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
 import com.autio.android_app.data.repository.datasource.local.AutioLocalDataSource
 import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSource
-import com.autio.android_app.domain.mappers.toDTO
-import com.autio.android_app.domain.mappers.toEntity
-import com.autio.android_app.domain.mappers.toMapPointEntity
-import com.autio.android_app.domain.mappers.toModel
-import com.autio.android_app.domain.mappers.toPlaysDto
-import com.autio.android_app.domain.mappers.toStoryEntity
+import com.autio.android_app.domain.mappers.*
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.AccountRequest
@@ -459,7 +454,6 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeBookmarkFromStory(storyId: Int) {
-
         val userAccount = getUserAccount()
         userAccount?.let { user ->
             val remoteBookmark =
@@ -504,9 +498,12 @@ class AutioRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun removeAllBookmarks() {
-        autioLocalDataSource.removeAllBookmarks()
-
+    override suspend fun removeAllBookmarks(stories: List<Story>) {
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            val storiesDto = stories.map { it.toDto() }
+            autioRemoteDataSource.removeAllBookmarks(user.id, user.apiToken, storiesDto)
+        }
     }
 
     override suspend fun storyLikesCount(storyId: Int): Result<Int> {

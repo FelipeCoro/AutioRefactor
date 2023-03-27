@@ -190,4 +190,10 @@ class AutioRemoteDataSourceImpl @Inject constructor(
         return apiClient.removeBookmarkFromStory(xUserId, apiToken, storyId)
     }
 
+    override suspend fun removeAllBookmarks(xUserId: Int, apiToken: String, stories:List<StoryDto>) {
+        for(story in stories){
+             apiClient.removeBookmarkFromStory(xUserId, apiToken, story.id)
+        }
+    }
+
 }

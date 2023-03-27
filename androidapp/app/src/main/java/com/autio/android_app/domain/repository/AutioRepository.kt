@@ -87,7 +87,7 @@ interface AutioRepository {
     suspend fun getUserBookmarkedStories(): List<Story>
 
     //TODO(Same as with storyViewModel we need to have parallel methods to avoid contradictions)
-    suspend fun removeAllBookmarks()
+    suspend fun removeAllBookmarks(stories: List<Story>)
 
     suspend fun giveLikeToStory(storyId: Int): Result<Pair<Boolean, Int>>
 
