@@ -89,7 +89,7 @@ class StoryClusterRenderer(
                     //TODO(HERE LOGIC HIGHLIGHT MARKER / NEAREST POINT)
                     item.bitmap = getBitmap(item.bitmap)
                     markerBitmap = item.bitmap
-              //      mapFragment.tapClusterItem(it)
+                    mapFragment.tapClusterItem(it)
                 }
             }
             val pinIcon = BitmapDescriptorFactory.fromBitmap(markerBitmap!!)

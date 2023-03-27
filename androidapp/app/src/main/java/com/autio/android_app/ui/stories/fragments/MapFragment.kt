@@ -501,7 +501,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
      * Tapping on the play/pause icon will make the story
      * call playMediaId
      */
-     fun tapClusterItem(clusterItem: StoryClusterItem) {
+    fun tapClusterItem(clusterItem: StoryClusterItem) {
         storyDisplayTimer?.cancelTimer()
         storyDisplayTimer = Timer()
         val story = clusterItem.story
