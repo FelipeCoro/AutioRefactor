@@ -227,8 +227,7 @@ class PlayerService() : MediaBrowserServiceCompat() {
         )
 
         switchToPlayer(
-            null,
-            if (castPlayer?.isCastSessionAvailable == true) castPlayer!! else exoPlayer
+            null, if (castPlayer?.isCastSessionAvailable == true) castPlayer!! else exoPlayer
         )
         notificationManager.showNotificationForPlayer(
             currentPlayer
@@ -537,26 +536,22 @@ class PlayerService() : MediaBrowserServiceCompat() {
             mediaId: String, playWhenReady: Boolean, extras: Bundle?
         ) {
             serviceScope.launch {
-                val itemToPlay = autioRepository.getStoryById(mediaId.toInt()
-                )
+
+                val itemToPlay = autioRepository.getUserBookmarkedStories()
                 if (itemToPlay == null) {
                     Log.w(TAG, "Content not found: MediaID=$mediaId")
                 } else {
-                    val itemMetadata = itemToPlay.getOrNull()?.let {
-                        MediaMetadataCompat.Builder().from(
-                            it
-                        ).build()
+                    val itemMetadata = itemToPlay.map {
+                        MediaMetadataCompat.Builder().from(it).build()
                     }
                     val playbackStartPositionMs = extras?.getLong(
                         MEDIA_DESCRIPTION_EXTRAS_START_PLAYBACK_POSITION_MS, C.TIME_UNSET
                     ) ?: C.TIME_UNSET
                     itemMetadata?.let {
-                        buildPlaylist(
-                            it
-                        )
+                        buildPlaylist(it.first())
                     }?.let {
                         preparePlaylist(
-                            it, itemMetadata, playWhenReady, playbackStartPositionMs
+                            it, itemMetadata.first(), playWhenReady, playbackStartPositionMs
                         )
                     }
                 }
@@ -601,9 +596,7 @@ class PlayerService() : MediaBrowserServiceCompat() {
         ): List<MediaMetadataCompat> {
             val playlist = mediaSource.filter { it.album == item.album }.sortedBy { it.trackNumber }
             return playlist.ifEmpty {
-                listOf(
-                    item
-                )
+                listOf(item)
             }
         }
     }

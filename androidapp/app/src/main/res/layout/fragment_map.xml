@@ -48,10 +48,9 @@
             android:elevation="15dp"
             android:outlineProvider="paddedBounds"
             android:padding="9dp"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="gone">
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/ivToggleIcon"
@@ -141,16 +140,16 @@
 
         </androidx.cardview.widget.CardView>
 
-    <include
-        android:id="@+id/layoutPlaylist"
-        layout="@layout/fragment_map_playlist"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/cvToggleMapPlaylist" />
+        <include
+            android:id="@+id/layoutPlaylist"
+            layout="@layout/fragment_map_playlist"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cvToggleMapPlaylist" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

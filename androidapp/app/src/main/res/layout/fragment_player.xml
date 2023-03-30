@@ -262,7 +262,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:src="@drawable/ic_forward"
-                        android:visibility="invisible"
                         app:tint="@color/button_background" />
 
                     <ImageView
