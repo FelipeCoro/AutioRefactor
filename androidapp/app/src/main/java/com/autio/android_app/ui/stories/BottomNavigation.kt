@@ -55,11 +55,12 @@ class BottomNavigation : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var snackBarView: View
 
+    var storyCount = 0
+
 
     private var castContext: CastContext? = null
     private var isNetworkAvailable = false
 
-    var tempCount = 5
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,6 +90,7 @@ class BottomNavigation : AppCompatActivity() {
         // castContext = CastContext.getSharedInstance(this) //TODO(Should we cast)
         volumeControlStream = AudioManager.STREAM_MUSIC
         purchaseViewModel.getUserStories()
+        bottomNavigationViewModel.fetchRemainingStories()
         updateSnackBarMessageDisplay()
         showPlayerComponent()
     }
@@ -110,7 +112,8 @@ class BottomNavigation : AppCompatActivity() {
 
         purchaseViewModel.customerInfo.observe(this) {
             it?.let {
-                binding.storiesFreePlansBanner.visibility = //TODO(URGENT. CHANGE FOR API VALIDATION TRUE VIEWSTATE)
+                binding.storiesFreePlansBanner.visibility =
+                        //TODO(URGENT. CHANGE FOR API VALIDATION TRUE VIEWSTATE)
                     if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) GONE
                     else VISIBLE
             }
@@ -123,6 +126,7 @@ class BottomNavigation : AppCompatActivity() {
             is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(
                 viewState.story
             )
+            is BottomNavigationViewState.RemainingStories -> handleAvailableStories(viewState.remainingStories)
             is BottomNavigationViewState.OnNotPremiumUser -> showPayWall()
             else -> {}
         }
@@ -131,7 +135,9 @@ class BottomNavigation : AppCompatActivity() {
     private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
         when (viewState) {
             is PurchaseViewState.FetchedUserSuccess -> handleFetchUserSuccessViewState(viewState.data)
-            is PurchaseViewState.FetchedUserStoriesSuccess ->handleFetchUserStoriesSuccessViewState(viewState.user)
+            is PurchaseViewState.FetchedUserStoriesSuccess -> handleFetchUserStoriesSuccessViewState(
+                viewState.user
+            )
             else -> {}
         }
     }
@@ -176,8 +182,7 @@ class BottomNavigation : AppCompatActivity() {
             }
         }
         binding.btnKillSwitch.setOnClickListener {
-            tempCount -= 1
-            updateAvailableStoriesUI(tempCount)
+            bottomNavigationViewModel.updateRemainingStories()
         }
     }
 
@@ -191,10 +196,9 @@ class BottomNavigation : AppCompatActivity() {
                 hidePlayerComponent()
             } else if (destination.label == controller.graph[R.id.subscribeFragment].label) {
                 hidePlayerComponent()
-            } else if (destination.label == controller.graph[R.id.account].label){
+            } else if (destination.label == controller.graph[R.id.account].label) {
                 hidePlayerComponent()
-            }
-            else {
+            } else {
                 showUiElements(true)
             }
         }
@@ -202,28 +206,35 @@ class BottomNavigation : AppCompatActivity() {
 
 
     fun showPayWall() {
-           purchaseViewModel.getUserInfo()
+        purchaseViewModel.getUserInfo()
     }
 
     private fun handleFetchUserSuccessViewState(user: User) {
 
-       if (!user.isPremiumUser) {
-           hidePlayerComponent()
-           navController.navigate(R.id.subscribeFragment)
-       }
+        if (!user.isPremiumUser) {
+            hidePlayerComponent()
+            navController.navigate(R.id.subscribeFragment)
+        }
     }
 
     private fun handleFetchUserStoriesSuccessViewState(user: User) {
-        if(!user.isPremiumUser){
-            updateAvailableStoriesUI(tempCount)//user.remainingStories)
+        if (!user.isPremiumUser) {
+            bottomNavigationViewModel.fetchRemainingStories()
         }
     }
+
+    private fun handleAvailableStories(remainingCount: Int) {
+        storyCount = remainingCount
+        updateAvailableStoriesUI(remainingCount)
+    }
+
     private fun showUiElements(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
         // binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
         purchaseViewModel.getUserStories()
     }
+
     private fun showUiElementsNoPaywall(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
         // binding.rlAllowNotifications.isVisible = isVisible
@@ -262,6 +273,7 @@ class BottomNavigation : AppCompatActivity() {
         }
     }
 
+
     private fun updateAvailableStoriesUI(remainingStories: Int) {
         with(binding) {
             val tickMarks = arrayOf(
@@ -272,7 +284,7 @@ class BottomNavigation : AppCompatActivity() {
                 llTickMarks.visibility = GONE
                 storiesFreePlansBanner.visibility = GONE
                 showPayWall()
-            }else{
+            } else {
                 for ((i, tickMark) in tickMarks.withIndex()) {
                     if (remainingStories >= i + 1) {
                         tickMark.setBackgroundColor(

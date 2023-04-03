@@ -38,6 +38,14 @@ class AutioRepositoryImpl @Inject constructor(
         return getUserAccount()?.isPremiumUser ?: false
     }
 
+    override suspend fun remainingStories(): Int {
+      return autioLocalDataSource.getRemainingStories()
+    }
+
+    override suspend fun updateRemainingStories(): Int {
+        return autioLocalDataSource.updateRemainingStories()
+    }
+
     override val userCategories: Flow<List<Category>> =
         autioLocalDataSource.userCategories.transform { entities ->
             entities.onEach { it.toModel() }

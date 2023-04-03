@@ -143,6 +143,7 @@ class PurchaseViewModel @Inject constructor(
     ) {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.updateSubStatus(true)
+
             setViewState(PurchaseViewState.SuccessfulPurchase) //TODO URGENT. API CALL WILL HAPPEN HERE)
         }
     }

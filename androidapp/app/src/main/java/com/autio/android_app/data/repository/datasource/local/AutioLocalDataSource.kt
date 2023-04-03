@@ -47,4 +47,6 @@ interface AutioLocalDataSource {
     suspend fun getUserAccount(): Result<User?>
     suspend fun updateUserInformation(user: User):Result<User>
     suspend fun createUserAccount(UserEntity: UserEntity): Result<UserEntity?>
+    suspend fun getRemainingStories():Int
+    suspend fun updateRemainingStories():Int
 }

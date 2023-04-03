@@ -191,6 +191,22 @@ class BottomNavigationViewModel @Inject constructor(
         )
     }
 
+
+    fun fetchRemainingStories() {
+        viewModelScope.launch {
+            val remainingStories = autioRepository.remainingStories()
+            setViewState(BottomNavigationViewState.RemainingStories(remainingStories))
+        }
+
+    }
+
+    fun updateRemainingStories(){
+        viewModelScope.launch {
+            val remainingStories = autioRepository.updateRemainingStories()
+            setViewState(BottomNavigationViewState.RemainingStories(remainingStories))
+        }
+    }
+
 // Player code
 
     /**
@@ -257,14 +273,28 @@ class BottomNavigationViewModel @Inject constructor(
                     transportControls.playFromMediaId(
                         mediaId.toString(), null
                     )
-                    nowPlaying?.id?.let { autioRepository.addStoryToHistory(it) } //TODO(URGENT. this could help with story count))
+                    nowPlaying?.id?.let {
+                        autioRepository.addStoryToHistory(it)
+                        autioRepository.updateRemainingStories()
+                    }
                 }
-            } else {setViewState(BottomNavigationViewState.OnNotPremiumUser)}
+            } else {
+                setViewState(BottomNavigationViewState.OnNotPremiumUser)
+            }
         }
     }
 
-    private fun isUserAllowedToPlayStories(user: User) =
-        user.isPremiumUser || user.remainingStories > 0
+    private fun isUserAllowedToPlayStories(user: User): Boolean {
+        var canHearStories = false
+        viewModelScope.launch {
+            val remainingStories = autioRepository.remainingStories()
+            if (user.isPremiumUser || remainingStories > 0) {
+                canHearStories = true
+            }
+        }
+        return canHearStories
+    }
+
 
     fun rewindFifteenSeconds() {
         val transportControls = playerServiceConnection.transportControls

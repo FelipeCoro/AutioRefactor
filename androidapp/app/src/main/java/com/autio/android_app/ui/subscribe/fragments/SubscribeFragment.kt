@@ -258,7 +258,7 @@ class SubscribeFragment : Fragment() {
     }
 
     private fun handleFetchUserSuccessViewState(user: User) {
-        if (bottomNavigationActivity?.tempCount!! > 0 || user.isPremiumUser) {
+        if (bottomNavigationActivity?.storyCount!! > 0 || user.isPremiumUser) {
             navController.navigate(R.id.action_subscribeFragment_to_map_fragment)
         }
     }

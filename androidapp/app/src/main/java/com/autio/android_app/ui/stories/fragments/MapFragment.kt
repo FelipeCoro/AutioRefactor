@@ -82,7 +82,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // The entry point to the Places API.
     private lateinit var placesClient: PlacesClient
 
-    var locationPermissionGranted = true
+    var locationPermissionGranted = false
 
     private var locationBackgroundPermissionGranted = false
     private var lastKnownLocation: Location? = null
@@ -239,7 +239,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             is StoryViewState.LikedRemoved -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_removed_from_favorites))
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_story_saved_to_my_device))
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_story_removed_from_my_device))
-            else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
+            else ->{} //TODO(Ideally have error handling for each error)
         }
     }
 
@@ -247,7 +247,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         when (viewState) {
             is BottomNavigationViewState.OnPlayMediaSuccess -> handlePLayMediaSuccess(viewState.id)
             is BottomNavigationViewState.FetchedStoryToPlay -> {}
-            else -> showFeedbackSnackBar(getString(R.string.map_fragment_feedback_connection_failure)) //TODO(Ideally have error handling for each error)
+            else -> {} //TODO(Ideally have error handling for each error)
         }
     }
 

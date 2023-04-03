@@ -1,9 +1,6 @@
 package com.autio.android_app.data.repository.datasource.local
 
-import com.autio.android_app.data.database.dao.CategoryDao
-import com.autio.android_app.data.database.dao.MapPointDao
-import com.autio.android_app.data.database.dao.StoryDao
-import com.autio.android_app.data.database.dao.UserDao
+import com.autio.android_app.data.database.dao.*
 import com.autio.android_app.data.database.entities.CategoryEntity
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
@@ -20,7 +17,8 @@ class AutioLocalDataSourceImpl @Inject constructor(
     private val mapPointDao: MapPointDao,
     private val categoryDao: CategoryDao,
     private val storyDao: StoryDao,
-    private val userDao: UserDao
+    private val userDao: UserDao,
+    private val remainingStoriesDao: RemainingStoriesDao
 ) : AutioLocalDataSource {
     private val executor = Executors.newSingleThreadExecutor()
     override val userCategories = categoryDao.readUserCategories()
@@ -78,6 +76,20 @@ class AutioLocalDataSourceImpl @Inject constructor(
         }
     }
 
+    override suspend fun getRemainingStories(): Int {
+        val stories = remainingStoriesDao.getCurrentStoryCount()
+        return stories.remainingStories
+    }
+
+    override suspend fun updateRemainingStories(): Int {
+        val stories = remainingStoriesDao.getCurrentStoryCount().remainingStories
+        if (stories > 0) {
+            val newAmount = stories-1
+            remainingStoriesDao.updateStoryCount(newAmount)
+        }
+        return remainingStoriesDao.getCurrentStoryCount().remainingStories
+    }
+
 
     override suspend fun getAllStories() = mapPointDao.readLiveStories()
 
@@ -127,8 +139,6 @@ class AutioLocalDataSourceImpl @Inject constructor(
             }
         }
     }
-
-
 
 
     override suspend fun markStoryAsListenedAtLeast30Secs(storyId: Int) {
