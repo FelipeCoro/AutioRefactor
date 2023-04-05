@@ -7,7 +7,7 @@ import com.autio.android_app.data.database.entities.*
 
 @Database(
     entities = [MapPointEntity::class, StoryEntity::class, CategoryEntity::class, HistoryEntity::class, UserEntity::class, RemainingStoriesEntity::class],
-    version = 26
+    version = 25
 )
 abstract class DataBase : RoomDatabase() {
     abstract fun mapPointDao(): MapPointDao
