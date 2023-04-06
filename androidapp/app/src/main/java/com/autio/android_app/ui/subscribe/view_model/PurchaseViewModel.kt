@@ -51,6 +51,9 @@ class PurchaseViewModel @Inject constructor(
             if (result != null) {
                 setViewState(PurchaseViewState.FetchedUserSuccess(result))
             }
+            else {
+                setViewState(PurchaseViewState.UserNotLoggedIn)
+            }
         }
     }
 

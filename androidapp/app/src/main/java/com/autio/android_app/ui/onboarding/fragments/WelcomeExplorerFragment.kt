@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentWelcomeExplorerBinding
@@ -30,7 +29,9 @@ class WelcomeExplorerFragment : Fragment() {
         binding = FragmentWelcomeExplorerBinding.inflate(
             inflater, container, false
         )
-        viewPager = requireActivity().findViewById(R.id.viewPager)
+        if (requireActivity().findViewById<ViewPager2>(R.id.viewPager) != null) {
+            viewPager = requireActivity().findViewById(R.id.viewPager)
+        }
         return binding.root
     }
 
@@ -83,6 +84,7 @@ class WelcomeExplorerFragment : Fragment() {
     private fun handlePurchaseViewState(viewState: PurchaseViewState?) {
         when (viewState) {
             is PurchaseViewState.FetchedUserSuccess -> handleHandleActiveUserSuccess(viewState.data)
+            is PurchaseViewState.UserNotLoggedIn ->handleNewUser()
             else -> {}
         }
     }
@@ -96,6 +98,12 @@ class WelcomeExplorerFragment : Fragment() {
 
     private fun isUserLoggedIn() {
         purchaseViewModel.getUserInfo()
+    }
+
+    private fun handleNewUser(){
+        if (viewPager != null) {
+            viewPager.currentItem += 1
+        }
     }
 
     private fun handleHandleActiveUserSuccess(user: User) {

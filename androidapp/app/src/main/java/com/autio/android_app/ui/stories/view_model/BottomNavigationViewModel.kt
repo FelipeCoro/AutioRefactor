@@ -251,7 +251,8 @@ class BottomNavigationViewModel @Inject constructor(
     fun playMediaId(mediaId: Int) {
         viewModelScope.launch {
             val user = autioRepository.getUserAccount() ?: return@launch
-            if (isUserAllowedToPlayStories(user)) {
+            val remainingStories = autioRepository.remainingStories()?:return@launch
+            if (isUserAllowedToPlayStories(user,remainingStories)) {
                 val nowPlaying = playerServiceConnection.nowPlaying.value
                 val transportControls = playerServiceConnection.transportControls
                 val isPrepared = playerServiceConnection.playbackState.value?.isPrepared ?: false
@@ -284,14 +285,11 @@ class BottomNavigationViewModel @Inject constructor(
         }
     }
 
-    private fun isUserAllowedToPlayStories(user: User): Boolean {
+    private fun isUserAllowedToPlayStories(user: User, remainingStories:Int): Boolean {
         var canHearStories = false
-        viewModelScope.launch {
-            val remainingStories = autioRepository.remainingStories()
             if (user.isPremiumUser || remainingStories > 0) {
-                canHearStories = true
+                   canHearStories = true
             }
-        }
         return canHearStories
     }
 
@@ -308,7 +306,8 @@ class BottomNavigationViewModel @Inject constructor(
     fun skipToNextStory() {
         viewModelScope.launch(coroutineDispatcher) {
             val user = autioRepository.getUserAccount()
-            if (user != null && !isUserAllowedToPlayStories(user)) {
+            val remainingStories = autioRepository.remainingStories()
+            if (user != null && !isUserAllowedToPlayStories(user,remainingStories)) {
                 setViewState(BottomNavigationViewState.OnNotPremiumUser)
             } else {
                 val transportControls = playerServiceConnection.transportControls
