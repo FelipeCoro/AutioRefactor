@@ -73,7 +73,9 @@
                     android:fontFamily="@font/sf_pro_text_regular"
                     android:inputType="textEmailAddress"
                     android:labelFor="@id/mail_label"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    android:layout_marginLeft="-4dp"
+                    android:layout_marginRight="-4dp"/>
 
                 <TextView
                     android:id="@+id/password_label"
@@ -93,6 +95,8 @@
                     android:fontFamily="@font/sf_pro_text_regular"
                     android:inputType="textPassword"
                     android:labelFor="@id/password_label"
+                    android:layout_marginLeft="-4dp"
+                    android:layout_marginRight="-4dp"
                     android:textColor="@color/white" />
             </LinearLayout>
 

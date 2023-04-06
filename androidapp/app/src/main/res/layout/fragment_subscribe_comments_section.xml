@@ -21,7 +21,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/lora_regular"
+            android:fontFamily="@font/new_york_large_medium"
             android:text="@string/_4_9_5_stars"
             android:textColor="@color/white"
             android:textSize="22sp" />
@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/sf_pro_text_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/a_traveling_companion_not_to_be_missed"
                 android:textColor="@color/white" />
 
@@ -82,7 +82,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/lora_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/my_family_and_i_travel_often_amp_the_stories_we_hear_are_informative_amp_interesting_even_listening_near_my_home_has_introduced_me_to_things_i_didn_t_know"
                 android:textColor="@color/white" />
 
@@ -90,7 +90,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/sf_pro_text_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/camswphd"
                 android:textColor="@color/white" />
         </LinearLayout>
@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/sf_pro_text_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/focus_on_your_road_trip"
                 android:textColor="@color/white" />
 
@@ -151,7 +151,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/lora_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/this_app_really_brings_the_trip_home_on_a_personal_level"
                 android:textColor="@color/white" />
 
@@ -159,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/sf_pro_text_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/ron_tg"
                 android:textColor="@color/white" />
         </LinearLayout>
@@ -212,7 +212,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/sf_pro_text_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/love_this"
                 android:textColor="@color/white" />
 
@@ -220,7 +220,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/lora_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/great_app_my_husband_and_i_are_fulltime_rv_rs_rv_n_free_and_this_is_the_perfect_app_to_use_while_traveling_the_us"
                 android:textColor="@color/white" />
 
@@ -228,14 +228,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:fontFamily="@font/sf_pro_text_regular"
+                android:fontFamily="@font/new_york_large_medium"
                 android:text="@string/rv_n_free"
                 android:textColor="@color/white" />
         </LinearLayout>
 
         <Button
             android:id="@+id/btn_choose_plan"
-            style="@style/Button.Shape"
+            style="@style/Button.ShapeNoMode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
