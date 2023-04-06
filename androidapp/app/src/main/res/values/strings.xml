@@ -206,7 +206,7 @@
     <string name="security">SECURITY</string>
     <string name="passwordResetLink">https://app.autio.com/password/reset</string>
     <string name="enterValidEmailMessage">Please enter a valid Email</string>
-    <string name="emailOnAnotherAccount">The mail is already used by another account</string>
+    <string name="emailOnAnotherAccount">Account already exists. Tap Cancel and then Sign In instead</string>
     <string name="account_fragment_password_has_been_updated">Password has been updated</string>
     <string name="account_fragment_give_autio_url">https://app.autio.com/give</string>
     <string name="autio_app_url">https://app.autio.com</string>

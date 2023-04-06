@@ -62,7 +62,8 @@ interface ApiClient {
     /**
      * Deletes the account and its associated data
      */
-    @POST("/api/v1/delete-account")
+
+    @DELETE("/api/v1/accounts")
     suspend fun deleteAccount(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String,

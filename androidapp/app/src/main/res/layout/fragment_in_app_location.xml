@@ -55,7 +55,7 @@
             android:text="@string/set_in_app_location_permissions"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8"/>
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <ImageView
             android:id="@+id/autio_logo"
@@ -80,11 +80,23 @@
             android:text="@string/termsOfService"
             android:textColor="@color/gray_letter"
             android:textSize="10sp"
-            app:layout_constraintEnd_toStartOf="@+id/privacy_policy_location"
+            app:layout_constraintEnd_toStartOf="@+id/separatorLocation1"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/autio_logo" />
+
+        <ImageView
+            android:id="@+id/separatorLocation1"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/terms_of_service_location"
+            app:layout_constraintEnd_toStartOf="@+id/privacy_policy_location"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/terms_of_service_location"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_location"
+            app:srcCompat="@drawable/ic_separator" />
 
         <TextView
             android:id="@+id/privacy_policy_location"
@@ -95,10 +107,22 @@
             android:textColor="@color/gray_letter"
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="@+id/autio_logo"
+            app:layout_constraintEnd_toStartOf="@+id/separatorLocation2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/separatorLocation1"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_location" />
+
+        <ImageView
+            android:id="@+id/separatorLocation2"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/privacy_policy_location"
             app:layout_constraintEnd_toStartOf="@+id/security_location"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/terms_of_service_location"
-            app:layout_constraintTop_toTopOf="@+id/terms_of_service_location" />
+            app:layout_constraintStart_toEndOf="@+id/privacy_policy_location"
+            app:layout_constraintTop_toTopOf="@+id/privacy_policy_location"
+            app:srcCompat="@drawable/ic_separator" />
 
         <TextView
             android:id="@+id/security_location"
@@ -110,9 +134,8 @@
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/privacy_policy_location"
+            app:layout_constraintStart_toEndOf="@+id/separatorLocation2"
             app:layout_constraintTop_toTopOf="@+id/terms_of_service_location" />
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,9 @@
     android:layout_height="194dp"
     android:importantForAccessibility="no"
     android:scaleType="centerCrop"
-    android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp"
+    android:layout_marginTop="2.5dp"
+    android:layout_marginBottom="2.5dp"
+    android:layout_marginStart="1.25dp"
+    android:layout_marginEnd="1.25dp"
     android:contentDescription="Image used for background purposes" />
 </layout>

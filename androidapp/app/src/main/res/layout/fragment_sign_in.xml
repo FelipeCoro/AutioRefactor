@@ -138,9 +138,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:text="@string/continue_as_guest"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="gone" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

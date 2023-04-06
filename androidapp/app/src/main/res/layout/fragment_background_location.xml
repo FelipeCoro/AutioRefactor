@@ -87,11 +87,23 @@
             android:text="@string/termsOfService"
             android:textColor="@color/gray_letter"
             android:textSize="10sp"
-            app:layout_constraintEnd_toStartOf="@+id/privacy_policy_background"
+            app:layout_constraintEnd_toStartOf="@+id/separatorBackground1"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/autio_logo" />
+
+        <ImageView
+            android:id="@+id/separatorBackground1"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/terms_of_service_background"
+            app:layout_constraintEnd_toStartOf="@+id/privacy_policy_background"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/terms_of_service_background"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_background"
+            app:srcCompat="@drawable/ic_separator" />
 
         <TextView
             android:id="@+id/privacy_policy_background"
@@ -101,11 +113,23 @@
             android:text="@string/privacyPolicy"
             android:textColor="@color/gray_letter"
             android:textSize="10sp"
-            app:layout_constraintEnd_toEndOf="@+id/autio_logo"
+            app:layout_constraintEnd_toStartOf="@+id/separatorBackground2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/separatorBackground1"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_background" />
+
+        <ImageView
+            android:id="@+id/separatorBackground2"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/privacy_policy_background"
             app:layout_constraintEnd_toStartOf="@+id/security_location_background"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/terms_of_service_background"
-            app:layout_constraintTop_toTopOf="@+id/terms_of_service_background" />
+            app:layout_constraintStart_toEndOf="@+id/privacy_policy_background"
+            app:layout_constraintTop_toTopOf="@+id/privacy_policy_background"
+            app:srcCompat="@drawable/ic_separator" />
+
 
         <TextView
             android:id="@+id/security_location_background"
@@ -117,7 +141,7 @@
             android:textSize="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/privacy_policy_background"
+            app:layout_constraintStart_toEndOf="@+id/separatorBackground2"
             app:layout_constraintTop_toTopOf="@+id/terms_of_service_background" />
 
 

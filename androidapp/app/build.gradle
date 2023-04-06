@@ -24,8 +24,8 @@ android {
         applicationId "autio.audio.travel.guide"
         minSdk 26
         targetSdk 33
-        versionCode 21
-        versionName "1.21"
+        versionCode 22
+        versionName "1.22"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation":
@@ -70,7 +70,7 @@ android {
     productFlavors {
         staging {
             dimension 'env'
-            buildConfigField "String", "base_url", '"https://staging-app.autio.com"'
+            buildConfigField "String", "base_url", '"https://staging.autio.com"'
         }
         production {
             dimension 'env'
