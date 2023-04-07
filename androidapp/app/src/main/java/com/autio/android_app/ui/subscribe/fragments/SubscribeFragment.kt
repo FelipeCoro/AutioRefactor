@@ -266,7 +266,7 @@ class SubscribeFragment : Fragment() {
     private fun handleSuccessfulPurchase(){
         Toast.makeText(
             context,
-            "Purchase made successfully, Enjoy!",
+            "Purchase successful — Welcome to the Autio community.",
             Toast.LENGTH_LONG
         ).show()
         navController.navigate(R.id.action_subscribeFragment_to_map_fragment)

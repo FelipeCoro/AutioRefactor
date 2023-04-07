@@ -248,9 +248,11 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="38dp"
                     android:background="@color/autio_blue_7"
+                    android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ly_account_status" />
+                    app:layout_constraintTop_toBottomOf="@id/ly_account_status"
+                    tools:visibility="gone" />
 
                 <RelativeLayout
                     android:id="@+id/lyProfile"
@@ -267,6 +269,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="18dp"
                         android:layout_marginBottom="17dp"
+                        android:fontFamily="@font/new_york_large_medium"
                         android:text="@string/profile"
                         android:textSize="20sp" />
 
@@ -292,6 +295,8 @@
                         android:paddingBottom="7dp"
                         android:textColor="@color/gray_letter"
                         android:textSize="16sp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginRight="-4dp"
                         android:textCursorDrawable="@color/autio_blue"
                         />
 
@@ -306,6 +311,8 @@
                         android:fontFamily="@font/sf_pro_text_regular"
                         android:inputType="none"
                         android:paddingBottom="7dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginRight="-4dp"
                         android:textColor="@color/gray_letter"
                         android:textSize="16sp" />
 
@@ -329,8 +336,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="7dp"
                             android:layout_weight="1"
-                            android:text="@string/update"
-                            android:textColor="@color/white" />
+                            android:text="@string/update" />
 
                         <Button
                             android:id="@+id/btn_cancel_update"
@@ -506,7 +512,9 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="60dp"
                     android:background="@color/divider"
-                    app:layout_constraintTop_toBottomOf="@+id/lyInterests" />
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/lyInterests"
+                    tools:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvQuestionsAbout"

@@ -104,6 +104,7 @@ class HistoryFragment : Fragment() {
             is StoryViewState.StoryDownloaded -> showFeedbackSnackBar("Story Saved To My Device")
             is StoryViewState.FetchedStoriesHistory -> showStoryHistory(viewState.stories)
             is StoryViewState.StoryRemoved -> showFeedbackSnackBar("Story Removed From My Device")
+            is StoryViewState.FetchedStoriesHistoryFailed -> historyFetchedError()
             else -> showFeedbackSnackBar("Connection Failure") //TODO(Ideally have error handling for each error)
         }
     }
@@ -165,6 +166,13 @@ class HistoryFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun historyFetchedError(){
+        binding.ivNoContentIcon.setImageResource(R.drawable.ic_history)
+        binding.tvNoContentMessage.text = resources.getText(R.string.empty_history_message)
+        binding.rlStories.visibility = View.GONE
+        binding.llNoContent.visibility = View.VISIBLE
     }
 
     private fun onPlaylistOptionClicked(option: PlaylistOption) {

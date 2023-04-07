@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/fragment_background">
@@ -49,7 +49,7 @@
             android:id="@+id/ivAuthorPic"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@drawable/bio_placeholder"
+            android:background="@drawable/ic_autiologo"
             android:scaleType="centerCrop" />
     </androidx.cardview.widget.CardView>
 
@@ -83,6 +83,7 @@
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="24dp"
+                android:fontFamily="@font/new_york_large_medium"
                 android:gravity="top"
                 android:visibility="gone"
                 tools:text="It all started with growing up in the mountains of Colorado which lit the love of the outdoors. 40 fantastic years in a variety of jobs in the outdoor industry in countries around the world did nothing but fuel the passions for travel and learning about new places. The spark of HearHere was driving my grandfather through Colorado and New Mexico and having him tell me stories about the places we were travellign through. It’s been a great journey with more to come!"

@@ -388,7 +388,7 @@ class StoryViewModel @Inject constructor(
                 val stories = result.getOrNull()
                 stories?.let {
                     setViewState(StoryViewState.FetchedStoriesHistory(it))
-                }
+                }?: setViewState(StoryViewState.FetchedStoriesHistoryFailed)
             }.onFailure {
                 setViewState(StoryViewState.FetchedStoriesHistoryFailed)
             }
