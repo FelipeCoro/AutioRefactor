@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChangePasswordResponse(
-    @SerialName("success") val success: String
+    @SerialName("success")
+    val success: String
 )

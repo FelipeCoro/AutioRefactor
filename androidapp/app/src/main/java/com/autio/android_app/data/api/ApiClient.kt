@@ -1,13 +1,14 @@
 package com.autio.android_app.data.api
 
-import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
-import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
-import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
-import com.autio.android_app.data.api.model.history.ClearHistoryResponse
-import com.autio.android_app.data.api.model.history.AddHistoryResponse
-import com.autio.android_app.data.api.model.story.StoryLikedResponse
 import com.autio.android_app.data.api.model.account.*
+import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
+import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
+import com.autio.android_app.data.api.model.history.AddHistoryResponse
+import com.autio.android_app.data.api.model.history.ClearHistoryResponse
+import com.autio.android_app.data.api.model.history.HistoryDto
+import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
 import com.autio.android_app.data.api.model.story.*
+import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -22,12 +23,12 @@ interface ApiClient {
 
     //TODO(make suspended)
     @POST("/api/v1/login")
-    suspend fun login(@Body loginDto: LoginDto) : Response<LoginResponse>
+    suspend fun login(@Body loginDto: LoginDto): Response<LoginResponse>
 
 
     //TODO(annotate method, check endpoint and make suspended)
     @POST("/api/v1/login")
-     suspend fun loginAsGuest(@Body loginDto: LoginDto)
+    suspend fun loginAsGuest(@Body loginDto: LoginDto)
 
     /**
      * Authenticates user as guest and returns the guest's
@@ -45,7 +46,8 @@ interface ApiClient {
     @Headers("Accept: application/json")
     @POST("/api/v1/accounts")
     suspend fun createAccount(
-        @Body createAccountDto: CreateAccountDto): Response<LoginResponse>
+        @Body createAccountDto: CreateAccountDto
+    ): Response<LoginResponse>
 
     /**
      * Changes password for future authentication
@@ -243,7 +245,7 @@ interface ApiClient {
     suspend fun getUserHistory(
         @Header("X-User-Id") xUserId: Int,
         @Header("Authorization") apiToken: String
-    ): Response<List<StoryDto>>
+    ): Response<HistoryDto>
 
     @PUT("/api/v1/playedHistory/{story_id}")
     suspend fun addStoryToHistory(
@@ -285,4 +287,22 @@ interface ApiClient {
         @Header("Authorization") apiToken: String,
         @Path("story_id") storyId: Int
     ): Response<RemoveBookmarkResponse>
+
+    @GET("/api/v1/latest-subscription")
+    suspend fun checkSubscriptionStatus(
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String
+    ): Response<CheckSubscriptionResponse>
+
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    @POST("/api/v1/android-receipts")
+    suspend fun sendAndroidReceipt(
+        @Header("X-User-Id") xUserId: Int,
+        @Header("Authorization") apiToken: String,
+        @Body receipt: AndroidReceiptDto
+    ):Response<Unit>
+
 }

@@ -1,21 +1,18 @@
 package com.autio.android_app.ui.subscribe.view_model
 
 import android.app.Activity
-import android.view.View
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.data.repository.revenue.RevenueCatRepository
+import com.autio.android_app.domain.mappers.toReceipt
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
 import com.autio.android_app.ui.stories.models.AccountRequest
 import com.autio.android_app.ui.stories.models.LoginRequest
-import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
-import com.autio.android_app.util.Constants
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
@@ -38,9 +35,9 @@ class PurchaseViewModel @Inject constructor(
     val viewState: LiveData<PurchaseViewState> = _viewState
     val customerInfo = revenueCatRepository.customerInfo
 
-    fun updateUserInfo(isPremium: Boolean) {
-        viewModelScope.launch(coroutineDispatcher) { //TODO(URGENT. THIS MUST GO WITH API CALL)
-            autioRepository.updateSubStatus(isPremium)
+    fun updateUserInfo() {
+        viewModelScope.launch(coroutineDispatcher) {
+            autioRepository.updateSubStatus()
         }
     }
 
@@ -50,8 +47,7 @@ class PurchaseViewModel @Inject constructor(
             val result = autioRepository.getUserAccount()
             if (result != null) {
                 setViewState(PurchaseViewState.FetchedUserSuccess(result))
-            }
-            else {
+            } else {
                 setViewState(PurchaseViewState.UserNotLoggedIn)
             }
         }
@@ -73,7 +69,8 @@ class PurchaseViewModel @Inject constructor(
             val result = autioRepository.login(loginRequest)
             if (result.isSuccess) {
                 result.getOrNull()?.let { user ->
-                    revenueCatRepository.login(user.id.toString())//TODO(URGENT.UPDATE ISPREMIUM THROUGH API SERVICE)
+                    revenueCatRepository.login(user.id.toString())
+                    user.isPremiumUser = !autioRepository.isPremiumUser() //Since we check "expired" if its false, the user is subscribed so its actually the inverse
                     setViewState(PurchaseViewState.OnLoginSuccess(user))
                 } ?: setViewState(PurchaseViewState.OnLoginFailed)
             } else setViewState(PurchaseViewState.OnLoginFailed)
@@ -145,11 +142,20 @@ class PurchaseViewModel @Inject constructor(
         storeTransaction: StoreTransaction, customerInfo: CustomerInfo
     ) {
         viewModelScope.launch(coroutineDispatcher) {
-            autioRepository.updateSubStatus(true)
 
-            setViewState(PurchaseViewState.SuccessfulPurchase) //TODO URGENT. API CALL WILL HAPPEN HERE)
+            val transaction = storeTransaction.toReceipt(
+                storeTransaction.orderId!!,
+                1,
+                storeTransaction.purchaseTime,
+                storeTransaction.purchaseToken
+            )
+            autioRepository.sendPurchaseReceipt(transaction)
+            autioRepository.updateSubStatus()
         }
+
+        setViewState(PurchaseViewState.SuccessfulPurchase)
     }
+
 
     private fun handlePurchaseError(error: PurchasesError, userCancelled: Boolean) {
 

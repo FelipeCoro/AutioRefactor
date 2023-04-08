@@ -1,6 +1,7 @@
 package com.autio.android_app.data.repository
 
 import android.util.Log
+import com.autio.android_app.data.api.model.account.AndroidReceiptDto
 import com.autio.android_app.data.api.model.account.ChangePasswordDto
 import com.autio.android_app.data.api.model.account.ProfileDto
 import com.autio.android_app.data.database.entities.HistoryEntity
@@ -11,17 +12,8 @@ import com.autio.android_app.data.repository.datasource.remote.AutioRemoteDataSo
 import com.autio.android_app.domain.mappers.*
 import com.autio.android_app.domain.repository.AutioRepository
 import com.autio.android_app.ui.di.coroutines.IoDispatcher
-import com.autio.android_app.ui.stories.models.AccountRequest
-import com.autio.android_app.ui.stories.models.Author
-import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.models.Contributor
-import com.autio.android_app.ui.stories.models.LoginRequest
-import com.autio.android_app.ui.stories.models.Narrator
-import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.ui.stories.models.User
-import com.autio.android_app.util.Constants
+import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
-import com.revenuecat.purchases.CustomerInfo
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
@@ -35,11 +27,20 @@ class AutioRepositoryImpl @Inject constructor(
 ) : AutioRepository {
 
     override suspend fun isPremiumUser(): Boolean {
-        return getUserAccount()?.isPremiumUser ?: false
+        var expired = true
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            val status = autioRemoteDataSource.checkSubscribedStatus(user.id, user.bearerToken)
+            if (status.isSuccessful)
+                expired = status.body()!!.expired
+            //  handle never created sub
+
+        }
+        return expired
     }
 
     override suspend fun remainingStories(): Int {
-      return autioLocalDataSource.getRemainingStories()
+        return autioLocalDataSource.getRemainingStories()
     }
 
     override suspend fun updateRemainingStories(): Int {
@@ -102,11 +103,12 @@ class AutioRepositoryImpl @Inject constructor(
         return Result.failure(Error())
     }
 
-    override suspend fun updateSubStatus(isPremium: Boolean) {
+    override suspend fun updateSubStatus() {
         val userAccount = getUserAccount()
         userAccount?.let { user ->
             kotlin.runCatching {
-                user.isPremiumUser = isPremium
+                val result = autioRemoteDataSource.checkSubscribedStatus(user.id,user.bearerToken)
+                user.isPremiumUser = !result.body()!!.expired
                 autioLocalDataSource.updateUserInformation(user)
             }
         }
@@ -558,8 +560,10 @@ class AutioRepositoryImpl @Inject constructor(
         val userAccount = getUserAccount()
         userAccount?.let { user ->
             val storyHistory = autioRemoteDataSource.getUserHistory(user.id, user.bearerToken)
+
             return if (storyHistory.isSuccessful) {
-                Result.success(storyHistory.body()!!.map { it.toModel() })
+
+                Result.success(storyHistory.body()!!.data.map { it.toModel() })
             } else {
                 val throwable = Error(storyHistory.errorBody().toString())
                 Result.failure(throwable)
@@ -716,6 +720,13 @@ class AutioRepositoryImpl @Inject constructor(
     override suspend fun isUserAllowedToPlayStories(): Boolean {
         val user = getUserAccount()
         return user != null && (user.isPremiumUser || (user.isGuest && user.remainingStories > 0))
+    }
+
+    override suspend fun sendPurchaseReceipt(receipt: AndroidReceiptDto) {
+        val userAccount = getUserAccount()
+        userAccount?.let { user ->
+            autioRemoteDataSource.sendPurchaseReceipt(user.id, user.bearerToken, receipt)
+        }
     }
 }
 

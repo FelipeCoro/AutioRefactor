@@ -82,7 +82,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // The entry point to the Places API.
     private lateinit var placesClient: PlacesClient
 
-    var locationPermissionGranted = true
+    var locationPermissionGranted = false
 
     private var locationBackgroundPermissionGranted = false
     private var lastKnownLocation: Location? = null

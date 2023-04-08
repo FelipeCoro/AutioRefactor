@@ -145,6 +145,6 @@ class StoryDetailFragmentViewModel @Inject constructor(
     }
 
     fun initView(storyParam: Story?) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 }

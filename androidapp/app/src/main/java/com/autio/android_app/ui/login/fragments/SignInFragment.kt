@@ -60,7 +60,7 @@ class SignInFragment : Fragment() {
         purchaseViewModel.viewState.observe(viewLifecycleOwner, ::handlePurchaseViewState)
         loginViewModel.viewState.observe(viewLifecycleOwner, ::handleLoginViewState)
         purchaseViewModel.customerInfo.observe(viewLifecycleOwner) {
-            it?.let { updateUserSub(it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) }
+            it?.let { updateUserSub() }
         }
     }
 
@@ -125,8 +125,8 @@ class SignInFragment : Fragment() {
 
     }
 
-    private fun updateUserSub(isPremium:Boolean){
-        purchaseViewModel.updateUserInfo(isPremium)
+    private fun updateUserSub(){
+        purchaseViewModel.updateUserInfo()
     }
 }
 

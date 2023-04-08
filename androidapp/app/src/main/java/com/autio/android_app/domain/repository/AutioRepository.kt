@@ -1,20 +1,13 @@
 package com.autio.android_app.domain.repository
 
+import com.autio.android_app.data.api.model.account.AndroidReceiptDto
 import com.autio.android_app.data.api.model.account.ProfileDto
+import com.autio.android_app.data.api.model.account.Receipt
 import com.autio.android_app.data.database.entities.HistoryEntity
 import com.autio.android_app.data.database.entities.MapPointEntity
 import com.autio.android_app.data.database.entities.StoryEntity
-import com.autio.android_app.ui.stories.models.AccountRequest
-import com.autio.android_app.ui.stories.models.Author
-import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.models.Contributor
-import com.autio.android_app.ui.stories.models.History
-import com.autio.android_app.ui.stories.models.LoginRequest
-import com.autio.android_app.ui.stories.models.Narrator
-import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.ui.stories.models.*
 import com.google.android.gms.maps.model.LatLng
-import com.revenuecat.purchases.CustomerInfo
 import kotlinx.coroutines.flow.Flow
 
 interface AutioRepository {
@@ -23,16 +16,16 @@ interface AutioRepository {
     val history: Flow<List<Story>>
     suspend fun isPremiumUser(): Boolean
 
-    suspend fun remainingStories():Int
+    suspend fun remainingStories(): Int
 
-    suspend fun updateRemainingStories():Int
+    suspend fun updateRemainingStories(): Int
     suspend fun createAccount(accountRequest: AccountRequest): Result<User>
-    suspend fun login(loginRequest: LoginRequest, ): Result<User>
+    suspend fun login(loginRequest: LoginRequest): Result<User>
 
     //TODO(URGENT. This one will disappear with correct back end call)
-    suspend fun updateSubStatus(isPremium:Boolean)
+    suspend fun updateSubStatus()
     suspend fun loginAsGuest(): Result<User>
-    suspend fun fetchUserData() : Result<User?>
+    suspend fun fetchUserData(): Result<User?>
     suspend fun updateProfile(infoUser: ProfileDto, onSuccess: () -> Unit, onFailure: () -> Unit)
     suspend fun updateCategoriesOrder(
         infoUser: ProfileDto,
@@ -85,7 +78,7 @@ interface AutioRepository {
 
     suspend fun bookmarkStory(storyId: Int)
 
-  //  suspend fun getUserBookmarks(userId: Int): List<String>
+    //  suspend fun getUserBookmarks(userId: Int): List<String>
 
     suspend fun getUserBookmarkedStories(): List<Story>
 
@@ -128,4 +121,8 @@ interface AutioRepository {
     ): Result<Boolean>
 
     suspend fun isUserAllowedToPlayStories(): Boolean
+
+    suspend fun sendPurchaseReceipt(receipt: AndroidReceiptDto)
+
+
 }

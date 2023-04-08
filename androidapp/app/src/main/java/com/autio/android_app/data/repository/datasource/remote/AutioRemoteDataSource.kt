@@ -1,27 +1,13 @@
 package com.autio.android_app.data.repository.datasource.remote
 
-import com.autio.android_app.data.api.model.account.ChangePasswordDto
-import com.autio.android_app.data.api.model.account.ChangePasswordResponse
-import com.autio.android_app.data.api.model.account.CreateAccountDto
-import com.autio.android_app.data.api.model.account.GuestResponse
-import com.autio.android_app.data.api.model.account.LoginDto
-import com.autio.android_app.data.api.model.account.LoginResponse
-import com.autio.android_app.data.api.model.account.ProfileDto
+import com.autio.android_app.data.api.model.account.*
 import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
 import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
 import com.autio.android_app.data.api.model.history.ClearHistoryResponse
+import com.autio.android_app.data.api.model.history.HistoryDto
 import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
-import com.autio.android_app.data.api.model.story.AuthorDto
-import com.autio.android_app.data.api.model.story.ContributorResponse
-import com.autio.android_app.data.api.model.story.LikeResponse
-import com.autio.android_app.data.api.model.story.NarratorDto
-import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.api.model.story.PlaysResponse
-import com.autio.android_app.data.api.model.story.StoryCategoryDto
-import com.autio.android_app.data.api.model.story.StoryDto
-import com.autio.android_app.data.api.model.story.StoryLikedResponse
-import com.autio.android_app.data.api.model.story.StoryLikesResponse
+import com.autio.android_app.data.api.model.story.*
 import retrofit2.Response
 
 interface AutioRemoteDataSource {
@@ -146,16 +132,16 @@ interface AutioRemoteDataSource {
         storyId: Int
     ): Response<LikeResponse>
 
-    suspend fun  storyLikesCount(
+    suspend fun storyLikesCount(
         xUserId: Int,
         apiToken: String,
         storyId: Int
-    ):Response<StoryLikesResponse>
+    ): Response<StoryLikesResponse>
 
     suspend fun getUserHistory(
         xUserId: Int,
         apiToken: String
-    ): Response<List<StoryDto>>
+    ): Response<HistoryDto>
 
     suspend fun addStoryToHistory(
         xUserId: Int,
@@ -191,5 +177,16 @@ interface AutioRemoteDataSource {
         storyId: Int
     ): Response<RemoveBookmarkResponse>
 
-    suspend fun removeAllBookmarks(xUserId: Int, apiToken: String, stories:List<StoryDto>)
+    suspend fun removeAllBookmarks(xUserId: Int, apiToken: String, stories: List<StoryDto>)
+
+    suspend fun checkSubscribedStatus(
+        xUserId: Int,
+        apiToken: String
+    ): Response<CheckSubscriptionResponse>
+
+    suspend fun sendPurchaseReceipt(
+        xUserId: Int,
+        apiToken: String,
+        receipt: AndroidReceiptDto
+    ):Response<Unit>
 }

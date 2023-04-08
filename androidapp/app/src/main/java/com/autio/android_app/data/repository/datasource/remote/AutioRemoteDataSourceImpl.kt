@@ -2,10 +2,11 @@ package com.autio.android_app.data.repository.datasource.remote
 
 import com.autio.android_app.data.api.ApiClient
 import com.autio.android_app.data.api.model.account.*
-import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.bookmarks.AddBookmarkResponse
+import com.autio.android_app.data.api.model.bookmarks.RemoveBookmarkResponse
 import com.autio.android_app.data.api.model.history.AddHistoryResponse
 import com.autio.android_app.data.api.model.history.ClearHistoryResponse
+import com.autio.android_app.data.api.model.history.HistoryDto
 import com.autio.android_app.data.api.model.history.RemoveHistoryResponse
 import com.autio.android_app.data.api.model.story.*
 import retrofit2.Response
@@ -150,7 +151,7 @@ class AutioRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getUserHistory(
         xUserId: Int, apiToken: String
-    ): Response<List<StoryDto>> {
+    ): Response<HistoryDto> {
         return apiClient.getUserHistory(xUserId, apiToken)
     }
 
@@ -195,5 +196,15 @@ class AutioRemoteDataSourceImpl @Inject constructor(
              apiClient.removeBookmarkFromStory(xUserId, apiToken, story.id)
         }
     }
+    override suspend fun checkSubscribedStatus(
+        xUserId: Int, apiToken: String
+    ): Response<CheckSubscriptionResponse> {
+        return apiClient.checkSubscriptionStatus(xUserId, apiToken)
+    }
+
+    override suspend fun sendPurchaseReceipt(xUserId: Int, apiToken: String, receipt: AndroidReceiptDto): Response<Unit> {
+       return  apiClient.sendAndroidReceipt(xUserId, apiToken,receipt)
+    }
+
 
 }

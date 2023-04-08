@@ -32,7 +32,6 @@ import com.autio.android_app.ui.stories.view_model.BottomNavigationViewModel
 import com.autio.android_app.ui.stories.view_states.BottomNavigationViewState
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
-import com.autio.android_app.util.Constants
 import com.autio.android_app.util.TrackingUtility
 import com.google.android.gms.cast.framework.CastContext
 import dagger.hilt.android.AndroidEntryPoint
@@ -110,22 +109,12 @@ class BottomNavigation : AppCompatActivity() {
 
         purchaseViewModel.viewState.observe(this, ::handlePurchaseViewState)
 
-        purchaseViewModel.customerInfo.observe(this) {
-            it?.let {
-                binding.storiesFreePlansBanner.visibility =
-                        //TODO(URGENT. CHANGE FOR API VALIDATION TRUE VIEWSTATE)
-                    if (it.entitlements[Constants.REVENUE_CAT_ENTITLEMENT]?.isActive == true) GONE
-                    else VISIBLE
-            }
-        }
 
     }
 
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
-            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(
-                viewState.story
-            )
+            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(viewState.story)
             is BottomNavigationViewState.RemainingStories -> handleAvailableStories(viewState.remainingStories)
             is BottomNavigationViewState.OnNotPremiumUser -> showPayWall()
             else -> {}
@@ -214,6 +203,7 @@ class BottomNavigation : AppCompatActivity() {
         if (!user.isPremiumUser) {
             hidePlayerComponent()
             navController.navigate(R.id.subscribeFragment)
+            binding.storiesFreePlansBanner.visibility = GONE
         }
     }
 
@@ -226,6 +216,9 @@ class BottomNavigation : AppCompatActivity() {
     private fun handleAvailableStories(remainingCount: Int) {
         storyCount = remainingCount
         updateAvailableStoriesUI(remainingCount)
+        if (remainingCount>0){
+            binding.storiesFreePlansBanner.visibility = GONE
+        }
     }
 
     private fun showUiElements(isVisible: Boolean) {

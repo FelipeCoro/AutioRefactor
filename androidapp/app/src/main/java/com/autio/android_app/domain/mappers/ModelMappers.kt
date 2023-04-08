@@ -1,28 +1,10 @@
 package com.autio.android_app.domain.mappers
 
-import com.autio.android_app.data.api.model.account.CreateAccountDto
-import com.autio.android_app.data.api.model.account.GuestResponse
-import com.autio.android_app.data.api.model.account.LoginDto
-import com.autio.android_app.data.api.model.account.LoginResponse
-import com.autio.android_app.data.api.model.story.AuthorDto
-import com.autio.android_app.data.api.model.story.ContributorResponse
-import com.autio.android_app.data.api.model.story.NarratorDto
-import com.autio.android_app.data.api.model.story.PlaysDto
-import com.autio.android_app.data.api.model.story.StoryDto
-import com.autio.android_app.data.database.entities.CategoryEntity
-import com.autio.android_app.data.database.entities.HistoryEntity
-import com.autio.android_app.data.database.entities.MapPointEntity
-import com.autio.android_app.data.database.entities.StoryEntity
-import com.autio.android_app.data.database.entities.UserEntity
-import com.autio.android_app.ui.stories.models.AccountRequest
-import com.autio.android_app.ui.stories.models.Author
-import com.autio.android_app.ui.stories.models.Category
-import com.autio.android_app.ui.stories.models.Contributor
-import com.autio.android_app.ui.stories.models.History
-import com.autio.android_app.ui.stories.models.LoginRequest
-import com.autio.android_app.ui.stories.models.Narrator
-import com.autio.android_app.ui.stories.models.Story
-import com.autio.android_app.ui.stories.models.User
+import com.autio.android_app.data.api.model.account.*
+import com.autio.android_app.data.api.model.story.*
+import com.autio.android_app.data.database.entities.*
+import com.autio.android_app.ui.stories.models.*
+import com.revenuecat.purchases.models.StoreTransaction
 
 //TODO(need to break this up for readability)
 fun CategoryEntity.toModel(): Category {
@@ -273,3 +255,40 @@ fun NarratorDto.toModel(): Narrator {
         imageUrl
     )
 }
+
+fun StoreTransaction.toReceipt(
+    orderId: String,
+    purchaseState: Int,
+    purchaseTime: Long,
+    purchaseToken: String,
+): AndroidReceiptDto {
+    return AndroidReceiptDto(
+        Receipt(
+            isAutoRenewing = isAutoRenewing,
+            marketplace = marketplace,
+            orderId = orderId,
+            originalJson =
+            OriginalJson(
+                acknowledged = true,
+                obfuscatedAccountId = "",
+                orderId = orderId,
+                packageName = "",
+                productId = skus.first(),
+                purchaseState = purchaseState,
+                purchaseTime = purchaseTime,
+                purchaseToken = purchaseToken,
+                quantity = 1
+            ),
+            presentedOfferingIdentifier = presentedOfferingIdentifier,
+            purchaseState = purchaseState.toString(),
+            purchaseTime = purchaseTime,
+            purchaseToken = purchaseToken,
+            purchaseType = purchaseType.toString(),
+            signature = signature,
+            skus = skus,
+            storeUserID = storeUserID,
+            type = type.toString()
+        )
+    )
+}
+
