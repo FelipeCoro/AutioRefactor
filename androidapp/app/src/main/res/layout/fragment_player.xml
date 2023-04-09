@@ -39,38 +39,16 @@
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/photo_slider1" />
 
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:background="#65000000"
                         android:gravity="center"
                         android:maxHeight="40dp"
                         android:orientation="horizontal"
                         app:layout_constraintBottom_toBottomOf="parent">
 
-                        <RelativeLayout
-                            android:layout_width="0dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:layout_weight="1"
-                            android:gravity="center">
 
-                            <ImageView
-                                android:id="@+id/btnHeart"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_heart" />
-
-                            <TextView
-                                android:id="@+id/tvNumberOfLikes"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_centerInParent="true"
-                                android:layout_marginStart="4dp"
-                                android:layout_toEndOf="@+id/btnHeart"
-                                android:textColor="@color/white"
-                                tools:text="213" />
-                        </RelativeLayout>
 
                         <ImageView
                             android:id="@+id/btnShare"
@@ -109,6 +87,17 @@
                             android:scaleType="centerInside"
                             android:src="@drawable/ic_more" />
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/imageView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintBottom_toBottomOf="@+id/ivStoryImage"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:srcCompat="@drawable/player_fragment_button_image_shadow"
+                        android:scaleType="fitXY"
+                        />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <SeekBar
@@ -118,8 +107,8 @@
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
                     android:saveEnabled="false"
-                    android:progressTint="@color/autio_white"
-                    android:thumbTint="@color/autio_white"
+                    android:progressTint="@color/autio_blue_day_night"
+                    android:thumbTint="@color/autio_blue_day_night"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/ly_image_story" />
@@ -266,9 +255,17 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:src="@drawable/ic_forward"
-                        android:visibility="invisible"
+                        android:visibility="gone"
                         app:tint="@color/button_background" />
 
+
+                    <ImageView
+                        android:id="@+id/btnChangeSpeed"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/ic_speed_audio_1x"
+                        app:tint="@color/button_background" />
                     <ImageView
                         android:id="@+id/btnRewind"
                         android:layout_width="0dp"
@@ -286,13 +283,7 @@
                         android:src="@drawable/ic_player_play"
                         app:tint="@color/button_background" />
 
-                    <ImageView
-                        android:id="@+id/btnChangeSpeed"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:src="@drawable/ic_speed_audio_1x"
-                        app:tint="@color/button_background" />
+
 
                     <ImageView
                         android:id="@+id/btnBookmark"
@@ -301,6 +292,29 @@
                         android:layout_weight="1"
                         android:src="@drawable/ic_player_bookmark"
                         app:tint="@color/button_background" />
+                    <RelativeLayout
+                        android:layout_width="0dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:layout_weight="1"
+                        android:gravity="center">
+
+                        <ImageView
+                            android:id="@+id/btnHeart"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_heart" />
+
+                        <TextView
+                            android:id="@+id/tvNumberOfLikes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:layout_marginStart="4dp"
+                            android:layout_toEndOf="@+id/btnHeart"
+                            android:textColor="@color/autio_blue_day_night"
+                            tools:text="213" />
+                    </RelativeLayout>
                 </LinearLayout>
 
                 <TextView

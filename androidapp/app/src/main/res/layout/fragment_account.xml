@@ -128,7 +128,8 @@
             android:layout_height="0dp"
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -223,6 +224,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:fontFamily="@font/new_york_large_medium"
                         android:text="@string/no_plan_selected"
                         android:textSize="24sp" />
 
@@ -276,13 +278,13 @@
                     <TextView
                         android:id="@+id/tvProfileSubtitle"
                         style="@style/SFSubtitle"
-                        android:textSize="16sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tvProfileHeader"
                         android:layout_marginStart="18dp"
                         android:layout_marginBottom="12dp"
-                        android:text="@string/personal_information" />
+                        android:text="@string/personal_information"
+                        android:textSize="16sp" />
 
                     <EditText
                         android:id="@+id/etName"
@@ -290,15 +292,14 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/tvProfileSubtitle"
                         android:layout_marginHorizontal="18dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginRight="-4dp"
                         android:backgroundTint="@color/gray_letter"
                         android:fontFamily="@font/sf_pro_text_regular"
                         android:paddingBottom="7dp"
                         android:textColor="@color/gray_letter"
-                        android:textSize="16sp"
-                        android:layout_marginLeft="-4dp"
-                        android:layout_marginRight="-4dp"
                         android:textCursorDrawable="@color/autio_blue"
-                        />
+                        android:textSize="16sp" />
 
                     <EditText
                         android:id="@+id/et_email"
@@ -306,13 +307,13 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/etName"
                         android:layout_marginHorizontal="18dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginRight="-4dp"
                         android:backgroundTint="@color/gray_letter"
                         android:clickable="false"
                         android:fontFamily="@font/sf_pro_text_regular"
                         android:inputType="none"
                         android:paddingBottom="7dp"
-                        android:layout_marginLeft="-4dp"
-                        android:layout_marginRight="-4dp"
                         android:textColor="@color/gray_letter"
                         android:textSize="16sp" />
 

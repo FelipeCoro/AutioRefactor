@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Colors in the app -->
+    <color name="autio_blue_day_night">
+        #FFFFFF
+    </color>
+
     <color name="autio_white">
         #FFFFFF
     </color>

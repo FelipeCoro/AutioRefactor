@@ -4,6 +4,7 @@ import android.Manifest
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -21,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.get
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.autio.android_app.R
 import com.autio.android_app.databinding.ActivityBottomNavigationBinding
@@ -172,6 +174,11 @@ class BottomNavigation : AppCompatActivity() {
         }
         binding.btnKillSwitch.setOnClickListener {
             bottomNavigationViewModel.updateRemainingStories()
+        }
+
+        binding.persistentPlayer.setOnClickListener {
+
+            NavigationUI.onNavDestinationSelected( binding.bottomNavigationView.menu.findItem(R.id.player), navController)
         }
     }
 

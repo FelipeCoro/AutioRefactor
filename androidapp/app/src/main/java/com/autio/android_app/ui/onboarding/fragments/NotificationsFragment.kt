@@ -38,7 +38,6 @@ class NotificationsFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        requestPermission()
         with(binding) {
             termsOfServiceNotifications.setOnClickListener { openTerms() }
             privacyPolicyNotifications.setOnClickListener { openPrivacy() }

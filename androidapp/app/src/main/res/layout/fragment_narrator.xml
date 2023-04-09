@@ -61,8 +61,10 @@
         android:layout_below="@id/cvNarratorPic"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
+        android:fontFamily="@font/new_york_large_medium"
         android:gravity="center"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/svAuthorContent"
@@ -83,8 +85,10 @@
                 android:layout_marginHorizontal="24dp"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="24dp"
+                android:fontFamily="@font/new_york_large_medium"
                 android:gravity="top"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:id="@+id/btnVisitNarratorLink"
@@ -93,7 +97,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@drawable/empty_button_background"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <TextView
                     style="@style/ButtonContentText"
@@ -123,7 +128,8 @@
                 android:layout_marginBottom="11dp"
                 android:text="Published Stories"
                 android:textAllCaps="true"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvNarratorStories"
