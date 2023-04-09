@@ -24,8 +24,8 @@ android {
         applicationId "autio.audio.travel.guide"
         minSdk 26
         targetSdk 33
-        versionCode 25
-        versionName "1.25"
+        versionCode 26
+        versionName "1.26"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation":
