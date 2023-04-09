@@ -96,12 +96,17 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun initView() {
+
         val notifyPermission = validateNotificationsPermission()
         val inAppPermission = validateInAppLocationPermission()
         val backgroundPermission = validateBackgroundLocation()
+        if (android.os.Build.VERSION.SDK_INT > 33) {
         viewModel.initView(
             isOnBoardingFinished(), notifyPermission, inAppPermission, backgroundPermission
-        )
+        )}
+        if (android.os.Build.VERSION.SDK_INT < 33) {
+            viewModel.initView(
+                isOnBoardingFinished(),true, inAppPermission, backgroundPermission)}
     }
 
     private fun isOnBoardingFinished(): Boolean {
@@ -130,15 +135,15 @@ class OnBoardingFragment : Fragment() {
     }
 
     private fun navigateToNotificationsFragment() {
-        setViewPagerPage(0)
-    }
-
-    private fun navigateToInAppLocationPermissionFragment() {
         setViewPagerPage(1)
     }
 
-    private fun navigateToBackgroundLocation() {
+    private fun navigateToInAppLocationPermissionFragment() {
         setViewPagerPage(2)
+    }
+
+    private fun navigateToBackgroundLocation() {
+        setViewPagerPage(3)
     }
 
     private fun setViewPagerPage(pageIndex: Int) {
