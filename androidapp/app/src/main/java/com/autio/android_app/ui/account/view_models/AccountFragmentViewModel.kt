@@ -31,11 +31,15 @@ class AccountFragmentViewModel @Inject constructor(
 
     fun fetchUserData() {
         viewModelScope.launch(coroutineDispatcher) {
-
-          val data =  autioRepository.fetchUserData()
-            val result = data.getOrNull()
-            if(result!=null)
-                setViewState(AccountViewState.OnUserDataFetched(result))
+            kotlin.runCatching {
+                autioRepository.getUserAccount()
+            }.onSuccess { user ->
+                if (user == null) {
+                    setViewState(AccountViewState.OnGetUserFailed)
+                } else setViewState(AccountViewState.OnUserDataFetched(user))
+            }.onFailure {
+                setViewState(AccountViewState.OnGetUserFailed)
+            }
         }
     }
 
@@ -56,8 +60,8 @@ class AccountFragmentViewModel @Inject constructor(
         categories: List<Category>, onSuccess: () -> Unit = {}, onFailure: () -> Unit = {}
     ) {
         viewModelScope.launch(coroutineDispatcher) {
-          //  val infoUser = ProfileDto( categories.map { it.toMapPointEntity() }) //TODO(This is not used right now but should be changed to UserDao impl. later on)
-         //   autioRepository.updateCategoriesOrder(infoUser, onSuccess, onFailure)
+            //  val infoUser = ProfileDto( categories.map { it.toMapPointEntity() }) //TODO(This is not used right now but should be changed to UserDao impl. later on)
+            //   autioRepository.updateCategoriesOrder(infoUser, onSuccess, onFailure)
         }
     }
 
@@ -75,7 +79,7 @@ class AccountFragmentViewModel @Inject constructor(
         }
     }
 
-    fun deleteAccount(){
+    fun deleteAccount() {
         viewModelScope.launch(coroutineDispatcher) {
             autioRepository.deleteAccount()
         }

@@ -5,5 +5,6 @@ import com.autio.android_app.ui.stories.models.User
 sealed interface AccountViewState {
     object OnSuccessPasswordChanged : AccountViewState
     object OnFailedPasswordChanged : AccountViewState
+    object OnGetUserFailed:AccountViewState
     data class OnUserDataFetched(val data : User):AccountViewState
 }

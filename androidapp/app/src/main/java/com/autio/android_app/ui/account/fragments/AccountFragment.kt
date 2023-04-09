@@ -13,12 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
-import androidx.recyclerview.widget.ItemTouchHelper.DOWN
-import androidx.recyclerview.widget.ItemTouchHelper.END
-import androidx.recyclerview.widget.ItemTouchHelper.START
-import androidx.recyclerview.widget.ItemTouchHelper.SimpleCallback
-import androidx.recyclerview.widget.ItemTouchHelper.UP
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.RecyclerView
 import com.autio.android_app.R
 import com.autio.android_app.databinding.FragmentAccountBinding
@@ -29,19 +24,10 @@ import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.adapter.CategoryAdapter
 import com.autio.android_app.ui.stories.models.Category
 import com.autio.android_app.ui.stories.models.User
-import com.autio.android_app.ui.stories.view_model.StoryViewModel
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
-import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
-import com.autio.android_app.util.bottomNavigationActivity
-import com.autio.android_app.util.checkEmptyField
-import com.autio.android_app.util.openUrl
-import com.autio.android_app.util.pleaseFillText
-import com.autio.android_app.util.showError
-import com.autio.android_app.util.showToast
-import com.autio.android_app.util.writeEmailToCustomerSupport
+import com.autio.android_app.util.*
 import com.bumptech.glide.Glide
-import com.revenuecat.purchases.CustomerInfo
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
@@ -76,8 +62,8 @@ class AccountFragment : Fragment() {
         bindObservables()
         bindListeners()
         setListeners()
+        accountFragmentViewModel.fetchUserData()
         initView()
-        getUserInfo()
     }
 
     private fun bindObservables() {
@@ -91,6 +77,8 @@ class AccountFragment : Fragment() {
                 is AccountViewState.OnSuccessPasswordChanged -> handleSuccessPasswordChanged()
                 is AccountViewState.OnFailedPasswordChanged -> handleFailedPasswordChanged()
                 is AccountViewState.OnUserDataFetched -> handleUserinfo(viewState.data)
+                else -> {
+                }
             }
         }
     }
@@ -121,9 +109,6 @@ class AccountFragment : Fragment() {
     private fun initView() {
         Glide.with(binding.ivAccount).load(R.drawable.account_header).fitCenter()
             .into(binding.ivAccount)
-
-        accountFragmentViewModel.fetchUserData()
-
         // initRecyclerViewInterest()
     }
 
@@ -315,9 +300,6 @@ class AccountFragment : Fragment() {
         // })
     }
 
-    private fun getUserInfo() {
-        accountFragmentViewModel.fetchUserData()
-    }
 
     private fun handleUserinfo(user: User) {
         name = user.name.trim()
@@ -326,12 +308,11 @@ class AccountFragment : Fragment() {
         binding.etEmail.setText(email)
 
         if (user.isGuest) {
-            binding.btnLogOut.visibility = GONE
-            binding.btnSignIn.visibility = VISIBLE
-            binding.btnDeleteAccount.visibility = GONE
+            binding.linearLayoutSignIn.visibility = VISIBLE
+            binding.scrollViewAccount.visibility = GONE
         } else {
-            binding.btnSignIn.visibility = GONE
-            binding.btnLogOut.visibility = VISIBLE
+            binding.linearLayoutSignIn.visibility = GONE
+            binding.scrollViewAccount.visibility = VISIBLE
         }
 
         updateSubscriptionUI(user.isPremiumUser)
@@ -351,7 +332,7 @@ class AccountFragment : Fragment() {
 //  }
 
     private fun bindListeners() {
-        binding.btnSignIn.setOnClickListener {
+        binding.btnSignInOld.setOnClickListener {
             goToSignIn()
         }
         binding.btnSignUp.setOnClickListener {

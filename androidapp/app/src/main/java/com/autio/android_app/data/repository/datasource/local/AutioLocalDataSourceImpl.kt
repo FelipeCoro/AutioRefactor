@@ -48,7 +48,9 @@ class AutioLocalDataSourceImpl @Inject constructor(
         runCatching {
             userDao.getCurrentUser()
         }.onSuccess { userEntity ->
+            val stories = remainingStoriesDao.getCurrentStoryCount().remainingStories
             val user = userEntity?.toModel()
+            user?.remainingStories = stories
             return Result.success(user)
         }.onFailure {
             return Result.failure(it)

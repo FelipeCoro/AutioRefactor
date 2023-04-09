@@ -7,7 +7,6 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,18 +20,18 @@ import com.autio.android_app.data.repository.prefs.PrefRepository
 import com.autio.android_app.databinding.FragmentSubscribeBinding
 import com.autio.android_app.databinding.MothPopupBinding
 import com.autio.android_app.extensions.makeLinks
-import com.autio.android_app.ui.stories.BottomNavigation
 import com.autio.android_app.ui.stories.models.User
 import com.autio.android_app.ui.subscribe.adapters.SliderAdapter
 import com.autio.android_app.ui.subscribe.view_model.PurchaseViewModel
 import com.autio.android_app.ui.subscribe.view_states.PurchaseViewState
-import com.autio.android_app.util.Constants.REVENUE_CAT_ENTITLEMENT
 import com.autio.android_app.util.bottomNavigationActivity
 import com.autio.android_app.util.navController
 import com.autio.android_app.util.openUrl
 import com.autio.android_app.util.resources.DeepLinkingActions
 import com.autio.android_app.util.resources.getDeepLinkingNavigationRequest
-import com.revenuecat.purchases.*
+import com.revenuecat.purchases.Package
+import com.revenuecat.purchases.Purchases
+import com.revenuecat.purchases.getOfferingsWith
 import com.smarteist.autoimageslider.SliderView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -81,6 +80,7 @@ class SubscribeFragment : Fragment() {
     }
 
     private fun initView() {
+        purchaseViewModel.getUserInfo()
         binding.tvMothInvitation.movementMethod = LinkMovementMethod.getInstance()
 
         val images = listOf(
@@ -169,34 +169,11 @@ class SubscribeFragment : Fragment() {
             }
         }
 
-
-        //On handle success, travel to map fragment
-
-        /*{ offerings -> //TODO (Make purchase handle viewStates for offerings)
-            offerings.current?.availablePackages?.takeUnless { it.isEmpty() }?.let { packages ->
-                with(binding) {
-                    packages.forEach { p ->
-                        when (p.product.sku) {
-                            SINGLE_TRIP_PRODUCT -> {
-                                subscriptionPathUi.cvSingleTrip.setOnClickListener { makePurchase(p) }
-                            }
-                            ADVENTURER_TRIP_PRODUCT -> {
-                                subscriptionPathUi.cvAdventurer.setOnClickListener { makePurchase(p) }
-                            }
-                            TRAVELER_TRIP_SUBSCRIPTION -> {
-                                cvTraveler.setOnClickListener { makePurchase(p) }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-*/
         binding.commentSection.btnChoosePlan.setOnClickListener { scrollToSubscribeSection() }
 
-        binding.subscriptionPathUi.btnStoriesFree1.setOnClickListener { isSessionAlive() }
+        binding.subscriptionPathUi.btnStoriesFree1.setOnClickListener { travelToMap() }
 
-        binding.commentSection.btnStoriesFree2.setOnClickListener { isSessionAlive() }
+        binding.commentSection.btnStoriesFree2.setOnClickListener { travelToMap() }
     }
 
     private fun scrollToSubscribeSection() {
@@ -239,11 +216,15 @@ class SubscribeFragment : Fragment() {
         }
     }
 
+    private fun travelToMap() {
+        navController.navigate(R.id.action_subscribeFragment_to_map_fragment)
+    }
+
     private fun isSessionAlive() {
         //  if (isSessionAlive.isEmpty()) {
         //      goToLoginActivity()
         //  } else {
-        purchaseViewModel.getUserInfo()
+
 
     }
 
@@ -258,12 +239,13 @@ class SubscribeFragment : Fragment() {
     }
 
     private fun handleFetchUserSuccessViewState(user: User) {
-        if (bottomNavigationActivity?.storyCount!! > 0 || user.isPremiumUser) {
-            navController.navigate(R.id.action_subscribeFragment_to_map_fragment)
+        if (user.remainingStories <= 0) {
+            binding.subscriptionPathUi.btnStoriesFree1.visibility =View.INVISIBLE
+            binding.commentSection.btnStoriesFree2.visibility =View.GONE
         }
     }
 
-    private fun handleSuccessfulPurchase(){
+    private fun handleSuccessfulPurchase() {
         Toast.makeText(
             context,
             "Purchase successful — Welcome to the Autio community.",
@@ -271,14 +253,16 @@ class SubscribeFragment : Fragment() {
         ).show()
         navController.navigate(R.id.action_subscribeFragment_to_map_fragment)
     }
-    private fun handlePurchaseError(errorMessage:String){
+
+    private fun handlePurchaseError(errorMessage: String) {
         Toast.makeText(
             context,
             errorMessage,
             Toast.LENGTH_SHORT
         ).show()
     }
-    private fun handleCancelledPurchase(){
+
+    private fun handleCancelledPurchase() {
         Toast.makeText(
             context,
             "Your purchase was not made",

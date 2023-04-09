@@ -82,7 +82,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     // The entry point to the Places API.
     private lateinit var placesClient: PlacesClient
 
-    var locationPermissionGranted = false
+    var locationPermissionGranted = true
 
     private var locationBackgroundPermissionGranted = false
     private var lastKnownLocation: Location? = null
@@ -116,7 +116,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private fun initView() {
         val mapFragment = childFragmentManager.findFragmentById(R.id.maps) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
-        //TODO(Implement showpaywall logic where if the 5 stories are out, showPaywall())
         recyclerView = binding.layoutPlaylist.rvMapPlaylist
         storyAdapter = StoryAdapter(
             bottomNavigationViewModel.playingStory, onStoryPlay = { id ->
@@ -516,9 +515,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         //   }
         // }
         binding.btnSelectedStoryPlay.setOnClickListener {
-            //     UtilsClass(prefRepository).showPaywallOrProceedWithNormalProcess(requireActivity()) { //TODO(Commented this out cause it get bringing me back to paywall, need to check logic later)
             bottomNavigationViewModel.playMediaId(story.id)
-            //}
         }
         binding.btnSelectedStoryInfo.setOnClickListener {
             showStoryOptions(requireContext(),

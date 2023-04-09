@@ -4,7 +4,6 @@ import android.Manifest
 import android.media.AudioManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -56,7 +55,6 @@ class BottomNavigation : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var snackBarView: View
 
-    var storyCount = 0
 
 
     private var castContext: CastContext? = null
@@ -116,7 +114,9 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun handleBottomNavViewState(viewState: BottomNavigationViewState?) {
         when (viewState) {
-            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(viewState.story)
+            is BottomNavigationViewState.FetchedStoryToPlay -> handleBottomNavSuccessViewState(
+                viewState.story
+            )
             is BottomNavigationViewState.RemainingStories -> handleAvailableStories(viewState.remainingStories)
             is BottomNavigationViewState.OnNotPremiumUser -> showPayWall()
             else -> {}
@@ -178,7 +178,10 @@ class BottomNavigation : AppCompatActivity() {
 
         binding.persistentPlayer.setOnClickListener {
 
-            NavigationUI.onNavDestinationSelected( binding.bottomNavigationView.menu.findItem(R.id.player), navController)
+            NavigationUI.onNavDestinationSelected(
+                binding.bottomNavigationView.menu.findItem(R.id.player),
+                navController
+            )
         }
     }
 
@@ -193,13 +196,12 @@ class BottomNavigation : AppCompatActivity() {
             } else if (destination.label == controller.graph[R.id.subscribeFragment].label) {
                 hidePlayerComponent()
             } else if (destination.label == controller.graph[R.id.account].label) {
-                hidePlayerComponent()
+                showUiElementsNoPaywall(true)
             } else {
                 showUiElements(true)
             }
         }
     }
-
 
     fun showPayWall() {
         purchaseViewModel.getUserInfo()
@@ -207,7 +209,7 @@ class BottomNavigation : AppCompatActivity() {
 
     private fun handleFetchUserSuccessViewState(user: User) {
 
-        if (!user.isPremiumUser) {
+        if (!user.isPremiumUser || user.remainingStories <= 0) {
             hidePlayerComponent()
             navController.navigate(R.id.subscribeFragment)
             binding.storiesFreePlansBanner.visibility = GONE
@@ -221,23 +223,20 @@ class BottomNavigation : AppCompatActivity() {
     }
 
     private fun handleAvailableStories(remainingCount: Int) {
-        storyCount = remainingCount
         updateAvailableStoriesUI(remainingCount)
-        if (remainingCount>0){
+        if (remainingCount <= 0) {
             binding.storiesFreePlansBanner.visibility = GONE
         }
     }
 
     private fun showUiElements(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
-        // binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
         purchaseViewModel.getUserStories()
     }
 
     private fun showUiElementsNoPaywall(isVisible: Boolean) {
         binding.persistentPlayer.isVisible = isVisible
-        // binding.rlAllowNotifications.isVisible = isVisible
         binding.bottomNavigationView.isVisible = isVisible
     }
 
@@ -279,7 +278,6 @@ class BottomNavigation : AppCompatActivity() {
             val tickMarks = arrayOf(
                 tickMark1, tickMark2, tickMark3, tickMark4, tickMark5
             )
-            //  if (remainingStories < 0 && purchaseViewModel.customerInfo.value?.entitlements?.get(Constants.REVENUE_CAT_ENTITLEMENT)?.isActive == true) {//TODO(User with an active plan ironically have -1 remainingStories, somewher here we should check isUserSubcribed [From RevenueCAT]))
             if (remainingStories <= 0) {
                 llTickMarks.visibility = GONE
                 storiesFreePlansBanner.visibility = GONE

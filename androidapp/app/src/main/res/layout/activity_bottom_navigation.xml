@@ -264,7 +264,7 @@
                 android:gravity="center"
                 android:orientation="horizontal"
                 android:showDividers="middle"
-                android:visibility="gone"
+                android:visibility="visible"
                 tools:visibility="visible">
 
                 <View
