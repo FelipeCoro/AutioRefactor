@@ -272,7 +272,7 @@ fun StoreTransaction.toReceipt(
                 acknowledged = true,
                 obfuscatedAccountId = "",
                 orderId = orderId,
-                packageName = "",
+                packageName = "autio.audio.travel.guide",
                 productId = skus.first(),
                 purchaseState = purchaseState,
                 purchaseTime = purchaseTime,
