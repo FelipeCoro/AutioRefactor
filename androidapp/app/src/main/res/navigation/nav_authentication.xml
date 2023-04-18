@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/authentication_nav"
+    app:startDestination="@id/onBoardingFragment">
+
+    <action
+        android:id="@+id/signUp"
+        app:destination="@id/signUpFragment" />
+    <action
+        android:id="@+id/signIn"
+        app:destination="@id/signInFragment" />
+
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.autio.android_app.ui.login.fragments.SignUpFragment"
+        android:label="SignUpFragment"
+        tools:layout="@layout/fragment_sign_up">
+        <deepLink app:uri="android-app://navigation.autio.app/sign-up" />
+        <action
+            android:id="@+id/action_signUpFragment_to_bottomNavigation"
+            app:destination="@id/bottomNavigation" />
+    </fragment>
+    <activity
+        android:id="@+id/bottomNavigation"
+        android:name="com.autio.android_app.ui.stories.BottomNavigation"
+        android:label="BottomNavigation"
+        tools:layout="@layout/activity_bottom_navigation">
+        <deepLink
+            android:id="@+id/deepLink2"
+            app:uri="android-app://navigation.autio.app/bottomNav" />
+    </activity>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.autio.android_app.ui.login.fragments.SignInFragment"
+        android:label="SignInFragment"
+        tools:layout="@layout/fragment_sign_in">
+        <deepLink app:uri="android-app://navigation.autio.app/sign-in" />
+        <action
+            android:id="@+id/action_signInFragment_to_bottomNavigation"
+            app:destination="@id/bottomNavigation" />
+        <action
+            android:id="@+id/action_signInFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.autio.android_app.ui.login.fragments.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <deepLink app:uri="android-app://navigation.autio.app/login" />
+        <action
+            android:id="@+id/action_loginFragment_to_bottomNavigation"
+            app:destination="@id/bottomNavigation" />
+        <action
+            android:id="@+id/action_loginFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/onBoardingFragment"
+        android:name="com.autio.android_app.ui.onboarding.fragments.OnBoardingFragment"
+        tools:layout="@layout/fragment_welcome_explorer">
+        <action
+            android:id="@+id/action_onBoardingFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <deepLink
+            android:id="@+id/deepLink"
+            app:uri="android-app://navigation.autio.app/onboarding" />
+        <action
+            android:id="@+id/action_onBoardingFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_onBoardingFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <argument
+            android:name="goToSignUpOrIn"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+    <fragment
+        android:id="@+id/waitlistFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.WaitlistFragment"
+        android:label="WaitlistFragment" >
+        <action
+            android:id="@+id/action_waitlistFragment_to_waitlistFragmentResponse"
+            app:destination="@id/waitlistFragmentResponse" />
+        <action
+            android:id="@+id/action_waitlistFragment_to_onBoardingFragment"
+            app:destination="@id/onBoardingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/waitlistFragmentResponse"
+        android:name="com.autio.android_app.ui.stories.fragments.WaitlistFragmentResponse"
+        android:label="WaitlistFragmentResponse" />
+</navigation>

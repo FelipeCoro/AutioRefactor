@@ -27,6 +27,7 @@
     <string name="see_plans">See Plans</string>
     <string name="up_next">Up Next</string>
     <string name="my_stories_user_not_logged_message">You’ll need a subscription to create playlists, as well as bookmark, favorite, or download stories.</string>
+    <string name="coming_soon_message">Very soon you’ll be able to create playlists, as well as bookmark, favorite, or download stories!</string>
     <string name="search">Search</string>
     <string name="most_popular">MOST POPULAR</string>
     <string name="account_header_title">The Perfect Gift for the Adventurer in Your Life</string>
@@ -44,7 +45,7 @@
     <string name="categories">Categories</string>
     <string name="organize_your_interests_from_the_top_down">Prioritize your interests for AUTIO to recommend more relevant types of stories</string>
     <string name="save_changes">Save Changes</string>
-    <string name="name">Name</string>
+    <string name="name">NAME</string>
     <string name="contact">Contact</string>
     <string name="log_out">Log Out</string>
     <string name="delete_my_account"><u>Delete My Account</u></string>
@@ -73,7 +74,7 @@
     <string name="adventurer_plan_note">One-time payment.</string>
     <string name="guest_authenticate_message">You\'re not currently signed in.\nCreate an account or sign in to\nmanage your account.</string>
     <string name="contact_support">Questions about your account or subscription? <u>Contact Autio</u>.</string>
-    <string name="no_story_loaded">No story loaded</string>
+    <string name="no_story_loaded">Pick a story from the map</string>
     <string name="empty_bookmarks_message">Bookmarked stories will appear on this list. Bookmarks are only visible to you and are a great way to earmark stories to revisit later.</string>
     <string name="empty_favorites_message">Liked stories will appear on this list. Everyone can see likes — they’re a great way to show some love for your absolute favorite stories.</string>
     <string name="empty_history_message">Listened-to stories will appear here in the order you discover them. Start listening now by choosing a story from the map.</string>
@@ -132,7 +133,7 @@
     <string name="map_list_subtitle">Adjust the map for more stories</string>
     <!-- Player -->
     <string name="allowed_caller_log">
-        Caller has a valid certificate, but its package doesn\'t match any expected package for the
+        Caller has a valid certificate, but its package does not match any expected package for the
         given certificate. To allow this caller, add the following to the allowed callers list:\n
         <![CDATA[
         <signature name=\"%1$s\" package=\"%2$s\">\n\t<key>%3$s</key>\n</signature>\n
@@ -142,11 +143,77 @@
     <string name="pause">Pause</string>
     <string name="story_art_alt">Story art</string>
     <string name="duration_unknown">--:--</string>
-    <string name="duration_format">%d:%02d</string>
+    <string name="duration_format">%1$d:%2$02d</string>
     <string name="address">%1$s, %2$s</string>
     <!-- My Stories Categories -->
     <string name="my_stories_bookmarks">Bookmarks</string>
     <string name="my_stories_favorites">Favorites</string>
     <string name="my_stories_history">History</string>
     <string name="my_stories_downloaded_stories">Downloaded Stories</string>
+
+    <!--Loading overlay-->
+    <string name="loading_loading_text">Loading</string>
+
+    <!-- subscribe fragment -->
+    <string name="youtube_using_autio_app_video_url" translatable="false">https://www.youtube.com/watch?v=SvbahDL4aYc&amp;ab_channel=Autio"</string>
+    <string name="sign_in_error_text">Please check your email or password</string>
+    <string name="subscribe_fragment_sign_in_link">Sign In</string>
+    <string name="subscribe_fragment_restore_purchase_link">Restore Purchase</string>
+    <string name="subscribe_fragment_url_moth_community_link">https://themoth.org/community</string>
+    <string name="subscribe_fragment_learn_more_link">Learn more</string>
+    <string name="subscribe_fragment_positive_button_dialog">Continue</string>
+    <string name="subscribe_fragment_request_again_negative_button_dialog">Request again</string>
+
+    <string-array name="subscribe_slider_titles">
+        <item>Take your journey to the next level with location-based audio stories</item>
+        <item>Go anywhere with nationwide coverage</item>
+        <item>Always more to discover with new original content</item>
+        <item>A collection of narrators as unique as the stories</item>
+    </string-array>
+
+    <string-array name="subscribe_slider_texts">
+        <item>Explore our collection of over 10,000+ stories exclusive to Autio.</item>
+        <item>Road trip across the country with new stories to discover wherever you travel.</item>
+        <item>New, unique stories added weekly.</item>
+        <item>Listen to some of your favorite voices, like Kevin Costner, Phil Jackson, &amp; John Lithgow.</item>
+    </string-array>
+
+    <string name="in_app_location_warning_dialog_permissions_text"> "For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue?\n You can change this later in your Settings.</string>
+    <string name="background_location_fragment_main_dialog_text">For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue? You can change this later in your Settings.</string>
+    <string name="background_location_fragment_positive_button_dialog_text">Continue</string>
+    <string name="background_location_fragment_negative_button_dialog_text">Request again</string>
+    <string name="notification_fragment_dialog_text">For a full experience of the app, accepting the requested permissions are necessary. Are you sure want to continue? You can change this later in your Settings.</string>
+    <string name="notification_fragment_dialog_positive_button_text">Continue</string>
+    <string name="notification_fragment_dialog_negative_button_text">Request again</string>
+    <string name="map_fragment_feedback_added_to_bookmarks">Added To Bookmarks</string>
+    <string name="map_fragment_feedback_remove_from_bookmarks">Removed From Bookmarks</string>
+    <string name="map_fragment_feedback_added_to_favorites">Added To Favorites</string>
+    <string name="map_fragment_feedback_removed_from_favorites">Removed From Favorites</string>
+    <string name="map_fragment_feedback_story_saved_to_my_device">Story Saved To My Device</string>
+    <string name="map_fragment_feedback_story_removed_from_my_device">Story Removed From My Device</string>
+    <string name="map_fragment_feedback_connection_failure">Connection Failure</string>
+    <string name="free_stories_banner_title">You\'ve Got 5 Free Stories</string>
+    <string name="free_stories_banner_content">Tap a story nearby, or browse destinations around the country. When you\'re done, you can select one of three different plans to access our growing library of 9,000+ stories.\n \nSafe travels!\n-The Autio Team</string>
+    <string name="waitlist_title">You\'re on the waitlist</string>
+    <string name="waitlist_content">Due to overwhelming demand, we’ll be granting access in phases.\n \nEnable notifications so we can let you know when the Autio app is ready for you!</string>
+    <string name="waitlist_content_response">Due to overwhelming demand, we’ll be granting access in phases.\n \nThe current estimated wait time is 7 days</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="termsOfService">TERMS OF SERVICE</string>
+    <string name="privacyPolicy">PRIVACY POLICY</string>
+    <string name="privacy_Link">https://autio.com/privacy</string>
+    <string name="termsOfServiceLink">https://autio.com/terms-of-service</string>
+    <string name="securityLink">https://autio.com/security</string>
+    <string name="security">SECURITY</string>
+    <string name="passwordResetLink">https://app.autio.com/password/reset</string>
+    <string name="enterValidEmailMessage">Please enter a valid Email</string>
+    <string name="emailOnAnotherAccount">Account already exists. Tap Cancel and then Sign In instead</string>
+    <string name="account_fragment_password_has_been_updated">Password has been updated</string>
+    <string name="account_fragment_give_autio_url">https://app.autio.com/give</string>
+    <string name="autio_app_url">https://app.autio.com</string>
+    <string name="autio_support_email" translatable="false">support@autio.com</string>
+    <string name="autio_email_subject_customer_support">Autio Android Customer Support</string>
+    <string name="bookmarked_stories">Bookmarked Stories</string>
+    /string>
+
+
 </resources>

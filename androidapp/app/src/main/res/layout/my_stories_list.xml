@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/divisor"
+            android:layout_width="match_parent"
+            android:layout_height="0.4dp"
+            android:background="@color/autio_blue"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/bookmarksImage"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_bordered_bookmarks" />
+
+        <TextView
+            android:id="@+id/bookmarks"
+            style="@style/SmallerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="8dp"
+            android:gravity="center|start"
+            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="24dp"
+            android:text="@string/my_stories_bookmarks"
+            app:layout_constraintBottom_toBottomOf="@+id/bookmarksImage"
+            app:layout_constraintStart_toEndOf="@+id/bookmarksImage"
+            app:layout_constraintTop_toTopOf="@+id/bookmarksImage" />
+
+        <ImageView
+            android:id="@+id/favoritesImage"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bookmarksImage"
+            app:srcCompat="@drawable/ic_bordered_favorite" />
+
+        <TextView
+            android:id="@+id/favorites"
+            style="@style/SmallerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="8dp"
+            android:gravity="center|start"
+            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="24dp"
+            android:text="@string/my_stories_favorites"
+            app:layout_constraintBottom_toBottomOf="@+id/favoritesImage"
+            app:layout_constraintStart_toEndOf="@+id/favoritesImage"
+            app:layout_constraintTop_toTopOf="@+id/favoritesImage" />
+
+
+        <ImageView
+            android:id="@+id/historyImage"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/favoritesImage"
+            app:srcCompat="@drawable/ic_bordered_history" />
+
+        <TextView
+            android:id="@+id/history"
+            style="@style/SmallerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="8dp"
+            android:gravity="center|start"
+            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="24dp"
+            android:text="@string/my_stories_history"
+            app:layout_constraintBottom_toBottomOf="@+id/historyImage"
+            app:layout_constraintStart_toEndOf="@+id/historyImage"
+            app:layout_constraintTop_toTopOf="@+id/historyImage" />
+
+        <ImageView
+            android:id="@+id/downloadImage"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/historyImage"
+            app:srcCompat="@drawable/ic_bordered_download" />
+
+        <TextView
+            android:id="@+id/downloaded_favorites"
+            style="@style/SmallerTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:drawablePadding="8dp"
+            android:gravity="center|start"
+            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="24dp"
+            android:text="@string/my_stories_downloaded_stories"
+            app:layout_constraintBottom_toBottomOf="@+id/downloadImage"
+            app:layout_constraintStart_toEndOf="@+id/downloadImage"
+            app:layout_constraintTop_toTopOf="@+id/downloadImage" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

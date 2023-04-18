@@ -1,591 +1,621 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/fragment_background"
-    tools:context=".ui.view.usecases.home.fragment.AccountFragment">
-
-    <LinearLayout
-        android:id="@+id/linear_layout_sign_in"
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/tvUnassignedMessage"
-            style="@style/TextViewInterRegular"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/guest_authenticate_message"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@color/fragment_background">
 
         <LinearLayout
+            android:id="@+id/linear_layout_sign_in"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="28dp"
-            android:layout_marginBottom="36dp"
-            android:orientation="horizontal"
+            android:layout_height="0dp"
+            android:layout_marginTop="68dp"
+            android:orientation="vertical"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvUnassignedMessage">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSignIn"
-                style="@style/Button.Shape"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="7dp"
-                android:layout_weight="1"
-                android:text="@string/sign_in" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSignUp"
-                style="@style/Button.Active.Filled"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="7dp"
-                android:layout_weight="1"
-                android:text="@string/sign_up" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider" />
-
-        <TextView
-            android:id="@+id/textView3"
-            style="@style/TextViewInterRegular"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:gravity="center"
-            android:text="@string/autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            style="@style/Button.Strong"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="28dp"
-            android:layout_marginBottom="36dp"
-            android:text="@string/see_plans"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/divider" />
-
-        <TextView
-            android:id="@+id/tvContactSupport"
-            style="@style/TextViewInterRegularLight"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="50dp"
-            android:layout_marginTop="32dp"
-            android:gravity="center"
-            android:text="@string/contact_support"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <include
-            android:id="@+id/lyYoutubeGuest"
-            layout="@layout/youtube_link_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="24dp"
-            app:layout_constraintEnd_toEndOf="@+id/tvQuestionsAbout"
-            app:layout_constraintStart_toStartOf="@+id/tvQuestionsAbout"
-            app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout" />
-
-    </LinearLayout>
-
-    <ScrollView
-        android:id="@+id/scroll_view_account"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <FrameLayout
-                android:id="@+id/flBanner"
-                android:layout_width="match_parent"
-                android:layout_height="424dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/iv_account"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/account_header" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_account"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/new_york_small_medium"
-                        android:gravity="center"
-                        android:text="@string/account_header_title"
-                        android:textColor="@color/white"
-                        android:textSize="24sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:gravity="center"
-                        android:lineSpacingExtra="3sp"
-                        android:paddingHorizontal="23dp"
-                        android:text="@string/account_header_subtitle"
-                        android:textColor="@color/white"
-                        android:textSize="16sp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="42dp"
-                        android:orientation="vertical">
-
-                        <Button
-                            android:id="@+id/btnGift"
-                            style="@style/Button.White"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:drawablePadding="12dp"
-                            android:text="@string/gift_autio"
-                            app:icon="@drawable/ic_gift"
-                            app:iconTint="@color/blue" />
-
-                        <Button
-                            android:id="@+id/btnSendDiscount"
-                            style="@style/Button.Active.Outlined.StrongStroke.White"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="20dp"
-                            android:text="@string/send_20_off_to_a_friend" />
-                    </LinearLayout>
-                </LinearLayout>
-            </FrameLayout>
-
-            <LinearLayout
-                android:id="@+id/ly_account_status"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="70dp"
-                android:layout_marginTop="21dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/flBanner">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/account_status"
-                    android:textColor="@color/gray_letter"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/tvPlanStatus"
-                    style="@style/TextViewLoraBoldTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/no_plan_selected"
-                    android:textSize="24sp" />
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="18dp"
-                    android:background="@color/normal_text" />
-
-                <TextView
-                    android:id="@+id/tvManageSubscription"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/manage_subscription"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <View
-                android:id="@+id/viewDivider1"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="38dp"
-                android:background="@color/autio_blue_7"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/ly_account_status" />
-
-            <RelativeLayout
-                android:id="@+id/lyProfile"
+            <TextView
+                android:id="@+id/tvUnassignedMessage"
+                style="@style/TextViewInterRegular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@id/viewDivider1">
-
-                <TextView
-                    android:id="@+id/tvProfileHeader"
-                    style="@style/TextViewLoraBoldTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="18dp"
-                    android:layout_marginBottom="17dp"
-                    android:text="@string/profile"
-                    android:textSize="20sp" />
-
-                <TextView
-                    android:id="@+id/tvProfileSubtitle"
-                    style="@style/SFSubtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tvProfileHeader"
-                    android:layout_marginStart="18dp"
-                    android:layout_marginBottom="12dp"
-                    android:text="@string/personal_information" />
-
-                <EditText
-                    android:id="@+id/etName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tvProfileSubtitle"
-                    android:layout_marginHorizontal="18dp"
-                    android:backgroundTint="@color/gray_letter"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:paddingBottom="7dp"
-                    android:textColor="@color/gray_letter"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/et_email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/etName"
-                    android:layout_marginHorizontal="18dp"
-                    android:backgroundTint="@color/gray_letter"
-                    android:fontFamily="@font/sf_pro_text_regular"
-                    android:paddingBottom="7dp"
-                    android:textColor="@color/gray_letter"
-                    android:textSize="12sp" />
-
-                <LinearLayout
-                    android:id="@+id/llUpdateProfileButtons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/et_email"
-                    android:layout_marginHorizontal="50dp"
-                    android:layout_marginVertical="8dp"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="gone"
-                    android:weightSum="2"
-                    tools:visibility="visible">
-
-                    <Button
-                        android:id="@+id/btn_update_profile"
-                        style="@style/Button.Active.Filled"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="7dp"
-                        android:layout_weight="1"
-                        android:text="@string/update"
-                        android:textColor="@color/white" />
-
-                    <Button
-                        android:id="@+id/btn_cancel_update"
-                        style="@style/Button.Shape.transparent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="7dp"
-                        android:layout_weight="1"
-                        android:text="@string/cancel" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/llChangePasswordForm"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/llUpdateProfileButtons"
-                    android:layout_marginHorizontal="18dp"
-                    android:orientation="vertical"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:text="@string/current_password"
-                        android:textAllCaps="true"
-                        android:textColor="@color/normal_text"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:id="@+id/et_current_password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/gray_letter"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/gray_letter"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:text="@string/new_password"
-                        android:textAllCaps="true"
-                        android:textColor="@color/normal_text"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:id="@+id/et_new_password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/gray_letter"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/gray_letter"
-                        android:textSize="12sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:text="@string/confirm_password"
-                        android:textAllCaps="true"
-                        android:textColor="@color/normal_text"
-                        android:textSize="12sp" />
-
-                    <EditText
-                        android:id="@+id/et_confirm_password"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:backgroundTint="@color/gray_letter"
-                        android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/gray_letter"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/llChangePasswordButtons"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/llChangePasswordForm"
-                    android:layout_marginHorizontal="50dp"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <Button
-                        android:id="@+id/btn_update_password"
-                        style="@style/Button.Active.Filled"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="7dp"
-                        android:layout_weight="1"
-                        android:text="@string/update" />
-
-                    <Button
-                        android:id="@+id/btn_cancel_password"
-                        style="@style/Button.Shape.transparent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="7dp"
-                        android:layout_weight="1"
-                        android:text="@string/cancel" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/btn_change_password"
-                    style="@style/Button.Shape.transparent"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/llChangePasswordButtons"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/change_password" />
-
-            </RelativeLayout>
+                android:gravity="center"
+                android:text="@string/guest_authenticate_message"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <LinearLayout
-                android:id="@+id/lyInterests"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="16dp"
-                android:orientation="vertical"
-                app:layout_constraintTop_toBottomOf="@+id/lyProfile">
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="36dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvUnassignedMessage">
 
-                <TextView
-                    style="@style/TextViewLoraBoldTitle"
-                    android:layout_width="wrap_content"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSignInOld"
+                    style="@style/Button.Shape"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/categories"
-                    android:textSize="20sp" />
+                    android:layout_marginEnd="7dp"
+                    android:layout_weight="1"
+                    android:text="@string/sign_in" />
 
-                <TextView
-                    style="@style/SFSubtitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="@string/organize_your_interests_from_the_top_down" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvInterests"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="30dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@color/fragment_background"
-                    android:nestedScrollingEnabled="false"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    tools:listitem="@layout/item_interest" />
-
-                <Button
-                    android:id="@+id/btnSaveCategoriesChanges"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSignUp"
                     style="@style/Button.Active.Filled"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="30dp"
-                    android:text="@string/save_changes"
-                    android:visibility="gone"
-                    tools:visibility="visible" />
+                    android:layout_marginStart="7dp"
+                    android:layout_weight="1"
+                    android:text="@string/sign_up" />
             </LinearLayout>
 
             <View
-                android:id="@+id/viewDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="60dp"
-                android:background="@color/divider"
-                app:layout_constraintTop_toBottomOf="@+id/lyInterests" />
+                android:background="@color/divider" />
 
             <TextView
-                android:id="@+id/tvQuestionsAbout"
+                android:id="@+id/textView3"
+                style="@style/TextViewInterRegular"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="48dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="32dp"
                 android:gravity="center"
-                android:text="@string/contact_support"
-                android:textColor="@color/gray_letter"
-                android:textSize="16sp"
+                android:text="@string/autio_offers_30_day_amp_3_year_nplans_that_don_t_automatically_renew_nas_well_as_an_annual_subscription"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/viewDivider" />
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/see_plans"
+                style="@style/Button.Strong"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="36dp"
+                android:text="@string/see_plans"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider" />
+
+            <TextView
+                android:id="@+id/tvContactSupport"
+                style="@style/TextViewInterRegularLight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="50dp"
+                android:layout_marginTop="32dp"
+                android:gravity="center"
+                android:text="@string/contact_support"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <include
-                android:id="@+id/lyYoutubeLink"
+                android:id="@+id/lyYoutubeGuest"
                 layout="@layout/youtube_link_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="24dp"
-                android:gravity="center"
                 app:layout_constraintEnd_toEndOf="@+id/tvQuestionsAbout"
                 app:layout_constraintStart_toStartOf="@+id/tvQuestionsAbout"
                 app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout" />
 
-            <LinearLayout
-                android:id="@+id/lyContactButtons"
+        </LinearLayout>
+
+        <ScrollView
+            android:id="@+id/scroll_view_account"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="gone">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="50dp"
-                android:layout_marginTop="40dp"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lyYoutubeLink">
+                android:layout_height="wrap_content">
 
-                <Button
-                    android:id="@+id/btn_contact"
-                    style="@style/Button.Shape.transparent"
+                <FrameLayout
+                    android:id="@+id/flBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="424dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/iv_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/account_header" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="@+id/iv_account"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/new_york_small_medium"
+                            android:gravity="center"
+                            android:text="@string/account_header_title"
+                            android:textColor="@color/white"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:gravity="center"
+                            android:lineSpacingExtra="3sp"
+                            android:paddingHorizontal="23dp"
+                            android:text="@string/account_header_subtitle"
+                            android:textColor="@color/white"
+                            android:textSize="16sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="42dp"
+                            android:orientation="vertical">
+
+                            <Button
+                                android:id="@+id/btnGift"
+                                style="@style/Button.White"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawablePadding="12dp"
+                                android:text="@string/gift_autio"
+                                app:icon="@drawable/ic_gift"
+                                app:iconTint="@color/blue" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </FrameLayout>
+
+                <LinearLayout
+                    android:id="@+id/ly_account_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="70dp"
+                    android:layout_marginTop="21dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@+id/flBanner">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/account_status"
+                        android:textColor="@color/gray_letter"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvPlanStatus"
+                        style="@style/TextViewLoraBoldTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/new_york_large_medium"
+                        android:text="@string/no_plan_selected"
+                        android:textSize="24sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="18dp"
+                        android:background="@color/normal_text" />
+
+                    <TextView
+                        android:id="@+id/tvManageSubscription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/manage_subscription"
+                        android:textSize="16sp"
+                        android:visibility="invisible" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/viewDivider1"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="38dp"
+                    android:background="@color/autio_blue_7"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/ly_account_status"
+                    tools:visibility="gone" />
+
+                <RelativeLayout
+                    android:id="@+id/lyProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@id/viewDivider1">
+
+                    <TextView
+                        android:id="@+id/tvProfileHeader"
+                        style="@style/TextViewLoraBoldTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginBottom="17dp"
+                        android:fontFamily="@font/new_york_large_medium"
+                        android:text="@string/profile"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        android:id="@+id/tvProfileSubtitle"
+                        style="@style/SFSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvProfileHeader"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginBottom="12dp"
+                        android:text="@string/personal_information"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/etName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvProfileSubtitle"
+                        android:layout_marginHorizontal="18dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginRight="-4dp"
+                        android:backgroundTint="@color/gray_letter"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:paddingBottom="7dp"
+                        android:textColor="@color/gray_letter"
+                        android:textCursorDrawable="@color/autio_blue"
+                        android:textSize="16sp" />
+
+                    <EditText
+                        android:id="@+id/et_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/etName"
+                        android:layout_marginHorizontal="18dp"
+                        android:layout_marginLeft="-4dp"
+                        android:layout_marginRight="-4dp"
+                        android:backgroundTint="@color/gray_letter"
+                        android:clickable="false"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:inputType="none"
+                        android:paddingBottom="7dp"
+                        android:textColor="@color/gray_letter"
+                        android:textSize="16sp" />
+
+                    <LinearLayout
+                        android:id="@+id/llUpdateProfileButtons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/et_email"
+                        android:layout_marginHorizontal="50dp"
+                        android:layout_marginVertical="8dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone"
+                        android:weightSum="2"
+                        tools:visibility="visible">
+
+                        <Button
+                            android:id="@+id/btn_update_profile"
+                            style="@style/Button.Active.Filled"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="1"
+                            android:text="@string/update" />
+
+                        <Button
+                            android:id="@+id/btn_cancel_update"
+                            style="@style/Button.Shape.transparent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="7dp"
+                            android:layout_weight="1"
+                            android:text="@string/cancel" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llChangePasswordForm"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/llUpdateProfileButtons"
+                        android:layout_marginHorizontal="18dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:text="@string/current_password"
+                            android:textAllCaps="true"
+                            android:textColor="@color/normal_text"
+                            android:textSize="12sp" />
+
+                        <EditText
+                            android:id="@+id/et_current_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray_letter"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:textColor="@color/gray_letter"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:text="@string/new_password"
+                            android:textAllCaps="true"
+                            android:textColor="@color/normal_text"
+                            android:textSize="12sp" />
+
+                        <EditText
+                            android:id="@+id/et_new_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray_letter"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:textColor="@color/gray_letter"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:text="@string/confirm_password"
+                            android:textAllCaps="true"
+                            android:textColor="@color/normal_text"
+                            android:textSize="12sp" />
+
+                        <EditText
+                            android:id="@+id/et_confirm_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/gray_letter"
+                            android:fontFamily="@font/sf_pro_text_regular"
+                            android:textColor="@color/gray_letter"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llChangePasswordButtons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/llChangePasswordForm"
+                        android:layout_marginHorizontal="50dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <Button
+                            android:id="@+id/btn_update_password"
+                            style="@style/Button.Active.Filled"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="7dp"
+                            android:layout_weight="1"
+                            android:text="@string/update" />
+
+                        <Button
+                            android:id="@+id/btn_cancel_password"
+                            style="@style/Button.Shape.transparent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="7dp"
+                            android:layout_weight="1"
+                            android:text="@string/cancel" />
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btn_change_password"
+                        style="@style/Button.Shape.transparent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/et_email"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="50dp"
+                        android:text="@string/change_password" />
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/lyInterests"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/lyProfile"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:visibility="gone">
+
+                    <TextView
+                        style="@style/TextViewLoraBoldTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/categories"
+                        android:textSize="20sp" />
+
+                    <TextView
+                        style="@style/SFSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="@string/organize_your_interests_from_the_top_down" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvInterests"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="30dp"
+                        android:layout_marginBottom="8dp"
+                        android:background="@color/fragment_background"
+                        android:nestedScrollingEnabled="false"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:listitem="@layout/item_interest" />
+
+                    <Button
+                        android:id="@+id/btnSaveCategoriesChanges"
+                        style="@style/Button.Active.Filled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="30dp"
+                        android:text="@string/save_changes"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/viewDivider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="60dp"
+                    android:background="@color/divider"
+                    android:visibility="gone"
+                    app:layout_constraintTop_toBottomOf="@+id/lyInterests"
+                    tools:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvQuestionsAbout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="48dp"
+                    android:layout_marginTop="48dp"
+                    android:gravity="center"
+                    android:text="@string/contact_support"
+                    android:textColor="@color/gray_letter"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/viewDivider" />
+
+                <include
+                    android:id="@+id/lyYoutubeLink"
+                    layout="@layout/youtube_link_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="7dp"
-                    android:layout_weight="1"
-                    android:text="@string/contact" />
+                    android:layout_marginTop="24dp"
+                    android:gravity="center"
+                    app:layout_constraintEnd_toEndOf="@+id/tvQuestionsAbout"
+                    app:layout_constraintStart_toStartOf="@+id/tvQuestionsAbout"
+                    app:layout_constraintTop_toBottomOf="@+id/tvQuestionsAbout" />
 
-                <Button
-                    android:id="@+id/btn_log_out"
-                    style="@style/Button.Active.Filled"
+                <LinearLayout
+                    android:id="@+id/lyContactButtons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="50dp"
+                    android:layout_marginTop="50dp"
+                    android:orientation="horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/lyYoutubeLink">
+
+                    <Button
+                        android:id="@+id/btn_contact"
+                        style="@style/Button.Shape.transparent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="7dp"
+                        android:layout_weight="1"
+                        android:text="@string/contact" />
+
+                    <Button
+                        android:id="@+id/btn_log_out"
+                        style="@style/Button.Active.Filled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="7dp"
+                        android:layout_weight="1"
+                        android:text="@string/log_out"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvRestorePurchase"
+                    style="@style/TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
-                    android:layout_weight="1"
-                    android:text="@string/log_out" />
-            </LinearLayout>
+                    android:layout_marginTop="36dp"
+                    android:text="@string/restore_purchase_underlined"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="@+id/lyContactButtons"
+                    app:layout_constraintStart_toStartOf="@+id/lyContactButtons"
+                    app:layout_constraintTop_toBottomOf="@+id/lyContactButtons" />
 
-            <TextView
-                android:id="@+id/tvRestorePurchase"
-                style="@style/TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="36dp"
-                android:text="@string/restore_purchase_underlined"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="@+id/lyContactButtons"
-                app:layout_constraintStart_toStartOf="@+id/lyContactButtons"
-                app:layout_constraintTop_toBottomOf="@+id/lyContactButtons" />
+                <TextView
+                    android:id="@+id/btnDeleteAccount"
+                    style="@style/WarningText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="170dp"
+                    android:text="@string/delete_my_account"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/tvRestorePurchase"
+                    app:layout_constraintStart_toStartOf="@+id/tvRestorePurchase"
+                    app:layout_constraintTop_toBottomOf="@+id/tvRestorePurchase" />
 
-            <TextView
-                android:id="@+id/btnDeleteAccount"
-                style="@style/WarningText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="180dp"
-                android:text="@string/delete_my_account"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/tvRestorePurchase"
-                app:layout_constraintStart_toStartOf="@+id/tvRestorePurchase"
-                app:layout_constraintTop_toBottomOf="@+id/tvRestorePurchase" />
+                <ProgressBar
+                    android:id="@+id/pbLoadingAccount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/white"
+                    android:indeterminateTintMode="src_atop"
+                    app:layout_constraintBottom_toTopOf="@+id/lyProfile"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.59" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

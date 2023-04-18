@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
-import com.autio.android_app.data.model.story.Story
 import com.autio.android_app.player.library.JsonSource
+import com.autio.android_app.ui.stories.models.Story
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.util.MimeTypes
@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit
 /**
  * Useful extensions for [MediaMetadataCompat].
  */
+
 inline val MediaMetadataCompat.id: String?
-    get() = getString(
-        MediaMetadataCompat.METADATA_KEY_MEDIA_ID
-    )
+    get() = MediaMetadataCompat.METADATA_KEY_MEDIA_ID
+
 
 inline val MediaMetadataCompat.title: String?
     get() = getString(
@@ -109,8 +109,7 @@ inline val MediaMetadataCompat.art: Bitmap
 inline val MediaMetadataCompat.artUri: Uri
     get() = this.getString(
         MediaMetadataCompat.METADATA_KEY_ART_URI
-    )
-        .toUri()
+    ).toUri()
 
 inline val MediaMetadataCompat.albumArt: Bitmap?
     get() = getBitmap(
@@ -120,8 +119,7 @@ inline val MediaMetadataCompat.albumArt: Bitmap?
 inline val MediaMetadataCompat.albumArtUri: Uri
     get() = this.getString(
         MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI
-    )
-        .toUri()
+    ).toUri()
 
 inline val MediaMetadataCompat.userRating
     get() = getLong(
@@ -156,14 +154,12 @@ inline val MediaMetadataCompat.displayIcon: Bitmap
 inline val MediaMetadataCompat.displayIconUri: Uri
     get() = this.getString(
         MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI
-    )
-        .toUri()
+    ).toUri()
 
 inline val MediaMetadataCompat.mediaUri: Uri
     get() = this.getString(
         MediaMetadataCompat.METADATA_KEY_MEDIA_URI
-    )
-        .toUri()
+    ).toUri()
 
 inline val MediaMetadataCompat.downloadStatus
     get() = getLong(
@@ -177,16 +173,14 @@ inline val MediaMetadataCompat.downloadStatus
 inline val MediaMetadataCompat.flag
     get() = this.getLong(
         METADATA_KEY_UAMP_FLAGS
-    )
-        .toInt()
+    ).toInt()
 
 /**
  * Useful extensions for [MediaMetadataCompat.Builder].
  */
 
 // These do not have getters, so create a message for the error.
-const val NO_GET =
-    "Property does not have a 'get'"
+const val NO_GET = "Property does not have a 'get'"
 
 /**
  * Extension method for [MediaMetadataCompat.Builder] to set the fields from
@@ -197,43 +191,29 @@ fun MediaMetadataCompat.Builder.from(
 ): MediaMetadataCompat.Builder {
     // The duration from the JSON is given in seconds, but the rest of the code works in
     // milliseconds. Here's where we convert to the proper units.
-    val durationMs =
-        TimeUnit.SECONDS.toMillis(
-            story.duration.toLong()
-        )
+    val durationMs = TimeUnit.SECONDS.toMillis(
+        story.duration.toLong()
+    )
 
-    id =
-        story.id
-    title =
-        story.title
-    narrator =
-        story.narrator
-    duration =
-        durationMs
-    category =
-        story.category?.title
-    mediaUri =
-        story.recordUrl
-    albumArtUri =
-        story.imageUrl
-    flag =
-        MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+    id = story.id.toString() //TODO(SHOULD BE ID BUT MEDIA DATA PLAYER_ID ONLY RECEIVES STRING)
+    title = story.title
+    narrator = story.narrator
+    duration = durationMs
+    category = story.category
+    mediaUri = story.recordUrl
+    albumArtUri = story.imageUrl
+    flag = MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
 
     // To make things easier for *displaying* these, set the display properties as well.
-    displayTitle =
-        story.title
-    displaySubtitle =
-        story.narrator
-    displayDescription =
-        story.description
-    displayIconUri =
-        story.imageUrl
+    displayTitle = story.title
+    displaySubtitle = story.narrator
+    displayDescription = story.description
+    displayIconUri = story.imageUrl
 
     // Add downloadStatus to force the creation of an "extras" bundle in the resulting
     // MediaMetadataCompat object. This is needed to send accurate metadata to the
     // media session during updates.
-    downloadStatus =
-        MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
+    downloadStatus = MediaDescriptionCompat.STATUS_NOT_DOWNLOADED
 
     // Allow it to be used in the typical builder style.
     return this
@@ -241,241 +221,193 @@ fun MediaMetadataCompat.Builder.from(
 
 inline var MediaMetadataCompat.Builder.id: String
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_MEDIA_ID,
-            value
+            MediaMetadataCompat.METADATA_KEY_MEDIA_ID, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.title: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_TITLE,
-            value
+            MediaMetadataCompat.METADATA_KEY_TITLE, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.narrator: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_ARTIST,
-            value
+            MediaMetadataCompat.METADATA_KEY_ARTIST, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.album: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_ALBUM,
-            value
+            MediaMetadataCompat.METADATA_KEY_ALBUM, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.duration: Long
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putLong(
-            MediaMetadataCompat.METADATA_KEY_DURATION,
-            value
+            MediaMetadataCompat.METADATA_KEY_DURATION, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.category: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_GENRE,
-            value
+            MediaMetadataCompat.METADATA_KEY_GENRE, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.mediaUri: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_MEDIA_URI,
-            value
+            MediaMetadataCompat.METADATA_KEY_MEDIA_URI, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.albumArtUri: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
-            value
+            MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.albumArt: Bitmap?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putBitmap(
-            MediaMetadataCompat.METADATA_KEY_ALBUM_ART,
-            value
+            MediaMetadataCompat.METADATA_KEY_ALBUM_ART, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.trackNumber: Long
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putLong(
-            MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER,
-            value
+            MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.trackCount: Long
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putLong(
-            MediaMetadataCompat.METADATA_KEY_NUM_TRACKS,
-            value
+            MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.displayTitle: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE,
-            value
+            MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.displaySubtitle: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE,
-            value
+            MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.displayDescription: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION,
-            value
+            MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.displayIconUri: String?
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putString(
-            MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,
-            value
+            MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI, value
         )
     }
 
 inline var MediaMetadataCompat.Builder.downloadStatus: Long
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putLong(
-            MediaMetadataCompat.METADATA_KEY_DOWNLOAD_STATUS,
-            value
+            MediaMetadataCompat.METADATA_KEY_DOWNLOAD_STATUS, value
         )
     }
 
@@ -485,16 +417,13 @@ inline var MediaMetadataCompat.Builder.downloadStatus: Long
  */
 inline var MediaMetadataCompat.Builder.flag: Int
     @Deprecated(
-        NO_GET,
-        level = DeprecationLevel.ERROR
-    )
-    get() = throw IllegalAccessException(
+        NO_GET, level = DeprecationLevel.ERROR
+    ) get() = throw IllegalAccessException(
         "Cannot get from MediaMetadataCompat.Builder"
     )
     set(value) {
         putLong(
-            METADATA_KEY_UAMP_FLAGS,
-            value.toLong()
+            METADATA_KEY_UAMP_FLAGS, value.toLong()
         )
     }
 
@@ -529,22 +458,19 @@ fun MediaMetadataCompat.toMediaItemMetadata(): MediaMetadata {
         setGenre(
             category
         )
-        val extras =
-            Bundle()
+        val extras = Bundle()
         getString(
             JsonSource.ORIGINAL_ARTWORK_URI_KEY
         )?.let {
             // album art is a content:// URI. Keep the original for Cast.
             extras.putString(
-                JsonSource.ORIGINAL_ARTWORK_URI_KEY,
-                getString(
+                JsonSource.ORIGINAL_ARTWORK_URI_KEY, getString(
                     JsonSource.ORIGINAL_ARTWORK_URI_KEY
                 )
             )
         }
         extras.putLong(
-            MediaMetadataCompat.METADATA_KEY_DURATION,
-            duration
+            MediaMetadataCompat.METADATA_KEY_DURATION, duration
         )
         setExtras(
             extras
@@ -552,9 +478,9 @@ fun MediaMetadataCompat.toMediaItemMetadata(): MediaMetadata {
     }.build()
 }
 
-fun MediaMetadataCompat.toMediaItem(): com.google.android.exoplayer2.MediaItem {
+fun MediaMetadataCompat.toMediaItem(): MediaItem {
     return with(
-        com.google.android.exoplayer2.MediaItem.Builder()
+        MediaItem.Builder()
     ) {
         setMediaId(
             mediaUri.toString()
@@ -575,5 +501,4 @@ fun MediaMetadataCompat.toMediaItem(): com.google.android.exoplayer2.MediaItem {
  * Custom property that holds whether an item is [MediaItem.FLAG_BROWSABLE] or
  * [MediaItem.FLAG_PLAYABLE].
  */
-const val METADATA_KEY_UAMP_FLAGS =
-    "com.example.android.uamp.media.METADATA_KEY_UAMP_FLAGS"
+const val METADATA_KEY_UAMP_FLAGS = "com.example.android.uamp.media.METADATA_KEY_UAMP_FLAGS"

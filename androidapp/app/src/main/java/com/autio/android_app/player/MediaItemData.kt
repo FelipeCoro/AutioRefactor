@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.recyclerview.widget.DiffUtil
 
 data class MediaItemData(
-    val mediaId: String,
+    val mediaId: Int,
     val title: String,
     val subtitle: String,
     val artUri: Uri,

@@ -6,22 +6,34 @@
     app:startDestination="@id/map_fragment">
     <fragment
         android:id="@+id/map_fragment"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MapFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.MapFragment"
         android:label="fragment_map"
         tools:layout="@layout/fragment_map">
         <argument
-            android:name="com.autio.android_app.ui.view.usecases.home.fragment.MediaItemFragment.MEDIA_ID"
+            android:name="com.autio.android_app.ui.stories.fragment.MediaItemFragment.MEDIA_ID"
             android:defaultValue="/__ALL__"
             app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/account"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.AccountFragment"
+        android:name="com.autio.android_app.ui.account.fragments.AccountFragment"
         android:label="fragment_account"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account">
+        <action
+            android:id="@+id/action_account_to_main_navigation_graph"
+            app:destination="@id/main_navigation_graph" />
+        <action
+            android:id="@+id/action_account_to_authentication_nav"
+            app:destination="@id/authentication_nav">
+            <argument
+                android:name="goToSignUpOrIn"
+                android:defaultValue="-1"
+                app:argType="integer" />
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/my_stories"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.MyStoriesFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.MyStoriesFragment"
         android:label="fragment_my_stories"
         tools:layout="@layout/fragment_my_stories">
         <action
@@ -36,10 +48,21 @@
         <action
             android:id="@+id/action_my_stories_to_downloaded_playlist"
             app:destination="@id/downloaded_playlist" />
+        <action
+            android:id="@+id/action_my_stories_to_authentication_nav"
+            app:destination="@id/authentication_nav">
+            <argument
+                android:name="goToSignUpOrIn"
+                android:defaultValue="-1"
+                app:argType="integer" />
+        </action>
+        <action
+            android:id="@+id/action_my_stories_to_subscribeFragment"
+            app:destination="@id/subscribeFragment" />
     </fragment>
     <fragment
         android:id="@+id/player"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.PlayerFragment"
         android:label="fragment_player"
         tools:layout="@layout/fragment_player">
         <argument
@@ -60,11 +83,11 @@
     </fragment>
     <fragment
         android:id="@+id/author_details"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.AuthorFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.AuthorFragment"
         android:label="fragment_author"
         tools:layout="@layout/fragment_author">
         <argument
-            android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"
+            android:name="com.autio.android_app.ui.stories.fragment.PlayerFragment.STORY_ID"
             android:defaultValue="0"
             app:argType="integer" />
         <action
@@ -73,11 +96,11 @@
     </fragment>
     <fragment
         android:id="@+id/narrator_details"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.NarratorFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.NarratorFragment"
         android:label="fragment_narrator"
         tools:layout="@layout/fragment_author">
         <argument
-            android:name="com.autio.android_app.ui.view.usecases.home.fragment.PlayerFragment.STORY_ID"
+            android:name="com.autio.android_app.ui.stories.fragment.PlayerFragment.STORY_ID"
             android:defaultValue="0"
             app:argType="integer" />
         <action
@@ -86,7 +109,7 @@
     </fragment>
     <fragment
         android:id="@+id/bookmarks_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.BookmarksFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.BookmarksFragment"
         android:label="fragment_bookmarks"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -95,7 +118,7 @@
     </fragment>
     <fragment
         android:id="@+id/favorites_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.FavoritesFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.FavoritesFragment"
         android:label="fragment_favorites"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -104,7 +127,7 @@
     </fragment>
     <fragment
         android:id="@+id/history_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.HistoryFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.HistoryFragment"
         android:label="fragment_history"
         tools:layout="@layout/fragment_playlist">
         <action
@@ -113,12 +136,24 @@
     </fragment>
     <fragment
         android:id="@+id/downloaded_playlist"
-        android:name="com.autio.android_app.ui.view.usecases.home.fragment.stories.DownloadedStoriesFragment"
+        android:name="com.autio.android_app.ui.stories.fragments.DownloadedStoriesFragment"
         android:label="fragment_downloaded_stories"
         tools:layout="@layout/fragment_playlist">
-
         <action
             android:id="@+id/action_downloaded_playlist_to_my_stories"
             app:destination="@id/my_stories" />
     </fragment>
+    <fragment
+        android:id="@+id/subscribeFragment"
+        android:name="com.autio.android_app.ui.subscribe.fragments.SubscribeFragment"
+        android:label="SubscribeFragment"
+        tools:layout="@layout/fragment_subscribe" >
+        <action
+            android:id="@+id/action_subscribeFragment_to_map_fragment"
+            app:destination="@id/map_fragment" />
+        <action
+            android:id="@+id/action_subscribeFragment_to_authentication_nav"
+            app:destination="@id/authentication_nav" />
+    </fragment>
+    <include app:graph="@navigation/nav_authentication" />
 </navigation>

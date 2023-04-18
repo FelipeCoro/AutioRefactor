@@ -1,10 +1,13 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'androidx.navigation.safeargs.kotlin'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
     id 'com.google.gms.google-services'
+    id 'kotlinx-serialization'
+    id 'kotlin-parcelize'
 }
 
 def localProperties = new Properties()
@@ -21,8 +24,8 @@ android {
         applicationId "autio.audio.travel.guide"
         minSdk 26
         targetSdk 33
-        versionCode 15
-        versionName "1.15"
+        versionCode 26
+        versionName "1.26"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation":
@@ -46,70 +49,90 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_11
     }
 
-    viewBinding {
-        enabled = true
-    }
     buildFeatures {
-        viewBinding true
+        dataBinding true
     }
+
+    kapt {
+        correctErrorTypes true
+    }
+
     namespace 'com.autio.android_app'
+
     flavorDimensions 'env'
     productFlavors {
         staging {
             dimension 'env'
-            buildConfigField "String", "base_url", '"https://staging-app.autio.com"'
+            buildConfigField "String", "base_url", '"https://staging.autio.com"'
         }
         production {
             dimension 'env'
             buildConfigField "String", "base_url", '"https://app.autio.com"'
         }
     }
+    buildToolsVersion '33.0.2'
 }
 
 dependencies {
     implementation "androidx.media:media:1.6.0"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.firebase:firebase-database-ktx:20.1.0'
-    implementation 'com.google.firebase:firebase-firestore-ktx:24.4.2'
+
+    def lifecycle_version = "2.6.0"
+    def arch_version = "2.1.0"
     def nav_version = "2.5.3"
-    def lottieVersion = "5.2.0"
+    def fragment_version = "1.5.5"
+    def hilt_version = "2.45"
+    def kotlin_coroutines = "1.6.4"
     def room_version = "2.5.0"
+    def activity_version = "1.6.1"
+    def lottieVersion = '6.0.0'
     def billing_version = "5.1.0"
 
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
-    // Don't upgrade to major version since there are some forced features included > 1.7.0 we don't want in app
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.github.smarteist:autoimageslider:1.4.0'
-    // Firebase
-    implementation 'com.google.firebase:firebase-bom:31.2.0'
+    implementation 'androidx.webkit:webkit:1.6.0'
+
+    //FIREBASE - CRASHLYTICS
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
     // dependency for loading image from url
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'com.github.bumptech.glide:glide:4.15.0'
     implementation 'androidx.preference:preference:1.2.0'
     // Kotlin
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     // Fragment
-    implementation "androidx.fragment:fragment-ktx:1.5.5"
+    implementation "androidx.fragment:fragment-ktx:$fragment_version"
     // Activity
-    implementation "androidx.activity:activity-ktx:1.6.1"
+    implementation "androidx.activity:activity-ktx:$activity_version"
     //Splash Screen
     implementation 'androidx.core:core-splashscreen:1.0.0'
     // ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // Saved state module for ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
     // LiveData
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    //lifecycle
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
     // Location
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     // Google Play Billing
@@ -117,37 +140,53 @@ dependencies {
 //    implementation 'com.android.billingclient:billing-ktx:5.1.0'
     // Google Maps
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
-    implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.libraries.places:places:3.0.0'
-    implementation 'com.google.maps.android:android-maps-utils:2.3.0'
-    // HTTP requests
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
-    //Fuel Gson
+    implementation 'com.google.maps.android:android-maps-utils:3.4.0'
+
+    // API
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
+    implementation "com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.10"
+
     //Co-routines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines"
+
     // DataStore
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     // Revenue Cat
     implementation "com.revenuecat.purchases:purchases:5.4.0"
     // Lottie
     implementation "com.airbnb.android:lottie:$lottieVersion"
     // Dagger hilt
-    implementation "com.google.dagger:hilt-android:2.42"
-    kapt "com.google.dagger:hilt-android-compiler:2.42"
-    implementation("androidx.hilt:hilt-navigation-fragment:1.0.0")
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+    implementation "androidx.hilt:hilt-navigation-fragment:1.0.0"
     // Room
+    implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
     // Pagination
     implementation "androidx.paging:paging-runtime:3.1.1"
     // Media Player
     implementation 'androidx.media:media:1.6.0'
-    implementation 'com.google.android.exoplayer:exoplayer-core:2.18.2'
-    implementation 'com.google.android.exoplayer:exoplayer-dash:2.18.2'
-    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.2'
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
-    implementation 'com.google.android.exoplayer:extension-mediasession:2.18.2'
-    api "com.google.android.exoplayer:extension-cast:2.18.2"
+
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.18.4'
+    implementation 'com.google.android.exoplayer:exoplayer-dash:2.18.4'
+    implementation 'com.google.android.exoplayer:exoplayer-ui:2.18.4'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.4'
+    implementation 'com.google.android.exoplayer:extension-mediasession:2.18.4'
+    api "com.google.android.exoplayer:extension-cast:2.18.4"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0"
+    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0"
+
 }
+
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'

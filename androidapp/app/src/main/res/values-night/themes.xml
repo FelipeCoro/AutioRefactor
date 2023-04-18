@@ -370,10 +370,10 @@
     <!-- Contained button with filling color -->
     <style name="Button.Active.Filled" parent="ThemeOverlay.AppCompat">
         <item name="android:backgroundTint">
-            @color/button_text
+            @color/white
         </item>
         <item name="android:textColor">
-            @color/white
+            @color/autio_blue
         </item>
         <item name="android:fontFamily">
             @font/sf_pro_text_regular

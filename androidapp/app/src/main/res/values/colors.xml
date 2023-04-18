@@ -29,6 +29,10 @@
         #080F45
     </color>
 
+    <color name="autio_blue_day_night">
+        #080F45
+    </color>
+
     <!-- Light Mode   -->
     <color name="black">
         #FF000000

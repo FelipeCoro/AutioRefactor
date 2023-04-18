@@ -1,63 +1,149 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background_blocation_perm"
-    tools:context=".ui.view.usecases.onboarding.screens.BackgroundLocationFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_blocation_perm"
         android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:layout_marginTop="140dp"
             android:contentDescription="@string/background_location_icon_description"
-            android:src="@drawable/background_location" />
+            android:src="@drawable/background_location"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/textView7"
             style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/new_york_large_medium"
             android:text="@string/background_location"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
         <TextView
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="8dp"
+            android:fontFamily="sans-serif"
             android:gravity="center"
             android:paddingHorizontal="15dp"
             android:text="@string/explanation_on_background_location"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
         <Button
             android:id="@+id/buttonLocationPermission"
             style="@style/Button.White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="58dp"
-            android:text="@string/set_background_permissions" />
-    </LinearLayout>
+            android:layout_marginTop="32dp"
+            android:text="@string/set_background_permissions"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
-    <ImageView
-        android:id="@+id/autio_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="88dp"
-        android:layout_marginBottom="100dp"
-        android:contentDescription="@string/logo_description"
-        android:src="@drawable/ic_splash_logo" />
+        <ImageView
+            android:id="@+id/autio_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/logo_description"
+            android:src="@drawable/ic_splash_logo"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonLocationPermission" />
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/terms_of_service_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/termsOfService"
+            android:textColor="@color/gray_letter"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toStartOf="@+id/separatorBackground1"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/autio_logo" />
+
+        <ImageView
+            android:id="@+id/separatorBackground1"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/terms_of_service_background"
+            app:layout_constraintEnd_toStartOf="@+id/privacy_policy_background"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/terms_of_service_background"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_background"
+            app:srcCompat="@drawable/ic_separator" />
+
+        <TextView
+            android:id="@+id/privacy_policy_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/privacyPolicy"
+            android:textColor="@color/gray_letter"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toStartOf="@+id/separatorBackground2"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/separatorBackground1"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_background" />
+
+        <ImageView
+            android:id="@+id/separatorBackground2"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/privacy_policy_background"
+            app:layout_constraintEnd_toStartOf="@+id/security_location_background"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/privacy_policy_background"
+            app:layout_constraintTop_toTopOf="@+id/privacy_policy_background"
+            app:srcCompat="@drawable/ic_separator" />
+
+
+        <TextView
+            android:id="@+id/security_location_background"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/security"
+            android:textColor="@color/gray_letter"
+            android:textSize="10sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/separatorBackground2"
+            app:layout_constraintTop_toTopOf="@+id/terms_of_service_background" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
