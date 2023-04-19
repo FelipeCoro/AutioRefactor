@@ -64,7 +64,7 @@ class OnBoardingFragment : Fragment() {
                 NotificationsFragment(),
                 InAppLocationFragment(),
                 BackgroundLocationFragment()
-            ), requireActivity().supportFragmentManager, lifecycle
+            ), childFragmentManager, lifecycle // Use getChildFragmentManager() here
         )
         binding.viewPager.adapter = adapter
         binding.viewPager.isUserInputEnabled = false
